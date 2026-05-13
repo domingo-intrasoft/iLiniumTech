@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/iLiniumTech.Backend.Api/iLiniumTech.Backend.Api.csproj" />
+    <Project Path="src/iLiniumTech.Backend.Application/iLiniumTech.Backend.Application.csproj" />
+    <Project Path="src/iLiniumTech.Backend.Domain/iLiniumTech.Backend.Domain.csproj" />
+    <Project Path="src/iLiniumTech.Backend.Infrastructure/iLiniumTech.Backend.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/iLiniumTech.Backend.Tests/iLiniumTech.Backend.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,23 @@
+title = "iLiniumTech secret scanning"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Repository-wide false positives"
+paths = [
+  '''(^|.*/)\.git/.*''',
+  '''(^|.*/)bin/(Debug|Release)/.*''',
+  '''(^|.*/)obj/(Debug|Release)/.*''',
+  '''(^|.*/)node_modules/.*''',
+  '''(^|.*/)dist/.*''',
+  '''(^|.*/)build/.*''',
+  '''(^|.*/)coverage/.*''',
+  '''(^|.*/)security-reports/.*''',
+]
+
+regexes = [
+  '''__SET_IN_ENVIRONMENT__''',
+  '''__CONFIGURED_BY_DEPLOY__''',
+  '''\$\((TEST_PASSWORD|OPENAI_API_KEY|ANTHROPIC_API_KEY|AZURE_DEVOPS_EXT_PAT|GITHUB_TOKEN)\)''',
+]

@@ -1,0 +1,18 @@
+import { createRouter, createWebHistory } from 'vue-router'
+
+import PolizasView from '@/features/polizas/PolizasView.vue'
+
+export const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    {
+      path: '/',
+      redirect: '/polizas',
+    },
+    {
+      path: '/polizas',
+      name: 'polizas',
+      component: PolizasView,
+    },
+  ],
+})

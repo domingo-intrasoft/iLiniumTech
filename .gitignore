@@ -1,0 +1,48 @@
+# OS and editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Dependencies and build outputs
+bin/
+obj/
+node_modules/
+dist/
+build/
+coverage/
+reports/
+*.tsbuildinfo
+*.log
+*.tmp
+*.cache
+
+# Local secrets and environment overrides
+.env
+.env.*
+*.user
+*.suo
+*.rsuser
+secrets/
+local.settings.json
+appsettings.Local.json
+appsettings.*.local.json
+*.pubxml.user
+
+# Local database files and exports
+*.bak
+*.bacpac
+*.dacpac
+*.mdf
+*.ldf
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# Generated runtime data
+SharedAppData/
+PublishData/
+security-reports/
+gitleaks-report*.json

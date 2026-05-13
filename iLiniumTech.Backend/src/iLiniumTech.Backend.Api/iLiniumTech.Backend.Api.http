@@ -1,0 +1,12 @@
+@iLiniumTech.Backend.Api_HostAddress = http://localhost:5146
+
+GET {{iLiniumTech.Backend.Api_HostAddress}}/health
+Accept: application/json
+
+###
+
+GET {{iLiniumTech.Backend.Api_HostAddress}}/api/polizas/metadata
+Accept: application/json
+X-ILiniumTech-Api-Key: __SET_IN_ENVIRONMENT__
+
+###
