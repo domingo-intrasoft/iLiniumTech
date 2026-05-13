@@ -1,0 +1,81 @@
+name: security
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+      - ci-cd
+  push:
+    branches:
+      - main
+      - develop
+      - ci-cd
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secret-scan:
+    name: security / secret-scan
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Gitleaks
+        shell: pwsh
+        run: choco install gitleaks -y --no-progress
+
+      - name: Secret scan
+        shell: pwsh
+        run: .\tools\security\Invoke-SecretScan.ps1
+
+  dependency-audit:
+    name: security / dependency-audit
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+          cache-dependency-path: iLiniumTech.Frontend/package-lock.json
+
+      - name: Dependency audit
+        shell: pwsh
+        run: .\tools\security\Invoke-DependencyAudit.ps1 -FailOnFindings
+
+      - name: Upload security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-audit-reports
+          path: security-reports
+          if-no-files-found: ignore
+
+  cors-audit:
+    name: security / cors-audit
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: CORS audit
+        shell: pwsh
+        run: .\tools\security\Invoke-CorsAudit.ps1 -FailOnFindings

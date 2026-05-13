@@ -1,0 +1,40 @@
+apps:
+  api:
+    description: ASP.NET Core API for iLiniumTech backend contracts.
+    paths:
+      - iLiniumTech.Backend/src/**
+      - iLiniumTech.Backend/tests/**
+    type: dotnet
+    restore: dotnet restore iLiniumTech.Backend/iLiniumTech.Backend.slnx
+    build: dotnet build iLiniumTech.Backend/iLiniumTech.Backend.slnx --configuration Release --no-restore
+    test: dotnet test iLiniumTech.Backend/iLiniumTech.Backend.slnx --configuration Release --no-build
+  frontend:
+    description: Vue 3 frontend for the first Polizas MVP.
+    paths:
+      - iLiniumTech.Frontend/**
+    type: node
+    install: npm ci
+    lint: npm run lint
+    typecheck: npm run typecheck
+    test: npm run test:unit
+    build: npm run build
+  infrastructure:
+    description: GitHub Actions, security scripts, repository policy, and CI/CD automation.
+    paths:
+      - .github/**
+      - tools/security/**
+      - docs/ai/**
+      - docs/engineering/**
+    type: governance
+  docs:
+    description: SDD specs, engineering guidance, and AppBuilder analysis.
+    paths:
+      - README.md
+      - docs/**
+    type: docs
+  extractor:
+    description: Future safe read-only extraction of AppBuilder metadata.
+    paths:
+      - iLiniumTech.Backend/src/**/Extractor/**
+      - docs/sdd/specs/**
+    type: planned

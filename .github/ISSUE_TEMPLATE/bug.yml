@@ -1,0 +1,54 @@
+name: Bug report
+description: Report a reproducible bug with sanitized evidence.
+title: "Bug: "
+labels:
+  - ai-candidate
+body:
+  - type: textarea
+    id: current
+    attributes:
+      label: Current behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include branch, route, endpoint, inputs, and sanitized logs when useful.
+    validations:
+      required: true
+  - type: dropdown
+    id: app
+    attributes:
+      label: App area
+      options:
+        - app:api
+        - app:frontend
+        - app:extractor
+        - app:renderer
+        - app:infrastructure
+        - app:docs
+        - app:core
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+    validations:
+      required: true
+  - type: checkboxes
+    id: sensitive
+    attributes:
+      label: Sensitive data check
+      options:
+        - label: Logs and screenshots are sanitized.
+          required: true
+        - label: No secrets, tokens, connection strings, or real personal data are included.
+          required: true

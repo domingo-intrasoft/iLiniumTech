@@ -1,0 +1,98 @@
+name: SDD feature
+description: Define a functional change using the project SDD format.
+title: "SDD: "
+labels:
+  - ai-candidate
+  - ai-needs-review
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for product changes that reproduce or modernize AppBuilder behavior.
+        Do not paste secrets, connection strings, real customer data, dumps, or screenshots with personal data.
+  - type: input
+    id: spec-id
+    attributes:
+      label: Spec ID
+      description: Example SDD-2026-002.
+      placeholder: SDD-YYYY-NNN
+    validations:
+      required: true
+  - type: dropdown
+    id: app
+    attributes:
+      label: App area
+      options:
+        - app:api
+        - app:frontend
+        - app:extractor
+        - app:renderer
+        - app:infrastructure
+        - app:docs
+        - app:core
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What AppBuilder behavior or business need justifies this change?
+      placeholder: Include component ids, datasource ids, menu ids, or sanitized examples when known.
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: Observable result expected when the issue is closed.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is included?
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Explicit exclusions for this issue.
+    validations:
+      required: true
+  - type: textarea
+    id: data-contract
+    attributes:
+      label: Data contract
+      description: Inputs, outputs, required fields, examples sanitized, and redaction rules.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Use verifiable Given/When/Then or checklist items.
+      placeholder: |
+        - [ ] Given ..., when ..., then ...
+        - [ ] No secrets or sensitive data are committed.
+    validations:
+      required: true
+  - type: checkboxes
+    id: security
+    attributes:
+      label: Security surface
+      options:
+        - label: Secrets or environment configuration
+        - label: Authentication or authorization
+        - label: Database or dynamic SQL
+        - label: Personal, financial, or risk data
+        - label: Workflows, expressions, or external services
+        - label: Pipelines, agents, deployments, or GitHub settings
+  - type: textarea
+    id: tests
+    attributes:
+      label: Test plan
+      description: Unit, integration, E2E/smoke, security, and manual/UAT expectations.
+    validations:
+      required: true

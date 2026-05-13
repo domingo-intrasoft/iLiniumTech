@@ -1,0 +1,42 @@
+name: Pipeline failure
+description: Track a CI/CD failure without leaking secrets.
+title: "Pipeline failure: "
+labels:
+  - ai-pipeline-failure
+  - automation
+  - app:infrastructure
+body:
+  - type: input
+    id: workflow
+    attributes:
+      label: Workflow
+      placeholder: ci.yml
+    validations:
+      required: true
+  - type: input
+    id: run-url
+    attributes:
+      label: Run URL
+    validations:
+      required: true
+  - type: input
+    id: job-step
+    attributes:
+      label: Job and step
+    validations:
+      required: true
+  - type: textarea
+    id: signature
+    attributes:
+      label: Failure signature
+      description: Sanitized normalized error summary.
+    validations:
+      required: true
+  - type: checkboxes
+    id: repair
+    attributes:
+      label: Repair policy
+      options:
+        - label: This does not require exposing or changing secrets.
+        - label: This does not require deployment credentials.
+        - label: This can be investigated from sanitized logs.

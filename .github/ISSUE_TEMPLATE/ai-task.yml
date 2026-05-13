@@ -1,0 +1,81 @@
+name: AI task
+description: Request a bounded task for Codex or Claude through GitHub.
+title: "AI: "
+labels:
+  - ai-candidate
+body:
+  - type: markdown
+    attributes:
+      value: |
+        AI tasks must be small, reviewable, and tied to an SDD or technical policy when they change behavior.
+        Do not include secrets or real personal data.
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Suggested engine
+      options:
+        - ai-codex
+        - ai-claude
+        - ai-codex-web
+        - ai-claude-web
+        - none
+    validations:
+      required: true
+  - type: dropdown
+    id: app
+    attributes:
+      label: App area
+      options:
+        - app:api
+        - app:frontend
+        - app:extractor
+        - app:renderer
+        - app:infrastructure
+        - app:docs
+        - app:core
+    validations:
+      required: true
+  - type: textarea
+    id: task
+    attributes:
+      label: Task
+      description: Concrete work requested.
+    validations:
+      required: true
+  - type: textarea
+    id: allowed-paths
+    attributes:
+      label: Allowed paths
+      description: Paths the AI may edit.
+      placeholder: |
+        iLiniumTech.Backend/src/...
+        docs/sdd/specs/...
+    validations:
+      required: true
+  - type: textarea
+    id: forbidden-paths
+    attributes:
+      label: Forbidden paths
+      description: Sensitive paths that require explicit override.
+      placeholder: |
+        .github/workflows/security.yml
+        tools/security/**
+        .gitleaks.toml
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Required validation
+      description: Commands, checks, or manual evidence expected.
+    validations:
+      required: true
+  - type: checkboxes
+    id: risk
+    attributes:
+      label: Risk markers
+      options:
+        - label: Low risk documentation-only change
+        - label: Touches platform or CI/CD
+        - label: Touches security-sensitive code
+        - label: Requires human decision before implementation

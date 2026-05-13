@@ -1,0 +1,12 @@
+# Repository governance
+* @domingo-intrasoft @admdcg
+
+# CI/CD and security policy changes
+.github/ @domingo-intrasoft @admdcg
+tools/security/ @domingo-intrasoft @admdcg
+docs/engineering/ @domingo-intrasoft @admdcg
+docs/ai/ @domingo-intrasoft @admdcg
+
+# Product code
+iLiniumTech.Backend/ @domingo-intrasoft @admdcg
+iLiniumTech.Frontend/ @domingo-intrasoft @admdcg
