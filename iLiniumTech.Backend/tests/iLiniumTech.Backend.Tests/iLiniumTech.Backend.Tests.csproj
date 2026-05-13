@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\iLiniumTech.Backend.Api\iLiniumTech.Backend.Api.csproj" />
     <ProjectReference Include="..\..\src\iLiniumTech.Backend.Application\iLiniumTech.Backend.Application.csproj" />
+    <ProjectReference Include="..\..\src\iLiniumTech.Backend.Infrastructure\iLiniumTech.Backend.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

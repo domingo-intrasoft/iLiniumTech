@@ -41,6 +41,27 @@ Fase documental completada, decision de arquitectura fijada y primer corte MVP c
 - `iLiniumTech.Backend`: API .NET 10 con contrato MVP de polizas.
 - `iLiniumTech.Frontend`: Vue 3 + Vite + TypeScript para pantalla estatica inicial del componente de polizas.
 
+## Configuracion local de polizas
+
+Por defecto el backend usa fixtures anonimizados:
+
+```json
+"Polizas": {
+  "Repository": "InMemory"
+}
+```
+
+Para activar lectura SQL read-only en un entorno local autorizado:
+
+```powershell
+$env:Polizas__Repository = "Sql"
+$env:ConnectionStrings__PolizasReadOnly = "<connection-string-local>"
+# o bien
+$env:ILINIUMTECH__POLIZAS_CONNECTION = "<connection-string-local>"
+```
+
+No guardar esas cadenas en Git. El repositorio SQL usa whitelist de columnas y parametros para valores; no interpreta metadata AppBuilder en runtime.
+
 ## Comandos base
 
 Backend:

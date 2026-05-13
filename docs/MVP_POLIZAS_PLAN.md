@@ -92,7 +92,7 @@ Fuera de alcance por ahora:
 - Google Wallet;
 - llamadas REST/SOAP;
 - permisos finos por oficina, gestor o perfil;
-- lectura directa de `Pantalla_Polizas` en runtime.
+- lectura directa de `Pantalla_Polizas` sin repositorio SQL controlado.
 - render dinamico de pantallas desde metadata `IAP_*`.
 - dependencia productiva del frontend sobre metadata AppBuilder.
 
@@ -194,8 +194,8 @@ GET /api/polizas/{id}
 
 3. Evolucion backend:
 
-   - Sustituir fixture in-memory por repositorio SQL parametrizado.
-   - Definir whitelist como codigo/configuracion iLiniumTech revisada.
+   - Repositorio SQL read-only parametrizado disponible por configuracion (`Polizas:Repository=Sql`).
+   - Definir y mantener whitelist como codigo/configuracion iLiniumTech revisada.
    - Anadir integration tests contra BBDD de test o contenedor.
    - Mantener API estable para el frontend.
 

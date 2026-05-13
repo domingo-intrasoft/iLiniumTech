@@ -20,6 +20,8 @@ El MVP actual usa `InMemoryPolizasRepository` con datos anonimizados. La siguien
 
 Decision de arquitectura aplicable: el repositorio SQL forma parte del backend API de datos de iLiniumTech. No es un runtime generico de datasources AppBuilder ni debe interpretar metadata `IAP_*` en produccion.
 
+Estado de implementacion inicial: existe una implementacion `SqlPolizasRepository` activable por configuracion, con query builder parametrizado y pruebas unitarias. Queda pendiente validarla contra BBDD real de test o contenedor cuando se disponga de entorno autorizado.
+
 ## Objetivo
 
 Sustituir progresivamente el repositorio in-memory por un repositorio SQL de solo lectura, parametrizado y limitado por contrato de producto iLiniumTech.
@@ -81,15 +83,15 @@ Campos permitidos inicialmente:
 
 ## Criterios de aceptacion
 
-- [ ] Existe implementacion SQL detras de `IPolizasRepository`.
-- [ ] La activacion del repositorio SQL se hace por configuracion, no por cambio de codigo.
-- [ ] La whitelist usada por el repositorio esta definida en codigo/configuracion iLiniumTech revisada.
-- [ ] No hay lectura runtime de `IAP_*` para construir la consulta productiva.
-- [ ] Sort malicioso o desconocido devuelve error de validacion.
-- [ ] Filtros maliciosos no alteran SQL estructural.
-- [ ] El endpoint mantiene API key obligatoria.
-- [ ] Los errores no devuelven SQL, connection strings ni trazas internas.
-- [ ] Hay pruebas unitarias del query object y whitelist.
+- [x] Existe implementacion SQL detras de `IPolizasRepository`.
+- [x] La activacion del repositorio SQL se hace por configuracion, no por cambio de codigo.
+- [x] La whitelist usada por el repositorio esta definida en codigo/configuracion iLiniumTech revisada.
+- [x] No hay lectura runtime de `IAP_*` para construir la consulta productiva.
+- [x] Sort malicioso o desconocido devuelve error de validacion.
+- [x] Filtros maliciosos no alteran SQL estructural.
+- [x] El endpoint mantiene API key obligatoria.
+- [x] Los errores de validacion no devuelven SQL, connection strings ni trazas internas.
+- [x] Hay pruebas unitarias del query object y whitelist.
 - [ ] Hay pruebas de integracion con BBDD de test, contenedor o fixture SQL controlado.
 
 ## Impacto tecnico
@@ -105,6 +107,9 @@ Configuracion:
 
 - Variables de entorno o secret store para conexion real.
 - Sin connection strings reales en `appsettings`.
+- `Polizas:Repository=InMemory` por defecto.
+- `Polizas:Repository=Sql` activa `SqlPolizasRepository`.
+- `ConnectionStrings:PolizasReadOnly` o `ILINIUMTECH__POLIZAS_CONNECTION` aporta la conexion local.
 
 ## Seguridad
 
@@ -119,7 +124,8 @@ Configuracion:
 ## Plan de pruebas
 
 - Unitarias: construccion de query, validacion de columnas, limites de pagina.
-- Integracion: endpoint protegido y lectura SQL con datos anonimizados.
+- Integracion actual: endpoint protegido, catalogos, listado y detalle sobre repositorio in-memory.
+- Integracion pendiente: lectura SQL con BBDD de test/contenedor/datos anonimizados.
 - E2E/smoke: `/polizas` muestra datos o estado vacio controlado.
 - Seguridad: payloads con `;`, comentarios SQL, subqueries y columnas inexistentes.
 - Manual/UAT: contrastar resultados con entorno de pruebas usando usuario autorizado.
