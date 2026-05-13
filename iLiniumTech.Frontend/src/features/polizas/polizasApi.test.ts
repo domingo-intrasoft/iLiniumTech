@@ -1,14 +1,24 @@
 import { describe, expect, it } from 'vitest'
 
-import { getPolizasMetadata, searchPolizas } from './polizasApi'
+import { getPolizaById, getPolizasCatalogs, searchPolizas } from './polizasApi'
+import { polizasTableColumns } from './polizasConstants'
 
-describe('polizas feature contract', () => {
-  it('exposes the AppBuilder component reference', async () => {
-    const metadata = await getPolizasMetadata()
+describe('polizas static frontend contract', () => {
+  it('keeps table columns declared locally', () => {
+    const columnNames = polizasTableColumns.map((column) => column.key)
 
-    expect(metadata.appBuilder.rootComponentId).toBe(2824)
-    expect(metadata.appBuilder.crudComponentId).toBe(2825)
-    expect(metadata.appBuilder.dataSourceId).toBe(146)
+    expect(columnNames).toEqual([
+      'compania',
+      'numero',
+      'aplicacion',
+      'estado',
+      'ramo',
+      'fechaEfecto',
+      'fechaVencimiento',
+      'primaAnual',
+      'clienteNombre',
+    ])
+    expect(columnNames).not.toContain('connectionString')
   })
 
   it('filters fixture rows by policy number', async () => {
@@ -18,12 +28,26 @@ describe('polizas feature contract', () => {
     expect(result.items[0]?.numero).toBe('POL-2026-0002')
   })
 
-  it('keeps visible fields inside the MVP whitelist', async () => {
-    const metadata = await getPolizasMetadata()
-    const visibleNames = metadata.fields.filter((field) => field.visible).map((field) => field.name)
+  it('filters fixture rows by local catalog-backed values', async () => {
+    const result = await searchPolizas({ estado: 'Vigor', ramo: 'Autos' })
 
-    expect(visibleNames).toContain('numero')
-    expect(visibleNames).toContain('clienteNombre')
-    expect(visibleNames).not.toContain('connectionString')
+    expect(result.total).toBe(1)
+    expect(result.items[0]?.estado).toBe('Vigor')
+    expect(result.items[0]?.ramo).toBe('Autos')
+  })
+
+  it('exposes local catalogs without metadata', async () => {
+    const catalogs = await getPolizasCatalogs()
+
+    expect(catalogs.tipoPoliza.map((option) => option.value)).toContain('Vigor')
+    expect(catalogs.ramo.map((option) => option.value)).toContain('Autos')
+    expect('appBuilder' in catalogs).toBe(false)
+  })
+
+  it('loads a policy detail from the local fixture', async () => {
+    const detail = await getPolizaById('POL-1001')
+
+    expect(detail?.numero).toBe('POL-2026-0001')
+    expect(detail?.clienteNombre).toBe('Cliente anonimo 1')
   })
 })

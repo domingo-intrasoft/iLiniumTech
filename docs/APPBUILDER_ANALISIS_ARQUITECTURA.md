@@ -8,6 +8,8 @@ Fuente analizada: `C:\Desarrollo\AppBuilder`
 
 Estado de esta fase: analisis de codigo fuente. No se ha ejecutado todavia la aplicacion, no se ha consultado la demo web y no se ha conectado contra las BBDD del entorno de pruebas desde este repositorio.
 
+Decision posterior de producto: este documento describe como funciona AppBuilder, pero iLiniumTech no debe convertirse en un runtime dinamico equivalente. La metadata descrita aqui sirve para extraccion, migracion, trazabilidad y scaffolding inicial; el producto objetivo es frontend Vue estatico + backend API de datos.
+
 ## 1. Proposito de este documento
 
 Este documento existe para que un agente de IA pueda continuar el proyecto iLiniumTech sin tener que volver a leer minuciosamente todo AppBuilder en cada intervencion.
@@ -19,10 +21,10 @@ Antes de implementar codigo nuevo, los agentes deben aplicar tambien la guia de 
 La primera meta tecnica es mas pequena y verificable:
 
 1. Entender como AppBuilder organiza aplicaciones, pantallas, componentes, fuentes de datos, formulas, flujos y conexiones.
-2. Documentar el comportamiento suficiente para reproducir un subconjunto.
+2. Documentar el comportamiento suficiente para traducir un subconjunto a producto iLiniumTech.
 3. En una fase posterior, leer el entorno de pruebas indicado por el usuario.
 4. Extraer un componente real configurado en AppBuilder.
-5. Levantar localmente una primera version que pueda renderizar o probar ese componente.
+5. Levantar localmente una primera version Vue/API que represente ese componente con codigo explicito.
 
 Regla critica: este repositorio no debe contener credenciales, passwords, cadenas de conexion completas, tokens, claves API ni dumps de BBDD. Si se necesita conectividad, se usaran variables de entorno, secret stores o ficheros locales ignorados por git.
 
@@ -51,12 +53,13 @@ La aplicacion resultante se construye en tiempo de ejecucion:
 6. Los CRUD consultan y modifican datos mediante operaciones genericas Search y Data.
 7. Las expresiones y workflows ejecutan reglas configuradas.
 
-La idea para iLiniumTech no deberia ser copiar todo AppBuilder desde el inicio. El camino mas prudente para un MVP es extraer el minimo subconjunto de metadata necesario para una pantalla real y construir un adaptador controlado:
+La idea para iLiniumTech no debe ser copiar AppBuilder ni reconstruir su runtime dinamico. El camino prudente para el MVP es extraer el minimo subconjunto de metadata necesario para una pantalla real y convertirlo en especificaciones, contratos y codigo revisado:
 
 - Leer conexiones y metadata desde `IL_Maestro` y la BBDD de programa.
 - Identificar aplicacion, version, entorno, menu y componente inicial.
 - Extraer `IapComponent`, `IapDataSource`, enlaces componente-fuente, campos y configuraciones de campo.
-- Reproducir una ruta de lectura Search y, despues, una ruta de update basica.
+- Disenar una ruta de lectura API propia y, despues, casos de uso de update solo si tienen SDD explicita.
+- Construir pantallas Vue estaticas que reflejen el comportamiento decidido, no un renderer generico de metadata.
 - Generar issues SDD pequenos, verificables y ligados a contratos de datos.
 
 ## 3. Mapa de codigo fuente
@@ -734,7 +737,8 @@ Decisiones recomendadas para iLiniumTech:
 - Guardar contratos extraidos en JSON sanitizado, no dumps de BBDD completos.
 - Elegir un componente real con dependencias simples.
 - Generar issues SDD pequenos.
-- Separar adaptador de metadata, runtime de render y motor de datos.
+- Mantener la extraccion de metadata fuera del runtime productivo.
+- Implementar frontend Vue estatico y backend API de datos con contratos explicitos.
 - Mantener un documento de trazabilidad entre metadata AppBuilder y artefactos iLiniumTech.
 
 ## 17. Plan recomendado para la siguiente fase
@@ -778,28 +782,30 @@ Criterios para elegir componente:
 - Puede cargarse con una query Search simple.
 - Permite comprobar visualmente tabla, formulario o detalle.
 
-### Fase 2.4: Primer runtime local
+### Fase 2.4: Primer producto local Vue/API
 
-Opciones:
+Salida recomendada:
 
-1. Adaptador ligero en iLiniumTech que lea metadata extraida y renderice un subconjunto.
-2. Reutilizacion parcial de frontend AppBuilder.
-3. Proxy local contra ApiBuilder real.
+1. Pantalla Vue estatica para el componente elegido.
+2. Backend API read-only con DTOs y validacion propia.
+3. Repositorio in-memory primero y SQL seguro despues.
+4. Trazabilidad AppBuilder visible en docs o endpoint diagnostico, no como motor de UI.
 
-Para velocidad de MVP, la opcion 1 suele ser la mas controlable. Para fidelidad, la opcion 2 o 3 se acercan mas al producto real, pero arrastran mas dependencias.
+No se recomienda reutilizar el frontend AppBuilder ni montar un proxy contra ApiBuilder real para el producto iLiniumTech. Pueden servir como referencia de analisis o UAT, pero no como arquitectura final.
 
 ### Fase 2.5: Generacion de issues SDD
 
 Crear issues por capas:
 
 - Conexion segura y lectura de maestro.
-- Extractor de metadata de aplicacion.
+- Extractor offline de metadata de aplicacion.
 - Extractor de componentes.
 - Extractor de datasource/campos.
 - Contrato JSON sanitizado.
-- Render minimo de componentes.
-- Search runtime.
-- Data update runtime.
+- Pantalla Vue estatica de la funcionalidad elegida.
+- API read-only de datos.
+- Repositorio SQL parametrizado con whitelist.
+- Casos de uso de update solo con spec propia.
 - Pruebas de componente real.
 
 ## 18. Plantilla SDD recomendada

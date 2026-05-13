@@ -607,17 +607,17 @@ Cuando exista app y destino:
 - ejecutar smoke Playwright;
 - publicar URL y evidencia.
 
-Destinos posibles:
+Destino arquitectonico decidido:
 
-- GitHub Pages para frontend estatico.
-- Azure Static Web Apps.
-- Azure App Service.
-- IIS/Windows mediante self-hosted runner.
-- Contenedor en registry + hosting.
+- frontend Vue publicado como build estatico;
+- backend API de datos desplegado como servicio .NET;
+- extractor de metadata fuera del runtime productivo.
 
-Decision pendiente:
+Destinos posibles por concretar:
 
-- No elegir destino hasta saber si el MVP sera frontend estatico, API .NET, contenedor o IIS.
+- GitHub Pages o Azure Static Web Apps para frontend estatico.
+- Azure App Service, IIS/Windows mediante self-hosted runner o contenedor para backend API.
+- La eleccion final depende de infraestructura disponible, secretos y requisitos de red/BBDD.
 
 ### 7.8 `.github/workflows/pipeline-failure-reporter.yml`
 

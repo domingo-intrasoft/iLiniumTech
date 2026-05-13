@@ -1,0 +1,74 @@
+name: Spec SDD
+description: Crear una tarea trazable para iLiniumTech.
+title: "SDD: "
+labels:
+  - sdd
+body:
+  - type: input
+    id: spec_id
+    attributes:
+      label: Spec ID
+      description: Ruta o identificador de la spec versionada.
+      placeholder: docs/sdd/specs/iLiniumTech/SDD-2026-002-extractor-metadata-polizas.md
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo
+      options:
+        - feature
+        - bug
+        - security
+        - infra
+        - docs
+    validations:
+      required: true
+  - type: dropdown
+    id: riesgo
+    attributes:
+      label: Riesgo
+      options:
+        - ai-low-risk
+        - ai-medium-risk
+        - ai-high-risk
+    validations:
+      required: true
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: Resultado observable al cerrar la tarea.
+    validations:
+      required: true
+  - type: textarea
+    id: alcance
+    attributes:
+      label: Alcance y fuera de alcance
+      description: Indicar lo que se implementa y lo que queda excluido.
+    validations:
+      required: true
+  - type: textarea
+    id: aceptacion
+    attributes:
+      label: Criterios de aceptacion
+      description: Lista verificable de resultados esperados.
+      placeholder: |
+        - [ ] Dado..., cuando..., entonces...
+        - [ ] No se guardan secretos ni datos sensibles en Git.
+    validations:
+      required: true
+  - type: textarea
+    id: seguridad
+    attributes:
+      label: Seguridad y datos
+      description: Auth, CORS, SQL dinamico, secretos, datos personales y dependencias.
+    validations:
+      required: true
+  - type: textarea
+    id: pruebas
+    attributes:
+      label: Plan de pruebas
+      description: Unitarias, integracion, E2E/smoke, seguridad y manual/UAT.
+    validations:
+      required: true

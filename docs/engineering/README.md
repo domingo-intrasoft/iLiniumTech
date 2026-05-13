@@ -1,6 +1,8 @@
 # Guia de ingenieria iLiniumTech
 
-Esta carpeta trae a iLiniumTech las reglas de desarrollo, seguridad, pruebas y calidad aprendidas en `C:\Desarrollo\AcademiaLasCortes`, adaptadas al objetivo especifico de este proyecto: extraer comportamiento de AppBuilder, generar especificaciones SDD y construir un MVP moderno sin repetir los riesgos de seguridad observados en el sistema actual.
+Esta carpeta trae a iLiniumTech las reglas de desarrollo, seguridad, pruebas y calidad aprendidas en `C:\Desarrollo\AcademiaLasCortes`, adaptadas al objetivo especifico de este proyecto: extraer conocimiento de AppBuilder, generar especificaciones SDD y construir un producto Vue/API sin repetir los riesgos de seguridad observados en el sistema actual.
+
+Decision base: iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadata heredada se usa para extraccion, trazabilidad y scaffolding revisado.
 
 ## Documentos
 
@@ -12,6 +14,7 @@ Esta carpeta trae a iLiniumTech las reglas de desarrollo, seguridad, pruebas y c
 - [Riesgos AppBuilder y resolucion moderna](05-appbuilder-riesgos-y-resolucion.md)
 - [Adopcion, madurez y origen demo](06-adopcion-madurez-y-origen-demo.md)
 - [Decisiones tecnicas iniciales](07-decisiones-tecnicas-iniciales.md)
+- [Decision producto/arquitectura](../DECISION_PRODUCTO_ARQUITECTURA.md)
 - [Plantilla SDD](../sdd/templates/spec-template.md)
 - [Plantilla de revision de seguridad](../sdd/templates/security-review-template.md)
 

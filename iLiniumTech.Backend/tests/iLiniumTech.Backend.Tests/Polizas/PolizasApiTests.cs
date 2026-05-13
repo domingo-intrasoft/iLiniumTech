@@ -31,7 +31,7 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
-    public async Task Metadata_exposes_appbuilder_polizas_reference()
+    public async Task Metadata_is_deprecated_without_appbuilder_reference()
     {
         await using var factory = new TestApiFactory();
         using var client = factory.CreateClient();
@@ -40,9 +40,59 @@ public sealed class PolizasApiTests
         var response = await client.GetAsync("/api/polizas/metadata");
         var body = await response.Content.ReadAsStringAsync();
 
+        response.StatusCode.Should().Be(HttpStatusCode.Gone);
+        body.Should().Contain("/api/polizas/catalogs");
+        body.Should().NotContain("rootComponentId");
+        body.Should().NotContain("dataSourceId");
+    }
+
+    [Fact]
+    public async Task Catalogs_exposes_policy_select_data()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/polizas/catalogs");
+        var body = await response.Content.ReadAsStringAsync();
+
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        body.Should().Contain("\"rootComponentId\":2824");
-        body.Should().Contain("\"dataSourceId\":146");
+        body.Should().Contain("\"tipoPoliza\"");
+        body.Should().Contain("\"ramo\"");
+        body.Should().Contain("\"compania\"");
+        body.Should().Contain("\"oficina\"");
+        body.Should().Contain("\"gestor\"");
+        body.Should().Contain("Compania demo");
+    }
+
+    [Fact]
+    public async Task Search_returns_polizas_data()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"items\"");
+        body.Should().Contain("POL-2026-0001");
+    }
+
+    [Fact]
+    public async Task GetById_returns_poliza_detail()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/polizas/POL-1001");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"clienteNombre\"");
+        body.Should().Contain("POL-2026-0001");
     }
 
     [Fact]

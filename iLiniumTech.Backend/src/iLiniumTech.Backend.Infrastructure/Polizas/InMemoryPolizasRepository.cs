@@ -35,6 +35,98 @@ public sealed class InMemoryPolizasRepository : IPolizasRepository
             Moneda: "EUR")
     ];
 
+    private static readonly PolizasCatalogs Catalogs = new(
+        TipoPoliza:
+        [
+            new("Vigor", "En vigor"),
+            new("Pendiente", "Pendiente"),
+            new("Anulada", "Anulada"),
+            new("Vencida", "Vencida")
+        ],
+        Compania:
+        [
+            new("Compania demo", "Compania demo")
+        ],
+        Ramo:
+        [
+            new("Autos", "Autos"),
+            new("Hogar", "Hogar"),
+            new("Salud", "Salud"),
+            new("Vida", "Vida"),
+            new("Empresa", "Empresa")
+        ],
+        Oficina:
+        [
+            new("Las Palmas", "Las Palmas"),
+            new("Tenerife", "Tenerife")
+        ],
+        Division:
+        [
+            new("Particulares", "Particulares"),
+            new("Empresas", "Empresas")
+        ],
+        Colaborador1:
+        [
+            new("COL-01", "Colaborador 1"),
+            new("COL-02", "Colaborador 2")
+        ],
+        Administrativo:
+        [
+            new("ADM-01", "Administrativo 1"),
+            new("ADM-02", "Administrativo 2")
+        ],
+        Comercial:
+        [
+            new("COM-01", "Comercial 1"),
+            new("COM-02", "Comercial 2")
+        ],
+        Siniestros:
+        [
+            new("SIN-01", "Siniestros 1"),
+            new("SIN-02", "Siniestros 2")
+        ],
+        Gestor:
+        [
+            new("GES-01", "Gestor 1"),
+            new("GES-02", "Gestor 2")
+        ],
+        CanalCobro:
+        [
+            new("Banco", "Banco"),
+            new("Tarjeta", "Tarjeta")
+        ],
+        FraccionPago:
+        [
+            new("Anual", "Anual"),
+            new("Semestral", "Semestral"),
+            new("Mensual", "Mensual")
+        ],
+        Ccaa:
+        [
+            new("Canarias", "Canarias"),
+            new("Madrid", "Madrid")
+        ],
+        Sexo:
+        [
+            new("M", "Mujer"),
+            new("H", "Hombre")
+        ],
+        EstadoCivil:
+        [
+            new("Soltero/a", "Soltero/a"),
+            new("Casado/a", "Casado/a")
+        ],
+        RegimenLaboral:
+        [
+            new("Cuenta ajena", "Cuenta ajena"),
+            new("Autonomo", "Autonomo")
+        ],
+        Profesion:
+        [
+            new("Administracion", "Administracion"),
+            new("Ingenieria", "Ingenieria")
+        ]);
+
     public Task<PagedResult<PolizaListItem>> SearchAsync(PolizasSearchRequest request, PolizasSort sort, CancellationToken cancellationToken)
     {
         var query = Items.AsEnumerable();
@@ -52,6 +144,16 @@ public sealed class InMemoryPolizasRepository : IPolizasRepository
         if (!string.IsNullOrWhiteSpace(request.Estado))
         {
             query = query.Where(item => item.Estado.Equals(request.Estado, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Compania))
+        {
+            query = query.Where(item => item.Compania.Equals(request.Compania, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Ramo))
+        {
+            query = query.Where(item => item.Ramo.Equals(request.Ramo, StringComparison.OrdinalIgnoreCase));
         }
 
         if (request.FechaEfectoDesde.HasValue)
@@ -86,18 +188,48 @@ public sealed class InMemoryPolizasRepository : IPolizasRepository
         var detail = new PolizaDetail(
             Id: item.Id,
             Numero: item.Numero,
+            Certificado: item.Id.Replace("POL", "CERT", StringComparison.OrdinalIgnoreCase),
+            TipoPoliza: item.Estado,
             Aplicacion: item.Aplicacion,
             Estado: item.Estado,
             Ramo: item.Ramo,
+            ClienteId: item.ClienteId,
+            ClienteNombre: item.ClienteNombre,
             Compania: item.Compania,
-            Cliente: new PolizaCliente(item.ClienteId, item.ClienteNombre, Documento: null),
-            Producto: new PolizaProducto(item.Aplicacion, "Modalidad demo"),
-            Vigencia: new PolizaVigencia(item.FechaEfecto, item.FechaVencimiento, "Anual"),
-            Financiero: new PolizaFinanciero(item.PrimaAnual, item.Moneda),
-            Riesgos: [new PolizaRiesgo("R-001", "Riesgo anonimizado")]);
+            Riesgo: item.Ramo == "Autos" ? "1234 ABC" : "Vivienda demo",
+            FechaEfecto: item.FechaEfecto,
+            FechaVencimiento: item.FechaVencimiento,
+            PrimaAnual: item.PrimaAnual,
+            Moneda: item.Moneda,
+            Oficina: item.Ramo == "Autos" ? "Las Palmas" : "Tenerife",
+            Division: "Particulares",
+            Colaborador1: item.Ramo == "Autos" ? "COL-01" : "COL-02",
+            Administrativo: item.Ramo == "Autos" ? "ADM-01" : "ADM-02",
+            Comercial: item.Ramo == "Autos" ? "COM-01" : "COM-02",
+            Siniestros: item.Ramo == "Autos" ? "SIN-01" : "SIN-02",
+            Gestor: item.Ramo == "Autos" ? "GES-01" : "GES-02",
+            CanalCobro: item.Ramo == "Autos" ? "Banco" : "Tarjeta",
+            FraccionPago: item.Ramo == "Autos" ? "Anual" : "Semestral",
+            Ccaa: "Canarias",
+            Documento: item.Ramo == "Autos" ? "00000001A" : "00000002B",
+            Apellido1: "Anonimo",
+            Apellido2: item.Ramo == "Autos" ? "Uno" : "Dos",
+            Nombre: "Cliente",
+            Sexo: item.Ramo == "Autos" ? "M" : "H",
+            FechaNacimiento: item.Ramo == "Autos" ? new DateOnly(1988, 5, 10) : new DateOnly(1991, 9, 22),
+            Edad: item.Ramo == "Autos" ? 37 : 34,
+            EstadoCivil: item.Ramo == "Autos" ? "Casado/a" : "Soltero/a",
+            Hijos: item.Ramo == "Autos" ? 1 : 0,
+            RegimenLaboral: item.Ramo == "Autos" ? "Cuenta ajena" : "Autonomo",
+            Profesion: item.Ramo == "Autos" ? "Administracion" : "Ingenieria",
+            Email: item.Ramo == "Autos" ? "cliente1@example.test" : "cliente2@example.test",
+            Telefono: item.Ramo == "Autos" ? "+34 600 000 001" : "+34 600 000 002");
 
         return Task.FromResult<PolizaDetail?>(detail);
     }
+
+    public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
+        Task.FromResult(Catalogs);
 
     private static IEnumerable<PolizaListItem> ApplySort(IEnumerable<PolizaListItem> query, PolizasSort sort)
     {

@@ -46,8 +46,15 @@ app.MapGet("/health", () => Results.Ok(new
 var polizas = app.MapGroup("/api/polizas")
     .RequireAuthorization();
 
-polizas.MapGet("/metadata", (IPolizasService service) => Results.Ok(service.GetMetadata()))
-    .WithName("GetPolizasMetadata");
+polizas.MapGet("/metadata", () => Results.Problem(
+        statusCode: StatusCodes.Status410Gone,
+        title: "Polizas metadata endpoint is deprecated.",
+        detail: "Runtime screen design metadata is no longer served by the backend. Use /api/polizas/catalogs for policy catalogs."))
+    .WithName("GetPolizasMetadataDeprecated");
+
+polizas.MapGet("/catalogs", async ([FromServices] IPolizasService service, CancellationToken cancellationToken) =>
+        Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
+    .WithName("GetPolizasCatalogs");
 
 polizas.MapGet("/", async (
     [FromServices] IPolizasService service,
@@ -57,6 +64,8 @@ polizas.MapGet("/", async (
     [FromQuery] string? numero,
     [FromQuery] string? cliente,
     [FromQuery] string? estado,
+    [FromQuery] string? compania,
+    [FromQuery] string? ramo,
     [FromQuery] DateOnly? fechaEfectoDesde,
     [FromQuery] DateOnly? fechaEfectoHasta,
     CancellationToken cancellationToken) =>
@@ -68,6 +77,8 @@ polizas.MapGet("/", async (
         Numero: numero,
         Cliente: cliente,
         Estado: estado,
+        Compania: compania,
+        Ramo: ramo,
         FechaEfectoDesde: fechaEfectoDesde,
         FechaEfectoHasta: fechaEfectoHasta);
 

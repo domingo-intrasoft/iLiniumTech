@@ -15,13 +15,13 @@ Decision:
 Motivo:
 
 - Encaja con Vue 3, Vite y TypeScript.
-- Permite probar stores, composables, transformadores y componentes dinamicos.
+- Permite probar stores, composables, transformadores y componentes Vue estaticos.
 - Evita depender de E2E para reglas pequenas.
 
 Aplicacion en iLiniumTech:
 
-- Probar transformadores de metadata AppBuilder.
-- Probar componentes dinamicos soportados en el MVP.
+- Probar transformadores de metadata AppBuilder solo como extraccion/scaffolding.
+- Probar componentes Vue estaticos soportados en el MVP.
 - Probar estados loading, empty, error y permisos.
 
 ## 0002 - Stack de pruebas backend
@@ -70,7 +70,7 @@ Aplicacion en iLiniumTech:
 
 - Cada app nueva debe nacer con lockfile.
 - La auditoria de dependencias debe ejecutarse antes de aceptar nuevas librerias.
-- Las dependencias para GraphQL, SQL, auth, render dinamico o workflows requieren justificacion en spec o ADR.
+- Las dependencias para GraphQL, SQL, auth, scaffolding desde metadata o workflows requieren justificacion en spec o ADR.
 
 ## 0004 - Seguridad como gate temprano
 
@@ -86,7 +86,7 @@ Decision:
 Motivo:
 
 - El analisis de AppBuilder detecto riesgos que no deben repetirse.
-- iLiniumTech trabajara con conexiones, metadata dinamica y posiblemente datos reales de prueba.
+- iLiniumTech trabajara con conexiones, metadata heredada usada para extraccion y posiblemente datos reales de prueba.
 
 Aplicacion en iLiniumTech:
 
