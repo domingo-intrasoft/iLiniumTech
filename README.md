@@ -63,6 +63,18 @@ $env:ILINIUMTECH__POLIZAS_CONNECTION = "<connection-string-local>"
 
 No guardar esas cadenas en Git. El repositorio SQL usa whitelist de columnas y parametros para valores; no interpreta metadata AppBuilder en runtime.
 
+Para resolver la conexion de modelo desde Master al estilo AppBuilder:
+
+```powershell
+$env:Polizas__Repository = "Sql"
+$env:Polizas__ConnectionResolver = "AppBuilderMaster"
+$env:Polizas__BrokerId = "<broker-id-local>"
+$env:ConnectionStrings__AppBuilderMaster = "<master-connection-string-local>"
+$env:AppBuilder__EncryptionKey = "<appbuilder-encryption-key-local>"
+```
+
+`AppBuilder__EncryptionKey` solo es necesario si los campos de `IAPM_Connection` estan cifrados como en AppBuilder. El broker sigue siendo configuracion local temporal; cuando haya autenticacion de usuario real, debera venir del contexto autenticado, no del frontend como dato confiable.
+
 ## Comandos base
 
 Backend:

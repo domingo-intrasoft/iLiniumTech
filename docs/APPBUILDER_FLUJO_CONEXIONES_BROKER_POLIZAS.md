@@ -413,6 +413,8 @@ Fase 2: resolver de conexion.
   - directa a Master cuando ya se tenga Master seguro;
   - via Builder + `IAP_ApplicationConnection` si se necesita replicar exactamente AppBuilder.
 
+Estado iLiniumTech 2026-05-14: implementado el primer corte backend como `AppBuilderMasterPolizasConnectionStringProvider`. Resuelve la conexion `tipobd-MO` en `IAPM_Connection` por `brokerId`, construye una connection string SQL sin loguearla y descifra campos con una clave compatible con `SecurityHelper.DecryptData`. Sigue pendiente sustituir el `brokerId` configurado por el broker del usuario autenticado.
+
 Fase 3: session context.
 
 - Crear helper que ejecute `sp_set_session_context` con parametros antes de consultas SQL.

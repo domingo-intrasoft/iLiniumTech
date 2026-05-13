@@ -20,7 +20,7 @@ El MVP actual usa `InMemoryPolizasRepository` con datos anonimizados. La siguien
 
 Decision de arquitectura aplicable: el repositorio SQL forma parte del backend API de datos de iLiniumTech. No es un runtime generico de datasources AppBuilder ni debe interpretar metadata `IAP_*` en produccion.
 
-Estado de implementacion inicial: existe una implementacion `SqlPolizasRepository` activable por configuracion, con query builder parametrizado y pruebas unitarias. Queda pendiente validarla contra BBDD real de test o contenedor cuando se disponga de entorno autorizado.
+Estado de implementacion inicial: existe una implementacion `SqlPolizasRepository` activable por configuracion, con query builder parametrizado y pruebas unitarias. Tambien existe un resolver `AppBuilderMaster` que localiza la conexion `tipobd-MO` en `IAPM_Connection` por broker y puede descifrar campos con la clave de AppBuilder. Queda pendiente validarla contra BBDD real de test o contenedor cuando se disponga de entorno autorizado.
 
 ## Objetivo
 
@@ -85,6 +85,7 @@ Campos permitidos inicialmente:
 
 - [x] Existe implementacion SQL detras de `IPolizasRepository`.
 - [x] La activacion del repositorio SQL se hace por configuracion, no por cambio de codigo.
+- [x] Existe resolver de conexion de modelo desde Master por broker para entornos AppBuilder.
 - [x] La whitelist usada por el repositorio esta definida en codigo/configuracion iLiniumTech revisada.
 - [x] No hay lectura runtime de `IAP_*` para construir la consulta productiva.
 - [x] Sort malicioso o desconocido devuelve error de validacion.
@@ -110,12 +111,17 @@ Configuracion:
 - `Polizas:Repository=InMemory` por defecto.
 - `Polizas:Repository=Sql` activa `SqlPolizasRepository`.
 - `ConnectionStrings:PolizasReadOnly` o `ILINIUMTECH__POLIZAS_CONNECTION` aporta la conexion local.
+- `Polizas:ConnectionResolver=AppBuilderMaster` activa resolucion por `IAPM_Connection`.
+- `ConnectionStrings:AppBuilderMaster` o `ILINIUMTECH__APPBUILDER_MASTER_CONNECTION` aporta la conexion Master.
+- `Polizas:BrokerId` o `ILINIUMTECH__BROKER_ID` aporta el broker temporal hasta tener contexto de usuario autenticado.
+- `AppBuilder:EncryptionKey` o `ILINIUMTECH__APPBUILDER_ENCRYPTION_KEY` descifra campos de conexion si vienen cifrados.
 
 ## Seguridad
 
 - [ ] Secretos fuera de Git.
 - [ ] SQL parametrizado.
 - [ ] Whitelist para estructura SQL.
+- [ ] Resolver por broker validado contra Master real autorizado.
 - [ ] `QueryStatic` y fragments heredados se tratan como evidencia, no como ejecutable.
 - [ ] Auth y autorizacion preservadas.
 - [ ] Logs con redaccion de datos sensibles.

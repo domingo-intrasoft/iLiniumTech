@@ -2,23 +2,30 @@ using System.Data;
 using System.Globalization;
 using iLiniumTech.Backend.Application.Polizas;
 using iLiniumTech.Backend.Domain.Polizas;
+using iLiniumTech.Backend.Infrastructure.Polizas.Connections;
 using iLiniumTech.Backend.Infrastructure.Polizas.Sql;
 using Microsoft.Data.SqlClient;
 
 namespace iLiniumTech.Backend.Infrastructure.Polizas;
 
 public sealed class SqlPolizasRepository(
-    string connectionString,
+    IPolizasConnectionStringProvider connectionStringProvider,
     PolizasSqlQueryBuilder? queryBuilder = null)
     : IPolizasRepository
 {
     private readonly PolizasSqlQueryBuilder _queryBuilder = queryBuilder ?? new PolizasSqlQueryBuilder();
+
+    public SqlPolizasRepository(string connectionString, PolizasSqlQueryBuilder? queryBuilder = null)
+        : this(new StaticPolizasConnectionStringProvider(connectionString), queryBuilder)
+    {
+    }
 
     public async Task<PagedResult<PolizaListItem>> SearchAsync(
         PolizasSearchRequest request,
         PolizasSort sort,
         CancellationToken cancellationToken)
     {
+        var connectionString = await connectionStringProvider.GetConnectionStringAsync(cancellationToken);
         await using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
 
@@ -30,6 +37,7 @@ public sealed class SqlPolizasRepository(
 
     public async Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken)
     {
+        var connectionString = await connectionStringProvider.GetConnectionStringAsync(cancellationToken);
         await using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
 
