@@ -25,7 +25,7 @@ Use web/cloud execution only for low-risk bounded tasks when secrets and local-o
 
 ## Security-sensitive blockers
 
-Require `needs-human` before automated execution when the issue touches:
+Require `human-decision-required` and `status:blocked` before automated execution when the issue touches:
 
 - real database credentials or connection setup;
 - authentication or authorization;
