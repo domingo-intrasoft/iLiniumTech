@@ -3,34 +3,39 @@ namespace iLiniumTech.Backend.Domain.Polizas;
 public sealed record PolizaDetail(
     string Id,
     string Numero,
+    string Certificado,
+    string TipoPoliza,
     string Aplicacion,
     string Estado,
     string Ramo,
+    string ClienteId,
+    string ClienteNombre,
     string Compania,
-    PolizaCliente Cliente,
-    PolizaProducto Producto,
-    PolizaVigencia Vigencia,
-    PolizaFinanciero Financiero,
-    IReadOnlyList<PolizaRiesgo> Riesgos);
-
-public sealed record PolizaCliente(
-    string Id,
-    string Nombre,
-    string? Documento);
-
-public sealed record PolizaProducto(
-    string Nombre,
-    string Modalidad);
-
-public sealed record PolizaVigencia(
-    DateOnly FechaInicio,
+    string Riesgo,
+    DateOnly FechaEfecto,
     DateOnly FechaVencimiento,
-    string Renovacion);
-
-public sealed record PolizaFinanciero(
     decimal PrimaAnual,
-    string Moneda);
-
-public sealed record PolizaRiesgo(
-    string Id,
-    string Descripcion);
+    string Moneda,
+    string Oficina,
+    string Division,
+    string Colaborador1,
+    string Administrativo,
+    string Comercial,
+    string Siniestros,
+    string Gestor,
+    string CanalCobro,
+    string FraccionPago,
+    string Ccaa,
+    string Documento,
+    string Apellido1,
+    string Apellido2,
+    string Nombre,
+    string Sexo,
+    DateOnly FechaNacimiento,
+    int Edad,
+    string EstadoCivil,
+    int Hijos,
+    string RegimenLaboral,
+    string Profesion,
+    string Email,
+    string Telefono);

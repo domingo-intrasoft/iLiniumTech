@@ -124,7 +124,7 @@ Pruebas:
 - campos no autorizados;
 - errores sin stack trace.
 
-## Render dinamico
+## Render dinamico heredado
 
 Riesgo:
 
@@ -132,16 +132,18 @@ Riesgo:
 
 Resolucion:
 
-- Contrato JSON versionado y validado.
-- Lista cerrada de componentes soportados.
+- iLiniumTech no debe implementar un renderer generico de metadata AppBuilder.
+- Metadata sanitizada solo para analisis, trazabilidad y scaffolding inicial.
+- Componentes Vue estaticos y revisados como codigo fuente.
+- Lista cerrada de componentes soportados por el producto.
 - Sanitizacion de HTML si se permite contenido enriquecido.
 - No ejecutar scripts arbitrarios en cliente.
 - Separar metadata confiable de input de usuario.
 
 Pruebas:
 
-- componente desconocido;
-- atributo malformado;
+- scaffolding con componente desconocido;
+- atributo malformado en artefactos de extraccion;
 - HTML peligroso;
 - evento no permitido;
 - datasource no autorizado.

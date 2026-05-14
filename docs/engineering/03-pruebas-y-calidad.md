@@ -15,7 +15,8 @@ Extractor de metadata:
 - filtra campos no soportados;
 - conserva orden y jerarquia;
 - redacciona valores sensibles;
-- falla con errores claros si falta metadata obligatoria.
+- falla con errores claros si falta metadata obligatoria;
+- demuestra que la salida es analisis/scaffolding, no contrato runtime.
 
 Datasources:
 
@@ -30,10 +31,11 @@ Expresiones:
 - controla errores y timeouts;
 - no ejecuta codigo arbitrario.
 
-Render:
+Frontend Vue estatico:
 
-- cada tipo de componente soportado genera un modelo visible;
+- cada componente propio renderiza el estado esperado;
 - props y eventos tienen tipos;
+- cualquier scaffolding derivado de metadata queda cubierto como codigo revisado;
 - estados vacio, loading y error no rompen layout.
 
 ## Pruebas backend de integracion
@@ -69,9 +71,9 @@ Herramientas:
 Priorizar:
 
 - stores o composables con reglas;
-- transformadores de metadata;
+- transformadores de metadata solo si alimentan scaffolding o trazabilidad;
 - validadores;
-- componentes dinamicos con reglas de interaccion;
+- componentes Vue estaticos con reglas de interaccion;
 - clientes API y tratamiento de errores.
 
 Evitar:
@@ -95,7 +97,7 @@ Smoke MVP minimo:
 
 - la app arranca;
 - carga configuracion sin secretos en consola;
-- renderiza el componente real extraido;
+- renderiza la pantalla Vue estatica creada a partir del componente analizado;
 - muestra datos o estado vacio controlado;
 - bloquea una accion sin permiso;
 - no hay errores de red inesperados.

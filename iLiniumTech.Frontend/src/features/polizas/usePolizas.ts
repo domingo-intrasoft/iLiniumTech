@@ -1,36 +1,34 @@
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 
-import { getPolizasMetadata, searchPolizas } from './polizasApi'
-import type { PolizaListItem, PolizasComponentMetadata } from './polizasTypes'
+import { getPolizasCatalogs, searchPolizas } from './polizasApi'
+import { polizasCatalogsFixture } from './polizasFixture'
+import type { PolizaListItem, PolizasCatalogs, PolizasQueryFilters } from './polizasTypes'
 
 export function usePolizas() {
-  const metadata = ref<PolizasComponentMetadata | null>(null)
+  const catalogs = ref<PolizasCatalogs>(polizasCatalogsFixture)
   const items = ref<PolizaListItem[]>([])
   const total = ref(0)
   const loading = ref(false)
   const error = ref<string | null>(null)
-  const filters = reactive({
+  const filters = reactive<PolizasQueryFilters>({
     numero: '',
     cliente: '',
     estado: '',
+    compania: '',
+    ramo: '',
   })
-
-  const visibleFields = computed(() =>
-    (metadata.value?.fields ?? [])
-      .filter((field) => field.visible)
-      .sort((a, b) => a.order - b.order),
-  )
 
   async function refresh() {
     loading.value = true
     error.value = null
 
     try {
-      metadata.value = await getPolizasMetadata()
       const result = await searchPolizas({
         numero: filters.numero || undefined,
         cliente: filters.cliente || undefined,
         estado: filters.estado || undefined,
+        compania: filters.compania || undefined,
+        ramo: filters.ramo || undefined,
         page: 1,
         pageSize: 25,
         sort: 'fechaEfecto:desc',
@@ -38,7 +36,7 @@ export function usePolizas() {
       items.value = result.items
       total.value = result.total
     } catch {
-      error.value = 'No se pudo cargar el componente de pólizas.'
+      error.value = 'No se pudieron cargar las polizas.'
       items.value = []
       total.value = 0
     } finally {
@@ -46,11 +44,17 @@ export function usePolizas() {
     }
   }
 
-  onMounted(refresh)
+  async function loadCatalogs() {
+    catalogs.value = await getPolizasCatalogs()
+  }
+
+  onMounted(() => {
+    void loadCatalogs()
+    void refresh()
+  })
 
   return {
-    metadata,
-    visibleFields,
+    catalogs,
     items,
     total,
     loading,

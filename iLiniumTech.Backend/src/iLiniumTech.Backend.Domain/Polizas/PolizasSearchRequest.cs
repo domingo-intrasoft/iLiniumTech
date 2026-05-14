@@ -7,6 +7,8 @@ public sealed record PolizasSearchRequest(
     string? Numero = null,
     string? Cliente = null,
     string? Estado = null,
+    string? Compania = null,
+    string? Ramo = null,
     DateOnly? FechaEfectoDesde = null,
     DateOnly? FechaEfectoHasta = null);
 

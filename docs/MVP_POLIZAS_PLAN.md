@@ -6,6 +6,8 @@ Fecha: 2026-05-13
 
 Construir el primer MVP de iLiniumTech alrededor del componente de polizas configurado en AppBuilder, sin migrar todo el generador y sin repetir sus riesgos de seguridad.
 
+Decision de producto: iLiniumTech no sera un runtime dinamico tipo AppBuilder. La metadata localizada sirve para entender, migrar, generar SDD y hacer scaffolding inicial. El producto final debe quedar como frontend Vue estatico + backend API de datos con contratos propios.
+
 ## Metadata real localizada
 
 Entorno consultado en solo lectura:
@@ -73,7 +75,7 @@ Campos relevantes detectados desde `IAP_ComponentDataSourceFieldConfiguration`:
 
 El MVP actual es de solo lectura y se limita a:
 
-- contrato de metadata de polizas;
+- contrato API de datos de polizas y trazabilidad AppBuilder documentada;
 - listado paginado;
 - detalle por id;
 - validacion de ordenacion por whitelist;
@@ -90,7 +92,9 @@ Fuera de alcance por ahora:
 - Google Wallet;
 - llamadas REST/SOAP;
 - permisos finos por oficina, gestor o perfil;
-- lectura directa de `Pantalla_Polizas` en runtime.
+- lectura directa de `Pantalla_Polizas` sin repositorio SQL controlado.
+- render dinamico de pantallas desde metadata `IAP_*`.
+- dependencia productiva del frontend sobre metadata AppBuilder.
 
 ## Proyectos creados
 
@@ -125,7 +129,7 @@ Endpoints:
 
 ```text
 GET /health
-GET /api/polizas/metadata
+GET /api/polizas/catalogs
 GET /api/polizas
 GET /api/polizas/{id}
 ```
@@ -138,14 +142,12 @@ Seguridad actual:
 - El placeholder `__SET_IN_ENVIRONMENT__` no autentica.
 - CORS usa `Cors:AllowedOrigins`, sin `AllowAnyOrigin`.
 
-## Contrato de metadata
+## Trazabilidad AppBuilder fuera de runtime
 
-La metadata expone referencias AppBuilder necesarias para trazabilidad:
+Las referencias AppBuilder necesarias para trazabilidad del MVP se mantienen en documentacion, specs SDD y artefactos sanitizados de extraccion offline. No son un contrato para renderizar UI ni construir queries en runtime.
 
 ```json
 {
-  "resource": "polizas",
-  "version": 1,
   "appBuilder": {
     "applicationId": 2,
     "applicationVersion": 1,
@@ -160,17 +162,49 @@ La metadata expone referencias AppBuilder necesarias para trazabilidad:
 }
 ```
 
-## Siguiente paso tecnico
+El endpoint historico `GET /api/polizas/metadata` queda deprecado y responde `410 Gone`. El frontend no debe consumirlo.
 
-Crear un extractor seguro de solo lectura:
+## Contratos runtime actuales
 
-1. Leer la conexion desde variable de entorno local o secret store.
-2. No imprimir la cadena.
-3. Consultar `AunnaTechADM` para metadata `IAP_*`.
-4. Consultar BBDD modelo solo con whitelist.
-5. Generar un JSON sanitizado de `Polizas`.
-6. Sustituir fixture in-memory por repositorio SQL parametrizado.
-7. Anadir integration tests contra BBDD de test o contenedor.
+El backend sirve datos y catalogos, no diseno de pantalla:
+
+```text
+GET /api/polizas/catalogs
+GET /api/polizas
+GET /api/polizas/{id}
+```
+
+`/api/polizas/catalogs` devuelve opciones para selects como tipo de poliza, compania, ramo, oficina, gestor, canal de cobro, fraccion de pago y otros catalogos funcionales. Esos catalogos son datos; la estructura visual de filtros, columnas y detalle vive en Vue/TypeScript.
+
+## Siguiente paso tecnico por fases
+
+1. Consolidar la decision documental:
+
+   - AppBuilder queda como fuente heredada de conocimiento.
+   - iLiniumTech queda orientado a Vue estatico + API backend.
+   - Las specs SDD deben distinguir evidencia de AppBuilder frente a comportamiento productivo.
+
+2. Crear un extractor seguro de solo lectura/offline:
+
+   - Leer la conexion desde variable de entorno local o secret store.
+   - No imprimir la cadena.
+   - Consultar `AunnaTechADM` para metadata `IAP_*`.
+   - Generar un JSON sanitizado de `Polizas` para revision, SDD y scaffolding.
+   - No usar ese JSON como contrato runtime del frontend/backend.
+
+3. Evolucion backend:
+
+   - Repositorio SQL read-only parametrizado disponible por configuracion (`Polizas:Repository=Sql`).
+   - Definir y mantener whitelist como codigo/configuracion iLiniumTech revisada.
+   - Anadir integration tests contra BBDD de test o contenedor.
+   - Mantener API estable para el frontend.
+
+4. Evolucion frontend:
+
+   - Mantener `/polizas` como pantalla Vue estatica.
+   - Traducir campos y agrupaciones heredadas a componentes propios revisados.
+   - Consumir la API de polizas, no metadata AppBuilder cruda.
+   - Cubrir estados de carga, vacio, error y permisos.
 
 ## Riesgos
 
@@ -179,6 +213,7 @@ Crear un extractor seguro de solo lectura:
 - El CRUD real arrastra muchos botones de accion y workflows.
 - El campo `QueryStatic` de AppBuilder contiene SQL generado dinamicamente; no debe ejecutarse sin validacion.
 - La UI real de AppBuilder usa templates de header, menus y botones que se han recortado para MVP.
+- Reintroducir metadata como runtime recrearia el problema que iLiniumTech intenta retirar.
 
 ## Criterio de exito de fase
 

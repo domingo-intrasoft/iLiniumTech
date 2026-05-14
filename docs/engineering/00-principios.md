@@ -4,6 +4,8 @@
 
 iLiniumTech no debe intentar reescribir AppBuilder entero en el primer movimiento. La estrategia correcta es extraer un comportamiento pequeno, entender sus dependencias y construir un MVP verificable.
 
+iLiniumTech tampoco debe evolucionar hacia un runtime dinamico tipo AppBuilder. La metadata heredada es entrada para extraccion, migracion, trazabilidad y scaffolding inicial; el producto debe quedar como Vue estatico + API backend explicita.
+
 ## Seguridad antes que comodidad
 
 La aplicacion actual contiene patrones peligrosos: secretos en fuentes auxiliares, SQL dinamico, CORS permisivo, cifrado reversible y configuracion sensible mezclada con codigo. En iLiniumTech esos riesgos se tratan como requisitos de diseno, no como tareas posteriores.
@@ -32,7 +34,8 @@ No se busca cobertura decorativa. Se priorizan pruebas donde hay:
 - SQL dinamico;
 - datos persistidos;
 - transformaciones de metadata;
-- render dinamico;
+- scaffolding derivado de metadata;
+- componentes Vue estaticos generados o ajustados desde ese scaffolding;
 - expresiones y workflows;
 - integraciones REST, SOAP o GraphQL.
 

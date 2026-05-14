@@ -36,7 +36,7 @@ La pantalla real se compone desde estos elementos del frontend AppBuilder:
 - `SearchFieldsPanels.vue`: paneles agrupados por cabecera.
 - `SearchFields.vue`: render de campos, tamanos `field-xs`, `field-small`, `field-medium`, `field-large`, `field-full` y addon de filtro.
 
-La configuracion fina no esta hardcodeada en Vue. Se lee desde `IAP_ComponentDataSourceFieldConfiguration.searchConfigParams`, con claves como:
+En AppBuilder, la configuracion fina no esta hardcodeada en Vue. Se lee desde `IAP_ComponentDataSourceFieldConfiguration.searchConfigParams`, con claves como:
 
 - `header`;
 - `headerOrder`;
@@ -48,6 +48,8 @@ La configuracion fina no esta hardcodeada en Vue. Se lee desde `IAP_ComponentDat
 - `defaultFilter`.
 
 ## Ajuste aplicado en iLiniumTech
+
+La decision actual es traducir esa informacion a una pantalla Vue estatica mantenida como codigo fuente. La metadata sirve para comprobar fidelidad y preparar scaffolding, no para renderizar la pantalla en produccion.
 
 Se ha cambiado la primera pantalla `/polizas` para que el MVP represente la forma real del componente:
 
