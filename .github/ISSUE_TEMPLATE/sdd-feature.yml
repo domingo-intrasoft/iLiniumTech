@@ -2,8 +2,8 @@ name: SDD feature
 description: Define a functional change using the project SDD format.
 title: "SDD: "
 labels:
-  - ai-candidate
-  - ai-needs-review
+  - status:new
+  - ai-review-required
 body:
   - type: markdown
     attributes:

@@ -15,13 +15,13 @@ The policy is adapted to this repository structure:
 An issue can be picked up by an AI workflow only when all of these are true:
 
 - It is open.
-- It has `ai-ready` or a GitHub Project status equivalent to `Ready for AI`.
+- It has `status:ready-for-ai` or a GitHub Project status equivalent to `Ready for AI`.
 - It has exactly one engine label: `ai-codex`, `ai-claude`, `ai-codex-web`, or `ai-claude-web`.
 - It has exactly one app label such as `app:api`, `app:frontend`, `app:extractor`, `app:infrastructure`, or `app:docs`.
 - It has a bounded scope and a validation plan.
-- It does not have `needs-human`, `ai-running`, `ai-queued`, `validated`, `preview-ready`, or `done`.
+- It does not have `human-decision-required`, `status:blocked`, `status:ai-in-progress`, `status:ready-for-qa`, `status:ready-for-uat`, `status:ready-for-merge`, or `status:done`.
 
-An issue must be blocked with `needs-human` when it is missing security context, requires production secrets, asks for broad refactors, or changes platform rules without approval.
+An issue must be blocked with `human-decision-required` and `status:blocked` when it is missing security context, requires production secrets, asks for broad refactors, or changes platform rules without approval.
 
 ## Branch routing
 
@@ -109,7 +109,10 @@ Each PR should state:
 Recommended labels:
 
 - engines: `ai-codex`, `ai-claude`, `ai-codex-web`, `ai-claude-web`;
-- state: `ai-candidate`, `ai-ready`, `ai-queued`, `ai-running`, `needs-human`, `validated`, `preview-ready`, `done`;
-- risk: `ai-low-risk`, `ai-needs-review`, `ai-platform-change`, `ai-security-sensitive`;
+- state: `status:new`, `status:ready-for-ai`, `status:ai-in-progress`, `status:ai-done`, `status:ai-review`, `status:ready-for-qa`, `status:ready-for-uat`, `status:ready-for-merge`, `status:done`, `status:blocked`;
+- orchestration: `ai-parent`, `ai-task`, `ai-generated`, `ai-review-required`, `ai-coordinator`;
+- control: `qa-required`, `uat-required`, `test-plan-linked`, `blocked-by-dependency`, `merge-conflict-risk`, `human-decision-required`;
+- locks: `lock:database`, `lock:architecture`, `lock:pipelines`, `lock:security`, `lock:release`;
+- risk: `ai-low-risk`, `ai-platform-change`, `ai-security-sensitive`;
 - apps: `app:api`, `app:frontend`, `app:extractor`, `app:renderer`, `app:infrastructure`, `app:docs`, `app:core`;
 - CI: `ci-failure`, `dependency`, `security`, `e2e`, `blocked-by-env`.

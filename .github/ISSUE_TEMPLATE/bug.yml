@@ -2,7 +2,7 @@ name: Bug report
 description: Report a reproducible bug with sanitized evidence.
 title: "Bug: "
 labels:
-  - ai-candidate
+  - status:new
 body:
   - type: textarea
     id: current
