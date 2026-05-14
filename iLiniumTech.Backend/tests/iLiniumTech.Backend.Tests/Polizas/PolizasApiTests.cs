@@ -324,7 +324,7 @@ public sealed class PolizasApiTests
         client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
         client.DefaultRequestHeaders.Add("X-Correlation-Id", "test-correlation-polizas-validation");
 
-        var response = await client.GetAsync("/api/polizas?sort=rawSql:desc");
+        var response = await client.GetAsync("/api/polizas?sort=SELECT%20*%20FROM%20SecretTable:desc");
         var body = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -332,6 +332,7 @@ public sealed class PolizasApiTests
         body.Should().Contain("POLIZAS_VALIDATION_ERROR");
         body.Should().Contain("\"correlationId\":\"test-correlation-polizas-validation\"");
         body.Contains("SELECT", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+        body.Contains("SecretTable", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
     }
 
     [Fact]

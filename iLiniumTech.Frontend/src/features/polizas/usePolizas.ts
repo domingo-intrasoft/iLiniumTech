@@ -45,6 +45,15 @@ export function usePolizas() {
     }
 
     const currentSession = await loadSession()
+    if (import.meta.env.VITE_USE_BACKEND === 'true' && !currentSession) {
+      error.value = sessionError.value ?? 'No se pudo validar la sesion antes de consultar polizas.'
+      runtimeError.value = error.value
+      contextBlocked.value = true
+      items.value = []
+      total.value = 0
+      return false
+    }
+
     if (
       import.meta.env.VITE_USE_BACKEND === 'true' &&
       currentSession?.polizasExecutionContextRequired &&

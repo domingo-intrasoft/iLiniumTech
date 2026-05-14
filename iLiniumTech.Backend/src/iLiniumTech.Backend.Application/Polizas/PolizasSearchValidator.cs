@@ -30,7 +30,7 @@ public static class PolizasSearchValidator
         var field = parts[0];
         if (!AllowedSortFields.Contains(field))
         {
-            throw new PolizasValidationException($"Sort field '{field}' is not allowed.");
+            throw new PolizasValidationException("Sort field is not allowed.");
         }
 
         var descending = parts.Length == 1 || parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase);

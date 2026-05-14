@@ -67,6 +67,7 @@ function retrySearch() {
     </div>
 
     <div v-if="loading" class="table-scroll" role="status" aria-label="Cargando polizas">
+      <span class="sr-only">Cargando polizas.</span>
       <table>
         <thead>
           <tr>

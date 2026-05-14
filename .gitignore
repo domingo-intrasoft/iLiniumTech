@@ -44,5 +44,7 @@ appsettings.*.local.json
 # Generated runtime data
 SharedAppData/
 PublishData/
+TestResults/
+quality-reports/
 security-reports/
 gitleaks-report*.json

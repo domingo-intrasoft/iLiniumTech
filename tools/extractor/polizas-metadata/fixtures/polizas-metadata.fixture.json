@@ -1,0 +1,248 @@
+{
+  "application": {
+    "Id": 2,
+    "Name": "Aunna Tech",
+    "Version": 1
+  },
+  "menu": {
+    "Id": 10,
+    "Title": "Polizas",
+    "ComponentId": 2824,
+    "Active": true
+  },
+  "components": [
+    {
+      "Id": 2824,
+      "Name": "Busqueda Polizas",
+      "Type": "componentsapp-comp",
+      "Category": "compcat-seacrh"
+    },
+    {
+      "Id": 2825,
+      "Name": "CrudPoliza",
+      "Type": "tipocontrol-crudtbl",
+      "ParentComponentId": 2824
+    }
+  ],
+  "componentDataSource": {
+    "Id": 354,
+    "ComponentId": 2825,
+    "DataSourceId": 146,
+    "Name": "Dat_PantallaPolizas",
+    "QueryStatic": "SELECT Poliza, NombreCompleto FROM Pantalla_Polizas WHERE BrokerId = @brokerId"
+  },
+  "dataSource": {
+    "Id": 146,
+    "Name": "Pantalla_Polizas",
+    "Type": "datasourcetype-db",
+    "DatabaseKind": "tipobd-MO",
+    "ModelObject": "Pantalla_Polizas",
+    "QueryStatic": "SELECT * FROM Pantalla_Polizas"
+  },
+  "fields": [
+    {
+      "Name": "Poliza",
+      "Label": "Poliza",
+      "DataType": "string",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 10,
+      "SearchConfigParams": "{\"control\":\"text\",\"operator\":\"contains\",\"advanced\":true}"
+    },
+    {
+      "Name": "Aplicacion",
+      "Label": "Aplicacion",
+      "DataType": "string",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 20,
+      "SearchConfigParams": "control=text;operator=contains;advanced=true"
+    },
+    {
+      "Name": "IdTipoPoliza",
+      "Label": "Tipo poliza",
+      "DataType": "int",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 30,
+      "Lookup": {
+        "catalog": "TipoPoliza",
+        "requiresBackendCatalogReview": true
+      },
+      "SearchConfigParams": "{\"control\":\"select\",\"catalog\":\"TipoPoliza\",\"operator\":\"equals\",\"advanced\":true}"
+    },
+    {
+      "Name": "NumDocumento",
+      "Label": "Documento",
+      "DataType": "string",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 40,
+      "SearchConfigParams": "{\"control\":\"text\",\"operator\":\"contains\",\"advanced\":true}"
+    },
+    {
+      "Name": "IdSituacion",
+      "Label": "Situacion",
+      "DataType": "int",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 50,
+      "Lookup": {
+        "catalog": "SituacionPoliza",
+        "requiresBackendCatalogReview": true
+      },
+      "SearchConfigParams": "{\"control\":\"select\",\"catalog\":\"SituacionPoliza\",\"operator\":\"equals\",\"advanced\":true}"
+    },
+    {
+      "Name": "IdRamo",
+      "Label": "Ramo",
+      "DataType": "int",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 60,
+      "Lookup": {
+        "catalog": "Ramo",
+        "requiresBackendCatalogReview": true
+      },
+      "SearchConfigParams": "{\"control\":\"select\",\"catalog\":\"Ramo\",\"operator\":\"equals\",\"advanced\":true}"
+    },
+    {
+      "Name": "Riesgo",
+      "Label": "Riesgo",
+      "DataType": "string",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 70,
+      "SearchConfigParams": "{\"control\":\"text\",\"operator\":\"contains\",\"advanced\":true}"
+    },
+    {
+      "Name": "F_Efecto",
+      "Label": "Fecha efecto",
+      "DataType": "date",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 80,
+      "SearchConfigParams": "{\"control\":\"date\",\"operator\":\"between\",\"advanced\":true,\"format\":\"yyyy-MM-dd\"}"
+    },
+    {
+      "Name": "F_Vencimiento",
+      "Label": "Fecha vencimiento",
+      "DataType": "date",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 90,
+      "SearchConfigParams": "{\"control\":\"date\",\"operator\":\"between\",\"advanced\":true,\"format\":\"yyyy-MM-dd\"}"
+    },
+    {
+      "Name": "F_Anulacion",
+      "Label": "Fecha anulacion",
+      "DataType": "date",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 100,
+      "SearchConfigParams": "{\"control\":\"date\",\"operator\":\"between\",\"advanced\":true,\"format\":\"yyyy-MM-dd\"}"
+    },
+    {
+      "Name": "IdMotivoAnulacion",
+      "Label": "Motivo anulacion",
+      "DataType": "int",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 110,
+      "Lookup": {
+        "catalog": "MotivoAnulacion",
+        "requiresBackendCatalogReview": true
+      },
+      "SearchConfigParams": "{\"control\":\"select\",\"catalog\":\"MotivoAnulacion\",\"operator\":\"equals\",\"advanced\":true}"
+    },
+    {
+      "Name": "Cia",
+      "Label": "Compania",
+      "DataType": "string",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 120,
+      "Lookup": {
+        "catalog": "Compania",
+        "requiresBackendCatalogReview": true
+      },
+      "SearchConfigParams": "{\"control\":\"select\",\"catalog\":\"Compania\",\"operator\":\"equals\",\"advanced\":true}"
+    },
+    {
+      "Name": "PAnualCartera",
+      "Label": "Prima anual cartera",
+      "DataType": "decimal",
+      "Visible": true,
+      "Searchable": false,
+      "Sortable": true,
+      "Order": 130,
+      "SearchConfigParams": ""
+    },
+    {
+      "Name": "NombreCompleto",
+      "Label": "Tomador",
+      "DataType": "string",
+      "Visible": true,
+      "Searchable": true,
+      "Sortable": true,
+      "Order": 140,
+      "SearchConfigParams": "{\"control\":\"text\",\"operator\":\"contains\",\"advanced\":true}"
+    },
+    {
+      "Name": "AlertaInformativa",
+      "Label": "Alerta informativa",
+      "DataType": "bool",
+      "Visible": true,
+      "Searchable": false,
+      "Sortable": false,
+      "Order": 150,
+      "SearchConfigParams": ""
+    },
+    {
+      "Name": "AlertaExclamativa",
+      "Label": "Alerta exclamativa",
+      "DataType": "bool",
+      "Visible": true,
+      "Searchable": false,
+      "Sortable": false,
+      "Order": 160,
+      "SearchConfigParams": ""
+    },
+    {
+      "Name": "AlertaRstrictiva",
+      "Label": "Alerta restrictiva",
+      "DataType": "bool",
+      "Visible": true,
+      "Searchable": false,
+      "Sortable": false,
+      "Order": 170,
+      "SearchConfigParams": ""
+    }
+  ],
+  "dependencies": [
+    {
+      "kind": "component",
+      "sourceId": 2824,
+      "targetId": 2825,
+      "relation": "root-child"
+    },
+    {
+      "kind": "datasource",
+      "sourceId": 354,
+      "targetId": 146,
+      "relation": "component-datasource"
+    }
+  ]
+}

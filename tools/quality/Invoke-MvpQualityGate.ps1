@@ -16,6 +16,7 @@ $backendSolution = Join-Path $repoRoot "iLiniumTech.Backend\iLiniumTech.Backend.
 $backendApiProject = Join-Path $repoRoot "iLiniumTech.Backend\src\iLiniumTech.Backend.Api"
 $reportsRoot = Join-Path $repoRoot "quality-reports"
 $frontendReports = Join-Path $frontendRoot "reports"
+$polizasMetadataExtractorTests = Join-Path $repoRoot "tools\extractor\polizas-metadata\tests\Test-PolizasMetadataExtractor.ps1"
 
 function Invoke-Step {
     param(
@@ -223,6 +224,12 @@ try {
 
         Invoke-Step "CORS audit" {
             & (Join-Path $repoRoot "tools\security\Invoke-CorsAudit.ps1") -FailOnFindings
+        }
+    }
+
+    if (Test-Path -LiteralPath $polizasMetadataExtractorTests -PathType Leaf) {
+        Invoke-Step "Polizas metadata extractor tests" {
+            & $polizasMetadataExtractorTests
         }
     }
 

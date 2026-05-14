@@ -69,15 +69,15 @@ El JSON no puede contener:
 
 ## Criterios de aceptacion
 
-- [ ] Existe comando local documentado para generar metadata sanitizada de polizas.
-- [ ] El comando lee configuracion desde variables de entorno o secret store.
-- [ ] La salida incluye referencias `2824`, `2825`, `354` y `146`.
-- [ ] La salida incluye campos y configuracion de busqueda avanzada.
-- [ ] La salida separa trazabilidad AppBuilder de sugerencias de scaffolding iLiniumTech.
-- [ ] La documentacion del comando indica explicitamente que el JSON no es contrato runtime.
-- [ ] No se imprimen connection strings ni passwords en consola o logs.
-- [ ] Los errores de conexion no exponen secretos.
-- [ ] Hay pruebas unitarias para mapeo, redaccion y campos obligatorios.
+- [x] Existe comando local documentado para generar metadata sanitizada de polizas.
+- [x] El comando lee configuracion desde variables de entorno o secret store.
+- [x] La salida incluye referencias `2824`, `2825`, `354` y `146`.
+- [x] La salida incluye campos y configuracion de busqueda avanzada.
+- [x] La salida separa trazabilidad AppBuilder de sugerencias de scaffolding iLiniumTech.
+- [x] La documentacion del comando indica explicitamente que el JSON no es contrato runtime.
+- [x] No se imprimen connection strings ni passwords en consola o logs.
+- [x] Los errores de conexion no exponen secretos.
+- [x] Hay pruebas unitarias para mapeo, redaccion y campos obligatorios.
 - [ ] Hay prueba de integracion opcional o marcada como skipped si no hay BBDD local.
 
 ## Impacto tecnico
@@ -87,6 +87,13 @@ Tooling:
 - Nuevo proyecto, comando o script de extraccion fuera del camino runtime del producto.
 - Contratos JSON de analisis/scaffolding.
 - Validadores de metadata.
+
+Implementacion base disponible en `tools/extractor/polizas-metadata`:
+
+- `Invoke-PolizasMetadataExtractor.ps1` soporta `Fixture`, `DryRun` y `Live`.
+- `Live` requiere `ILINIUMTECH__MASTER_CONNECTION` e `ILINIUMTECH__PROGRAM_DATABASE`, y falla sin imprimir secretos si no hay entorno autorizado.
+- `QueryStatic` se conserva solo como evidencia redaccionada con fingerprint; no se ejecuta.
+- Los artefactos generados por defecto van a `reports/polizas-metadata`, ruta ignorada por Git.
 
 Documentacion:
 

@@ -44,5 +44,17 @@ describe('PolizasFilters', () => {
 
     expect(wrapper.find('[role="alert"]').text()).toContain('catalogos')
     expect(wrapper.get('#polizas-filter-poliza').attributes('aria-label')).toBe('Poliza')
+    expect(wrapper.get('#polizas-filter-tipoPoliza').attributes('aria-describedby')).toBe(
+      'polizas-catalog-error',
+    )
+  })
+
+  it('keeps text criteria usable while catalog selects are loading', () => {
+    const wrapper = mountFilters({ loading: true })
+
+    expect(wrapper.attributes('aria-busy')).toBe('true')
+    expect(wrapper.find('[role="status"]').text()).toContain('Cargando catalogos')
+    expect(wrapper.get('#polizas-filter-poliza').attributes('disabled')).toBeUndefined()
+    expect(wrapper.get('#polizas-filter-tipoPoliza').attributes('disabled')).toBeDefined()
   })
 })

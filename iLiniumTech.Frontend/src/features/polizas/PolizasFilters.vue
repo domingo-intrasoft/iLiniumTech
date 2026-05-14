@@ -42,6 +42,10 @@ function catalogOptions(field: PolizasSearchField) {
   return props.catalogs[field.catalogKey]
 }
 
+function fieldDisabled(field: PolizasSearchField) {
+  return props.loading === true && field.control === 'select'
+}
+
 function executeSearch() {
   emit('search', {
     numero: searchValue('poliza'),
@@ -63,7 +67,11 @@ function clearFilters() {
 </script>
 
 <template>
-  <section class="search-panel" aria-label="Busqueda avanzada de polizas">
+  <section
+    class="search-panel"
+    aria-label="Busqueda avanzada de polizas"
+    :aria-busy="props.loading"
+  >
     <header class="search-actions">
       <div class="search-action-buttons">
         <button
@@ -99,7 +107,11 @@ function clearFilters() {
       <i class="pi pi-chevron-up" aria-hidden="true"></i>
     </header>
 
-    <p v-if="props.error" class="filter-warning" role="alert">
+    <p v-if="props.loading" id="polizas-catalog-loading" class="sr-only" role="status">
+      Cargando catalogos de polizas.
+    </p>
+
+    <p v-if="props.error" id="polizas-catalog-error" class="filter-warning" role="alert">
       {{ props.error }}
     </p>
 
@@ -131,6 +143,8 @@ function clearFilters() {
                 :id="fieldControlId(field)"
                 v-model="searchValues[field.key]"
                 :aria-label="field.label"
+                :aria-describedby="props.error ? 'polizas-catalog-error' : undefined"
+                :disabled="fieldDisabled(field)"
               >
                 <option value=""></option>
                 <option

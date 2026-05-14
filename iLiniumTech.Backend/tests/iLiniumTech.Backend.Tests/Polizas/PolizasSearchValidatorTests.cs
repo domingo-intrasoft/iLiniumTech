@@ -20,10 +20,10 @@ public sealed class PolizasSearchValidatorTests
     [Fact]
     public void ValidateAndParseSort_rejects_unknown_sort_fields()
     {
-        var act = () => PolizasSearchValidator.ValidateAndParseSort("rawSql:desc");
+        var act = () => PolizasSearchValidator.ValidateAndParseSort("SELECT * FROM SecretTable:desc");
 
         act.Should().Throw<PolizasValidationException>()
-            .WithMessage("*not allowed*");
+            .WithMessage("Sort field is not allowed.");
     }
 
     [Fact]
