@@ -9,6 +9,7 @@ Documento principal:
 - [docs/DECISION_PRODUCTO_ARQUITECTURA.md](docs/DECISION_PRODUCTO_ARQUITECTURA.md)
 - [docs/APPBUILDER_ANALISIS_ARQUITECTURA.md](docs/APPBUILDER_ANALISIS_ARQUITECTURA.md)
 - [docs/APPBUILDER_FLUJO_CONEXIONES_BROKER_POLIZAS.md](docs/APPBUILDER_FLUJO_CONEXIONES_BROKER_POLIZAS.md)
+- [docs/ROADMAP_OBJETIVOS_FINALES.md](docs/ROADMAP_OBJETIVOS_FINALES.md)
 - [docs/engineering/README.md](docs/engineering/README.md)
 - [docs/engineering/08-runbook-mvp-local.md](docs/engineering/08-runbook-mvp-local.md)
 - [docs/PLAN_CICD_GITHUB_ONLY.md](docs/PLAN_CICD_GITHUB_ONLY.md)
