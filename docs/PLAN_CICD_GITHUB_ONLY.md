@@ -3,6 +3,8 @@
 Fecha: 2026-05-13  
 Referencia analizada: `C:\Desarrollo\AcademiaLasCortes-boards-ai`, rama `demo`, commit `dae8b2f5`.
 
+Nota de actualizacion 2026-05-14: este documento conserva el analisis inicial y algunas referencias historicas a labels como `ai-ready`, `ai-running` o `needs-human`. El modelo operativo vigente para estados, locks y labels es `docs/ai/multi-agent-orchestration.md`.
+
 ## 1. Objetivo
 
 Montar en iLiniumTech un flujo equivalente al de `AcademiaLasCortes/demo`, pero sin Azure DevOps como autoridad final.
@@ -66,17 +68,18 @@ Lecciones que ya no aplican:
 
 ## 3. Politica de ramas decidida
 
-iLiniumTech usara trunk-based development.
+iLiniumTech empezo con un plan trunk-based puro, pero la decision operativa actual del proyecto separa producto y plataforma para reducir riesgo mientras se construye el MVP.
 
 Ramas permanentes:
 
-- `main`: unica rama permanente, rama por defecto y fuente de verdad.
+- `main`: rama estable, protegida y fuente de verdad de releases.
+- `develop`: rama de desarrollo de producto.
+- `ci-cd`: rama de desarrollo de plataforma, workflows, gobierno, seguridad y automatizacion.
 
 Ramas que no se usaran:
 
 - No usar `demo` como rama.
-- No usar `develop`.
-- No mantener ramas largas de integracion.
+- No crear ramas largas adicionales de integracion.
 
 Ramas cortas permitidas:
 
@@ -91,9 +94,11 @@ Ramas cortas permitidas:
 
 Reglas:
 
-- Toda rama que aspire a entrar en el producto abre PR contra `main`.
+- Las ramas de producto abren PR contra `develop`.
+- Las ramas de plataforma abren PR contra `ci-cd`.
+- Los cortes estabilizados abren PR contra `main`.
 - No hay push directo a `main` salvo emergencia documentada y con permisos de administrador.
-- Las ramas de IA siempre nacen de `main` actualizado.
+- Las ramas de IA nacen de la rama base que corresponda: `develop` para producto, `ci-cd` para plataforma.
 - Una rama de trabajo debe vivir lo minimo posible y cerrarse al mergear o descartar la PR.
 - Los despliegues no se modelan con ramas; se modelan con GitHub Environments.
 
