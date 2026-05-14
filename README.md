@@ -10,6 +10,7 @@ Documento principal:
 - [docs/APPBUILDER_ANALISIS_ARQUITECTURA.md](docs/APPBUILDER_ANALISIS_ARQUITECTURA.md)
 - [docs/APPBUILDER_FLUJO_CONEXIONES_BROKER_POLIZAS.md](docs/APPBUILDER_FLUJO_CONEXIONES_BROKER_POLIZAS.md)
 - [docs/engineering/README.md](docs/engineering/README.md)
+- [docs/engineering/08-runbook-mvp-local.md](docs/engineering/08-runbook-mvp-local.md)
 - [docs/PLAN_CICD_GITHUB_ONLY.md](docs/PLAN_CICD_GITHUB_ONLY.md)
 - [docs/MVP_POLIZAS_PLAN.md](docs/MVP_POLIZAS_PLAN.md)
 - [docs/MVP_POLIZAS_DIFERENCIAS.md](docs/MVP_POLIZAS_DIFERENCIAS.md)
@@ -43,6 +44,11 @@ Fase documental completada, decision de arquitectura fijada y primer corte MVP c
 - `iLiniumTech.Frontend`: Vue 3 + Vite + TypeScript para pantalla estatica inicial del componente de polizas.
 
 ## Configuracion local de polizas
+
+Runbook operativo recomendado: [docs/engineering/08-runbook-mvp-local.md](docs/engineering/08-runbook-mvp-local.md). Resume los dos modos locales soportados:
+
+- fixtures locales de frontend, sin backend ni SQL;
+- backend + SQL controlado, con secretos fuera del repo.
 
 Por defecto el backend usa fixtures anonimizados:
 
@@ -140,17 +146,27 @@ El frontend requiere Node.js 20.19 o superior, alineado con las guias traidas de
 
 Para conectar el frontend al backend local en desarrollo, usar valores publicos de entorno como `VITE_USE_BACKEND=true`, `VITE_API_BASE_URL=http://localhost:5146` y `VITE_ILINIUMTECH_API_KEY=<clave-local>`. Esa clave de frontend solo sirve para desarrollo/demo; no debe tratarse como secreto de produccion.
 
-### Runbook demo MVP con backend
+### Runbook rapido MVP
+
+Modo fixtures locales de frontend:
+
+```powershell
+cd .\iLiniumTech.Frontend
+$env:VITE_USE_BACKEND = "false"
+npm run dev
+```
+
+Modo backend + SQL controlado:
 
 Backend:
 
 ```powershell
-$env:ApiSecurity__ApiKey = "<clave-local-demo>"
+$env:ApiSecurity__ApiKey = "local-demo-api-key-change-me"
 $env:Polizas__Repository = "Sql"
 $env:Polizas__ConnectionResolver = "AppBuilderMaster"
 $env:Polizas__AllowHeaderExecutionContext = "true"
-$env:ConnectionStrings__AppBuilderMaster = "<master-connection-string-local>"
-$env:AppBuilder__EncryptionKey = "<appbuilder-encryption-key-local>"
+$env:ConnectionStrings__AppBuilderMaster = "<MASTER_CONNECTION_STRING_FROM_LOCAL_SECRET_STORE>"
+$env:AppBuilder__EncryptionKey = "<APPBUILDER_ENCRYPTION_KEY_FROM_LOCAL_SECRET_STORE>"
 dotnet run --project .\iLiniumTech.Backend\src\iLiniumTech.Backend.Api
 ```
 
@@ -160,11 +176,18 @@ Frontend:
 cd .\iLiniumTech.Frontend
 $env:VITE_USE_BACKEND = "true"
 $env:VITE_API_BASE_URL = "http://localhost:5146"
-$env:VITE_ILINIUMTECH_API_KEY = "<clave-local-demo>"
-$env:VITE_BROKER_ID = "<broker-id-local>"
+$env:VITE_ILINIUMTECH_API_KEY = "local-demo-api-key-change-me"
+$env:VITE_BROKER_ID = "<BROKER_ID_FOR_LOCAL_MVP_CONTEXT>"
 npm run dev
 ```
 
 `/api/me` devuelve el contexto efectivo que usa la UI para mostrar el broker activo y detectar si falta contexto antes de consultar polizas. Cuando `VITE_USE_BACKEND=true`, los fallos de backend no se sustituyen por fixtures silenciosos: deben mostrarse como error de configuracion/conexion para que la demo sea honesta.
 
 La pantalla de polizas ya envia `page`, `pageSize`, `fechaEfectoDesde` y `fechaEfectoHasta` al backend. En SQL, `fechaEfectoHasta` se traduce como limite superior exclusivo del dia siguiente para cubrir columnas `datetime` con hora.
+
+Checklist corto:
+
+- `VITE_*` son valores publicos del frontend; no poner secretos reales ahi.
+- `VITE_ILINIUMTECH_API_KEY` solo sirve para demo/dev porque viaja al navegador.
+- `ApiSecurity__ApiKey`, connection strings y `AppBuilder__EncryptionKey` son secretos y deben venir de entorno local, user secrets o vault.
+- `Polizas__AllowHeaderExecutionContext=true` y `VITE_BROKER_ID` son ayudas MVP controladas; no sustituyen autenticacion/autorizacion real.
