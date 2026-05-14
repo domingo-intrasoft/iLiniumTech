@@ -9,6 +9,8 @@ export interface PolizasSearchParams {
   estado?: string
   compania?: string
   ramo?: string
+  fechaEfectoDesde?: string
+  fechaEfectoHasta?: string
   page?: number
   pageSize?: number
   sort?: string
@@ -27,18 +29,36 @@ export async function searchPolizas(
   const estado = params.estado?.toLowerCase() ?? ''
   const compania = params.compania?.toLowerCase() ?? ''
   const ramo = params.ramo?.toLowerCase() ?? ''
-  const items = polizasFixture.items.filter((item) => {
+  const fechaEfectoDesde = params.fechaEfectoDesde ?? ''
+  const fechaEfectoHasta = params.fechaEfectoHasta ?? ''
+  const filteredItems = polizasFixture.items.filter((item) => {
     const matchesNumero = !numero || item.numero.toLowerCase().includes(numero)
     const matchesCliente = !cliente || item.clienteNombre.toLowerCase().includes(cliente)
     const matchesEstado = !estado || item.estado.toLowerCase().includes(estado)
     const matchesCompania = !compania || item.compania.toLowerCase().includes(compania)
     const matchesRamo = !ramo || item.ramo.toLowerCase().includes(ramo)
-    return matchesNumero && matchesCliente && matchesEstado && matchesCompania && matchesRamo
+    const matchesFechaDesde = !fechaEfectoDesde || item.fechaEfecto >= fechaEfectoDesde
+    const matchesFechaHasta = !fechaEfectoHasta || item.fechaEfecto <= fechaEfectoHasta
+    return (
+      matchesNumero &&
+      matchesCliente &&
+      matchesEstado &&
+      matchesCompania &&
+      matchesRamo &&
+      matchesFechaDesde &&
+      matchesFechaHasta
+    )
   })
+  const page = Math.max(1, params.page ?? polizasFixture.page)
+  const pageSize = Math.max(1, params.pageSize ?? polizasFixture.pageSize)
+  const start = (page - 1) * pageSize
+  const items = filteredItems.slice(start, start + pageSize)
 
   return {
     ...polizasFixture,
-    total: items.length,
+    page,
+    pageSize,
+    total: filteredItems.length,
     items,
   }
 }

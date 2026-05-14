@@ -43,6 +43,8 @@ function executeSearch() {
     estado: searchValue('tipoPoliza'),
     compania: searchValue('cia'),
     ramo: searchValue('ramo'),
+    fechaEfectoDesde: searchValue('efectoInicial'),
+    fechaEfectoHasta: searchValue('efectoFinal'),
   })
 }
 

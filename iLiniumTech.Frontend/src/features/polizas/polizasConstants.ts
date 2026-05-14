@@ -133,6 +133,7 @@ export const polizasFilterKeys = [
   'ramo',
   'riesgo',
   'efectoInicial',
+  'efectoFinal',
   'vencimiento',
   'anulacion',
   'oficina',
@@ -182,6 +183,8 @@ export interface PolizasSearchCriteria {
   estado: string
   compania: string
   ramo: string
+  fechaEfectoDesde: string
+  fechaEfectoHasta: string
 }
 
 export const polizasSearchSections: PolizasSearchSection[] = [
@@ -209,6 +212,7 @@ export const polizasSearchSections: PolizasSearchSection[] = [
     rows: [
       [
         { key: 'efectoInicial', label: 'F_EfectoInicial', control: 'date', span: 2 },
+        { key: 'efectoFinal', label: 'F_EfectoHasta', control: 'date', span: 2 },
         { key: 'vencimiento', label: 'F. Vencimiento', control: 'date', span: 2 },
         { key: 'anulacion', label: 'F. Anulacion', control: 'date', span: 2 },
         { key: 'oficina', label: 'Oficina', control: 'select', catalogKey: 'oficina', span: 2 },

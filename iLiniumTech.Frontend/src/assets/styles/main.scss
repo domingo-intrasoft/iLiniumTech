@@ -530,6 +530,47 @@ tbody tr:hover {
   text-decoration: underline;
 }
 
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  border-top: 1px solid #d6e1ed;
+  color: #506278;
+  font-size: 0.78rem;
+}
+
+.page-size-control,
+.page-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-size-control select {
+  height: 28px;
+  border: 1px solid #c8d6e3;
+  color: #17324a;
+  background: #ffffff;
+}
+
+.page-controls button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  border: 1px solid #c8d6e3;
+  color: #17324a;
+  background: #ffffff;
+  font-weight: 700;
+}
+
+.page-controls button:disabled {
+  color: #95a9be;
+  background: #f5f8fb;
+}
+
 .state {
   margin: 0;
   padding: 14px;
