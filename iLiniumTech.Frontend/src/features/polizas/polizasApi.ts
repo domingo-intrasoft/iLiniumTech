@@ -45,12 +45,8 @@ export async function searchPolizas(
 
 export async function getPolizasCatalogs(): Promise<PolizasCatalogs> {
   if (import.meta.env.VITE_USE_BACKEND === 'true') {
-    try {
-      const response = await apiClient.get<PolizasCatalogs>('/api/polizas/catalogs')
-      return response.data
-    } catch {
-      return polizasCatalogsFixture
-    }
+    const response = await apiClient.get<PolizasCatalogs>('/api/polizas/catalogs')
+    return response.data
   }
 
   return polizasCatalogsFixture
@@ -58,12 +54,8 @@ export async function getPolizasCatalogs(): Promise<PolizasCatalogs> {
 
 export async function getPolizaById(id: string): Promise<PolizaDetail | null> {
   if (import.meta.env.VITE_USE_BACKEND === 'true') {
-    try {
-      const response = await apiClient.get<PolizaDetail>(`/api/polizas/${encodeURIComponent(id)}`)
-      return response.data
-    } catch {
-      return polizasDetailFixture.find((item) => item.id === id) ?? null
-    }
+    const response = await apiClient.get<PolizaDetail>(`/api/polizas/${encodeURIComponent(id)}`)
+    return response.data
   }
 
   return polizasDetailFixture.find((item) => item.id === id) ?? null

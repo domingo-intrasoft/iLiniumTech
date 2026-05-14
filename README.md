@@ -139,3 +139,30 @@ npm run build
 El frontend requiere Node.js 20.19 o superior, alineado con las guias traidas de `AcademiaLasCortes` rama `demo`.
 
 Para conectar el frontend al backend local en desarrollo, usar valores publicos de entorno como `VITE_USE_BACKEND=true`, `VITE_API_BASE_URL=http://localhost:5146` y `VITE_ILINIUMTECH_API_KEY=<clave-local>`. Esa clave de frontend solo sirve para desarrollo/demo; no debe tratarse como secreto de produccion.
+
+### Runbook demo MVP con backend
+
+Backend:
+
+```powershell
+$env:ApiSecurity__ApiKey = "<clave-local-demo>"
+$env:Polizas__Repository = "Sql"
+$env:Polizas__ConnectionResolver = "AppBuilderMaster"
+$env:Polizas__AllowHeaderExecutionContext = "true"
+$env:ConnectionStrings__AppBuilderMaster = "<master-connection-string-local>"
+$env:AppBuilder__EncryptionKey = "<appbuilder-encryption-key-local>"
+dotnet run --project .\iLiniumTech.Backend\src\iLiniumTech.Backend.Api
+```
+
+Frontend:
+
+```powershell
+cd .\iLiniumTech.Frontend
+$env:VITE_USE_BACKEND = "true"
+$env:VITE_API_BASE_URL = "http://localhost:5146"
+$env:VITE_ILINIUMTECH_API_KEY = "<clave-local-demo>"
+$env:VITE_BROKER_ID = "<broker-id-local>"
+npm run dev
+```
+
+`/api/me` devuelve el contexto efectivo que usa la UI para mostrar el broker activo y detectar si falta contexto antes de consultar polizas. Cuando `VITE_USE_BACKEND=true`, los fallos de backend no se sustituyen por fixtures silenciosos: deben mostrarse como error de configuracion/conexion para que la demo sea honesta.

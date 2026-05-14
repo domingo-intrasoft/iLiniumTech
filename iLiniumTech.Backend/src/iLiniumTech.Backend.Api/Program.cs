@@ -46,6 +46,34 @@ app.MapGet("/health", () => Results.Ok(new
     application = "iLiniumTech.Backend"
 }));
 
+app.MapGet("/api/me", (
+    [FromServices] IPolizasExecutionContextAccessor executionContextAccessor,
+    [FromServices] IConfiguration configuration) =>
+{
+    try
+    {
+        var executionContext = executionContextAccessor.Current;
+        return Results.Ok(new MeResponse(
+            BrokerId: executionContext?.BrokerId,
+            EntityMainId: executionContext?.EntityMainId,
+            UserId: executionContext?.UserId,
+            ProfileId: executionContext?.ProfileId,
+            ProfileTypeId: executionContext?.ProfileTypeId,
+            IsAdmin: executionContext?.IsAdmin,
+            HeaderExecutionContextEnabled: IsHeaderExecutionContextEnabled(configuration),
+            PolizasExecutionContextRequired: RequiresPolizasExecutionContext(configuration)));
+    }
+    catch (PolizasExecutionContextException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "POLIZAS_CONTEXT_INVALID",
+            Message: exception.Message,
+            CorrelationId: null)));
+    }
+})
+.RequireAuthorization()
+.WithName("GetMe");
+
 var polizas = app.MapGroup("/api/polizas")
     .RequireAuthorization();
 
@@ -173,8 +201,25 @@ static bool RequiresPolizasExecutionContext(IConfiguration configuration)
         && requireExecutionContext;
 }
 
+static bool IsHeaderExecutionContextEnabled(IConfiguration configuration) =>
+    bool.TryParse(
+        configuration["Polizas:AllowHeaderExecutionContext"]
+        ?? configuration["ILINIUMTECH:ALLOW_HEADER_EXECUTION_CONTEXT"],
+        out var allowHeaderExecutionContext)
+    && allowHeaderExecutionContext;
+
 public partial class Program;
 
 public sealed record ErrorResponse(ErrorBody Error);
 
 public sealed record ErrorBody(string Code, string Message, string? CorrelationId);
+
+public sealed record MeResponse(
+    int? BrokerId,
+    int? EntityMainId,
+    int? UserId,
+    int? ProfileId,
+    string? ProfileTypeId,
+    bool? IsAdmin,
+    bool HeaderExecutionContextEnabled,
+    bool PolizasExecutionContextRequired);
