@@ -1,24 +1,17 @@
 import { apiClient } from '@/services/apiClient'
 
-import { polizasFixture, polizasMetadata } from './polizasFixture'
-import type { PagedResult, PolizaListItem, PolizasComponentMetadata } from './polizasTypes'
+import { polizasCatalogsFixture, polizasDetailFixture, polizasFixture } from './polizasFixture'
+import type { PagedResult, PolizaDetail, PolizaListItem, PolizasCatalogs } from './polizasTypes'
 
 export interface PolizasSearchParams {
   numero?: string
   cliente?: string
   estado?: string
+  compania?: string
+  ramo?: string
   page?: number
   pageSize?: number
   sort?: string
-}
-
-export async function getPolizasMetadata(): Promise<PolizasComponentMetadata> {
-  if (import.meta.env.VITE_USE_BACKEND === 'true') {
-    const response = await apiClient.get<PolizasComponentMetadata>('/api/polizas/metadata')
-    return response.data
-  }
-
-  return polizasMetadata
 }
 
 export async function searchPolizas(
@@ -32,11 +25,15 @@ export async function searchPolizas(
   const numero = params.numero?.toLowerCase() ?? ''
   const cliente = params.cliente?.toLowerCase() ?? ''
   const estado = params.estado?.toLowerCase() ?? ''
+  const compania = params.compania?.toLowerCase() ?? ''
+  const ramo = params.ramo?.toLowerCase() ?? ''
   const items = polizasFixture.items.filter((item) => {
     const matchesNumero = !numero || item.numero.toLowerCase().includes(numero)
     const matchesCliente = !cliente || item.clienteNombre.toLowerCase().includes(cliente)
     const matchesEstado = !estado || item.estado.toLowerCase().includes(estado)
-    return matchesNumero && matchesCliente && matchesEstado
+    const matchesCompania = !compania || item.compania.toLowerCase().includes(compania)
+    const matchesRamo = !ramo || item.ramo.toLowerCase().includes(ramo)
+    return matchesNumero && matchesCliente && matchesEstado && matchesCompania && matchesRamo
   })
 
   return {
@@ -44,4 +41,22 @@ export async function searchPolizas(
     total: items.length,
     items,
   }
+}
+
+export async function getPolizasCatalogs(): Promise<PolizasCatalogs> {
+  if (import.meta.env.VITE_USE_BACKEND === 'true') {
+    const response = await apiClient.get<PolizasCatalogs>('/api/polizas/catalogs')
+    return response.data
+  }
+
+  return polizasCatalogsFixture
+}
+
+export async function getPolizaById(id: string): Promise<PolizaDetail | null> {
+  if (import.meta.env.VITE_USE_BACKEND === 'true') {
+    const response = await apiClient.get<PolizaDetail>(`/api/polizas/${encodeURIComponent(id)}`)
+    return response.data
+  }
+
+  return polizasDetailFixture.find((item) => item.id === id) ?? null
 }

@@ -16,6 +16,8 @@
 
 AppBuilder contiene un componente real de busqueda de polizas configurado por metadata. El objetivo es usarlo como primer corte MVP de iLiniumTech, extrayendo su forma y contrato sin migrar todo AppBuilder.
 
+Decision de arquitectura: la metadata se usa para trazabilidad y scaffolding inicial. La pantalla final de iLiniumTech debe ser Vue estatico consumiendo una API backend explicita, no un render dinamico de AppBuilder.
+
 Metadata localizada:
 
 - Aplicacion `2`, version `1`.
@@ -39,15 +41,15 @@ Crear una primera aplicacion backend/frontend que represente el componente de po
 - REST/SOAP externos.
 - Motor completo de expresiones.
 - Ejecucion directa de SQL dinamico de AppBuilder.
+- Render dinamico desde metadata `IAP_*` en runtime.
 
 ## Contrato de datos
 
-Metadata:
+Trazabilidad:
 
-- `resource`: `polizas`.
-- `version`: version del contrato.
-- `appBuilder`: referencias a aplicacion, menu, componentes y datasource.
-- `fields`: columnas visibles/filter/sort permitidas.
+- Las referencias AppBuilder de aplicacion, menu, componentes y datasource quedan en la spec y documentacion.
+- El backend no publica metadata de pantalla como contrato runtime.
+- El endpoint historico `/api/polizas/metadata` queda deprecado y no devuelve referencias AppBuilder.
 
 Listado:
 
@@ -55,6 +57,15 @@ Listado:
 - `page`.
 - `pageSize`.
 - `total`.
+
+Catalogos:
+
+- `tipoPoliza`.
+- `compania`.
+- `ramo`.
+- `oficina`.
+- `gestor`.
+- catalogos auxiliares necesarios para filtros codificados en Vue.
 
 Campos iniciales:
 
@@ -77,17 +88,19 @@ Campos iniciales:
 - Solo se permiten campos de ordenacion declarados por whitelist.
 - La UI no debe mostrar datos personales reales en fixtures.
 - El backend no debe devolver SQL, connection strings ni trazas internas.
-- La metadata debe conservar la trazabilidad a AppBuilder.
+- La trazabilidad AppBuilder debe conservarse en documentacion y artefactos offline, sin gobernar la UI en produccion.
 
 ## Criterios de aceptacion
 
 - [x] Existe proyecto `iLiniumTech.Backend`.
 - [x] Existe proyecto `iLiniumTech.Frontend`.
-- [x] `GET /api/polizas/metadata` devuelve referencias AppBuilder `2824`, `2825`, `354` y `146`.
+- [x] `GET /api/polizas/metadata` queda deprecado y no devuelve referencias AppBuilder.
+- [x] `GET /api/polizas/catalogs` devuelve catalogos funcionales para filtros.
 - [x] `GET /api/polizas` devuelve listado paginado con datos anonimizados.
 - [x] Los endpoints `/api/polizas/*` requieren API key.
 - [x] Ordenaciones fuera de whitelist devuelven error de validacion.
-- [x] La UI `/polizas` renderiza tabla y filtros.
+- [x] La UI `/polizas` renderiza tabla y filtros desde codigo Vue/TypeScript propio.
+- [x] La UI `/polizas/:id` renderiza detalle read-only desde API/fixture.
 - [x] No se guardan secretos ni cadenas de conexion en Git.
 
 ## Impacto tecnico
@@ -118,8 +131,8 @@ Frontend:
 ## Plan de pruebas
 
 - Unitarias backend: validador de busqueda y whitelist de sort.
-- Integracion backend: health anonimo, polizas protegido, metadata y error de sort.
-- Unitarias frontend: metadata AppBuilder, filtro por numero y whitelist visible.
+- Integracion backend: health anonimo, polizas protegido, catalogos, metadata deprecada y error de sort.
+- Unitarias frontend: columnas locales, filtros por numero/catalogos y detalle.
 - Build frontend: typecheck y Vite build.
 - Seguridad: Gitleaks, dependency audit y CORS audit.
 - Manual/UAT: abrir `/polizas` y validar que la tabla corresponde al contrato MVP.

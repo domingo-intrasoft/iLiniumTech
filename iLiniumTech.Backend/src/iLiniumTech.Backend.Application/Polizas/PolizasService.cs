@@ -4,8 +4,6 @@ namespace iLiniumTech.Backend.Application.Polizas;
 
 public sealed class PolizasService(IPolizasRepository repository) : IPolizasService
 {
-    public PolizasComponentMetadata GetMetadata() => PolizasMetadataProvider.Create();
-
     public Task<PagedResult<PolizaListItem>> SearchAsync(PolizasSearchRequest request, CancellationToken cancellationToken)
     {
         PolizasSearchValidator.Validate(request);
@@ -22,4 +20,7 @@ public sealed class PolizasService(IPolizasRepository repository) : IPolizasServ
 
         return repository.GetByIdAsync(id, cancellationToken);
     }
+
+    public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
+        repository.GetCatalogsAsync(cancellationToken);
 }

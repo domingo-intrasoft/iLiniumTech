@@ -5,7 +5,7 @@ Accept: application/json
 
 ###
 
-GET {{iLiniumTech.Backend.Api_HostAddress}}/api/polizas/metadata
+GET {{iLiniumTech.Backend.Api_HostAddress}}/api/polizas/catalogs
 Accept: application/json
 X-ILiniumTech-Api-Key: __SET_IN_ENVIRONMENT__
 

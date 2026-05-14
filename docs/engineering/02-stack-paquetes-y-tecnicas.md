@@ -11,7 +11,7 @@ Para una UI nueva:
 - Vite como bundler.
 - Pinia para estado compartido.
 - Vue Router para navegacion.
-- PrimeVue si la app es administrativa o de CRUD dinamico.
+- PrimeVue si la app es administrativa o de CRUD operativo.
 - Tailwind CSS solo si se decide por ADR o si el producto lo pide claramente.
 - Axios o `fetch` encapsulado en un cliente propio.
 - Vitest para unit tests.
@@ -93,12 +93,12 @@ Autorizacion:
 - Permisos por operacion y recurso.
 - Tests 401/403 para endpoints protegidos.
 
-Render dinamico:
+UI derivada de metadata:
 
-- Contratos JSON sanitizados.
-- Tipos discriminados para componentes.
-- Validacion del schema antes de renderizar.
-- Lista cerrada de controles soportados en el MVP.
+- Metadata sanitizada solo para analisis y scaffolding.
+- Componentes Vue estaticos tras revision humana.
+- Validacion del schema antes de generar o aceptar scaffolding.
+- Lista cerrada de controles soportados por el producto, expresada como codigo.
 
 Expresiones y workflows:
 
@@ -124,4 +124,4 @@ Antes de anadir una dependencia:
 - revisar mantenimiento y vulnerabilidades;
 - fijar version con lockfile;
 - evitar upgrades mezclados con funcionalidad;
-- anadir ADR si afecta a varias apps o al runtime base.
+- anadir ADR si afecta a varias apps, contratos compartidos o arquitectura base.

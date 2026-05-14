@@ -31,7 +31,92 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
-    public async Task Metadata_exposes_appbuilder_polizas_reference()
+    public async Task Me_requires_api_key()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/me");
+
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Me_returns_effective_polizas_context_from_configuration()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:BrokerId"] = "84",
+            ["Polizas:UserId"] = "10",
+            ["Polizas:ProfileId"] = "11",
+            ["Polizas:ProfileTypeId"] = "configured-profile",
+            ["Polizas:IsAdmin"] = "false"
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"brokerId\":84");
+        body.Should().Contain("\"entityMainId\":84");
+        body.Should().Contain("\"userId\":10");
+        body.Should().Contain("\"profileId\":11");
+        body.Should().Contain("\"profileTypeId\":\"configured-profile\"");
+        body.Should().Contain("\"isAdmin\":false");
+        body.Should().Contain("\"headerExecutionContextEnabled\":false");
+    }
+
+    [Fact]
+    public async Task Me_returns_effective_polizas_context_from_headers_when_enabled()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:AllowHeaderExecutionContext"] = "true",
+            ["Polizas:BrokerId"] = "84"
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Broker-Id", "42");
+        client.DefaultRequestHeaders.Add("X-User-Id", "7");
+        client.DefaultRequestHeaders.Add("X-Profile-Id", "9");
+        client.DefaultRequestHeaders.Add("X-Profile-Type-Id", "header-profile");
+        client.DefaultRequestHeaders.Add("X-Is-Admin", "true");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"brokerId\":42");
+        body.Should().Contain("\"entityMainId\":42");
+        body.Should().Contain("\"userId\":7");
+        body.Should().Contain("\"profileId\":9");
+        body.Should().Contain("\"profileTypeId\":\"header-profile\"");
+        body.Should().Contain("\"isAdmin\":true");
+        body.Should().Contain("\"headerExecutionContextEnabled\":true");
+    }
+
+    [Fact]
+    public async Task Me_rejects_invalid_header_context()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:AllowHeaderExecutionContext"] = "true"
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Broker-Id", "not-a-broker");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        body.Should().Contain("POLIZAS_CONTEXT_INVALID");
+    }
+
+    [Fact]
+    public async Task Metadata_is_deprecated_without_appbuilder_reference()
     {
         await using var factory = new TestApiFactory();
         using var client = factory.CreateClient();
@@ -40,9 +125,59 @@ public sealed class PolizasApiTests
         var response = await client.GetAsync("/api/polizas/metadata");
         var body = await response.Content.ReadAsStringAsync();
 
+        response.StatusCode.Should().Be(HttpStatusCode.Gone);
+        body.Should().Contain("/api/polizas/catalogs");
+        body.Should().NotContain("rootComponentId");
+        body.Should().NotContain("dataSourceId");
+    }
+
+    [Fact]
+    public async Task Catalogs_exposes_policy_select_data()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/polizas/catalogs");
+        var body = await response.Content.ReadAsStringAsync();
+
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        body.Should().Contain("\"rootComponentId\":2824");
-        body.Should().Contain("\"dataSourceId\":146");
+        body.Should().Contain("\"tipoPoliza\"");
+        body.Should().Contain("\"ramo\"");
+        body.Should().Contain("\"compania\"");
+        body.Should().Contain("\"oficina\"");
+        body.Should().Contain("\"gestor\"");
+        body.Should().Contain("Compania demo");
+    }
+
+    [Fact]
+    public async Task Search_returns_polizas_data()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"items\"");
+        body.Should().Contain("POL-2026-0001");
+    }
+
+    [Fact]
+    public async Task GetById_returns_poliza_detail()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/polizas/POL-1001");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"clienteNombre\"");
+        body.Should().Contain("POL-2026-0001");
     }
 
     [Fact]
@@ -60,17 +195,67 @@ public sealed class PolizasApiTests
         body.Contains("SELECT", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
     }
 
-    private sealed class TestApiFactory : WebApplicationFactory<Program>
+    [Fact]
+    public async Task Sql_appbuilder_mode_requires_broker_context()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:Repository"] = "Sql",
+            ["Polizas:ConnectionResolver"] = "AppBuilderMaster",
+            ["ConnectionStrings:AppBuilderMaster"] = "Server=localhost;Database=Master;User Id=user;Password=password;TrustServerCertificate=True"
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        body.Should().Contain("POLIZAS_CONTEXT_REQUIRED");
+    }
+
+    [Fact]
+    public async Task Sql_appbuilder_mode_rejects_invalid_header_broker_context()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:Repository"] = "Sql",
+            ["Polizas:ConnectionResolver"] = "AppBuilderMaster",
+            ["Polizas:AllowHeaderExecutionContext"] = "true",
+            ["ConnectionStrings:AppBuilderMaster"] = "Server=localhost;Database=Master;User Id=user;Password=password;TrustServerCertificate=True"
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Broker-Id", "not-a-broker");
+
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        body.Should().Contain("POLIZAS_CONTEXT_INVALID");
+    }
+
+    private sealed class TestApiFactory(Dictionary<string, string?>? configurationOverrides = null)
+        : WebApplicationFactory<Program>
     {
         protected override IHost CreateHost(IHostBuilder builder)
         {
             builder.ConfigureAppConfiguration(configuration =>
             {
-                configuration.AddInMemoryCollection(new Dictionary<string, string?>
+                var values = new Dictionary<string, string?>
                 {
                     ["ApiSecurity:ApiKey"] = "test-key",
                     ["Cors:AllowedOrigins:0"] = "http://localhost:5173"
-                });
+                };
+                if (configurationOverrides is not null)
+                {
+                    foreach (var (key, value) in configurationOverrides)
+                    {
+                        values[key] = value;
+                    }
+                }
+
+                configuration.AddInMemoryCollection(values);
             });
 
             return base.CreateHost(builder);

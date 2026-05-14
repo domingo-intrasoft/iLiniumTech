@@ -1,36 +1,57 @@
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 
-import { getPolizasMetadata, searchPolizas } from './polizasApi'
-import type { PolizaListItem, PolizasComponentMetadata } from './polizasTypes'
+import { useSession } from '@/services/session'
+
+import { getPolizasCatalogs, searchPolizas } from './polizasApi'
+import { polizasCatalogsFixture } from './polizasFixture'
+import type { PolizaListItem, PolizasCatalogs, PolizasQueryFilters } from './polizasTypes'
 
 export function usePolizas() {
-  const metadata = ref<PolizasComponentMetadata | null>(null)
+  const { session, loading: sessionLoading, error: sessionError, loadSession } = useSession()
+  const catalogs = ref<PolizasCatalogs>(polizasCatalogsFixture)
   const items = ref<PolizaListItem[]>([])
   const total = ref(0)
   const loading = ref(false)
   const error = ref<string | null>(null)
-  const filters = reactive({
+  const filters = reactive<PolizasQueryFilters>({
     numero: '',
     cliente: '',
     estado: '',
+    compania: '',
+    ramo: '',
   })
 
-  const visibleFields = computed(() =>
-    (metadata.value?.fields ?? [])
-      .filter((field) => field.visible)
-      .sort((a, b) => a.order - b.order),
-  )
+  async function ensureBackendContext() {
+    const currentSession = await loadSession()
+    if (
+      import.meta.env.VITE_USE_BACKEND === 'true' &&
+      currentSession?.polizasExecutionContextRequired &&
+      currentSession.brokerId === null
+    ) {
+      error.value = 'Configura un broker para consultar polizas.'
+      items.value = []
+      total.value = 0
+      return false
+    }
+
+    return true
+  }
 
   async function refresh() {
     loading.value = true
     error.value = null
 
     try {
-      metadata.value = await getPolizasMetadata()
+      if (!(await ensureBackendContext())) {
+        return
+      }
+
       const result = await searchPolizas({
         numero: filters.numero || undefined,
         cliente: filters.cliente || undefined,
         estado: filters.estado || undefined,
+        compania: filters.compania || undefined,
+        ramo: filters.ramo || undefined,
         page: 1,
         pageSize: 25,
         sort: 'fechaEfecto:desc',
@@ -38,7 +59,7 @@ export function usePolizas() {
       items.value = result.items
       total.value = result.total
     } catch {
-      error.value = 'No se pudo cargar el componente de pólizas.'
+      error.value = 'No se pudieron cargar las polizas.'
       items.value = []
       total.value = 0
     } finally {
@@ -46,11 +67,24 @@ export function usePolizas() {
     }
   }
 
-  onMounted(refresh)
+  async function loadCatalogs() {
+    try {
+      catalogs.value = await getPolizasCatalogs()
+    } catch {
+      error.value = 'No se pudieron cargar los catalogos de polizas.'
+    }
+  }
+
+  onMounted(() => {
+    void refresh()
+    void loadCatalogs()
+  })
 
   return {
-    metadata,
-    visibleFields,
+    session,
+    sessionLoading,
+    sessionError,
+    catalogs,
     items,
     total,
     loading,
