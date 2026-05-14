@@ -34,8 +34,18 @@ jobs:
           test -f .github/CODEOWNERS
           test -f .github/pull_request_template.md
           test -f .github/apps.yml
+          test -f .github/labels.json
+          test -f .github/ISSUE_TEMPLATE/ai-epic.yml
+          test -f .github/workflows/ai-issue-dispatcher.yml
+          test -f .github/workflows/ai-codex-manual-worker.yml
           test -f docs/ai/github-ai-policy.md
           test -f docs/ai/ai-engine-routing.md
+          test -f docs/ai/multi-agent-orchestration.md
+          test -f docs/ai/manual-worker.md
+          test -f tools/github/Sync-Labels.ps1
+          test -f tools/github/Invoke-AiIssueDispatcherDiagnostics.ps1
+          test -f tools/github/Start-AiManualWorker.ps1
+          python -m json.tool .github/labels.json >/dev/null
 
   backend:
     name: ci / backend
@@ -95,6 +105,49 @@ jobs:
       - name: Build
         working-directory: iLiniumTech.Frontend
         run: npm run build
+
+      - name: Check Playwright E2E availability
+        id: playwright-e2e
+        shell: pwsh
+        working-directory: iLiniumTech.Frontend
+        run: |
+          $package = Get-Content -Raw -Path package.json | ConvertFrom-Json
+          $hasScript = $null -ne $package.scripts -and $package.scripts.PSObject.Properties.Name -contains 'test:e2e'
+          $hasConfig = Test-Path -Path playwright.config.ts
+
+          if ($hasScript -and $hasConfig) {
+            "run=true" >> $env:GITHUB_OUTPUT
+            "Playwright E2E enabled: found playwright.config.ts and npm script test:e2e."
+          } else {
+            "run=false" >> $env:GITHUB_OUTPUT
+            $missing = @()
+            if (-not $hasConfig) { $missing += "playwright.config.ts" }
+            if (-not $hasScript) { $missing += "npm script test:e2e" }
+            $message = "Skipping Playwright E2E: missing " + ($missing -join " and ") + "."
+            $message
+            $message >> $env:GITHUB_STEP_SUMMARY
+          }
+
+      - name: Install Playwright browsers
+        if: steps.playwright-e2e.outputs.run == 'true'
+        working-directory: iLiniumTech.Frontend
+        run: npx playwright install chromium
+
+      - name: Playwright E2E
+        if: steps.playwright-e2e.outputs.run == 'true'
+        working-directory: iLiniumTech.Frontend
+        run: npm run test:e2e
+
+      - name: Upload Playwright E2E artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-e2e-artifacts
+          path: |
+            iLiniumTech.Frontend/playwright-report
+            iLiniumTech.Frontend/test-results
+            iLiniumTech.Frontend/reports/playwright
+          if-no-files-found: ignore
 
       - name: Upload frontend reports
         if: always()

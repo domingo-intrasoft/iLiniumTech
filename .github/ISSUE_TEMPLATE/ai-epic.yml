@@ -1,0 +1,91 @@
+name: AI epic
+description: Define a parent issue for coordinated multi-agent work.
+title: "AI Epic: "
+labels:
+  - ai-parent
+  - ai-coordinator
+  - status:new
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for large objectives that must be split into bounded AI tasks.
+        Do not include secrets, real customer data, connection strings, dumps, or screenshots with personal data.
+  - type: textarea
+    id: objective
+    attributes:
+      label: Final objective
+      description: What must be true when the epic is complete?
+    validations:
+      required: true
+  - type: input
+    id: roadmap-phase
+    attributes:
+      label: Roadmap phase or SDD
+      description: Link a roadmap phase, SDD id, ADR, or decision document.
+      placeholder: SDD-YYYY-NNN or docs/...
+    validations:
+      required: true
+  - type: dropdown
+    id: base-branch
+    attributes:
+      label: Primary target branch
+      options:
+        - develop
+        - ci-cd
+        - main
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is included in this epic?
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What must not be done in this epic?
+    validations:
+      required: true
+  - type: textarea
+    id: subtasks
+    attributes:
+      label: Initial subtasks
+      description: List the first tasks the coordinator should create or verify.
+      placeholder: |
+        - [ ] Backend contract
+        - [ ] Frontend state
+        - [ ] E2E smoke
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and blockers
+      description: Issues, PRs, decisions, environments, secrets, or human approvals needed.
+    validations:
+      required: true
+  - type: checkboxes
+    id: locks
+    attributes:
+      label: Expected concurrency locks
+      options:
+        - label: lock:database
+        - label: lock:architecture
+        - label: lock:pipelines
+        - label: lock:security
+        - label: lock:release
+  - type: textarea
+    id: exit-criteria
+    attributes:
+      label: Exit criteria
+      description: Evidence required before the epic can be closed.
+      placeholder: |
+        - [ ] CI and security green
+        - [ ] QA evidence attached
+        - [ ] UAT accepted
+    validations:
+      required: true

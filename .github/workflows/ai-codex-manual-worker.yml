@@ -1,0 +1,57 @@
+name: ai-codex-manual-worker
+
+on:
+  workflow_dispatch:
+    inputs:
+      issueNumber:
+        description: "Issue concreta a reservar/preparar para Codex."
+        required: true
+      dryRun:
+        description: "Validar sin crear rama, cambiar labels ni comentar."
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-codex-manual-worker-issue-${{ inputs.issueNumber }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: prepare manual Codex handoff
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare issue handoff
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ inputs.issueNumber }}
+          DRY_RUN: ${{ inputs.dryRun }}
+        run: |
+          New-Item -ItemType Directory -Force -Path worker-reports | Out-Null
+
+          $dryRun = [System.Boolean]::Parse($env:DRY_RUN)
+
+          .\tools\github\Start-AiManualWorker.ps1 `
+              -IssueNumber ([int]$env:ISSUE_NUMBER) `
+              -DryRun:$dryRun `
+              -JsonOutputPath worker-reports\ai-codex-manual-worker.json `
+              -MarkdownOutputPath worker-reports\ai-codex-manual-worker.md
+
+          Get-Content -Raw -Path worker-reports\ai-codex-manual-worker.md >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload worker report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-codex-manual-worker-report
+          path: worker-reports
+          if-no-files-found: error
