@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -119,8 +120,7 @@ public sealed class PolizasApiTests
     public async Task Metadata_is_deprecated_without_appbuilder_reference()
     {
         await using var factory = new TestApiFactory();
-        using var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        using var client = factory.CreateAuthenticatedClient();
 
         var response = await client.GetAsync("/api/polizas/metadata");
         var body = await response.Content.ReadAsStringAsync();
@@ -184,15 +184,89 @@ public sealed class PolizasApiTests
     public async Task Search_rejects_sort_fields_outside_whitelist()
     {
         await using var factory = new TestApiFactory();
-        using var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        using var client = factory.CreateAuthenticatedClient();
 
         var response = await client.GetAsync("/api/polizas?sort=rawSql:desc");
         var body = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         body.Should().Contain("POLIZAS_VALIDATION_ERROR");
+        AssertNoSensitiveLeak(body);
+    }
+
+    [Fact]
+    public async Task Search_returns_paged_results()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateAuthenticatedClient();
+
+        var response = await client.GetAsync("/api/polizas?page=1&pageSize=1&sort=numero:asc");
+        var body = await response.Content.ReadAsStringAsync();
+        using var document = JsonDocument.Parse(body);
+        var root = document.RootElement;
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        root.GetProperty("page").GetInt32().Should().Be(1);
+        root.GetProperty("pageSize").GetInt32().Should().Be(1);
+        root.GetProperty("total").GetInt32().Should().Be(2);
+        root.GetProperty("items").GetArrayLength().Should().Be(1);
+        root.GetProperty("items")[0].GetProperty("numero").GetString().Should().Be("POL-2026-0001");
+    }
+
+    [Fact]
+    public async Task Search_applies_numero_filter()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateAuthenticatedClient();
+
+        var response = await client.GetAsync("/api/polizas?numero=0002&sort=numero:asc");
+        var body = await response.Content.ReadAsStringAsync();
+        using var document = JsonDocument.Parse(body);
+        var root = document.RootElement;
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        root.GetProperty("total").GetInt32().Should().Be(1);
+        root.GetProperty("items")[0].GetProperty("numero").GetString().Should().Be("POL-2026-0002");
+    }
+
+    [Fact]
+    public async Task Search_applies_estado_and_date_filters()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateAuthenticatedClient();
+
+        var response = await client.GetAsync("/api/polizas?estado=Pendiente&fechaEfectoDesde=2026-02-01&fechaEfectoHasta=2026-02-28");
+        var body = await response.Content.ReadAsStringAsync();
+        using var document = JsonDocument.Parse(body);
+        var root = document.RootElement;
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        root.GetProperty("total").GetInt32().Should().Be(1);
+        root.GetProperty("items")[0].GetProperty("estado").GetString().Should().Be("Pendiente");
+        root.GetProperty("items")[0].GetProperty("fechaEfecto").GetString().Should().Be("2026-02-15");
+    }
+
+    [Fact]
+    public async Task Search_rejects_invalid_pagination_without_sensitive_leak()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateAuthenticatedClient();
+
+        var response = await client.GetAsync("/api/polizas?page=-1&pageSize=25");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        body.Should().Contain("POLIZAS_VALIDATION_ERROR");
+        AssertNoSensitiveLeak(body);
+    }
+
+    private static void AssertNoSensitiveLeak(string body)
+    {
         body.Contains("SELECT", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+        body.Contains("ConnectionString", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+        body.Contains("Data Source", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+        body.Contains("Server=", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+        body.Contains("C:\\", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
     }
 
     [Fact]
@@ -238,6 +312,13 @@ public sealed class PolizasApiTests
     private sealed class TestApiFactory(Dictionary<string, string?>? configurationOverrides = null)
         : WebApplicationFactory<Program>
     {
+        public HttpClient CreateAuthenticatedClient()
+        {
+            var client = CreateClient();
+            client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+            return client;
+        }
+
         protected override IHost CreateHost(IHostBuilder builder)
         {
             builder.ConfigureAppConfiguration(configuration =>
