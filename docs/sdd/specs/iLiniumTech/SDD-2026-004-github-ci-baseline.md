@@ -7,7 +7,7 @@
 - Aplicacion: iLiniumTech
 - Tipo: infra
 - Tamano SDD: S
-- Estado SDD: spec-ready
+- Estado SDD: implementado con pendientes de activacion externa
 - Responsable funcional: Intrasoft
 - Responsable tecnico: iLiniumTech
 - Fecha: 2026-05-13
@@ -62,6 +62,7 @@ Salidas:
 - [x] Existe issue form SDD.
 - [x] Existe politica AI GitHub-only versionada.
 - [x] Los comandos equivalentes pasan localmente.
+- [x] Gate local MVP documentado y actualizado con backend, frontend, smoke, extractor, auditorias, validacion documental y `git diff --check`.
 
 ## Impacto tecnico
 
@@ -73,11 +74,11 @@ Salidas:
 
 ## Seguridad
 
-- [ ] No se anaden secretos.
-- [ ] Los workflows no imprimen variables sensibles.
-- [ ] Secret scan se ejecuta en PR y push.
-- [ ] Auditoria de dependencias falla si hay findings.
-- [ ] CORS audit falla si hay configuracion permisiva.
+- [x] No se anaden secretos.
+- [x] Los workflows no imprimen variables sensibles.
+- [x] Secret scan se ejecuta en PR y push.
+- [x] Auditoria de dependencias falla si hay findings.
+- [x] CORS audit falla si hay configuracion permisiva.
 
 ## Plan de pruebas
 
@@ -86,6 +87,24 @@ Salidas:
 - E2E/smoke: no aplica.
 - Seguridad: ejecutar scripts de seguridad locales.
 - Manual/UAT: crear una PR de prueba y revisar checks en GitHub.
+
+## Estado de cierre QA/UAT
+
+Completado con evidencia:
+
+- CI y seguridad baseline existen en `.github/workflows`.
+- Gate local `tools/quality/Invoke-MvpQualityGate.ps1` agrupa checks backend/frontend, smoke, extractor, seguridad, validacion documental y `git diff --check`.
+- Validacion documental local existe en `tools/quality/Test-DocumentationBaseline.ps1`.
+- Roadmap y DoD enlazan el gate y los comandos granulares.
+
+Pendiente tecnico:
+
+- Ejecutar gate completo como evidencia de cada rama que toque runtime, seguridad o configuracion.
+- Revisar primera ejecucion GitHub verde antes de convertir checks en required.
+
+Bloqueado externo:
+
+- Activar branch protection, Code Scanning required y preview real depende de configuracion GitHub/environments por responsables humanos.
 
 ## Riesgos
 

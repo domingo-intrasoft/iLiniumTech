@@ -13,6 +13,43 @@ permissions:
   contents: read
 
 jobs:
+  quality-docs:
+    name: Documentation and hygiene
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Documentation baseline
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File tools/quality/Test-DocumentationBaseline.ps1
+
+      - name: Git whitespace check
+        shell: pwsh
+        run: git diff --check
+
+      - name: Write quality summary
+        if: always()
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force quality-reports | Out-Null
+          @(
+            "# CI Quality Summary",
+            "",
+            "- Documentation baseline: see job result.",
+            "- Git whitespace check: see job result.",
+            "- Preview/deploy: not executed from CI; use preview dry-run workflow."
+          ) | Set-Content -Path quality-reports/ci-quality-summary.md -Encoding utf8
+
+      - name: Upload quality reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-quality-reports
+          path: quality-reports/**
+          if-no-files-found: ignore
+
   backend:
     name: Backend build and tests
     runs-on: windows-latest
@@ -68,6 +105,9 @@ jobs:
       - name: Prepare reports
         shell: pwsh
         run: New-Item -ItemType Directory -Force reports | Out-Null
+
+      - name: Format
+        run: npm run format
 
       - name: Lint
         run: npm run lint

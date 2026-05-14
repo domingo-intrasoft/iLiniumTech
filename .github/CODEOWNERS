@@ -1,0 +1,34 @@
+# CODEOWNERS for sensitive platform, security and governance paths.
+#
+# Placeholder owner:
+# - @OWNER-REVIEW-REQUIRED is not a real GitHub handle.
+# - Replace it with real users or teams before enabling CODEOWNERS as a
+#   protected-branch requirement.
+
+.github/CODEOWNERS @OWNER-REVIEW-REQUIRED
+.github/workflows/** @OWNER-REVIEW-REQUIRED
+.github/ISSUE_TEMPLATE/** @OWNER-REVIEW-REQUIRED
+.github/pull_request_template.md @OWNER-REVIEW-REQUIRED
+
+tools/security/** @OWNER-REVIEW-REQUIRED
+tools/quality/** @OWNER-REVIEW-REQUIRED
+tools/extractor/** @OWNER-REVIEW-REQUIRED
+
+iLiniumTech.Backend/src/iLiniumTech.Backend.Api/Security/** @OWNER-REVIEW-REQUIRED
+iLiniumTech.Backend/src/iLiniumTech.Backend.Api/Program.cs @OWNER-REVIEW-REQUIRED
+iLiniumTech.Backend/src/iLiniumTech.Backend.Api/appsettings*.json @OWNER-REVIEW-REQUIRED
+iLiniumTech.Backend/src/iLiniumTech.Backend.Infrastructure/Polizas/Sql/** @OWNER-REVIEW-REQUIRED
+iLiniumTech.Backend/src/iLiniumTech.Backend.Infrastructure/Polizas/Connections/** @OWNER-REVIEW-REQUIRED
+iLiniumTech.Backend/src/iLiniumTech.Backend.Infrastructure/Polizas/SqlPolizasRepository.cs @OWNER-REVIEW-REQUIRED
+
+AGENTS.md @OWNER-REVIEW-REQUIRED
+PLANS.md @OWNER-REVIEW-REQUIRED
+README.md @OWNER-REVIEW-REQUIRED
+docs/ROADMAP_OBJETIVO_FINAL.md @OWNER-REVIEW-REQUIRED
+docs/DECISION_PRODUCTO_ARQUITECTURA.md @OWNER-REVIEW-REQUIRED
+docs/PLAN_CICD_GITHUB_ONLY.md @OWNER-REVIEW-REQUIRED
+docs/engineering/** @OWNER-REVIEW-REQUIRED
+docs/workflows/** @OWNER-REVIEW-REQUIRED
+docs/qa/** @OWNER-REVIEW-REQUIRED
+docs/sdd/templates/** @OWNER-REVIEW-REQUIRED
+docs/sdd/specs/iLiniumTech/** @OWNER-REVIEW-REQUIRED

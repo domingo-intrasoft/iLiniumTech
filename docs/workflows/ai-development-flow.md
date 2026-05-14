@@ -175,3 +175,5 @@ Antes de marcar Done se necesita:
    - como se valido;
    - riesgos residuales;
    - siguiente paso.
+
+4. Si el cierre afecta una fase, UAT o PR con varias areas, completar `docs/qa/phase-closure-checklist.md` o copiar sus apartados al cuerpo de PR/cierre. Cada pendiente debe quedar clasificado como `completado con evidencia`, `pendiente tecnico` o `bloqueado externo`.

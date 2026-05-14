@@ -2,6 +2,8 @@
 
 Este documento define la evidencia minima para considerar Done un cambio en iLiniumTech.
 
+Para cierres de fase o PRs con varias areas, usar tambien la plantilla operativa [phase-closure-checklist.md](phase-closure-checklist.md).
+
 ## Done general
 
 Un cambio esta Done cuando:
@@ -121,6 +123,7 @@ Para Polizas MVP, UAT minimo:
 - Bloqueos externos.
 - Evidencia UAT si aplica.
 - Confirmacion de que no se introducen secretos ni datos personales reales.
+- Clasificacion de pendientes como `completado con evidencia`, `pendiente tecnico` o `bloqueado externo`.
 
 ## Motivos validos para no ejecutar una prueba
 

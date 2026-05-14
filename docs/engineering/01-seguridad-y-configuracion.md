@@ -56,6 +56,19 @@ Los nombres exactos podran cambiar cuando exista el primer servicio, pero el cri
 - Logs estructurados con redaccion de secretos y datos personales.
 - Passwords con hashing robusto; nunca cifrado reversible.
 
+## Auth y permisos de producto
+
+La SDD canonica para Fase 5 es [SDD-2026-005 Auth y permisos de producto](../sdd/specs/iLiniumTech/SDD-2026-005-auth-permisos-producto.md).
+
+Reglas minimas hasta cerrar proveedor:
+
+- `X-ILiniumTech-Api-Key` y los headers MVP de broker/usuario/perfil son bootstrap de desarrollo/demo, no identidad de produccion.
+- En produccion, `currentUserId`, `currentBrokerId`, perfil, roles y permisos deben salir de claims o sesion backend validada.
+- Si coexisten headers MVP y auth real, los claims/sesion tienen prioridad y cualquier broker solicitado se valida contra los brokers permitidos del usuario.
+- 401 significa ausencia o invalidez de credenciales; 403 significa usuario autenticado sin broker, permiso o alcance suficiente.
+- Los errores publicos de auth deben ser genericos, sanitizados y, cuando aplique, incluir `correlationId`.
+- Los logs no deben incluir tokens, cookies, claims completos, connection strings, SQL ni datos personales innecesarios.
+
 ## BBDD y SQL dinamico
 
 El modelo heredado de AppBuilder permite construir SQL desde metadata. En iLiniumTech:

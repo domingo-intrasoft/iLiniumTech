@@ -40,6 +40,9 @@ try {
         "docs/sdd/templates/security-review-template.md",
         ".github/workflows/ci.yml",
         ".github/workflows/security.yml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/preview-dry-run.yml",
+        ".github/CODEOWNERS",
         ".github/pull_request_template.md",
         ".github/ISSUE_TEMPLATE/sdd-feature.yml",
         "tools/quality/Invoke-MvpQualityGate.ps1",
@@ -73,8 +76,14 @@ try {
     Test-ContentPattern -Path "docs/ROADMAP_OBJETIVO_FINAL.md" -Pattern "Jefe calidad, CI y documentacion" -Description "quality owner section"
     Test-ContentPattern -Path "docs/ROADMAP_OBJETIVO_FINAL.md" -Pattern "Bloqueos actuales" -Description "real environment blockers"
     Test-ContentPattern -Path ".github/workflows/ci.yml" -Pattern "dotnet build" -Description "backend build in CI"
+    Test-ContentPattern -Path ".github/workflows/ci.yml" -Pattern "npm run format" -Description "frontend format in CI"
     Test-ContentPattern -Path ".github/workflows/ci.yml" -Pattern "npm run lint" -Description "frontend lint in CI"
+    Test-ContentPattern -Path ".github/workflows/ci.yml" -Pattern "Test-DocumentationBaseline\.ps1" -Description "documentation baseline in CI"
     Test-ContentPattern -Path ".github/workflows/security.yml" -Pattern "gitleaks" -Description "secret scan in security workflow"
+    Test-ContentPattern -Path ".github/workflows/codeql.yml" -Pattern "github/codeql-action/analyze" -Description "CodeQL analysis workflow"
+    Test-ContentPattern -Path ".github/workflows/preview-dry-run.yml" -Pattern "DEPLOY_PREVIEW_ENABLED: `"false`"" -Description "preview deploy disabled by default"
+    Test-ContentPattern -Path ".github/CODEOWNERS" -Pattern "OWNER-REVIEW-REQUIRED" -Description "placeholder owner for sensitive paths"
+    Test-ContentPattern -Path ".github/CODEOWNERS" -Pattern "Replace it with real users or teams" -Description "CODEOWNERS enforcement warning"
     Test-ContentPattern -Path ".github/pull_request_template.md" -Pattern "Riesgos residuales" -Description "PR residual risks section"
 
     Write-Host "# Documentation Baseline"

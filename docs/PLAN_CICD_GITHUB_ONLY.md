@@ -455,6 +455,29 @@ Checks:
 - CodeQL default setup o workflow avanzado cuando haya lenguajes soportados.
 - Validacion de que no se versionan `.env`, dumps, backups ni logs sensibles.
 
+Estado actual:
+
+- existe workflow de seguridad con secret scan, dependency audit y CORS audit;
+- se ejecuta en PR, push a `main`, `workflow_dispatch` y schedule semanal;
+- publica artefactos bajo `security-reports/**` cuando los scripts locales generan reportes;
+- no depende de secretos reales.
+
+### 7.2.1 `.github/workflows/codeql.yml`
+
+Objetivo: analisis estatico CodeQL para backend .NET y frontend TypeScript sin depender de secretos ni despliegue.
+
+Fase inicial:
+
+- `pull_request`, `push` a `main`, schedule semanal y `workflow_dispatch`;
+- jobs separados para `csharp` y `javascript-typescript`;
+- permisos minimos: `contents: read`, `actions: read`, `security-events: write`;
+- .NET se prepara solo para el analisis C#;
+- no ejecuta despliegues ni lee secrets de entorno.
+
+Bloqueo externo:
+
+- la publicacion de alertas requiere que GitHub Code Scanning este disponible para el repositorio y que los checks pasen al menos una vez antes de marcarlos como required.
+
 ### 7.3 `.github/workflows/ai-issue-dispatcher.yml`
 
 Equivalente GitHub-only de `azure-pipelines-ai-dispatcher.yml`.
@@ -599,6 +622,15 @@ Fase inicial:
 - environment `preview`;
 - no despliega si `DEPLOY_PREVIEW_ENABLED=false`;
 - valida que no faltan variables basicas.
+
+Estado actual seguro:
+
+- existe `.github/workflows/preview-dry-run.yml`;
+- solo se ejecuta manualmente con `workflow_dispatch`;
+- `DEPLOY_PREVIEW_ENABLED` queda fijado a `false` dentro del job;
+- falla si se intenta ejecutar con `dryRun=false`;
+- genera artefacto `preview-dry-run-report` con el plan y bloqueos;
+- no declara environment ni consume secrets hasta que `preview` tenga destino, reviewers y configuracion aprobada.
 
 Cuando exista app y destino:
 
@@ -765,13 +797,16 @@ Orden recomendado:
 11. Crear environments `ci` y `preview`.
 12. Crear `ci.yml` en modo no-op seguro.
 13. Crear `security.yml` con gitleaks si el script esta listo.
-14. Crear `ai-issue-dispatcher.yml` primero en modo diagnostico.
-15. Crear `ai-codex-workitem.yml` con `workflow_dispatch`, sin schedule.
-16. Probar con una Issue documental y label `ai-codex`.
-17. Revisar que crea rama y PR, pero no hace merge.
-18. Activar branch protection con checks que ya hayan corrido.
-19. Activar dispatcher programado con `top=1`.
-20. Subir a `top=5` solo tras varios ciclos estables.
+14. Crear `codeql.yml` sin secrets y esperar primera ejecucion verde antes de hacerlo required.
+15. Sustituir placeholders de `.github/CODEOWNERS` por usuarios o equipos reales antes de exigir CODEOWNERS en branch protection.
+16. Crear `preview-dry-run.yml` manual y bloqueado por defecto.
+17. Crear `ai-issue-dispatcher.yml` primero en modo diagnostico.
+18. Crear `ai-codex-workitem.yml` con `workflow_dispatch`, sin schedule.
+19. Probar con una Issue documental y label `ai-codex`.
+20. Revisar que crea rama y PR, pero no hace merge.
+21. Activar branch protection con checks que ya hayan corrido.
+22. Activar dispatcher programado con `top=1`.
+23. Subir a `top=5` solo tras varios ciclos estables.
 
 ## 11. Checklist para la primera app que se cree
 

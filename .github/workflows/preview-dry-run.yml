@@ -1,0 +1,78 @@
+name: Preview Dry Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      dryRun:
+        description: "Must remain true until preview destination and secrets are approved."
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      target:
+        description: "Informational target under review."
+        required: true
+        default: "unconfigured"
+        type: choice
+        options:
+          - "unconfigured"
+          - "static-web-plus-api"
+
+permissions:
+  contents: read
+
+jobs:
+  preview-plan:
+    name: Preview deployment plan
+    runs-on: windows-latest
+    env:
+      DEPLOY_PREVIEW_ENABLED: "false"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Block real deploy
+        if: ${{ inputs.dryRun != 'true' || env.DEPLOY_PREVIEW_ENABLED != 'false' }}
+        shell: pwsh
+        run: |
+          throw "Real preview deploy is blocked. Define destination, GitHub environment rules and required secrets before enabling deployment."
+
+      - name: Validate dry-run prerequisites
+        shell: pwsh
+        run: |
+          $required = @(
+            "docs/PLAN_CICD_GITHUB_ONLY.md",
+            "docs/ROADMAP_OBJETIVO_FINAL.md",
+            ".github/workflows/ci.yml",
+            ".github/workflows/security.yml"
+          )
+
+          foreach ($path in $required) {
+            if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+              throw "Missing required preview planning file: $path"
+            }
+          }
+
+      - name: Write preview dry-run artifact
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force preview-reports | Out-Null
+          @(
+            "# Preview Dry Run",
+            "",
+            "- Result: no deployment executed.",
+            "- Target: ${{ inputs.target }}.",
+            "- Deploy flag: $env:DEPLOY_PREVIEW_ENABLED.",
+            "- Required before real preview: destination, GitHub environment, reviewers, secrets, smoke checks and rollback notes.",
+            "- Runtime rule: AppBuilder metadata remains offline/scaffolding only, never preview runtime."
+          ) | Set-Content -Path preview-reports/preview-dry-run.md -Encoding utf8
+
+      - name: Upload preview dry-run report
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-dry-run-report
+          path: preview-reports/**
+          if-no-files-found: error

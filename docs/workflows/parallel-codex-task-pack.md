@@ -100,11 +100,11 @@ Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea
 ## Tarea 7 - QA/UAT y cierre de fase
 
 - **Nombre:** `qa-uat-phase-closure`
-- **Alcance exacto:** preparar matriz de aceptacion, evidencias, pruebas manuales, riesgos residuales, bloqueos externos y estado de DoD para cierre de fase.
+- **Alcance exacto:** preparar matriz de aceptacion, evidencias, pruebas manuales, riesgos residuales, bloqueos externos y estado de DoD para cierre de fase. Usar `docs/qa/phase-closure-checklist.md` como plantilla operativa.
 - **Archivos que puede tocar:** `docs/qa/**`, `docs/workflows/**`, `docs/ROADMAP_OBJETIVO_FINAL.md`.
 - **Archivos que NO debe tocar:** `iLiniumTech.Backend/**`, `iLiniumTech.Frontend/**`, `.github/**`, `tools/**`.
 - **Dependencias:** resultados de backend, frontend, extractor, CI y seguridad.
-- **Criterios de aceptacion:** cada criterio Done tiene evidencia o bloqueo; UAT de `/polizas` definido; skips justificados; riesgos residuales escritos.
+- **Criterios de aceptacion:** cada criterio Done tiene evidencia o bloqueo; UAT de `/polizas` definido; skips justificados; riesgos residuales escritos; los puntos abiertos estan clasificados como `completado con evidencia`, `pendiente tecnico` o `bloqueado externo`.
 - **Pruebas obligatorias:** validacion documental; revision de comandos reportados por otros agentes.
 - **Documentacion a actualizar:** DoD, roadmap e informe de cierre si se crea.
 - **Riesgo de conflicto con otras tareas:** bajo; debe ir al final.

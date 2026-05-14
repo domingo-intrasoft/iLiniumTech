@@ -7,7 +7,7 @@
 - Aplicacion: iLiniumTech
 - Tipo: feature
 - Tamano SDD: M
-- Estado SDD: spec-ready
+- Estado SDD: implementado con bloqueos externos
 - Responsable funcional: Intrasoft
 - Responsable tecnico: iLiniumTech
 - Fecha: 2026-05-13
@@ -103,11 +103,11 @@ Documentacion:
 
 ## Seguridad
 
-- [ ] Secretos fuera de Git.
+- [x] Secretos fuera de Git.
 - [ ] Conexion con cuenta de minimo privilegio y solo lectura.
-- [ ] Logs sin connection strings, SQL sensible ni datos personales.
-- [ ] Salida JSON sanitizada.
-- [ ] No se ejecuta `QueryStatic` ni SQL procedente de metadata AppBuilder.
+- [x] Logs sin connection strings, SQL sensible ni datos personales.
+- [x] Salida JSON sanitizada.
+- [x] No se ejecuta `QueryStatic` ni SQL procedente de metadata AppBuilder.
 
 ## Plan de pruebas
 
@@ -117,6 +117,26 @@ Documentacion:
 - Revision de scaffolding: confirmar que el resultado se traduce a codigo estatico/API explicita antes de usarse.
 - Seguridad: secret scan y revision de artefactos generados.
 - Manual/UAT: comparar campos extraidos con captura y metadata documentada.
+
+## Estado de cierre QA/UAT
+
+Completado con evidencia:
+
+- Extractor offline disponible en `tools/extractor/polizas-metadata`.
+- Comando documentado en `tools/extractor/polizas-metadata/README.md`.
+- Modos `Fixture`, `DryRun` y `Live`; `Live` exige variables de entorno locales y no versionadas.
+- Pruebas versionadas en `tools/extractor/polizas-metadata/tests/Test-PolizasMetadataExtractor.ps1`.
+- La salida redacciona connection strings y SQL raw; `QueryStatic` queda como evidencia/fingerprint, no ejecutable.
+
+Pendiente tecnico:
+
+- Marcar o implementar formalmente la prueba de integracion opcional cuando se acuerde el entorno autorizado.
+- Definir si algun JSON sanitizado debe versionarse como artefacto de SDD y bajo que ruta.
+
+Bloqueado externo:
+
+- Falta entorno read-only autorizado para `IL_Maestro` y `AunnaTechADM`.
+- Falta cuenta de minimo privilegio y confirmacion de campos sensibles en metadata real.
 
 ## Riesgos
 
@@ -136,4 +156,4 @@ Documentacion:
 - [ ] Criterios de aceptacion completados.
 - [ ] Pruebas ejecutadas y documentadas.
 - [ ] Gates de seguridad aplicables ejecutados.
-- [ ] Documentacion actualizada.
+- [x] Documentacion actualizada.

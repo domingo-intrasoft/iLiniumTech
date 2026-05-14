@@ -18,10 +18,12 @@ Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. L
 
 - Fase documental y decision de arquitectura: completada.
 - MVP read-only de polizas: implementado con frontend Vue, backend API, fixtures anonimizados, API key y pruebas base.
-- Repositorio SQL read-only: implementacion inicial disponible, pendiente de validar contra entorno real autorizado.
-- Extractor offline de metadata: especificado, pendiente de implementar.
+- Repositorio SQL read-only: implementado como backend configurable, parametrizado y con whitelist; pendiente de validar contra entorno real autorizado y auth real.
+- Extractor offline de metadata: implementado en `tools/extractor/polizas-metadata` con modos `Fixture`, `DryRun` y `Live`; pendiente de validar modo `Live` contra entorno autorizado y politica final de artefactos.
+- Frontend polizas: protegido por configuracion runtime y contexto `/api/me`; no consulta backend si falta API key/contexto de broker requerido.
 - CI GitHub: baseline disponible con `ci.yml`, `security.yml`, PR template e issue form SDD.
-- Gate local fase 7: disponible en `tools/quality/Invoke-MvpQualityGate.ps1`.
+- Gate local fase 7: disponible y actualizado en `tools/quality/Invoke-MvpQualityGate.ps1` con backend, frontend, smoke, auditorias, validacion documental y `git diff --check`.
+- Fase 7 plataforma: CI publica artefacto de calidad documental, seguridad tiene schedule, CodeQL esta definido y preview queda como dry-run manual sin secrets ni deploy real.
 
 ## Principios de cierre
 
@@ -157,7 +159,21 @@ DoD:
 - Pruebas de integracion contra BBDD de test, contenedor o fixture SQL controlado.
 - UAT compara resultados con entorno autorizado.
 
-Bloqueos actuales de entorno real:
+Completado con evidencia versionada:
+
+- `SqlPolizasRepository` activable por configuracion, con `InMemory` como default seguro.
+- Query builder con valores parametrizados, sort/columnas por whitelist y pruebas de payloads maliciosos.
+- Resolver `AppBuilderMaster` por broker efectivo, con cabeceras MVP solo si hay opt-in de `Polizas:AllowHeaderExecutionContext`.
+- `SESSION_CONTEXT` se aplica antes de consultas SQL con `sp_set_session_context` parametrizado y se limpia con valores `NULL` si no hay contexto.
+- `/api/me` expone contexto efectivo para que el frontend detecte ausencia de broker antes de consultar.
+
+Pendiente tecnico:
+
+- Sustituir cabeceras MVP por autenticacion/autorizacion real y claims/sesion backend.
+- Ejecutar pruebas de integracion SQL contra BBDD de test, contenedor o fixture SQL controlado.
+- Ejecutar UAT comparando resultados contra entorno autorizado.
+
+Bloqueado externo:
 
 - Falta confirmar BBDD de test o contenedor SQL Server autorizado.
 - Falta confirmar claves obligatorias de `SESSION_CONTEXT`.
@@ -178,15 +194,31 @@ DoD:
 - Integracion opcional marcada como skipped si no hay BBDD local autorizada.
 - Cualquier salida util se convierte en codigo o documentacion revisada antes de entrar al producto.
 
-Bloqueos actuales:
+Completado con evidencia versionada:
+
+- Comando local `tools/extractor/polizas-metadata/Invoke-PolizasMetadataExtractor.ps1`.
+- Modos `Fixture`, `DryRun` y `Live`; el modo `Live` requiere variables de entorno y no debe imprimir secretos.
+- README del extractor documenta que el JSON es solo trazabilidad/scaffolding offline, no contrato runtime.
+- `QueryStatic` se conserva como evidencia redaccionada con fingerprint y no se ejecuta.
+- Pruebas del extractor cubren escritura JSON sanitizada, redaccion de connection strings y fragmentos SQL, y modo `DryRun`.
+- Salida por defecto en `reports/polizas-metadata`, ruta no destinada a versionarse.
+
+Pendiente tecnico:
+
+- Definir contrato JSON final si se va a consumir como insumo de SDD/scaffolding en nuevas fases.
+- Decidir si algun artefacto sanitizado debe versionarse y en que ruta.
+- Ejecutar modo `Live` solo cuando exista entorno read-only autorizado.
+
+Bloqueado externo:
 
 - Falta entorno read-only para `IL_Maestro` y `AunnaTechADM`.
-- Falta acordar ubicacion de artefactos sanitizados si se versionan.
-- Falta definir contrato JSON final del extractor.
+- Falta cuenta con permisos minimos y confirmacion de campos sensibles en metadata real.
 
 ### Fase 5 - Autenticacion, autorizacion y permisos de producto
 
 Objetivo: retirar confianza en headers MVP y modelar identidad/permisos como producto.
+
+SDD base: [SDD-2026-005 Auth y permisos de producto](sdd/specs/iLiniumTech/SDD-2026-005-auth-permisos-producto.md).
 
 DoD:
 
@@ -197,10 +229,38 @@ DoD:
 - Pruebas de acceso sin token, con token invalido, sin broker y sin permiso.
 - Documentacion de migracion desde cabeceras MVP.
 
-Bloqueos actuales:
+Estado real a 2026-05-14:
+
+Entregado:
+
+- Modelo documental de auth/permisos definido en `SDD-2026-005`.
+- Headers MVP clasificados como bootstrap no confiable para produccion.
+- Estrategia incremental definida para pasar de API key/headers a claims o sesion backend sin romper contratos del frontend.
+- Contrato conceptual de contexto definido: `currentUserId`, `currentBrokerId`, perfil, roles, permisos, brokers permitidos y `correlationId`.
+- Regla reafirmada: permisos AppBuilder pueden servir como evidencia o migracion, nunca como motor runtime dinamico.
+
+Pendiente de implementacion:
+
+- Elegir e integrar mecanismo auth aprobado.
+- Normalizar claims/sesion a contexto backend por request.
+- Crear politicas backend por permisos efectivos como `polizas.read`, `polizas.detail` y `polizas.catalogs`.
+- Aplicar 401/403 sanitizados con `correlationId` y logs seguros.
+- Conectar `SESSION_CONTEXT` a valores autenticados, no a headers manipulables.
+- Cubrir pruebas de acceso anonimo, token invalido, broker cruzado y falta de permiso.
+
+Bloqueos externos:
 
 - Falta decision de proveedor/mecanismo auth.
 - Falta mapa funcional de permisos por broker, perfil, oficina, gestor y usuario.
+- Falta confirmar con DBA las claves obligatorias de `SESSION_CONTEXT` asociadas a permisos reales.
+- Falta responsable funcional para validar equivalencias entre permisos AppBuilder historicos y permisos iLiniumTech.
+
+Siguientes pasos recomendados:
+
+- Abrir issue `SDD-2026-005 Auth y permisos de producto`.
+- Resolver decision humana de proveedor auth antes de programar runtime.
+- Levantar matriz funcional de permisos por broker, perfil, oficina, gestor y usuario.
+- Implementar primero contrato de contexto y pruebas 401/403; despues retirar headers MVP de preview/produccion.
 
 ### Fase 6 - Funcionalidad explicita posterior al MVP
 
@@ -236,7 +296,25 @@ Bloqueos actuales:
 
 - Falta decidir destino preview para frontend estatico y backend API.
 - Falta configurar secrets/environments reales.
-- Falta activar CodeQL o equivalente cuando el repositorio este estable.
+- Falta confirmar que GitHub Code Scanning esta disponible y que CodeQL pasa verde antes de hacerlo required.
+- Falta ejecutar `preview-dry-run.yml` en GitHub y, despues, definir environment `preview` protegido antes de cualquier despliegue real.
+
+Avance 2026-05-14:
+
+- `ci.yml` incorpora baseline documental y `git diff --check` con artefacto `ci-quality-reports`.
+- `security.yml` mantiene secret scan, dependency audit y CORS audit, ahora tambien con schedule semanal.
+- `codeql.yml` queda creado para C# y TypeScript sin secrets.
+- `preview-dry-run.yml` queda manual, bloqueado por `DEPLOY_PREVIEW_ENABLED=false` y publica solo un plan de preview.
+- `Invoke-MvpQualityGate.ps1` agrupa restore/build/test backend, formato/lint/test/build frontend, smoke backend/frontend, pruebas del extractor, auditorias, validacion documental y `git diff --check`.
+
+Pendiente tecnico:
+
+- Ejecutar gate completo como evidencia de rama antes de PR cuando los cambios toquen runtime o seguridad.
+- Ejecutar `preview-dry-run.yml` en GitHub y revisar artefactos antes de activar cualquier preview real.
+
+Bloqueado externo:
+
+- Required checks y environments reales dependen de configuracion GitHub/preview por responsables humanos.
 
 ### Fase 8 - Preparacion productiva
 
@@ -269,6 +347,11 @@ Cada cierre de fase debe dejar:
 - Pruebas no ejecutadas y motivo.
 - Riesgos residuales.
 - Bloqueos por entorno real, con responsable externo si aplica.
+- Clasificacion explicita de cada punto abierto como `completado con evidencia`, `pendiente tecnico` o `bloqueado externo`.
+
+Plantilla operativa:
+
+- [qa/phase-closure-checklist.md](qa/phase-closure-checklist.md)
 
 ## Comandos de calidad
 

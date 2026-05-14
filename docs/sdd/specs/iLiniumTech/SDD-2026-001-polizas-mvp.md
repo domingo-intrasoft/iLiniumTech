@@ -101,6 +101,7 @@ Campos iniciales:
 - [x] Ordenaciones fuera de whitelist devuelven error de validacion.
 - [x] La UI `/polizas` renderiza tabla y filtros desde codigo Vue/TypeScript propio.
 - [x] La UI `/polizas/:id` renderiza detalle read-only desde API/fixture.
+- [x] La UI `/polizas` valida configuracion runtime y contexto `/api/me` antes de consultar backend.
 - [x] No se guardan secretos ni cadenas de conexion en Git.
 
 ## Impacto tecnico
@@ -136,6 +137,25 @@ Frontend:
 - Build frontend: typecheck y Vite build.
 - Seguridad: Gitleaks, dependency audit y CORS audit.
 - Manual/UAT: abrir `/polizas` y validar que la tabla corresponde al contrato MVP.
+
+## Estado de cierre QA/UAT
+
+Completado con evidencia:
+
+- Frontend polizas es Vue/TypeScript propio y no renderiza desde metadata AppBuilder.
+- En modo backend, `usePolizas` bloquea busquedas si falta configuracion runtime o no se puede validar sesion/contexto.
+- `runtimeConfig` exige API key no placeholder y valida `VITE_BROKER_ID` como entero positivo antes de enviarlo.
+- `/api/me` se usa para exponer el contexto efectivo de polizas al frontend.
+- Pruebas versionadas cubren bloqueo por configuracion incompleta, sesion no validada y cabecera `X-Broker-Id`.
+
+Pendiente tecnico:
+
+- Ejecutar smoke/UAT visual en entorno elegido para cada cierre de fase.
+- Sustituir API key/headers MVP por auth real segun `SDD-2026-005`.
+
+Bloqueado externo:
+
+- Falta proveedor/mecanismo auth y mapa funcional de permisos para retirar contexto MVP.
 
 ## Riesgos
 

@@ -24,6 +24,25 @@ El gate ejecuta:
 - validacion documental de roadmap, SDDs, CI y plantillas;
 - `git diff --check`.
 
+## Validacion CI local granular
+
+Para cambios de plataforma/CI que no tocan backend ni frontend, ejecutar como minimo:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
+git diff --check
+```
+
+Si se modifica configuracion de seguridad, sumar:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-DependencyAudit.ps1 -FailOnFindings
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-CorsAudit.ps1 -FailOnFindings
+```
+
+El workflow `preview-dry-run.yml` no despliega: solo comprueba que los documentos y workflows base existen y publica un artefacto de plan. Cualquier intento de `dryRun=false` debe quedar bloqueado hasta definir destino preview, environment, reviewers, secrets, smoke y rollback.
+
 ## Definicion de done
 
 Una rama MVP no esta lista si falta alguna de estas evidencias:

@@ -17,6 +17,7 @@ Decision base: iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadat
 - [Quality gate fase 7 y DoD](08-quality-phase-7-dod.md)
 - [Roadmap objetivo final](../ROADMAP_OBJETIVO_FINAL.md)
 - [Decision producto/arquitectura](../DECISION_PRODUCTO_ARQUITECTURA.md)
+- [SDD Auth y permisos de producto](../sdd/specs/iLiniumTech/SDD-2026-005-auth-permisos-producto.md)
 - [Plantilla SDD](../sdd/templates/spec-template.md)
 - [Plantilla de revision de seguridad](../sdd/templates/security-review-template.md)
 

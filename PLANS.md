@@ -112,6 +112,10 @@ Calidad y seguridad:
 - Riesgos residuales:
 - Bloqueos externos:
 - Siguiente paso recomendado:
+- Clasificacion de pendientes:
+  - Completado con evidencia:
+  - Pendiente tecnico:
+  - Bloqueado externo:
 
 ## Reglas para planes con multiples agentes
 

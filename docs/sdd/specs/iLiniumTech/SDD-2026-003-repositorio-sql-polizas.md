@@ -7,7 +7,7 @@
 - Aplicacion: iLiniumTech
 - Tipo: feature
 - Tamano SDD: M
-- Estado SDD: spec-ready
+- Estado SDD: implementado parcialmente con bloqueos externos
 - Responsable funcional: Intrasoft
 - Responsable tecnico: iLiniumTech
 - Fecha: 2026-05-13
@@ -20,7 +20,9 @@ El MVP actual usa `InMemoryPolizasRepository` con datos anonimizados. La siguien
 
 Decision de arquitectura aplicable: el repositorio SQL forma parte del backend API de datos de iLiniumTech. No es un runtime generico de datasources AppBuilder ni debe interpretar metadata `IAP_*` en produccion.
 
-Estado de implementacion inicial: existe una implementacion `SqlPolizasRepository` activable por configuracion, con query builder parametrizado y pruebas unitarias. Tambien existe un resolver `AppBuilderMaster` que localiza la conexion `tipobd-MO` en `IAPM_Connection` por broker y puede descifrar campos con la clave de AppBuilder. El flujo MVP debe evolucionar a broker por request, con `Polizas:BrokerId` solo como fallback local temporal. Queda pendiente validarla contra BBDD real de test o contenedor cuando se disponga de entorno autorizado.
+Estado de implementacion: existe `SqlPolizasRepository` activable por configuracion, con query builder parametrizado, whitelist y pruebas unitarias. Tambien existe un resolver `AppBuilderMaster` que localiza la conexion `tipobd-MO` en `IAPM_Connection` por broker y puede descifrar campos con la clave de AppBuilder. El flujo MVP ya puede tomar broker/contexto por request mediante cabeceras solo con opt-in explicito, mantiene `Polizas:BrokerId` como fallback local temporal y aplica `SESSION_CONTEXT` parametrizado antes de consultar. Queda pendiente validarlo contra BBDD real de test o contenedor y sustituir cabeceras MVP por auth real.
+
+Dependencia de seguridad: `SDD-2026-005` define el modelo objetivo para sustituir headers MVP por claims/sesion backend, permisos efectivos y errores 401/403 sanitizados.
 
 ## Objetivo
 
@@ -94,9 +96,9 @@ Campos permitidos inicialmente:
 - [x] El endpoint mantiene API key obligatoria.
 - [x] Los errores de validacion no devuelven SQL, connection strings ni trazas internas.
 - [x] Hay pruebas unitarias del query object y whitelist.
-- [ ] El broker efectivo se resuelve por request y no por configuracion global en escenarios MVP multi-broker.
-- [ ] El fallback `Polizas:BrokerId` queda limitado a ejecucion local/controlada.
-- [ ] `SESSION_CONTEXT` se establece antes de consultar polizas si las vistas/tablas lo requieren.
+- [x] El broker efectivo se resuelve por request y no por configuracion global en escenarios MVP multi-broker.
+- [x] El fallback `Polizas:BrokerId` queda limitado a ejecucion local/controlada.
+- [x] `SESSION_CONTEXT` se establece antes de consultar polizas si las vistas/tablas lo requieren.
 - [ ] Auth real sustituye la confianza en headers MVP para broker, usuario y perfil.
 - [ ] Hay pruebas de integracion con BBDD de test, contenedor o fixture SQL controlado.
 
@@ -139,17 +141,17 @@ Headers MVP:
 
 ## Seguridad
 
-- [ ] Secretos fuera de Git.
-- [ ] SQL parametrizado.
-- [ ] Whitelist para estructura SQL.
+- [x] Secretos fuera de Git.
+- [x] SQL parametrizado.
+- [x] Whitelist para estructura SQL.
 - [ ] Resolver por broker validado contra Master real autorizado.
 - [ ] Broker por request validado contra usuario/sesion real cuando exista autenticacion.
-- [ ] Headers MVP tratados como contexto temporal, no como identidad confiable.
-- [ ] `SESSION_CONTEXT` parametrizado cuando aplique.
-- [ ] `QueryStatic` y fragments heredados se tratan como evidencia, no como ejecutable.
+- [x] Headers MVP tratados como contexto temporal, no como identidad confiable.
+- [x] `SESSION_CONTEXT` parametrizado cuando aplique.
+- [x] `QueryStatic` y fragments heredados se tratan como evidencia, no como ejecutable.
 - [ ] Auth y autorizacion preservadas.
 - [ ] Logs con redaccion de datos sensibles.
-- [ ] Pruebas de inyeccion para filtros y ordenacion.
+- [x] Pruebas de inyeccion para filtros y ordenacion.
 
 ## Plan de pruebas
 
@@ -161,6 +163,30 @@ Headers MVP:
 - E2E/smoke: `/polizas` muestra datos o estado vacio controlado.
 - Seguridad: payloads con `;`, comentarios SQL, subqueries y columnas inexistentes.
 - Manual/UAT: contrastar resultados con entorno de pruebas usando usuario autorizado.
+
+## Estado de cierre QA/UAT
+
+Completado con evidencia:
+
+- Backend SQL read-only configurable: `Polizas:Repository=Sql` activa `SqlPolizasRepository`; `InMemory` sigue como default seguro.
+- Valores de filtros, detalle y `SESSION_CONTEXT` se aplican mediante parametros.
+- Estructura SQL y sort se limitan por whitelist iLiniumTech, sin interpretar `IAP_*` ni `QueryStatic` en runtime.
+- Broker/contexto MVP por request existe mediante `X-Broker-Id`, `X-User-Id`, `X-Profile-Id`, `X-Profile-Type-Id` y `X-Is-Admin`, solo con `Polizas:AllowHeaderExecutionContext=true` y restricciones de entorno.
+- `SESSION_CONTEXT` se aplica por conexion antes de queries de busqueda/detalle y se limpia con `NULL` si no hay contexto.
+- Pruebas versionadas cubren query builder, whitelist, payloads maliciosos, contexto por cabecera, `/api/me`, resolver AppBuilderMaster y `SESSION_CONTEXT`.
+
+Pendiente tecnico:
+
+- Sustituir cabeceras MVP por auth/autorizacion real.
+- Ejecutar integracion SQL con BBDD de test, contenedor o fixture SQL controlado.
+- Confirmar y documentar mascarado/recorte final de campos sensibles cuando se use dato real.
+
+Bloqueado externo:
+
+- Falta BBDD de test o contenedor SQL Server autorizado.
+- Falta confirmacion DBA de claves obligatorias/adicionales de `SESSION_CONTEXT`.
+- Falta proveedor/mecanismo de autenticacion real y mapa funcional de permisos.
+- Falta validacion de cuenta read-only contra Master/modelo reales.
 
 ## Riesgos
 
@@ -186,4 +212,4 @@ Headers MVP:
 - [ ] Criterios de aceptacion completados.
 - [ ] Pruebas ejecutadas y documentadas.
 - [ ] Gates de seguridad aplicables ejecutados.
-- [ ] Documentacion actualizada.
+- [x] Documentacion actualizada.
