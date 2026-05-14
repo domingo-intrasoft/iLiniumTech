@@ -15,6 +15,7 @@ Decision base: iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadat
 - [Adopcion, madurez y origen demo](06-adopcion-madurez-y-origen-demo.md)
 - [Decisiones tecnicas iniciales](07-decisiones-tecnicas-iniciales.md)
 - [Runbook MVP local](08-runbook-mvp-local.md)
+- [Roadmap de objetivos finales](../ROADMAP_OBJETIVOS_FINALES.md)
 - [Decision producto/arquitectura](../DECISION_PRODUCTO_ARQUITECTURA.md)
 - [Plantilla SDD](../sdd/templates/spec-template.md)
 - [Plantilla de revision de seguridad](../sdd/templates/security-review-template.md)
