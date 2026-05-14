@@ -87,7 +87,7 @@ function New-MockIssue {
         number = $IssueNumber
         title = "AI: definir contrato operativo Issue a agente a PR"
         state = "open"
-        body = "Rama base `ci-cd`. Paths permitidos docs/ai/**."
+        body = "## Rama base`n`ci-cd`n`n## Paths permitidos`ndocs/ai/**."
         html_url = "https://github.com/example/repo/issues/$IssueNumber"
         labels = @(
             @{ name = "status:ready-for-ai" },
@@ -134,15 +134,39 @@ function Get-BaseBranch {
         [string]$Body
     )
 
+    $explicitBranch = Get-ExplicitBaseBranch -Body $Body
+    if ($explicitBranch) {
+        return $explicitBranch
+    }
+
     if ($Labels -contains "app:infrastructure") {
         return "ci-cd"
     }
 
-    if ($Body -match "(?i)(`\.github/|`\.github\\|tools/github|tools\\github|docs/ai|docs\\ai|ci-cd)") {
-        return "ci-cd"
+    "develop"
+}
+
+function Get-ExplicitBaseBranch {
+    param([string]$Body)
+
+    if ([string]::IsNullOrWhiteSpace($Body)) {
+        return $null
     }
 
-    "develop"
+    $patterns = @(
+        "(?im)^\s*##\s*Rama base\s*\r?\n\s*`?(main|develop|ci-cd)`?",
+        "(?im)^\s*##\s*Base branch\s*\r?\n\s*`?(main|develop|ci-cd)`?",
+        "(?im)^\s*[-*]?\s*(Rama base|Base branch)\s*:\s*`?(main|develop|ci-cd)`?"
+    )
+
+    foreach ($pattern in $patterns) {
+        $match = [regex]::Match($Body, $pattern)
+        if ($match.Success) {
+            return $match.Groups[$match.Groups.Count - 1].Value
+        }
+    }
+
+    $null
 }
 
 function ConvertTo-BranchSlug {

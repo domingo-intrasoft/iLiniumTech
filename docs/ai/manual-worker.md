@@ -79,8 +79,11 @@ Acciones en `dryRun=true`:
 
 Regla actual:
 
-- `app:infrastructure`, `docs/ai/**`, `.github/**` y `tools/github/**` van a `ci-cd`;
-- el resto va a `develop`, salvo que la Issue indique otra decision aprobada.
+- si la Issue declara `Rama base` o `Base branch`, esa declaracion manda;
+- si no hay declaracion explicita, `app:infrastructure` va a `ci-cd`;
+- si no hay declaracion explicita y no es infraestructura, va a `develop`.
+
+Las tareas que toquen `docs/ai/**`, `.github/**` o `tools/github/**` deben declarar `Rama base` en la Issue para evitar inferencias a partir de paths prohibidos o contexto textual.
 
 La rama generada usa formato:
 
