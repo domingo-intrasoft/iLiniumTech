@@ -166,3 +166,5 @@ npm run dev
 ```
 
 `/api/me` devuelve el contexto efectivo que usa la UI para mostrar el broker activo y detectar si falta contexto antes de consultar polizas. Cuando `VITE_USE_BACKEND=true`, los fallos de backend no se sustituyen por fixtures silenciosos: deben mostrarse como error de configuracion/conexion para que la demo sea honesta.
+
+La pantalla de polizas ya envia `page`, `pageSize`, `fechaEfectoDesde` y `fechaEfectoHasta` al backend. En SQL, `fechaEfectoHasta` se traduce como limite superior exclusivo del dia siguiente para cubrir columnas `datetime` con hora.

@@ -143,10 +143,10 @@ public sealed class PolizasSqlQueryBuilder
 
         if (request.FechaEfectoHasta.HasValue)
         {
-            clauses.Add("[F_Efecto] <= @fechaEfectoHasta");
+            clauses.Add("[F_Efecto] < @fechaEfectoHastaExclusiva");
             parameters.Add(new PolizasSqlParameter(
-                "@fechaEfectoHasta",
-                request.FechaEfectoHasta.Value.ToDateTime(TimeOnly.MinValue)));
+                "@fechaEfectoHastaExclusiva",
+                request.FechaEfectoHasta.Value.AddDays(1).ToDateTime(TimeOnly.MinValue)));
         }
 
         if (clauses.Count == 0)
