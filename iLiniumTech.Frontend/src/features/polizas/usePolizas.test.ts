@@ -87,4 +87,58 @@ describe('usePolizas', () => {
     expect(wrapper.vm.polizas.contextBlocked.value).toBe(true)
     expect(wrapper.vm.polizas.error.value).toContain('VITE_ILINIUMTECH_API_KEY')
   })
+
+  it('queries backend polizas after validating a broker session', async () => {
+    mocks.loadSession.mockResolvedValue({
+      brokerId: 42,
+      entityMainId: 42,
+      userId: 7,
+      profileId: 9,
+      profileTypeId: 'mvp-profile',
+      isAdmin: false,
+      headerExecutionContextEnabled: true,
+      polizasExecutionContextRequired: true,
+    })
+
+    const wrapper = mount(Harness)
+    await flushPromises()
+
+    expect(mocks.loadSession).toHaveBeenCalledOnce()
+    expect(mocks.searchPolizas).toHaveBeenCalledWith({
+      numero: undefined,
+      cliente: undefined,
+      estado: undefined,
+      compania: undefined,
+      ramo: undefined,
+      fechaEfectoDesde: undefined,
+      fechaEfectoHasta: undefined,
+      page: 1,
+      pageSize: 25,
+      sort: 'fechaEfecto:desc',
+    })
+    expect(wrapper.vm.polizas.contextBlocked.value).toBe(false)
+    expect(wrapper.vm.polizas.error.value).toBeNull()
+    expect(wrapper.vm.polizas.items.value).toEqual(polizasFixture.items)
+    expect(wrapper.vm.polizas.total.value).toBe(polizasFixture.total)
+  })
+
+  it('blocks backend searches when the session requires a broker but has none', async () => {
+    mocks.loadSession.mockResolvedValue({
+      brokerId: null,
+      entityMainId: null,
+      userId: 7,
+      profileId: 9,
+      profileTypeId: 'mvp-profile',
+      isAdmin: false,
+      headerExecutionContextEnabled: true,
+      polizasExecutionContextRequired: true,
+    })
+
+    const wrapper = mount(Harness)
+    await flushPromises()
+
+    expect(mocks.searchPolizas).not.toHaveBeenCalled()
+    expect(wrapper.vm.polizas.contextBlocked.value).toBe(true)
+    expect(wrapper.vm.polizas.error.value).toBe('Configura un broker para consultar polizas.')
+  })
 })

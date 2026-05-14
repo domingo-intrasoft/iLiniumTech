@@ -1,6 +1,6 @@
 ## Resumen
 
-- 
+- Pendiente de completar.
 
 ## Spec / Issue
 
@@ -28,4 +28,4 @@
 
 ## Riesgos residuales
 
-- 
+- Pendiente de completar.

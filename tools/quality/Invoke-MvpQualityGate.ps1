@@ -153,6 +153,16 @@ function Invoke-FrontendSmoke {
     }
 }
 
+function Invoke-GitWhitespaceCheck {
+    git rev-parse --verify origin/main *> $null
+    if ($global:LASTEXITCODE -eq 0) {
+        git diff --check origin/main...HEAD
+        return
+    }
+
+    git diff --check
+}
+
 Push-Location $repoRoot
 try {
     New-Item -ItemType Directory -Force -Path $reportsRoot | Out-Null
@@ -238,7 +248,7 @@ try {
     }
 
     Invoke-Step "Git whitespace check" {
-        git diff --check
+        Invoke-GitWhitespaceCheck
     }
 }
 finally {

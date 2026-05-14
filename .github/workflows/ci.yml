@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Documentation baseline
         shell: pwsh
@@ -27,7 +29,13 @@ jobs:
 
       - name: Git whitespace check
         shell: pwsh
-        run: git diff --check
+        run: |
+          if ("${{ github.event_name }}" -eq "pull_request") {
+            git diff --check "origin/${{ github.base_ref }}...HEAD"
+          }
+          else {
+            git diff --check
+          }
 
       - name: Write quality summary
         if: always()
