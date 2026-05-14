@@ -1,10 +1,13 @@
 import { onMounted, reactive, ref } from 'vue'
 
+import { useSession } from '@/services/session'
+
 import { getPolizasCatalogs, searchPolizas } from './polizasApi'
 import { polizasCatalogsFixture } from './polizasFixture'
 import type { PolizaListItem, PolizasCatalogs, PolizasQueryFilters } from './polizasTypes'
 
 export function usePolizas() {
+  const { session, loading: sessionLoading, error: sessionError, loadSession } = useSession()
   const catalogs = ref<PolizasCatalogs>(polizasCatalogsFixture)
   const items = ref<PolizaListItem[]>([])
   const total = ref(0)
@@ -18,11 +21,31 @@ export function usePolizas() {
     ramo: '',
   })
 
+  async function ensureBackendContext() {
+    const currentSession = await loadSession()
+    if (
+      import.meta.env.VITE_USE_BACKEND === 'true' &&
+      currentSession?.polizasExecutionContextRequired &&
+      currentSession.brokerId === null
+    ) {
+      error.value = 'Configura un broker para consultar polizas.'
+      items.value = []
+      total.value = 0
+      return false
+    }
+
+    return true
+  }
+
   async function refresh() {
     loading.value = true
     error.value = null
 
     try {
+      if (!(await ensureBackendContext())) {
+        return
+      }
+
       const result = await searchPolizas({
         numero: filters.numero || undefined,
         cliente: filters.cliente || undefined,
@@ -45,15 +68,22 @@ export function usePolizas() {
   }
 
   async function loadCatalogs() {
-    catalogs.value = await getPolizasCatalogs()
+    try {
+      catalogs.value = await getPolizasCatalogs()
+    } catch {
+      error.value = 'No se pudieron cargar los catalogos de polizas.'
+    }
   }
 
   onMounted(() => {
-    void loadCatalogs()
     void refresh()
+    void loadCatalogs()
   })
 
   return {
+    session,
+    sessionLoading,
+    sessionError,
     catalogs,
     items,
     total,

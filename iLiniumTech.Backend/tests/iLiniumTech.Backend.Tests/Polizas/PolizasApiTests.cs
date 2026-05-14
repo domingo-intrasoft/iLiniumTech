@@ -31,6 +31,91 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Me_requires_api_key()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/me");
+
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Me_returns_effective_polizas_context_from_configuration()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:BrokerId"] = "84",
+            ["Polizas:UserId"] = "10",
+            ["Polizas:ProfileId"] = "11",
+            ["Polizas:ProfileTypeId"] = "configured-profile",
+            ["Polizas:IsAdmin"] = "false"
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"brokerId\":84");
+        body.Should().Contain("\"entityMainId\":84");
+        body.Should().Contain("\"userId\":10");
+        body.Should().Contain("\"profileId\":11");
+        body.Should().Contain("\"profileTypeId\":\"configured-profile\"");
+        body.Should().Contain("\"isAdmin\":false");
+        body.Should().Contain("\"headerExecutionContextEnabled\":false");
+    }
+
+    [Fact]
+    public async Task Me_returns_effective_polizas_context_from_headers_when_enabled()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:AllowHeaderExecutionContext"] = "true",
+            ["Polizas:BrokerId"] = "84"
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Broker-Id", "42");
+        client.DefaultRequestHeaders.Add("X-User-Id", "7");
+        client.DefaultRequestHeaders.Add("X-Profile-Id", "9");
+        client.DefaultRequestHeaders.Add("X-Profile-Type-Id", "header-profile");
+        client.DefaultRequestHeaders.Add("X-Is-Admin", "true");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"brokerId\":42");
+        body.Should().Contain("\"entityMainId\":42");
+        body.Should().Contain("\"userId\":7");
+        body.Should().Contain("\"profileId\":9");
+        body.Should().Contain("\"profileTypeId\":\"header-profile\"");
+        body.Should().Contain("\"isAdmin\":true");
+        body.Should().Contain("\"headerExecutionContextEnabled\":true");
+    }
+
+    [Fact]
+    public async Task Me_rejects_invalid_header_context()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:AllowHeaderExecutionContext"] = "true"
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Broker-Id", "not-a-broker");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        body.Should().Contain("POLIZAS_CONTEXT_INVALID");
+    }
+
+    [Fact]
     public async Task Metadata_is_deprecated_without_appbuilder_reference()
     {
         await using var factory = new TestApiFactory();

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import PolizasFilters from './PolizasFilters.vue'
 import PolizasTable from './PolizasTable.vue'
 import {
@@ -10,7 +12,40 @@ import {
 } from './polizasConstants'
 import { usePolizas } from './usePolizas'
 
-const { catalogs, items, total, loading, error, filters, refresh } = usePolizas()
+const {
+  session,
+  sessionLoading,
+  sessionError,
+  catalogs,
+  items,
+  total,
+  loading,
+  error,
+  filters,
+  refresh,
+} = usePolizas()
+
+const sessionLabel = computed(() => {
+  if (sessionLoading.value) {
+    return 'Contexto...'
+  }
+
+  if (sessionError.value) {
+    return 'Sesion no disponible'
+  }
+
+  if (session.value?.brokerId) {
+    return `Broker ${session.value.brokerId}`
+  }
+
+  return session.value?.polizasExecutionContextRequired ? 'Broker requerido' : 'Modo local'
+})
+
+const sessionNeedsAttention = computed(
+  () =>
+    Boolean(sessionError.value) ||
+    Boolean(session.value?.polizasExecutionContextRequired && !session.value.brokerId),
+)
 
 async function executeSearch(criteria: PolizasSearchCriteria) {
   filters.numero = criteria.numero
@@ -61,7 +96,9 @@ async function clearFilters() {
           <span>/</span>
         </div>
 
-        <span class="environment-badge">Aunna Tech | Portal (DEMO)</span>
+        <span class="environment-badge" :class="{ warning: sessionNeedsAttention }">
+          {{ sessionLabel }}
+        </span>
 
         <div class="top-actions" aria-label="Acciones de usuario">
           <span v-for="badge in topBadges" :key="badge" class="round-badge">{{ badge }}</span>
