@@ -307,6 +307,8 @@ Una tarea AI debe contener:
 - criterio de done;
 - instrucciones de PR.
 
+El contrato completo de entrada, evidencia, PR, transiciones y manejo de fallos esta definido en `docs/ai/issue-agent-pr-contract.md`.
+
 ## Fases de implantacion
 
 ### Fase 0 - Gobierno manual versionado
