@@ -36,6 +36,26 @@ describe('polizas static frontend contract', () => {
     expect(result.items[0]?.ramo).toBe('Autos')
   })
 
+  it('filters fixture rows by fecha efecto range', async () => {
+    const result = await searchPolizas({
+      fechaEfectoDesde: '2026-02-01',
+      fechaEfectoHasta: '2026-02-28',
+    })
+
+    expect(result.total).toBe(1)
+    expect(result.items[0]?.fechaEfecto).toBe('2026-02-15')
+  })
+
+  it('paginates fixture rows with the backend page contract', async () => {
+    const result = await searchPolizas({ page: 2, pageSize: 1 })
+
+    expect(result.page).toBe(2)
+    expect(result.pageSize).toBe(1)
+    expect(result.total).toBe(2)
+    expect(result.items).toHaveLength(1)
+    expect(result.items[0]?.numero).toBe('POL-2026-0002')
+  })
+
   it('exposes local catalogs without metadata', async () => {
     const catalogs = await getPolizasCatalogs()
 

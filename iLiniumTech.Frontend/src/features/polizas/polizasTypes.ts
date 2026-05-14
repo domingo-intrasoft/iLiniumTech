@@ -73,6 +73,8 @@ export interface PolizasQueryFilters {
   estado: string
   compania: string
   ramo: string
+  fechaEfectoDesde: string
+  fechaEfectoHasta: string
 }
 
 export interface PagedResult<T> {

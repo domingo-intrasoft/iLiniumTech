@@ -22,7 +22,10 @@ const {
   loading,
   error,
   filters,
+  pagination,
   refresh,
+  setPage,
+  setPageSize,
 } = usePolizas()
 
 const sessionLabel = computed(() => {
@@ -53,6 +56,9 @@ async function executeSearch(criteria: PolizasSearchCriteria) {
   filters.estado = criteria.estado
   filters.compania = criteria.compania
   filters.ramo = criteria.ramo
+  filters.fechaEfectoDesde = criteria.fechaEfectoDesde
+  filters.fechaEfectoHasta = criteria.fechaEfectoHasta
+  pagination.page = 1
   await refresh()
 }
 
@@ -62,6 +68,9 @@ async function clearFilters() {
   filters.estado = ''
   filters.compania = ''
   filters.ramo = ''
+  filters.fechaEfectoDesde = ''
+  filters.fechaEfectoHasta = ''
+  pagination.page = 1
   await refresh()
 }
 </script>
@@ -156,7 +165,16 @@ async function clearFilters() {
       </div>
 
       <PolizasFilters :catalogs="catalogs" @search="executeSearch" @clear="clearFilters" />
-      <PolizasTable :items="items" :total="total" :loading="loading" :error="error" />
+      <PolizasTable
+        :items="items"
+        :total="total"
+        :loading="loading"
+        :error="error"
+        :page="pagination.page"
+        :page-size="pagination.pageSize"
+        @page-change="setPage"
+        @page-size-change="setPageSize"
+      />
     </section>
   </main>
 </template>

@@ -19,6 +19,12 @@ export function usePolizas() {
     estado: '',
     compania: '',
     ramo: '',
+    fechaEfectoDesde: '',
+    fechaEfectoHasta: '',
+  })
+  const pagination = reactive({
+    page: 1,
+    pageSize: 25,
   })
 
   async function ensureBackendContext() {
@@ -52,12 +58,16 @@ export function usePolizas() {
         estado: filters.estado || undefined,
         compania: filters.compania || undefined,
         ramo: filters.ramo || undefined,
-        page: 1,
-        pageSize: 25,
+        fechaEfectoDesde: filters.fechaEfectoDesde || undefined,
+        fechaEfectoHasta: filters.fechaEfectoHasta || undefined,
+        page: pagination.page,
+        pageSize: pagination.pageSize,
         sort: 'fechaEfecto:desc',
       })
       items.value = result.items
       total.value = result.total
+      pagination.page = result.page
+      pagination.pageSize = result.pageSize
     } catch {
       error.value = 'No se pudieron cargar las polizas.'
       items.value = []
@@ -65,6 +75,25 @@ export function usePolizas() {
     } finally {
       loading.value = false
     }
+  }
+
+  async function setPage(page: number) {
+    if (page === pagination.page || loading.value) {
+      return
+    }
+
+    pagination.page = page
+    await refresh()
+  }
+
+  async function setPageSize(pageSize: number) {
+    if (pageSize === pagination.pageSize || loading.value) {
+      return
+    }
+
+    pagination.page = 1
+    pagination.pageSize = pageSize
+    await refresh()
   }
 
   async function loadCatalogs() {
@@ -90,6 +119,9 @@ export function usePolizas() {
     loading,
     error,
     filters,
+    pagination,
     refresh,
+    setPage,
+    setPageSize,
   }
 }
