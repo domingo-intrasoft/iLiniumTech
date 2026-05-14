@@ -34,6 +34,8 @@ La base de datos de modelo no debe elegirse por una unica connection string fija
 6. Seleccionar la fila `DatabaseTypeId == tipobd-MO`.
 7. Usar esa conexion de modelo para consultar tablas/vistas de polizas.
 
+En iLiniumTech MVP, el broker efectivo debe venir del request o de la sesion autenticada cuando exista. `Polizas:BrokerId` queda solo como fallback local temporal para ejecutar el repositorio sin frontend/auth completa.
+
 AppBuilder usa metadata y CRUD generico para montar pantallas en runtime. iLiniumTech no debe hacerlo. iLiniumTech debe reutilizar solo el conocimiento de resolucion de conexion y permisos; las pantallas Vue y endpoints backend de polizas deben quedar programados como codigo estatico y mantenible.
 
 ## Mapa conceptual
@@ -263,6 +265,15 @@ Patron activo:
 
 En iLiniumTech conviene exponer explicitamente un `brokerId` efectivo en claims/contexto backend, sin depender de nombres ambiguos de frontend.
 
+Contrato MVP previsto:
+
+- La API de polizas mantiene `X-ILiniumTech-Api-Key` como barrera actual de desarrollo/demo.
+- Mientras no haya autenticacion real, el broker del request puede viajar en `X-Broker-Id` solo si el backend tiene `Polizas:AllowHeaderExecutionContext=true`.
+- `X-User-Id`, `X-Profile-Id`, `X-Profile-Type-Id` y `X-Is-Admin` pueden completar contexto MVP para `SESSION_CONTEXT` en entornos controlados.
+- Esos headers no prueban identidad ni permisos; solo permiten avanzar el MVP multi-broker.
+- Cuando exista auth real, el backend debe derivar `brokerId`, `userId`, `profileId`, `profileTypeId` e `isAdmin` desde claims/sesion y dejar de confiar en headers enviados por el frontend para autorizacion.
+- Si se permite cambio de broker, el backend debe validar que el usuario autenticado puede operar ese broker antes de resolver `IAPM_Connection`.
+
 ## Permisos
 
 Archivos principales:
@@ -313,6 +324,20 @@ Para iLiniumTech:
 - Si las vistas de polizas dependen de `SESSION_CONTEXT`, el backend debe establecer esas claves antes de ejecutar consultas.
 - No se deben interpolar valores en SQL; usar parametros para cada clave.
 - Confirmar con DBA o analisis de vistas si `brokerId`, `entityMainId`, `profileId` u otras claves son obligatorias.
+- En el MVP, las claves pueden construirse desde el contexto de request, pero deben quedar marcadas como temporales hasta que exista autenticacion real.
+- La configuracion de `SESSION_CONTEXT` debe ejecutarse por conexion y por request para evitar fuga de contexto entre brokers.
+- Si se usa pooling de conexiones, el backend debe garantizar que el contexto queda sobrescrito para cada request antes de consultar polizas.
+
+Claves candidatas a documentar/validar:
+
+- `brokerId`
+- `entityMainId`
+- `userId`
+- `profileId`
+- `profileTypeId`
+- `isAdmin`
+- `ip`
+- `userAgent`
 
 ## Busqueda y CRUD generico en AppBuilder
 
@@ -380,6 +405,16 @@ iLiniumTech debe evolucionar hacia este patron:
 4. Endpoints REST explicitos para listado, detalle, catalogos y acciones.
 5. Frontend Vue estatico, compilable sin metadata.
 
+Para acelerar el MVP antes de cerrar autenticacion completa:
+
+1. El request llega con `X-ILiniumTech-Api-Key` y, si se usa SQL por broker, `X-Broker-Id`.
+2. El backend construye un contexto interno de request con `brokerId` efectivo y placeholders seguros para usuario/perfil cuando no existan claims. Las cabeceras de contexto requieren opt-in explicito (`Polizas:AllowHeaderExecutionContext=true`).
+3. El resolver `AppBuilderMaster` usa ese `brokerId` para localizar `tipobd-MO` en `IAPM_Connection`.
+4. Si aplica, el repositorio establece `SESSION_CONTEXT` parametrizado antes de ejecutar la query whitelist.
+5. La respuesta no expone connection strings, SQL interno ni datos de autorizacion sensibles.
+
+Este flujo MVP no es autenticacion real. Debe reemplazarse por claims/sesion autorizada antes de produccion.
+
 Lo que se conserva de AppBuilder:
 
 - Semantica de `brokerId`/`EntityMainCurrentId`.
@@ -403,23 +438,27 @@ Fase 1: configuracion segura.
 - Definir `AppBuilder:BuilderConnection` o `AppBuilder:MasterConnection` solo por entorno seguro.
 - Definir `AppBuilder:ApplicationId`, `ApplicationVersion`, `EnvironmentType`.
 - No guardar valores reales en `appsettings*.json` versionados.
+- Mantener `ApiSecurity:ApiKey` fuera de Git.
+- Mantener `ConnectionStrings:AppBuilderMaster`, `ConnectionStrings:PolizasReadOnly`, `AppBuilder:EncryptionKey` y equivalentes `ILINIUMTECH__*` fuera de Git.
 
 Fase 2: resolver de conexion.
 
 - Crear `IModelConnectionResolver`.
-- Entrada: `brokerId`, app/version/entorno.
+- Entrada: contexto de request con `brokerId`, app/version/entorno y, cuando exista auth real, usuario/perfil/permisos.
 - Salida: descriptor de conexion modelo, sin exponer password en logs.
 - Implementar dos estrategias:
   - directa a Master cuando ya se tenga Master seguro;
   - via Builder + `IAP_ApplicationConnection` si se necesita replicar exactamente AppBuilder.
 
-Estado iLiniumTech 2026-05-14: implementado el primer corte backend como `AppBuilderMasterPolizasConnectionStringProvider`. Resuelve la conexion `tipobd-MO` en `IAPM_Connection` por `brokerId`, construye una connection string SQL sin loguearla y descifra campos con una clave compatible con `SecurityHelper.DecryptData`. Sigue pendiente sustituir el `brokerId` configurado por el broker del usuario autenticado.
+Estado iLiniumTech 2026-05-14: implementado el primer corte backend como `AppBuilderMasterPolizasConnectionStringProvider`. Resuelve la conexion `tipobd-MO` en `IAPM_Connection` por `brokerId`, construye una connection string SQL sin loguearla y descifra campos con una clave compatible con `SecurityHelper.DecryptData`. Siguiente paso MVP: tomar el `brokerId` del request (`X-Broker-Id`) solo con opt-in de cabeceras de contexto. Paso pendiente de seguridad: sustituir ese header por el broker del usuario autenticado.
 
 Fase 3: session context.
 
 - Crear helper que ejecute `sp_set_session_context` con parametros antes de consultas SQL.
 - Claves minimas: `brokerId`, `entityMainId`, `userId`, `profileId`, `profileTypeId`, `isAdmin`.
 - Hacerlo opcional por configuracion hasta confirmar dependencia real de vistas/triggers.
+- Anadir `ip` y `userAgent` si las vistas/triggers o auditoria los requieren.
+- Asegurar que el contexto se establece en cada request antes de consultar, especialmente con pooling de conexiones.
 
 Fase 4: repositorio de polizas.
 
@@ -433,6 +472,7 @@ Fase 5: autorizacion.
 - En cada endpoint, validar `brokerId` del usuario contra broker solicitado.
 - Si aplica, consultar grupos/permisos importados desde Master/Modelo/Builder.
 - Tests para usuario admin, usuario sin permiso, broker cruzado y broker sin conexion modelo.
+- Durante el MVP, tratar `X-Broker-Id` y los headers de usuario/perfil como entrada provisional y no como identidad confiable.
 
 Fase 6: observabilidad.
 
@@ -446,6 +486,7 @@ Fase 1: contrato de sesion.
 
 - El frontend no debe conocer connection strings ni metadata de pantalla.
 - Debe consumir `/me` o endpoint equivalente con `brokerId`, perfil, permisos y datos de presentacion minimos.
+- Mientras no exista `/me`, puede enviar `X-Broker-Id` solo en entornos MVP controlados.
 
 Fase 2: pantalla de polizas estatica.
 
@@ -477,7 +518,9 @@ Antes de tocar codigo de datos de polizas:
 
 - Confirmar de donde se obtendra Master/Builder en iLiniumTech.
 - Confirmar si `IAPM_Connection.IdentityId` coincide siempre con `brokerId`.
+- Confirmar si el corte actual recibe `brokerId` por header MVP, claims reales o fallback local.
 - Confirmar si las vistas/tablas de polizas requieren `SESSION_CONTEXT`.
+- Confirmar las claves exactas de `SESSION_CONTEXT` usadas por vistas/triggers.
 - Confirmar si hay que usar `IAP_ObjectGroup` o un modelo de permisos propio.
 - Confirmar la vista/tabla final para listado de polizas.
 - Confirmar campos obligatorios del detalle.

@@ -67,6 +67,19 @@ public sealed class AppBuilderConnectionResolverTests
             .WithMessage("*incomplete*");
     }
 
+    [Fact]
+    public async Task AppBuilderMaster_resolver_requires_runtime_broker_context()
+    {
+        var resolver = new AppBuilderMasterPolizasConnectionStringProvider(
+            "Server=localhost;Database=Master;User Id=user;Password=password;TrustServerCertificate=True",
+            new TestExecutionContextAccessor(null));
+
+        var act = async () => await resolver.GetConnectionStringAsync(CancellationToken.None);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*broker execution context*");
+    }
+
     private static string EncryptLikeAppBuilder(string value, string key)
     {
         var inputBytes = Encoding.UTF8.GetBytes(value);
@@ -94,5 +107,10 @@ public sealed class AppBuilderConnectionResolverTests
 
         CryptographicOperations.ZeroMemory(derivedBytes);
         return Convert.ToBase64String(output.ToArray());
+    }
+
+    private sealed class TestExecutionContextAccessor(PolizasExecutionContext? current) : IPolizasExecutionContextAccessor
+    {
+        public PolizasExecutionContext? Current => current;
     }
 }

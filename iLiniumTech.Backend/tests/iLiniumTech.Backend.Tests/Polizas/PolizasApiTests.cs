@@ -110,17 +110,67 @@ public sealed class PolizasApiTests
         body.Contains("SELECT", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
     }
 
-    private sealed class TestApiFactory : WebApplicationFactory<Program>
+    [Fact]
+    public async Task Sql_appbuilder_mode_requires_broker_context()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:Repository"] = "Sql",
+            ["Polizas:ConnectionResolver"] = "AppBuilderMaster",
+            ["ConnectionStrings:AppBuilderMaster"] = "Server=localhost;Database=Master;User Id=user;Password=password;TrustServerCertificate=True"
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        body.Should().Contain("POLIZAS_CONTEXT_REQUIRED");
+    }
+
+    [Fact]
+    public async Task Sql_appbuilder_mode_rejects_invalid_header_broker_context()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:Repository"] = "Sql",
+            ["Polizas:ConnectionResolver"] = "AppBuilderMaster",
+            ["Polizas:AllowHeaderExecutionContext"] = "true",
+            ["ConnectionStrings:AppBuilderMaster"] = "Server=localhost;Database=Master;User Id=user;Password=password;TrustServerCertificate=True"
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Broker-Id", "not-a-broker");
+
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        body.Should().Contain("POLIZAS_CONTEXT_INVALID");
+    }
+
+    private sealed class TestApiFactory(Dictionary<string, string?>? configurationOverrides = null)
+        : WebApplicationFactory<Program>
     {
         protected override IHost CreateHost(IHostBuilder builder)
         {
             builder.ConfigureAppConfiguration(configuration =>
             {
-                configuration.AddInMemoryCollection(new Dictionary<string, string?>
+                var values = new Dictionary<string, string?>
                 {
                     ["ApiSecurity:ApiKey"] = "test-key",
                     ["Cors:AllowedOrigins:0"] = "http://localhost:5173"
-                });
+                };
+                if (configurationOverrides is not null)
+                {
+                    foreach (var (key, value) in configurationOverrides)
+                    {
+                        values[key] = value;
+                    }
+                }
+
+                configuration.AddInMemoryCollection(values);
             });
 
             return base.CreateHost(builder);

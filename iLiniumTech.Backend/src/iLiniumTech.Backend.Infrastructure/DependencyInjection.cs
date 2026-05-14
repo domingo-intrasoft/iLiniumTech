@@ -3,6 +3,7 @@ using iLiniumTech.Backend.Infrastructure.Polizas;
 using iLiniumTech.Backend.Infrastructure.Polizas.Connections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace iLiniumTech.Backend.Infrastructure;
 
@@ -13,16 +14,22 @@ public static class DependencyInjection
         var repositoryMode = configuration["Polizas:Repository"];
         if (string.Equals(repositoryMode, "Sql", StringComparison.OrdinalIgnoreCase))
         {
-            services.AddSingleton(CreateConnectionStringProvider(configuration));
-            services.AddSingleton<IPolizasRepository, SqlPolizasRepository>();
+            services.TryAddScoped<IPolizasExecutionContextAccessor>(_ => new ConfiguredPolizasExecutionContextAccessor(configuration));
+            services.AddScoped<IPolizasConnectionStringProvider>(provider =>
+                CreateConnectionStringProvider(configuration, provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
+            services.AddScoped<IPolizasRepository>(provider => new SqlPolizasRepository(
+                provider.GetRequiredService<IPolizasConnectionStringProvider>(),
+                provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
             return services;
         }
 
-        services.AddSingleton<IPolizasRepository, InMemoryPolizasRepository>();
+        services.AddScoped<IPolizasRepository, InMemoryPolizasRepository>();
         return services;
     }
 
-    private static IPolizasConnectionStringProvider CreateConnectionStringProvider(IConfiguration configuration)
+    private static IPolizasConnectionStringProvider CreateConnectionStringProvider(
+        IConfiguration configuration,
+        IPolizasExecutionContextAccessor executionContextAccessor)
     {
         var resolverMode = configuration["Polizas:ConnectionResolver"];
         if (string.Equals(resolverMode, "AppBuilderMaster", StringComparison.OrdinalIgnoreCase))
@@ -36,14 +43,6 @@ public static class DependencyInjection
                     "AppBuilderMaster resolver requires ConnectionStrings:AppBuilderMaster or ILINIUMTECH__APPBUILDER_MASTER_CONNECTION.");
             }
 
-            var brokerIdValue = configuration["Polizas:BrokerId"]
-                ?? configuration["ILINIUMTECH:BROKER_ID"];
-            if (!int.TryParse(brokerIdValue, out var brokerId) || brokerId <= 0)
-            {
-                throw new InvalidOperationException(
-                    "AppBuilderMaster resolver requires Polizas:BrokerId or ILINIUMTECH__BROKER_ID.");
-            }
-
             var encryptionKey = configuration["AppBuilder:EncryptionKey"]
                 ?? configuration["ILINIUMTECH:APPBUILDER_ENCRYPTION_KEY"];
             var databaseTypeId = configuration["Polizas:ModelDatabaseTypeId"]
@@ -51,7 +50,7 @@ public static class DependencyInjection
 
             return new AppBuilderMasterPolizasConnectionStringProvider(
                 masterConnectionString,
-                brokerId,
+                executionContextAccessor,
                 new AppBuilderConnectionValueProtector(encryptionKey),
                 databaseTypeId);
         }

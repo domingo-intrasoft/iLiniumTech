@@ -5,7 +5,7 @@ namespace iLiniumTech.Backend.Infrastructure.Polizas.Connections;
 
 public sealed class AppBuilderMasterPolizasConnectionStringProvider(
     string masterConnectionString,
-    int brokerId,
+    IPolizasExecutionContextAccessor executionContextAccessor,
     AppBuilderConnectionValueProtector? valueProtector = null,
     string modelDatabaseTypeId = AppBuilderMasterPolizasConnectionStringProvider.DefaultModelDatabaseTypeId)
     : IPolizasConnectionStringProvider
@@ -21,6 +21,9 @@ public sealed class AppBuilderMasterPolizasConnectionStringProvider(
         {
             throw new InvalidOperationException("AppBuilder master connection is required to resolve model connections.");
         }
+
+        var executionContext = executionContextAccessor.Current
+            ?? throw new InvalidOperationException("AppBuilderMaster resolver requires a broker execution context.");
 
         await using var connection = new SqlConnection(masterConnectionString);
         await connection.OpenAsync(cancellationToken);
@@ -39,7 +42,7 @@ public sealed class AppBuilderMasterPolizasConnectionStringProvider(
             ORDER BY [Id];
             """;
         command.CommandType = CommandType.Text;
-        command.Parameters.AddWithValue("@brokerId", brokerId);
+        command.Parameters.AddWithValue("@brokerId", executionContext.BrokerId);
         command.Parameters.AddWithValue("@databaseTypeId", modelDatabaseTypeId);
 
         await using var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow, cancellationToken);

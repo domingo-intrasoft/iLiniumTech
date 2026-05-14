@@ -63,17 +63,59 @@ $env:ILINIUMTECH__POLIZAS_CONNECTION = "<connection-string-local>"
 
 No guardar esas cadenas en Git. El repositorio SQL usa whitelist de columnas y parametros para valores; no interpreta metadata AppBuilder en runtime.
 
-Para resolver la conexion de modelo desde Master al estilo AppBuilder:
+Para resolver la conexion de modelo desde Master al estilo AppBuilder en el MVP:
 
 ```powershell
 $env:Polizas__Repository = "Sql"
 $env:Polizas__ConnectionResolver = "AppBuilderMaster"
-$env:Polizas__BrokerId = "<broker-id-local>"
 $env:ConnectionStrings__AppBuilderMaster = "<master-connection-string-local>"
 $env:AppBuilder__EncryptionKey = "<appbuilder-encryption-key-local>"
 ```
 
-`AppBuilder__EncryptionKey` solo es necesario si los campos de `IAPM_Connection` estan cifrados como en AppBuilder. El broker sigue siendo configuracion local temporal; cuando haya autenticacion de usuario real, debera venir del contexto autenticado, no del frontend como dato confiable.
+`AppBuilder__EncryptionKey` solo es necesario si los campos de `IAPM_Connection` estan cifrados como en AppBuilder. La conexion Master y la clave de descifrado son secretos: deben venir de variables de entorno, secret store o del mecanismo corporativo que se defina.
+
+### Contexto de request MVP
+
+El flujo objetivo para acelerar el MVP es resolver el broker por request, no por una unica configuracion global:
+
+- `X-ILiniumTech-Api-Key`: cabecera obligatoria actual para proteger `/api/polizas/*` en desarrollo/demo. Se configura con `ApiSecurity__ApiKey`. No sustituye autenticacion real.
+- `X-Broker-Id`: cabecera MVP prevista para seleccionar el broker efectivo del request mientras no exista sesion autenticada completa. El backend solo la lee si `Polizas__AllowHeaderExecutionContext=true`; debe usarse como mecanismo temporal y validarse contra el contexto autenticado cuando exista auth real.
+- `X-User-Id`, `X-Profile-Id`, `X-Profile-Type-Id`, `X-Is-Admin`: cabeceras MVP opcionales para completar `SESSION_CONTEXT` en entornos controlados sin auth real. No prueban identidad ni permisos.
+- Headers futuros de autenticacion: `Authorization: Bearer <token>` o el mecanismo corporativo que se apruebe. A partir de ese momento, `brokerId`, `userId`, `profileId`, `profileTypeId` e `isAdmin` deben salir de claims/sesion backend, no de valores confiados al frontend.
+
+Compatibilidad local temporal:
+
+```powershell
+$env:Polizas__BrokerId = "<broker-id-local>"
+$env:Polizas__AllowHeaderExecutionContext = "true" # solo MVP/dev si se necesita X-Broker-Id
+$env:Polizas__UserId = "<user-id-local>"
+$env:Polizas__ProfileId = "<profile-id-local>"
+$env:Polizas__ProfileTypeId = "<profile-type-id-local>"
+$env:Polizas__IsAdmin = "false"
+# o bien
+$env:ILINIUMTECH__BROKER_ID = "<broker-id-local>"
+$env:ILINIUMTECH__ALLOW_HEADER_EXECUTION_CONTEXT = "true" # solo MVP/dev si se necesita X-Broker-Id
+$env:ILINIUMTECH__USER_ID = "<user-id-local>"
+$env:ILINIUMTECH__PROFILE_ID = "<profile-id-local>"
+$env:ILINIUMTECH__PROFILE_TYPE_ID = "<profile-type-id-local>"
+$env:ILINIUMTECH__IS_ADMIN = "false"
+```
+
+Ese fallback solo sirve para pruebas locales sin broker por request. No debe usarse como modelo de produccion ni como forma de saltarse autorizacion.
+
+### SESSION_CONTEXT previsto
+
+Si las vistas, funciones o triggers de polizas dependen de SQL Server `SESSION_CONTEXT`, el backend debe establecer las claves necesarias antes de cada consulta sobre la conexion de modelo resuelta para el broker. Claves base/candidatas:
+
+- `brokerId`
+- `entityMainId`
+- `userId`
+- `profileId`
+- `profileTypeId`
+- `isAdmin`
+- `ip` y `userAgent` si las vistas, triggers o auditoria los requieren.
+
+Las claves deben enviarse a `sp_set_session_context` con parametros, nunca interpoladas en SQL. Hasta cerrar autenticacion real, cualquier valor procedente de cabeceras es contexto MVP no confiable y debe quedar limitado a entornos de desarrollo/demo o validado por backend.
 
 ## Comandos base
 

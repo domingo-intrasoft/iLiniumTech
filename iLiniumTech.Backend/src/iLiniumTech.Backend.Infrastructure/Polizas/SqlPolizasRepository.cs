@@ -10,13 +10,14 @@ namespace iLiniumTech.Backend.Infrastructure.Polizas;
 
 public sealed class SqlPolizasRepository(
     IPolizasConnectionStringProvider connectionStringProvider,
+    IPolizasExecutionContextAccessor? executionContextAccessor = null,
     PolizasSqlQueryBuilder? queryBuilder = null)
     : IPolizasRepository
 {
     private readonly PolizasSqlQueryBuilder _queryBuilder = queryBuilder ?? new PolizasSqlQueryBuilder();
 
     public SqlPolizasRepository(string connectionString, PolizasSqlQueryBuilder? queryBuilder = null)
-        : this(new StaticPolizasConnectionStringProvider(connectionString), queryBuilder)
+        : this(new StaticPolizasConnectionStringProvider(connectionString), null, queryBuilder)
     {
     }
 
@@ -28,6 +29,7 @@ public sealed class SqlPolizasRepository(
         var connectionString = await connectionStringProvider.GetConnectionStringAsync(cancellationToken);
         await using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
+        await SqlServerSessionContext.ApplyAsync(connection, executionContextAccessor?.Current, cancellationToken);
 
         var total = await ExecuteCountAsync(connection, _queryBuilder.BuildCountQuery(request), cancellationToken);
         var items = await ExecuteListAsync(connection, _queryBuilder.BuildSearchQuery(request, sort), cancellationToken);
@@ -40,6 +42,7 @@ public sealed class SqlPolizasRepository(
         var connectionString = await connectionStringProvider.GetConnectionStringAsync(cancellationToken);
         await using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
+        await SqlServerSessionContext.ApplyAsync(connection, executionContextAccessor?.Current, cancellationToken);
 
         await using var command = CreateCommand(connection, _queryBuilder.BuildDetailQuery(id));
         await using var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow, cancellationToken);

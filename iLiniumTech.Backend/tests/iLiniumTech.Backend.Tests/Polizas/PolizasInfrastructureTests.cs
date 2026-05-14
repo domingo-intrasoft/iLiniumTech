@@ -34,7 +34,10 @@ public sealed class PolizasInfrastructureTests
             })
             .Build();
 
-        var act = () => services.AddInfrastructure(configuration);
+        services.AddInfrastructure(configuration);
+        using var provider = services.BuildServiceProvider();
+
+        var act = () => provider.GetRequiredService<IPolizasConnectionStringProvider>();
 
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("*PolizasReadOnly*");
@@ -74,14 +77,17 @@ public sealed class PolizasInfrastructureTests
             })
             .Build();
 
-        var act = () => services.AddInfrastructure(configuration);
+        services.AddInfrastructure(configuration);
+        using var provider = services.BuildServiceProvider();
+
+        var act = () => provider.GetRequiredService<IPolizasConnectionStringProvider>();
 
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("*AppBuilderMaster*");
     }
 
     [Fact]
-    public void AddInfrastructure_requires_broker_for_appbuilder_master_resolver()
+    public void AddInfrastructure_registers_appbuilder_master_connection_provider_without_startup_broker()
     {
         var services = new ServiceCollection();
         var configuration = new ConfigurationBuilder()
@@ -93,10 +99,13 @@ public sealed class PolizasInfrastructureTests
             })
             .Build();
 
-        var act = () => services.AddInfrastructure(configuration);
+        services.AddInfrastructure(configuration);
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("*BrokerId*");
+        using var provider = services.BuildServiceProvider();
+        provider.GetRequiredService<IPolizasConnectionStringProvider>()
+            .Should().BeOfType<AppBuilderMasterPolizasConnectionStringProvider>();
+        provider.GetRequiredService<IPolizasExecutionContextAccessor>()
+            .Should().BeOfType<ConfiguredPolizasExecutionContextAccessor>();
     }
 
     [Fact]
