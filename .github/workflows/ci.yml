@@ -34,8 +34,13 @@ jobs:
           test -f .github/CODEOWNERS
           test -f .github/pull_request_template.md
           test -f .github/apps.yml
+          test -f .github/labels.json
+          test -f .github/ISSUE_TEMPLATE/ai-epic.yml
           test -f docs/ai/github-ai-policy.md
           test -f docs/ai/ai-engine-routing.md
+          test -f docs/ai/multi-agent-orchestration.md
+          test -f tools/github/Sync-Labels.ps1
+          python -m json.tool .github/labels.json >/dev/null
 
   backend:
     name: ci / backend

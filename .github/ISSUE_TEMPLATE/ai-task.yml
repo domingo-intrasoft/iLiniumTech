@@ -2,7 +2,8 @@ name: AI task
 description: Request a bounded task for Codex or Claude through GitHub.
 title: "AI: "
 labels:
-  - ai-candidate
+  - ai-task
+  - status:new
 body:
   - type: markdown
     attributes:
@@ -33,6 +34,24 @@ body:
         - app:infrastructure
         - app:docs
         - app:core
+    validations:
+      required: true
+  - type: input
+    id: parent
+    attributes:
+      label: Parent epic or issue
+      description: Link the parent epic, SDD, or dependency chain.
+      placeholder: "#123 or SDD-YYYY-NNN"
+    validations:
+      required: true
+  - type: dropdown
+    id: target-branch
+    attributes:
+      label: Target branch
+      options:
+        - develop
+        - ci-cd
+        - main
     validations:
       required: true
   - type: textarea
@@ -70,6 +89,18 @@ body:
       description: Commands, checks, or manual evidence expected.
     validations:
       required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Done evidence
+      description: What must the PR/comment prove before the task moves to review, QA, or UAT?
+      placeholder: |
+        - PR linked
+        - CI/security green
+        - E2E evidence attached
+        - No forbidden paths touched
+    validations:
+      required: true
   - type: checkboxes
     id: risk
     attributes:
@@ -79,3 +110,13 @@ body:
         - label: Touches platform or CI/CD
         - label: Touches security-sensitive code
         - label: Requires human decision before implementation
+  - type: checkboxes
+    id: locks
+    attributes:
+      label: Concurrency locks
+      options:
+        - label: lock:database
+        - label: lock:architecture
+        - label: lock:pipelines
+        - label: lock:security
+        - label: lock:release

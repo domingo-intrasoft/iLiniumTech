@@ -5,6 +5,8 @@ labels:
   - ai-pipeline-failure
   - automation
   - app:infrastructure
+  - status:blocked
+  - human-decision-required
 body:
   - type: input
     id: workflow
