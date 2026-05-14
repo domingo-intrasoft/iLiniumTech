@@ -9,10 +9,13 @@ import type { PolizaListItem, PolizasCatalogs, PolizasQueryFilters } from './pol
 export function usePolizas() {
   const { session, loading: sessionLoading, error: sessionError, loadSession } = useSession()
   const catalogs = ref<PolizasCatalogs>(polizasCatalogsFixture)
+  const catalogsLoading = ref(false)
+  const catalogsError = ref<string | null>(null)
   const items = ref<PolizaListItem[]>([])
   const total = ref(0)
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const contextBlocked = ref(false)
   const filters = reactive<PolizasQueryFilters>({
     numero: '',
     cliente: '',
@@ -35,11 +38,13 @@ export function usePolizas() {
       currentSession.brokerId === null
     ) {
       error.value = 'Configura un broker para consultar polizas.'
+      contextBlocked.value = true
       items.value = []
       total.value = 0
       return false
     }
 
+    contextBlocked.value = false
     return true
   }
 
@@ -97,10 +102,15 @@ export function usePolizas() {
   }
 
   async function loadCatalogs() {
+    catalogsLoading.value = true
+    catalogsError.value = null
+
     try {
       catalogs.value = await getPolizasCatalogs()
     } catch {
-      error.value = 'No se pudieron cargar los catalogos de polizas.'
+      catalogsError.value = 'No se pudieron cargar los catalogos de polizas.'
+    } finally {
+      catalogsLoading.value = false
     }
   }
 
@@ -114,10 +124,13 @@ export function usePolizas() {
     sessionLoading,
     sessionError,
     catalogs,
+    catalogsLoading,
+    catalogsError,
     items,
     total,
     loading,
     error,
+    contextBlocked,
     filters,
     pagination,
     refresh,

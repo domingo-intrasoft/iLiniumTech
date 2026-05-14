@@ -63,6 +63,16 @@ Cada PR o ejecucion de agente debe indicar:
 - riesgos residuales;
 - si hubo cambios de seguridad o configuracion.
 
+## Gate local fase 7
+
+El comando local de referencia es:
+
+```powershell
+.\tools\quality\Invoke-MvpQualityGate.ps1
+```
+
+Este gate envuelve los comandos de CI actuales y anade smoke local backend/frontend y `git diff --check`. Si el Node global no coincide con CI, usar `-NodeExe` con un runtime `>=20.19.0`. El DoD operativo queda en [08-quality-phase-7-dod.md](08-quality-phase-7-dod.md).
+
 ## Plantilla de pipeline futura
 
 Cuando exista la primera app, la pipeline deberia ejecutar:

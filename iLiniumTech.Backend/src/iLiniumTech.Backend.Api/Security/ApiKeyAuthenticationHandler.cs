@@ -1,4 +1,6 @@
+using System.Security.Cryptography;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -28,7 +30,7 @@ public sealed class ApiKeyAuthenticationHandler(
             return Task.FromResult(AuthenticateResult.Fail("API key header is missing."));
         }
 
-        if (!string.Equals(apiKey[0], configuredApiKey, StringComparison.Ordinal))
+        if (!ApiKeysMatch(apiKey[0], configuredApiKey))
         {
             return Task.FromResult(AuthenticateResult.Fail("API key is invalid."));
         }
@@ -40,5 +42,26 @@ public sealed class ApiKeyAuthenticationHandler(
         var ticket = new AuthenticationTicket(principal, SchemeName);
 
         return Task.FromResult(AuthenticateResult.Success(ticket));
+    }
+
+    private static bool ApiKeysMatch(string? providedApiKey, string configuredApiKey)
+    {
+        if (providedApiKey is null)
+        {
+            return false;
+        }
+
+        var providedBytes = Encoding.UTF8.GetBytes(providedApiKey);
+        var configuredBytes = Encoding.UTF8.GetBytes(configuredApiKey);
+        try
+        {
+            return providedBytes.Length == configuredBytes.Length &&
+                CryptographicOperations.FixedTimeEquals(providedBytes, configuredBytes);
+        }
+        finally
+        {
+            CryptographicOperations.ZeroMemory(providedBytes);
+            CryptographicOperations.ZeroMemory(configuredBytes);
+        }
     }
 }

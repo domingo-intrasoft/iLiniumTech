@@ -11,6 +11,8 @@ import type { PolizasCatalogs } from './polizasTypes'
 
 const props = defineProps<{
   catalogs: PolizasCatalogs
+  loading?: boolean
+  error?: string | null
 }>()
 
 const emit = defineEmits<{
@@ -22,6 +24,10 @@ const searchValues = reactive(createEmptyPolizasFilterForm())
 
 function fieldStyle(field: PolizasSearchField) {
   return { gridColumn: `span ${field.span}` }
+}
+
+function fieldControlId(field: PolizasSearchField) {
+  return `polizas-filter-${field.key}`
 }
 
 function searchValue(key: keyof typeof searchValues) {
@@ -60,31 +66,48 @@ function clearFilters() {
   <section class="search-panel" aria-label="Busqueda avanzada de polizas">
     <header class="search-actions">
       <div class="search-action-buttons">
-        <button type="button" class="primary-action" @click="executeSearch">
-          <i class="pi pi-search"></i>
+        <button
+          type="button"
+          class="primary-action"
+          :disabled="props.loading"
+          @click="executeSearch"
+        >
+          <i class="pi pi-search" aria-hidden="true"></i>
           Buscar
         </button>
-        <button type="button" @click="clearFilters">
-          <i class="pi pi-trash"></i>
+        <button type="button" :disabled="props.loading" @click="clearFilters">
+          <i class="pi pi-trash" aria-hidden="true"></i>
           Limpiar Filtros
         </button>
-        <button type="button"><i class="pi pi-times"></i>Cerrar Pestanas</button>
-        <button type="button"><i class="pi pi-save"></i>Guardar busqueda</button>
-        <button type="button"><i class="pi pi-arrow-up"></i>Avanzada</button>
-        <button type="button" class="primary-action compact-action">
-          <i class="pi pi-search"></i>
+        <button type="button" disabled>
+          <i class="pi pi-times" aria-hidden="true"></i>Cerrar Pestanas
+        </button>
+        <button type="button" disabled>
+          <i class="pi pi-save" aria-hidden="true"></i>Guardar busqueda
+        </button>
+        <button type="button" disabled>
+          <i class="pi pi-arrow-up" aria-hidden="true"></i>Avanzada
+        </button>
+        <button type="button" class="primary-action compact-action" disabled>
+          <i class="pi pi-search" aria-hidden="true"></i>
           Simple
         </button>
-        <button type="button" class="primary-action icon-only" aria-label="Agregar filtro">
-          <i class="pi pi-plus"></i>
+        <button type="button" class="primary-action icon-only" aria-label="Agregar filtro" disabled>
+          <i class="pi pi-plus" aria-hidden="true"></i>
         </button>
       </div>
-      <i class="pi pi-chevron-up"></i>
+      <i class="pi pi-chevron-up" aria-hidden="true"></i>
     </header>
+
+    <p v-if="props.error" class="filter-warning" role="alert">
+      {{ props.error }}
+    </p>
 
     <div class="criteria-card">
       <div class="criteria-select">
-        <button type="button">Seleccione... <i class="pi pi-chevron-down"></i></button>
+        <button type="button" disabled>
+          Seleccione... <i class="pi pi-chevron-down" aria-hidden="true"></i>
+        </button>
       </div>
 
       <section v-for="section in polizasSearchSections" :key="section.title" class="filter-section">
@@ -98,11 +121,17 @@ function clearFilters() {
             v-for="field in row"
             :key="field.key"
             class="filter-field"
+            :for="fieldControlId(field)"
             :style="fieldStyle(field)"
           >
             <span>{{ field.label }}</span>
             <span class="field-control">
-              <select v-if="field.control === 'select'" v-model="searchValues[field.key]">
+              <select
+                v-if="field.control === 'select'"
+                :id="fieldControlId(field)"
+                v-model="searchValues[field.key]"
+                :aria-label="field.label"
+              >
                 <option value=""></option>
                 <option
                   v-for="option in catalogOptions(field)"
@@ -114,11 +143,13 @@ function clearFilters() {
               </select>
               <input
                 v-else
+                :id="fieldControlId(field)"
                 v-model="searchValues[field.key]"
                 :type="field.control === 'date' ? 'date' : 'search'"
+                :aria-label="field.label"
               />
-              <button type="button" aria-label="Filtro de campo">
-                <i class="pi pi-filter"></i>
+              <button type="button" :aria-label="`Opciones de filtro para ${field.label}`" disabled>
+                <i class="pi pi-filter" aria-hidden="true"></i>
               </button>
             </span>
           </label>

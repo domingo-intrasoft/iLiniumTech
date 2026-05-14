@@ -140,6 +140,15 @@ El frontend requiere Node.js 20.19 o superior, alineado con las guias traidas de
 
 Para conectar el frontend al backend local en desarrollo, usar valores publicos de entorno como `VITE_USE_BACKEND=true`, `VITE_API_BASE_URL=http://localhost:5146` y `VITE_ILINIUMTECH_API_KEY=<clave-local>`. Esa clave de frontend solo sirve para desarrollo/demo; no debe tratarse como secreto de produccion.
 
+Quality gate local de fase 7:
+
+```powershell
+.\tools\quality\Invoke-MvpQualityGate.ps1
+```
+
+Este gate ejecuta pruebas backend, formato/lint/tests/build frontend, auditorias de seguridad y `git diff --check`. Usar `-SkipSecurity` solo durante iteracion local rapida, nunca antes de cerrar una rama.
+Si el Node global no cumple `>=20.19.0`, usar `-NodeExe "C:\ruta\a\node.exe"`. El DoD completo queda en [docs/engineering/08-quality-phase-7-dod.md](docs/engineering/08-quality-phase-7-dod.md).
+
 ### Runbook demo MVP con backend
 
 Backend:

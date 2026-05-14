@@ -1,7 +1,12 @@
 using System.Net;
 using FluentAssertions;
+using iLiniumTech.Backend.Application.Polizas;
+using iLiniumTech.Backend.Domain.Polizas;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace iLiniumTech.Backend.Tests.Polizas;
@@ -17,6 +22,33 @@ public sealed class PolizasApiTests
         var response = await client.GetAsync("/health");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task Responses_include_baseline_security_headers()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/health");
+
+        response.Headers.GetValues("X-Content-Type-Options").Should().ContainSingle("nosniff");
+        response.Headers.GetValues("Referrer-Policy").Should().ContainSingle("no-referrer");
+        response.Headers.GetValues("X-Frame-Options").Should().ContainSingle("DENY");
+    }
+
+    [Fact]
+    public void Cors_wildcard_origins_are_rejected_at_startup()
+    {
+        using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Cors:AllowedOrigins:0"] = "*"
+        });
+
+        var act = () => factory.CreateClient();
+
+        act.Should().Throw<InvalidOperationException>()
+            .Where(exception => exception.ToString().Contains("wildcard", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
@@ -126,6 +158,7 @@ public sealed class PolizasApiTests
         var body = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.Gone);
+        body.Should().Contain("POLIZAS_METADATA_DEPRECATED");
         body.Should().Contain("/api/polizas/catalogs");
         body.Should().NotContain("rootComponentId");
         body.Should().NotContain("dataSourceId");
@@ -186,13 +219,41 @@ public sealed class PolizasApiTests
         await using var factory = new TestApiFactory();
         using var client = factory.CreateClient();
         client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "test-correlation-polizas-validation");
 
         var response = await client.GetAsync("/api/polizas?sort=rawSql:desc");
         var body = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("test-correlation-polizas-validation");
         body.Should().Contain("POLIZAS_VALIDATION_ERROR");
+        body.Should().Contain("\"correlationId\":\"test-correlation-polizas-validation\"");
         body.Contains("SELECT", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Sql_repository_configuration_errors_are_sanitized()
+    {
+        await using var factory = new TestApiFactory(configureServices: services =>
+        {
+            services.RemoveAll<IPolizasService>();
+            services.AddScoped<IPolizasService, ThrowingConfigurationPolizasService>();
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "test-correlation-polizas-config");
+
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("test-correlation-polizas-config");
+        body.Should().Contain("POLIZAS_CONFIGURATION_ERROR");
+        body.Should().Contain("\"correlationId\":\"test-correlation-polizas-config\"");
+        body.Should().NotContain("ConnectionStrings");
+        body.Should().NotContain("PolizasReadOnly");
+        body.Should().NotContain("ILINIUMTECH");
+        body.Contains("Server=", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
     }
 
     [Fact]
@@ -235,9 +296,19 @@ public sealed class PolizasApiTests
         body.Should().Contain("POLIZAS_CONTEXT_INVALID");
     }
 
-    private sealed class TestApiFactory(Dictionary<string, string?>? configurationOverrides = null)
+    private sealed class TestApiFactory(
+        Dictionary<string, string?>? configurationOverrides = null,
+        Action<IServiceCollection>? configureServices = null)
         : WebApplicationFactory<Program>
     {
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            if (configureServices is not null)
+            {
+                builder.ConfigureServices(configureServices);
+            }
+        }
+
         protected override IHost CreateHost(IHostBuilder builder)
         {
             builder.ConfigureAppConfiguration(configuration =>
@@ -260,5 +331,19 @@ public sealed class PolizasApiTests
 
             return base.CreateHost(builder);
         }
+    }
+
+    private sealed class ThrowingConfigurationPolizasService : IPolizasService
+    {
+        public Task<PagedResult<PolizaListItem>> SearchAsync(
+            PolizasSearchRequest request,
+            CancellationToken cancellationToken) =>
+            throw new InvalidOperationException("ConnectionStrings:PolizasReadOnly is missing.");
+
+        public Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken) =>
+            throw new InvalidOperationException("ConnectionStrings:PolizasReadOnly is missing.");
+
+        public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
+            throw new InvalidOperationException("ConnectionStrings:PolizasReadOnly is missing.");
     }
 }

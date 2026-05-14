@@ -18,9 +18,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("DefaultCors", policy =>
     {
-        var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-            ?? ["http://localhost:5173"];
-        policy.WithOrigins(origins)
+        policy.WithOrigins(GetAllowedCorsOrigins(builder.Configuration))
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -31,10 +29,54 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
+app.Use(async (context, next) =>
+{
+    EnsureCorrelationId(context);
+
+    try
+    {
+        await next(context);
+    }
+    catch (InvalidOperationException exception) when (IsKnownConfigurationException(exception))
+    {
+        app.Logger.LogError(
+            "Known backend configuration error {CorrelationId} ({ExceptionType})",
+            EnsureCorrelationId(context),
+            exception.GetType().Name);
+
+        await WriteErrorAsync(
+            context,
+            StatusCodes.Status500InternalServerError,
+            "POLIZAS_CONFIGURATION_ERROR",
+            "Polizas backend configuration is incomplete.");
+    }
+    catch (Exception exception)
+    {
+        app.Logger.LogError(
+            "Unhandled backend error {CorrelationId} ({ExceptionType})",
+            EnsureCorrelationId(context),
+            exception.GetType().Name);
+
+        await WriteErrorAsync(
+            context,
+            StatusCodes.Status500InternalServerError,
+            "POLIZAS_UNEXPECTED_ERROR",
+            "Unexpected backend error.");
+    }
+});
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.TryAdd("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.TryAdd("Referrer-Policy", "no-referrer");
+    context.Response.Headers.TryAdd("X-Frame-Options", "DENY");
+    await next(context);
+});
 
 app.UseCors("DefaultCors");
 app.UseAuthentication();
@@ -47,6 +89,7 @@ app.MapGet("/health", () => Results.Ok(new
 }));
 
 app.MapGet("/api/me", (
+    HttpContext httpContext,
     [FromServices] IPolizasExecutionContextAccessor executionContextAccessor,
     [FromServices] IConfiguration configuration) =>
 {
@@ -68,7 +111,7 @@ app.MapGet("/api/me", (
         return Results.BadRequest(new ErrorResponse(new ErrorBody(
             Code: "POLIZAS_CONTEXT_INVALID",
             Message: exception.Message,
-            CorrelationId: null)));
+            CorrelationId: EnsureCorrelationId(httpContext))));
     }
 })
 .RequireAuthorization()
@@ -77,10 +120,12 @@ app.MapGet("/api/me", (
 var polizas = app.MapGroup("/api/polizas")
     .RequireAuthorization();
 
-polizas.MapGet("/metadata", () => Results.Problem(
-        statusCode: StatusCodes.Status410Gone,
-        title: "Polizas metadata endpoint is deprecated.",
-        detail: "Runtime screen design metadata is no longer served by the backend. Use /api/polizas/catalogs for policy catalogs."))
+polizas.MapGet("/metadata", (HttpContext httpContext) => Results.Json(
+        new ErrorResponse(new ErrorBody(
+            Code: "POLIZAS_METADATA_DEPRECATED",
+            Message: "Runtime screen design metadata is no longer served by the backend. Use /api/polizas/catalogs for policy catalogs.",
+            CorrelationId: EnsureCorrelationId(httpContext))),
+        statusCode: StatusCodes.Status410Gone))
     .WithName("GetPolizasMetadataDeprecated");
 
 polizas.MapGet("/catalogs", async ([FromServices] IPolizasService service, CancellationToken cancellationToken) =>
@@ -89,6 +134,7 @@ polizas.MapGet("/catalogs", async ([FromServices] IPolizasService service, Cance
     .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
 polizas.MapGet("/", async (
+    HttpContext httpContext,
     [FromServices] IPolizasService service,
     [FromQuery] int? page,
     [FromQuery] int? pageSize,
@@ -123,13 +169,13 @@ polizas.MapGet("/", async (
         return Results.BadRequest(new ErrorResponse(new ErrorBody(
             Code: "POLIZAS_VALIDATION_ERROR",
             Message: exception.Message,
-            CorrelationId: null)));
+            CorrelationId: EnsureCorrelationId(httpContext))));
     }
 })
 .WithName("SearchPolizas")
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
-polizas.MapGet("/{id}", async ([FromServices] IPolizasService service, string id, CancellationToken cancellationToken) =>
+polizas.MapGet("/{id}", async (HttpContext httpContext, [FromServices] IPolizasService service, string id, CancellationToken cancellationToken) =>
 {
     try
     {
@@ -141,7 +187,7 @@ polizas.MapGet("/{id}", async ([FromServices] IPolizasService service, string id
         return Results.BadRequest(new ErrorResponse(new ErrorBody(
             Code: "POLIZAS_VALIDATION_ERROR",
             Message: exception.Message,
-            CorrelationId: null)));
+            CorrelationId: EnsureCorrelationId(httpContext))));
     }
 })
 .WithName("GetPolizaById")
@@ -173,13 +219,52 @@ static async ValueTask<object?> RequirePolizasExecutionContextAsync(
         return Results.BadRequest(new ErrorResponse(new ErrorBody(
             Code: "POLIZAS_CONTEXT_INVALID",
             Message: exception.Message,
-            CorrelationId: null)));
+            CorrelationId: EnsureCorrelationId(context.HttpContext))));
     }
 
     return Results.BadRequest(new ErrorResponse(new ErrorBody(
         Code: "POLIZAS_CONTEXT_REQUIRED",
         Message: "Broker context is required for SQL polizas requests.",
-        CorrelationId: null)));
+        CorrelationId: EnsureCorrelationId(context.HttpContext))));
+}
+
+static string EnsureCorrelationId(HttpContext context)
+{
+    const string headerName = "X-Correlation-Id";
+    if (context.Items.TryGetValue(headerName, out var existing) &&
+        existing is string existingCorrelationId)
+    {
+        return existingCorrelationId;
+    }
+
+    var requestedCorrelationId = context.Request.Headers[headerName].Count == 1
+        ? context.Request.Headers[headerName][0]
+        : null;
+    var correlationId = !string.IsNullOrWhiteSpace(requestedCorrelationId) &&
+        requestedCorrelationId.Length <= 100
+            ? requestedCorrelationId.Trim()
+            : context.TraceIdentifier;
+
+    context.Items[headerName] = correlationId;
+    context.Response.Headers[headerName] = correlationId;
+    return correlationId;
+}
+
+static bool IsKnownConfigurationException(InvalidOperationException exception) =>
+    exception.Message.Contains("connection", StringComparison.OrdinalIgnoreCase) ||
+    exception.Message.Contains("AppBuilderMaster", StringComparison.OrdinalIgnoreCase) ||
+    exception.Message.Contains("Polizas SQL repository", StringComparison.OrdinalIgnoreCase);
+
+static Task WriteErrorAsync(HttpContext context, int statusCode, string code, string message)
+{
+    context.Response.StatusCode = statusCode;
+    return Results.Json(
+            new ErrorResponse(new ErrorBody(
+                Code: code,
+                Message: message,
+                CorrelationId: EnsureCorrelationId(context))),
+            statusCode: statusCode)
+        .ExecuteAsync(context);
 }
 
 static bool RequiresPolizasExecutionContext(IConfiguration configuration)
@@ -207,6 +292,38 @@ static bool IsHeaderExecutionContextEnabled(IConfiguration configuration) =>
         ?? configuration["ILINIUMTECH:ALLOW_HEADER_EXECUTION_CONTEXT"],
         out var allowHeaderExecutionContext)
     && allowHeaderExecutionContext;
+
+static string[] GetAllowedCorsOrigins(IConfiguration configuration)
+{
+    var origins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+        ?? ["http://localhost:5173"];
+    var normalizedOrigins = origins
+        .Where(origin => !string.IsNullOrWhiteSpace(origin))
+        .Select(origin => origin.Trim())
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToArray();
+
+    if (normalizedOrigins.Length == 0)
+    {
+        throw new InvalidOperationException("Cors:AllowedOrigins must define at least one explicit origin.");
+    }
+
+    foreach (var origin in normalizedOrigins)
+    {
+        if (origin.Contains('*', StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("CORS wildcard origins are not allowed. Configure explicit origins.");
+        }
+
+        if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            throw new InvalidOperationException($"CORS origin '{origin}' must be an absolute http or https origin.");
+        }
+    }
+
+    return normalizedOrigins;
+}
 
 public partial class Program;
 

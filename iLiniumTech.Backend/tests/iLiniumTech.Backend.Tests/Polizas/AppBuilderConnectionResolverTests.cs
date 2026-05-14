@@ -49,6 +49,10 @@ public sealed class AppBuilderConnectionResolverTests
         builder.TrustServerCertificate.Should().BeTrue();
         builder.IntegratedSecurity.Should().BeFalse();
         builder.MultipleActiveResultSets.Should().BeTrue();
+        builder.ApplicationName.Should().Be("iLiniumTech");
+        builder.ConnectRetryCount.Should().Be(3);
+        builder.ConnectRetryInterval.Should().Be(10);
+        builder.ConnectTimeout.Should().Be(30);
     }
 
     [Fact]

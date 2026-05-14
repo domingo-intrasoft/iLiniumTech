@@ -14,6 +14,7 @@ Decision base: iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadat
 - [Riesgos AppBuilder y resolucion moderna](05-appbuilder-riesgos-y-resolucion.md)
 - [Adopcion, madurez y origen demo](06-adopcion-madurez-y-origen-demo.md)
 - [Decisiones tecnicas iniciales](07-decisiones-tecnicas-iniciales.md)
+- [Quality gate fase 7 y DoD](08-quality-phase-7-dod.md)
 - [Decision producto/arquitectura](../DECISION_PRODUCTO_ARQUITECTURA.md)
 - [Plantilla SDD](../sdd/templates/spec-template.md)
 - [Plantilla de revision de seguridad](../sdd/templates/security-review-template.md)
@@ -37,9 +38,10 @@ Antes de implementar funcionalidades reales, el proyecto debe tener:
 ## Scripts incorporados
 
 ```powershell
+.\tools\quality\Invoke-MvpQualityGate.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/security/Invoke-SecretScan.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/security/Invoke-DependencyAudit.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/security/Invoke-CorsAudit.ps1 -FailOnFindings
 ```
 
-Estos scripts son genericos para iLiniumTech. Cuando existan apps concretas, deben integrarse tambien en CI.
+El gate MVP agrupa build, pruebas, smoke, auditorias y `git diff --check`. Los scripts de seguridad siguen disponibles por separado para diagnostico o ejecucion granular.
