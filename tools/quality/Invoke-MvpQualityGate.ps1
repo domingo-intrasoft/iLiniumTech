@@ -2,6 +2,7 @@ param(
     [switch]$SkipSecurity,
     [switch]$SkipFrontendBuild,
     [switch]$SkipSmoke,
+    [switch]$RunFrontendE2E,
     [string]$NodeExe = "",
     [string]$FrontendSmokeUrl = "",
     [string]$BackendSmokeUrl = "http://127.0.0.1:5146",
@@ -206,6 +207,12 @@ try {
         if (-not $SkipFrontendBuild) {
             Invoke-Step "Frontend build" {
                 Invoke-Npm run build
+            }
+        }
+
+        if ($RunFrontendE2E) {
+            Invoke-Step "Frontend E2E smoke" {
+                Invoke-Npm run test:e2e
             }
         }
     }

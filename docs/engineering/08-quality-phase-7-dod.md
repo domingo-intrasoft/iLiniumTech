@@ -20,6 +20,7 @@ El gate ejecuta:
 - `npm ci`, `npm run format`, `npm run lint`, `npm run test:unit:ci` y `npm run build`;
 - smoke HTTP de backend con repositorio `InMemory`;
 - smoke frontend sobre `dist/index.html` o sobre `-FrontendSmokeUrl` si se quiere validar un Vite/preview ya levantado;
+- smoke E2E de `/polizas` con Playwright Chromium cuando se invoca `-RunFrontendE2E`; usa `VITE_USE_BACKEND=false`, fixture local anonimizadas y no genera screenshots, videos ni traces;
 - Gitleaks, auditoria npm/NuGet y auditoria CORS;
 - validacion documental de roadmap, SDDs, CI y plantillas;
 - `git diff --check`.
@@ -42,6 +43,19 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-CorsAu
 ```
 
 El workflow `preview-dry-run.yml` no despliega: solo comprueba que los documentos y workflows base existen y publica un artefacto de plan. Cualquier intento de `dryRun=false` debe quedar bloqueado hasta definir destino preview, environment, reviewers, secrets, smoke y rollback.
+
+El smoke Playwright se puede ejecutar localmente desde `iLiniumTech.Frontend` con:
+
+```powershell
+npx playwright install chromium
+npm run test:e2e
+```
+
+El gate local no lo ejecuta por defecto para evitar que la instalacion de navegadores bloquee entornos ligeros. Para incluirlo en cierre de rama:
+
+```powershell
+.\tools\quality\Invoke-MvpQualityGate.ps1 -RunFrontendE2E
+```
 
 ## Definicion de done
 

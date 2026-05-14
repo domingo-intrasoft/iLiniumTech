@@ -12,6 +12,8 @@ dist/
 build/
 coverage/
 reports/
+playwright-report/
+test-results/
 *.tsbuildinfo
 *.log
 *.tmp
