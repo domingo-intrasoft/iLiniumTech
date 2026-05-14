@@ -20,7 +20,7 @@ El MVP actual usa `InMemoryPolizasRepository` con datos anonimizados. La siguien
 
 Decision de arquitectura aplicable: el repositorio SQL forma parte del backend API de datos de iLiniumTech. No es un runtime generico de datasources AppBuilder ni debe interpretar metadata `IAP_*` en produccion.
 
-Estado de implementacion: existe `SqlPolizasRepository` activable por configuracion, con query builder parametrizado, whitelist y pruebas unitarias. Tambien existe un resolver `AppBuilderMaster` que localiza la conexion `tipobd-MO` en `IAPM_Connection` por broker y puede descifrar campos con la clave de AppBuilder. El flujo MVP ya puede tomar broker/contexto por request mediante cabeceras solo con opt-in explicito, mantiene `Polizas:BrokerId` como fallback local temporal y aplica `SESSION_CONTEXT` parametrizado antes de consultar. Queda pendiente validarlo contra BBDD real de test o contenedor y sustituir cabeceras MVP por auth real.
+Estado de implementacion: existe `SqlPolizasRepository` activable por configuracion, con query builder parametrizado, whitelist y pruebas unitarias. Tambien existe un resolver `AppBuilderMaster` que localiza la conexion `tipobd-MO` en `IAPM_Connection` por broker y puede descifrar campos con la clave de AppBuilder. El flujo MVP ya puede tomar broker/contexto por request mediante cabeceras solo con opt-in explicito, mantiene `Polizas:BrokerId` como fallback local temporal y aplica `SESSION_CONTEXT` parametrizado antes de consultar. La readiness bloquea entornos no Development si se habilitan headers MVP fuera de desarrollo sin opt-in demo explicito, y el resolver `AppBuilderMaster` no confia en certificados de servidor por defecto. Queda pendiente validarlo contra BBDD real de test o contenedor y sustituir cabeceras MVP por auth real.
 
 Dependencia de seguridad: `SDD-2026-005` define el modelo objetivo para sustituir headers MVP por claims/sesion backend, permisos efectivos y errores 401/403 sanitizados.
 
@@ -121,8 +121,10 @@ Configuracion:
 - `Polizas:ConnectionResolver=AppBuilderMaster` activa resolucion por `IAPM_Connection`.
 - `ConnectionStrings:AppBuilderMaster` o `ILINIUMTECH__APPBUILDER_MASTER_CONNECTION` aporta la conexion Master.
 - `AppBuilder:EncryptionKey` o `ILINIUMTECH__APPBUILDER_ENCRYPTION_KEY` descifra campos de conexion si vienen cifrados.
+- `Polizas:AppBuilderMaster:TrustServerCertificate` o `ILINIUMTECH__APPBUILDER_MASTER_TRUST_SERVER_CERTIFICATE` permite `TrustServerCertificate=true` solo por configuracion explicita para local/demo/test. El valor por defecto es seguro: `false`.
 - `Polizas:BrokerId` o `ILINIUMTECH__BROKER_ID` queda como fallback temporal para ejecucion local sin broker por request.
 - `Polizas:AllowHeaderExecutionContext` o `ILINIUMTECH__ALLOW_HEADER_EXECUTION_CONTEXT` permite leer cabeceras MVP de contexto. Debe estar desactivado por defecto fuera de entornos controlados.
+- Si `Polizas:AllowHeaderExecutionContextOutsideDevelopment=true` queda configurado fuera de Development, `/ready` debe devolver `not_ready` salvo opt-in demo exacto con `Polizas:AllowHeaderExecutionContextDemoOptIn=DEMO_ONLY_NOT_FOR_REAL_DATA` o `ILINIUMTECH__ALLOW_HEADER_EXECUTION_CONTEXT_DEMO_OPT_IN=DEMO_ONLY_NOT_FOR_REAL_DATA`.
 - `Polizas:UserId` o `ILINIUMTECH__USER_ID`, `Polizas:ProfileId` o `ILINIUMTECH__PROFILE_ID`, `Polizas:ProfileTypeId` o `ILINIUMTECH__PROFILE_TYPE_ID`, y `Polizas:IsAdmin` o `ILINIUMTECH__IS_ADMIN` son fallback temporal para completar contexto local.
 
 Headers MVP:
@@ -147,6 +149,8 @@ Headers MVP:
 - [ ] Resolver por broker validado contra Master real autorizado.
 - [ ] Broker por request validado contra usuario/sesion real cuando exista autenticacion.
 - [x] Headers MVP tratados como contexto temporal, no como identidad confiable.
+- [x] `/ready` falla fuera de Development si se habilitan headers MVP con override externo sin opt-in demo explicito.
+- [x] `TrustServerCertificate` en el resolver `AppBuilderMaster` queda en `false` por defecto y solo se activa por configuracion local/demo/test.
 - [x] `SESSION_CONTEXT` parametrizado cuando aplique.
 - [x] `QueryStatic` y fragments heredados se tratan como evidencia, no como ejecutable.
 - [ ] Auth y autorizacion preservadas.

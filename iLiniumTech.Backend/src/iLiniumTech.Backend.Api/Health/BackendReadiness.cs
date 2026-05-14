@@ -190,16 +190,35 @@ public static class BackendReadiness
     {
         var configured = HeaderExecutionContextPolicy.IsConfigured(configuration);
         var enabled = HeaderExecutionContextPolicy.IsEnabled(configuration, environment);
+        var requiresDemoOptIn = HeaderExecutionContextPolicy.RequiresDemoOptInForReadiness(configuration, environment);
+        var hasDemoOptIn = HeaderExecutionContextPolicy.HasDemoOptIn(configuration);
+        if (requiresDemoOptIn && !hasDemoOptIn)
+        {
+            return ReadinessCheck.Fail(
+                "headerExecutionContext",
+                "Temporary header execution context cannot be enabled outside Development without explicit demo opt-in.",
+                new Dictionary<string, object?>
+                {
+                    ["configured"] = configured,
+                    ["enabled"] = enabled,
+                    ["environment"] = environment.EnvironmentName,
+                    ["requiresDemoOptIn"] = true
+                });
+        }
+
         return ReadinessCheck.Ok(
             "headerExecutionContext",
             enabled
-                ? "Temporary header execution context is enabled."
+                ? hasDemoOptIn && requiresDemoOptIn
+                    ? "Temporary header execution context is enabled for demo outside Development."
+                    : "Temporary header execution context is enabled."
                 : "Temporary header execution context is disabled.",
             new Dictionary<string, object?>
             {
                 ["configured"] = configured,
                 ["enabled"] = enabled,
-                ["environment"] = environment.EnvironmentName
+                ["environment"] = environment.EnvironmentName,
+                ["demoOptIn"] = hasDemoOptIn && requiresDemoOptIn
             });
     }
 

@@ -88,6 +88,7 @@ Estos headers quedan permitidos solo como bootstrap temporal y no confiable:
 Reglas obligatorias:
 
 - fuera de desarrollo/demo no deben habilitarse como fuente de identidad o permisos;
+- si se habilitan fuera de Development mediante override temporal, `/ready` debe quedar `not_ready` salvo opt-in demo exacto y visible: `Polizas:AllowHeaderExecutionContextDemoOptIn=DEMO_ONLY_NOT_FOR_REAL_DATA` o `ILINIUMTECH__ALLOW_HEADER_EXECUTION_CONTEXT_DEMO_OPT_IN=DEMO_ONLY_NOT_FOR_REAL_DATA`;
 - si coexisten con autenticacion real, los claims/sesion tienen prioridad;
 - cualquier valor de header debe validarse contra el contexto autenticado antes de influir en datos;
 - `X-Is-Admin` nunca concede permisos por si solo;
@@ -192,6 +193,7 @@ Documentacion:
 1. Documentar y mantener modo MVP actual.
    - API key y headers siguen disponibles solo para desarrollo/demo.
    - `Polizas:AllowHeaderExecutionContext` debe estar desactivado por defecto fuera de entornos controlados.
+   - El override `Polizas:AllowHeaderExecutionContextOutsideDevelopment` no puede dejar `/ready` verde fuera de Development sin el opt-in demo exacto `DEMO_ONLY_NOT_FOR_REAL_DATA`.
 
 2. Introducir adaptador de identidad sin cambiar contratos de polizas.
    - El backend crea un contexto interno normalizado desde claims/sesion.

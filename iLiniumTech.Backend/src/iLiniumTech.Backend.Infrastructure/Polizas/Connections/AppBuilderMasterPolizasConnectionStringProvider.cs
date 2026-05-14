@@ -7,7 +7,8 @@ public sealed class AppBuilderMasterPolizasConnectionStringProvider(
     string masterConnectionString,
     IPolizasExecutionContextAccessor executionContextAccessor,
     AppBuilderConnectionValueProtector? valueProtector = null,
-    string modelDatabaseTypeId = AppBuilderMasterPolizasConnectionStringProvider.DefaultModelDatabaseTypeId)
+    string modelDatabaseTypeId = AppBuilderMasterPolizasConnectionStringProvider.DefaultModelDatabaseTypeId,
+    bool trustServerCertificate = false)
     : IPolizasConnectionStringProvider
 {
     public const string DefaultModelDatabaseTypeId = "tipobd-MO";
@@ -51,12 +52,13 @@ public sealed class AppBuilderMasterPolizasConnectionStringProvider(
             throw new InvalidOperationException("No AppBuilder model connection was found for the configured broker.");
         }
 
-        return BuildModelConnectionString(ReadConnectionRecord(reader), _valueProtector);
+        return BuildModelConnectionString(ReadConnectionRecord(reader), _valueProtector, trustServerCertificate);
     }
 
     public static string BuildModelConnectionString(
         AppBuilderModelConnectionRecord record,
-        AppBuilderConnectionValueProtector valueProtector)
+        AppBuilderConnectionValueProtector valueProtector,
+        bool trustServerCertificate = false)
     {
         var server = valueProtector.DecryptData(record.Server);
         var database = valueProtector.DecryptData(record.Database);
@@ -77,7 +79,7 @@ public sealed class AppBuilderMasterPolizasConnectionStringProvider(
             InitialCatalog = database,
             UserID = user,
             Password = password,
-            TrustServerCertificate = true,
+            TrustServerCertificate = trustServerCertificate,
             IntegratedSecurity = false,
             MultipleActiveResultSets = true,
             ConnectRetryCount = 3,

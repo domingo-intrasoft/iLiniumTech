@@ -1,5 +1,6 @@
 using System.Net;
 using FluentAssertions;
+using iLiniumTech.Backend.Api.Security;
 using iLiniumTech.Backend.Application.Polizas;
 using iLiniumTech.Backend.Domain.Polizas;
 using Microsoft.AspNetCore.Hosting;
@@ -78,6 +79,74 @@ public sealed class PolizasApiTests
         body.Should().NotContain("ConnectionStrings");
         body.Should().NotContain("Password");
         body.Should().NotContain("Server=");
+    }
+
+    [Fact]
+    public async Task Ready_rejects_header_context_outside_development_without_demo_opt_in()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["ApiSecurity:ApiKey"] = "test-key-that-is-long-enough-for-production",
+                ["Polizas:AllowHeaderExecutionContext"] = "true",
+                ["Polizas:AllowHeaderExecutionContextOutsideDevelopment"] = "true"
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/ready");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
+        body.Should().Contain("\"status\":\"not_ready\"");
+        body.Should().Contain("\"name\":\"headerExecutionContext\"");
+        body.Should().Contain("Temporary header execution context cannot be enabled outside Development");
+        body.Should().Contain("\"requiresDemoOptIn\":true");
+        body.Should().NotContain(HeaderExecutionContextPolicy.DemoOptInRequiredValue);
+    }
+
+    [Fact]
+    public async Task Ready_rejects_outside_development_header_override_without_demo_opt_in()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["ApiSecurity:ApiKey"] = "test-key-that-is-long-enough-for-production",
+                ["Polizas:AllowHeaderExecutionContextOutsideDevelopment"] = "true"
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/ready");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
+        body.Should().Contain("\"status\":\"not_ready\"");
+        body.Should().Contain("\"name\":\"headerExecutionContext\"");
+        body.Should().Contain("\"requiresDemoOptIn\":true");
+    }
+
+    [Fact]
+    public async Task Ready_allows_header_context_outside_development_with_explicit_demo_opt_in()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["ApiSecurity:ApiKey"] = "test-key-that-is-long-enough-for-production",
+                ["Polizas:AllowHeaderExecutionContext"] = "true",
+                ["Polizas:AllowHeaderExecutionContextOutsideDevelopment"] = "true",
+                [HeaderExecutionContextPolicy.DemoOptInKey] = HeaderExecutionContextPolicy.DemoOptInRequiredValue
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/ready");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"status\":\"ready\"");
+        body.Should().Contain("Temporary header execution context is enabled for demo outside Development");
+        body.Should().Contain("\"demoOptIn\":true");
     }
 
     [Fact]

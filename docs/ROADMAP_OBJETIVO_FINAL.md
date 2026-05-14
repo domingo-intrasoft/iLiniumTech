@@ -156,6 +156,7 @@ DoD:
 - Valores parametrizados.
 - Broker efectivo resuelto por request en escenarios multi-broker.
 - `SESSION_CONTEXT` parametrizado y aislado si la BBDD real lo requiere.
+- Readiness bloquea overrides de headers MVP fuera de Development salvo opt-in demo explicito, y `TrustServerCertificate` del resolver `AppBuilderMaster` queda desactivado por defecto.
 - Pruebas de integracion contra BBDD de test, contenedor o fixture SQL controlado.
 - UAT compara resultados con entorno autorizado.
 
@@ -166,6 +167,8 @@ Completado con evidencia versionada:
 - Resolver `AppBuilderMaster` por broker efectivo, con cabeceras MVP solo si hay opt-in de `Polizas:AllowHeaderExecutionContext`.
 - `SESSION_CONTEXT` se aplica antes de consultas SQL con `sp_set_session_context` parametrizado y se limpia con valores `NULL` si no hay contexto.
 - `/api/me` expone contexto efectivo para que el frontend detecte ausencia de broker antes de consultar.
+- `/ready` falla fuera de Development si se permite contexto por cabeceras con override externo sin el opt-in demo `DEMO_ONLY_NOT_FOR_REAL_DATA`.
+- `AppBuilderMaster` construye la conexion de modelo con `TrustServerCertificate=false` por defecto y solo acepta `true` por configuracion explicita local/demo/test.
 
 Pendiente tecnico:
 

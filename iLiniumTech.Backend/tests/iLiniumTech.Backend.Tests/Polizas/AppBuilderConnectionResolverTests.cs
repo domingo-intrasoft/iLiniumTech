@@ -28,7 +28,7 @@ public sealed class AppBuilderConnectionResolverTests
     }
 
     [Fact]
-    public void BuildModelConnectionString_decrypts_fields_and_sets_sql_options()
+    public void BuildModelConnectionString_decrypts_fields_and_sets_secure_sql_options_by_default()
     {
         const string key = "unit-test-key";
         var protector = new AppBuilderConnectionValueProtector(key);
@@ -46,13 +46,32 @@ public sealed class AppBuilderConnectionResolverTests
         builder.InitialCatalog.Should().Be("IL_Modelo");
         builder.UserID.Should().Be("readonly_user");
         builder.Password.Should().Be("readonly_password");
-        builder.TrustServerCertificate.Should().BeTrue();
+        builder.TrustServerCertificate.Should().BeFalse();
         builder.IntegratedSecurity.Should().BeFalse();
         builder.MultipleActiveResultSets.Should().BeTrue();
         builder.ApplicationName.Should().Be("iLiniumTech");
         builder.ConnectRetryCount.Should().Be(3);
         builder.ConnectRetryInterval.Should().Be(10);
         builder.ConnectTimeout.Should().Be(30);
+    }
+
+    [Fact]
+    public void BuildModelConnectionString_allows_trusting_server_certificate_by_explicit_configuration()
+    {
+        var record = new AppBuilderModelConnectionRecord(
+            Server: "ModeloSql",
+            Database: "IL_Modelo",
+            DatabaseUser: "readonly_user",
+            DatabasePassword: "readonly_password");
+
+        var connectionString = AppBuilderMasterPolizasConnectionStringProvider
+            .BuildModelConnectionString(
+                record,
+                new AppBuilderConnectionValueProtector(null),
+                trustServerCertificate: true);
+
+        var builder = new SqlConnectionStringBuilder(connectionString);
+        builder.TrustServerCertificate.Should().BeTrue();
     }
 
     [Fact]

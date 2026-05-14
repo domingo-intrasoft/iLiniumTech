@@ -47,12 +47,18 @@ public static class DependencyInjection
                 ?? configuration["ILINIUMTECH:APPBUILDER_ENCRYPTION_KEY"];
             var databaseTypeId = configuration["Polizas:ModelDatabaseTypeId"]
                 ?? AppBuilderMasterPolizasConnectionStringProvider.DefaultModelDatabaseTypeId;
+            var trustServerCertificate = bool.TryParse(
+                    configuration["Polizas:AppBuilderMaster:TrustServerCertificate"]
+                    ?? configuration["ILINIUMTECH:APPBUILDER_MASTER_TRUST_SERVER_CERTIFICATE"],
+                    out var configuredTrustServerCertificate)
+                && configuredTrustServerCertificate;
 
             return new AppBuilderMasterPolizasConnectionStringProvider(
                 masterConnectionString,
                 executionContextAccessor,
                 new AppBuilderConnectionValueProtector(encryptionKey),
-                databaseTypeId);
+                databaseTypeId,
+                trustServerCertificate);
         }
 
         var connectionString = configuration.GetConnectionString("PolizasReadOnly")
