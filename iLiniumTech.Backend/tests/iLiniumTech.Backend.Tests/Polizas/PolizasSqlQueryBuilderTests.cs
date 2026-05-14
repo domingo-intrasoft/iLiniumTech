@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FluentAssertions;
 using iLiniumTech.Backend.Domain.Polizas;
 using iLiniumTech.Backend.Infrastructure.Polizas.Sql;
@@ -54,6 +55,17 @@ public sealed class PolizasSqlQueryBuilderTests
         query.CommandText.Should().NotContain("primaAnual ASC");
     }
 
+    [Fact]
+    public void BuildSearchQuery_minimizes_legal_document_in_list_projection()
+    {
+        var query = _builder.BuildSearchQuery(
+            new PolizasSearchRequest(Page: 1, PageSize: 25),
+            new PolizasSort("numero", Descending: false));
+
+        query.CommandText.Should().Contain("CAST('' AS nvarchar(100)) AS [ClienteId]");
+        ShouldNotProjectNumDocumentoAs(query.CommandText, "ClienteId");
+    }
+
     [Theory]
     [InlineData(1, 25, 0)]
     [InlineData(2, 25, 25)]
@@ -103,5 +115,27 @@ public sealed class PolizasSqlQueryBuilderTests
         query.CommandText.Should().NotContain("SELECT 1 --");
         query.Parameters.Should().ContainSingle(parameter =>
             parameter.Name == "@id" && (string)parameter.Value == "POL-1001'; SELECT 1 --");
+    }
+
+    [Fact]
+    public void BuildDetailQuery_minimizes_legal_document_in_detail_projection()
+    {
+        var query = _builder.BuildDetailQuery("POL-1001");
+
+        query.CommandText.Should().Contain("CAST('' AS nvarchar(100)) AS [ClienteId]");
+        query.CommandText.Should().Contain("CAST('' AS nvarchar(100)) AS [Documento]");
+        ShouldNotProjectNumDocumentoAs(query.CommandText, "ClienteId");
+        ShouldNotProjectNumDocumentoAs(query.CommandText, "Documento");
+    }
+
+    private static void ShouldNotProjectNumDocumentoAs(string commandText, string alias)
+    {
+        var projectsNumDocumentoAsAlias = Regex.IsMatch(
+            commandText,
+            $@"\[NumDocumento\][^\r\n,]*\s+AS\s+\[{Regex.Escape(alias)}\]",
+            RegexOptions.IgnoreCase);
+
+        projectsNumDocumentoAsAlias.Should().BeFalse(
+            "SQL responses must not expose the complete legal document through {0}", alias);
     }
 }

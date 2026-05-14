@@ -169,12 +169,14 @@ Completado con evidencia versionada:
 - `/api/me` expone contexto efectivo para que el frontend detecte ausencia de broker antes de consultar.
 - `/ready` falla fuera de Development si se permite contexto por cabeceras con override externo sin el opt-in demo `DEMO_ONLY_NOT_FOR_REAL_DATA`.
 - `AppBuilderMaster` construye la conexion de modelo con `TrustServerCertificate=false` por defecto y solo acepta `true` por configuracion explicita local/demo/test.
+- Primer incremento de minimizacion PII en SQL: listado y detalle no proyectan `NumDocumento` completo como `ClienteId` ni `Documento`; el contrato se conserva con valores vacios hasta decision funcional/auth real.
 
 Pendiente tecnico:
 
 - Sustituir cabeceras MVP por autenticacion/autorizacion real y claims/sesion backend.
 - Ejecutar pruebas de integracion SQL contra BBDD de test, contenedor o fixture SQL controlado.
 - Ejecutar UAT comparando resultados contra entorno autorizado.
+- Confirmar con producto/DBA si los identificadores de cliente deben permanecer vacios, ser no legales o exponerse mediante mascara no reversible ligada a permisos reales.
 
 Bloqueado externo:
 

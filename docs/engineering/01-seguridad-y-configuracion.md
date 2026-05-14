@@ -50,6 +50,7 @@ Los nombres exactos podran cambiar cuando exista el primer servicio, pero el cri
 - Autenticacion por defecto; endpoints anonimos solo si estan documentados como publicos.
 - Autorizacion por endpoint y por operacion, no solo por visibilidad en UI.
 - DTOs para contratos publicos; no exponer entidades EF directamente.
+- Minimizar PII en DTOs y proyecciones SQL: no devolver documentos legales completos ni identificadores personales si el caso de uso no los necesita o no hay autorizacion real definida.
 - CORS restrictivo por configuracion.
 - Validacion de DTOs antes de persistir o ejecutar consultas.
 - Errores sin trazas internas, SQL, rutas fisicas o detalles de infraestructura.
@@ -78,6 +79,7 @@ El modelo heredado de AppBuilder permite construir SQL desde metadata. En iLiniu
 - nombres de tabla, vista, columna y orden deben validarse contra whitelist extraida de metadata confiable;
 - filtros libres se deben representar como AST o query object, no como strings arbitrarias;
 - cada datasource debe declarar permisos de lectura/escritura;
+- las respuestas SQL deben proyectar solo los campos necesarios; documentos legales como `NumDocumento` no deben exponerse completos por defecto y deben quedar vacios, anonimizados o enmascarados de forma no reversible segun decision funcional;
 - las cuentas de BBDD deben tener minimo privilegio;
 - `TrustServerCertificate` debe quedar en `false` por defecto; solo se permite `true` por configuracion explicita local/demo/test y nunca como hardcode para datos reales;
 - los comandos destructivos requieren pruebas y entorno controlado.

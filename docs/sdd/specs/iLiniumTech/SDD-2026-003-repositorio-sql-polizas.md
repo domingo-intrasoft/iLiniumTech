@@ -38,6 +38,7 @@ La metadata extraida puede ayudar a crear la whitelist inicial, pero la whitelis
 - Interpretacion runtime de `IAP_DataSource`, `QueryStatic` o fragments SQL heredados.
 - Workflows, REST/SOAP externos y motor completo de expresiones.
 - Exponer campos personales no necesarios para el MVP.
+- Devolver documentos legales completos en respuestas SQL por defecto.
 
 ## Contrato de datos
 
@@ -71,6 +72,7 @@ Campos permitidos inicialmente:
 - `Cia`;
 - `PAnualCartera`;
 - `NombreCompleto`;
+- `NumDocumento` queda clasificado como campo sensible heredado: no se proyecta completo como `ClienteId` ni como `Documento` en las respuestas SQL del MVP. Hasta cerrar decision funcional/auth real, esos campos salen vacios desde SQL.
 - alertas documentadas.
 
 ## Reglas de negocio
@@ -96,6 +98,7 @@ Campos permitidos inicialmente:
 - [x] El endpoint mantiene API key obligatoria.
 - [x] Los errores de validacion no devuelven SQL, connection strings ni trazas internas.
 - [x] Hay pruebas unitarias del query object y whitelist.
+- [x] La proyeccion SQL minimiza PII: `ClienteId` y `Documento` no devuelven `NumDocumento` completo por defecto.
 - [x] El broker efectivo se resuelve por request y no por configuracion global en escenarios MVP multi-broker.
 - [x] El fallback `Polizas:BrokerId` queda limitado a ejecucion local/controlada.
 - [x] `SESSION_CONTEXT` se establece antes de consultar polizas si las vistas/tablas lo requieren.
@@ -153,6 +156,7 @@ Headers MVP:
 - [x] `TrustServerCertificate` en el resolver `AppBuilderMaster` queda en `false` por defecto y solo se activa por configuracion local/demo/test.
 - [x] `SESSION_CONTEXT` parametrizado cuando aplique.
 - [x] `QueryStatic` y fragments heredados se tratan como evidencia, no como ejecutable.
+- [x] Las respuestas SQL de listado y detalle no proyectan el documento legal completo como `ClienteId` ni `Documento`; el contrato se mantiene con valores vacios hasta decision funcional/autorizacion real.
 - [ ] Auth y autorizacion preservadas.
 - [ ] Logs con redaccion de datos sensibles.
 - [x] Pruebas de inyeccion para filtros y ordenacion.
@@ -177,13 +181,14 @@ Completado con evidencia:
 - Estructura SQL y sort se limitan por whitelist iLiniumTech, sin interpretar `IAP_*` ni `QueryStatic` en runtime.
 - Broker/contexto MVP por request existe mediante `X-Broker-Id`, `X-User-Id`, `X-Profile-Id`, `X-Profile-Type-Id` y `X-Is-Admin`, solo con `Polizas:AllowHeaderExecutionContext=true` y restricciones de entorno.
 - `SESSION_CONTEXT` se aplica por conexion antes de queries de busqueda/detalle y se limpia con `NULL` si no hay contexto.
+- Primer incremento de minimizacion PII aplicado: listado y detalle SQL mantienen el contrato pero devuelven `ClienteId` y `Documento` vacios, evitando exponer `NumDocumento` completo por defecto.
 - Pruebas versionadas cubren query builder, whitelist, payloads maliciosos, contexto por cabecera, `/api/me`, resolver AppBuilderMaster y `SESSION_CONTEXT`.
 
 Pendiente tecnico:
 
 - Sustituir cabeceras MVP por auth/autorizacion real.
 - Ejecutar integracion SQL con BBDD de test, contenedor o fixture SQL controlado.
-- Confirmar y documentar mascarado/recorte final de campos sensibles cuando se use dato real.
+- Confirmar con producto/DBA si `ClienteId` y `Documento` deben seguir vacios, usar identificadores no legales o aplicar mascara no reversible por permiso cuando exista auth real.
 
 Bloqueado externo:
 
