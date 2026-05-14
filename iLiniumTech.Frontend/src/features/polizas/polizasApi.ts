@@ -1,4 +1,5 @@
 import { apiClient } from '@/services/apiClient'
+import { assertRuntimeConfigReady } from '@/services/runtimeConfig'
 
 import { polizasCatalogsFixture, polizasDetailFixture, polizasFixture } from './polizasFixture'
 import type { PagedResult, PolizaDetail, PolizaListItem, PolizasCatalogs } from './polizasTypes'
@@ -20,6 +21,7 @@ export async function searchPolizas(
   params: PolizasSearchParams,
 ): Promise<PagedResult<PolizaListItem>> {
   if (import.meta.env.VITE_USE_BACKEND === 'true') {
+    assertRuntimeConfigReady()
     const response = await apiClient.get<PagedResult<PolizaListItem>>('/api/polizas', { params })
     return response.data
   }
@@ -65,6 +67,7 @@ export async function searchPolizas(
 
 export async function getPolizasCatalogs(): Promise<PolizasCatalogs> {
   if (import.meta.env.VITE_USE_BACKEND === 'true') {
+    assertRuntimeConfigReady()
     const response = await apiClient.get<PolizasCatalogs>('/api/polizas/catalogs')
     return response.data
   }
@@ -74,6 +77,7 @@ export async function getPolizasCatalogs(): Promise<PolizasCatalogs> {
 
 export async function getPolizaById(id: string): Promise<PolizaDetail | null> {
   if (import.meta.env.VITE_USE_BACKEND === 'true') {
+    assertRuntimeConfigReady()
     const response = await apiClient.get<PolizaDetail>(`/api/polizas/${encodeURIComponent(id)}`)
     return response.data
   }

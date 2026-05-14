@@ -150,13 +150,13 @@ function retrySearch() {
 
       <div class="page-controls">
         <button type="button" :disabled="!canGoPrevious" @click="changePage(page - 1)">
-          <i class="pi pi-chevron-left"></i>
+          <i class="pi pi-chevron-left" aria-hidden="true"></i>
           Anterior
         </button>
         <span>Pagina {{ page }} de {{ totalPages }}</span>
         <button type="button" :disabled="!canGoNext" @click="changePage(page + 1)">
           Siguiente
-          <i class="pi pi-chevron-right"></i>
+          <i class="pi pi-chevron-right" aria-hidden="true"></i>
         </button>
       </div>
     </footer>

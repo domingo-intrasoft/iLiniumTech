@@ -1,6 +1,8 @@
 import { computed, readonly, ref } from 'vue'
 
+import { toPolizasUserMessage } from './apiErrors'
 import { apiClient } from './apiClient'
+import { assertRuntimeConfigReady } from './runtimeConfig'
 
 export interface SessionContext {
   brokerId: number | null
@@ -55,6 +57,7 @@ export async function getSessionContext(): Promise<SessionContext> {
     })
   }
 
+  assertRuntimeConfigReady()
   const response = await apiClient.get<SessionContext>('/api/me')
   return normalizeSessionContext(response.data)
 }
@@ -78,9 +81,9 @@ export function useSession() {
     try {
       session.value = await pendingRequest
       return session.value
-    } catch {
+    } catch (exception) {
       session.value = null
-      error.value = 'No se pudo cargar la sesion.'
+      error.value = toPolizasUserMessage(exception, 'No se pudo cargar la sesion.')
       return null
     } finally {
       loading.value = false

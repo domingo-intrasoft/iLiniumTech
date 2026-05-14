@@ -25,6 +25,62 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Ready_is_anonymous_and_reports_configured_backend()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/ready");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"status\":\"ready\"");
+        body.Should().Contain("\"name\":\"apiKey\"");
+        body.Should().Contain("\"name\":\"polizasRepository\"");
+        body.Should().Contain("\"mode\":\"InMemory\"");
+    }
+
+    [Fact]
+    public async Task Ready_reports_unavailable_when_api_key_is_not_configured()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["ApiSecurity:ApiKey"] = "__SET_IN_ENVIRONMENT__"
+        });
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/ready");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
+        body.Should().Contain("\"status\":\"not_ready\"");
+        body.Should().Contain("\"name\":\"apiKey\"");
+        body.Should().Contain("API key is not configured");
+        body.Should().NotContain("__SET_IN_ENVIRONMENT__");
+    }
+
+    [Fact]
+    public async Task Ready_reports_sql_configuration_gap_without_secret_values()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:Repository"] = "Sql"
+        });
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/ready");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
+        body.Should().Contain("\"status\":\"not_ready\"");
+        body.Should().Contain("Polizas SQL connection is not configured");
+        body.Should().Contain("\"connectionResolver\":\"Static\"");
+        body.Should().NotContain("ConnectionStrings");
+        body.Should().NotContain("Password");
+        body.Should().NotContain("Server=");
+    }
+
+    [Fact]
     public async Task Responses_include_baseline_security_headers()
     {
         await using var factory = new TestApiFactory();
@@ -126,6 +182,53 @@ public sealed class PolizasApiTests
         body.Should().Contain("\"profileId\":9");
         body.Should().Contain("\"profileTypeId\":\"header-profile\"");
         body.Should().Contain("\"isAdmin\":true");
+        body.Should().Contain("\"headerExecutionContextEnabled\":true");
+    }
+
+    [Fact]
+    public async Task Me_ignores_header_context_outside_development_without_explicit_override()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["ApiSecurity:ApiKey"] = "test-key-that-is-long-enough-for-production",
+                ["Polizas:AllowHeaderExecutionContext"] = "true",
+                ["Polizas:BrokerId"] = "84"
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key-that-is-long-enough-for-production");
+        client.DefaultRequestHeaders.Add("X-Broker-Id", "42");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"brokerId\":84");
+        body.Should().Contain("\"headerExecutionContextEnabled\":false");
+    }
+
+    [Fact]
+    public async Task Me_can_use_header_context_outside_development_with_explicit_override()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["ApiSecurity:ApiKey"] = "test-key-that-is-long-enough-for-production",
+                ["Polizas:AllowHeaderExecutionContext"] = "true",
+                ["Polizas:AllowHeaderExecutionContextOutsideDevelopment"] = "true",
+                ["Polizas:BrokerId"] = "84"
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key-that-is-long-enough-for-production");
+        client.DefaultRequestHeaders.Add("X-Broker-Id", "42");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"brokerId\":42");
         body.Should().Contain("\"headerExecutionContextEnabled\":true");
     }
 
@@ -298,11 +401,13 @@ public sealed class PolizasApiTests
 
     private sealed class TestApiFactory(
         Dictionary<string, string?>? configurationOverrides = null,
-        Action<IServiceCollection>? configureServices = null)
+        Action<IServiceCollection>? configureServices = null,
+        string environmentName = "Development")
         : WebApplicationFactory<Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.UseEnvironment(environmentName);
             if (configureServices is not null)
             {
                 builder.ConfigureServices(configureServices);

@@ -1,10 +1,12 @@
 using iLiniumTech.Backend.Infrastructure.Polizas.Connections;
+using Microsoft.Extensions.Hosting;
 
 namespace iLiniumTech.Backend.Api.Security;
 
 public sealed class HeaderPolizasExecutionContextAccessor(
     IHttpContextAccessor httpContextAccessor,
-    IConfiguration configuration)
+    IConfiguration configuration,
+    IHostEnvironment environment)
     : IPolizasExecutionContextAccessor
 {
     public const string BrokerIdHeaderName = "X-Broker-Id";
@@ -17,9 +19,7 @@ public sealed class HeaderPolizasExecutionContextAccessor(
     {
         get
         {
-            var allowHeaderContext = ReadBoolConfiguration(
-                "Polizas:AllowHeaderExecutionContext",
-                "ILINIUMTECH:ALLOW_HEADER_EXECUTION_CONTEXT") == true;
+            var allowHeaderContext = HeaderExecutionContextPolicy.IsEnabled(configuration, environment);
             var brokerId = (allowHeaderContext ? ReadPositiveIntHeader(BrokerIdHeaderName) : null)
                 ?? ReadIntConfiguration("Polizas:BrokerId", "ILINIUMTECH:BROKER_ID");
             return brokerId is null or <= 0

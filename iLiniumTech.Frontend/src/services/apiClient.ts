@@ -1,14 +1,31 @@
-import axios from 'axios'
+import axios, { AxiosHeaders } from 'axios'
 
-const apiKey = import.meta.env.VITE_ILINIUMTECH_API_KEY
-const brokerId = import.meta.env.VITE_BROKER_ID
-const headers = {
-  ...(apiKey ? { 'X-ILiniumTech-Api-Key': apiKey } : {}),
-  ...(brokerId ? { 'X-Broker-Id': brokerId } : {}),
-}
+import { getApiHeaders, getRuntimeConfig } from './runtimeConfig'
+
+const runtimeConfig = getRuntimeConfig()
+const headers = getApiHeaders(runtimeConfig)
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5146',
+  baseURL: runtimeConfig.apiBaseUrl,
   timeout: 10_000,
   headers: Object.keys(headers).length > 0 ? headers : undefined,
+})
+
+function createCorrelationId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return `iliniumtech-frontend-${crypto.randomUUID()}`
+  }
+
+  return `iliniumtech-frontend-${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
+apiClient.interceptors.request.use((config) => {
+  const requestHeaders = AxiosHeaders.from(config.headers)
+
+  if (!requestHeaders.has('X-Correlation-Id')) {
+    requestHeaders.set('X-Correlation-Id', createCorrelationId())
+  }
+
+  config.headers = requestHeaders
+  return config
 })

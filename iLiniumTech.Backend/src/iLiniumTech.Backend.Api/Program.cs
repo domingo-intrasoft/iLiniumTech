@@ -1,3 +1,4 @@
+using iLiniumTech.Backend.Api.Health;
 using iLiniumTech.Backend.Api.Security;
 using iLiniumTech.Backend.Application.Polizas;
 using iLiniumTech.Backend.Domain.Polizas;
@@ -86,12 +87,23 @@ app.MapGet("/health", () => Results.Ok(new
 {
     status = "ok",
     application = "iLiniumTech.Backend"
-}));
+}))
+.AllowAnonymous();
+
+app.MapGet("/ready", ([FromServices] IConfiguration configuration, [FromServices] IHostEnvironment environment) =>
+{
+    var readiness = BackendReadiness.Check(configuration, environment);
+    return readiness.IsReady
+        ? Results.Ok(readiness)
+        : Results.Json(readiness, statusCode: StatusCodes.Status503ServiceUnavailable);
+})
+.AllowAnonymous();
 
 app.MapGet("/api/me", (
     HttpContext httpContext,
     [FromServices] IPolizasExecutionContextAccessor executionContextAccessor,
-    [FromServices] IConfiguration configuration) =>
+    [FromServices] IConfiguration configuration,
+    [FromServices] IHostEnvironment environment) =>
 {
     try
     {
@@ -103,7 +115,7 @@ app.MapGet("/api/me", (
             ProfileId: executionContext?.ProfileId,
             ProfileTypeId: executionContext?.ProfileTypeId,
             IsAdmin: executionContext?.IsAdmin,
-            HeaderExecutionContextEnabled: IsHeaderExecutionContextEnabled(configuration),
+            HeaderExecutionContextEnabled: IsHeaderExecutionContextEnabled(configuration, environment),
             PolizasExecutionContextRequired: RequiresPolizasExecutionContext(configuration)));
     }
     catch (PolizasExecutionContextException exception)
@@ -286,12 +298,8 @@ static bool RequiresPolizasExecutionContext(IConfiguration configuration)
         && requireExecutionContext;
 }
 
-static bool IsHeaderExecutionContextEnabled(IConfiguration configuration) =>
-    bool.TryParse(
-        configuration["Polizas:AllowHeaderExecutionContext"]
-        ?? configuration["ILINIUMTECH:ALLOW_HEADER_EXECUTION_CONTEXT"],
-        out var allowHeaderExecutionContext)
-    && allowHeaderExecutionContext;
+static bool IsHeaderExecutionContextEnabled(IConfiguration configuration, IHostEnvironment environment) =>
+    HeaderExecutionContextPolicy.IsEnabled(configuration, environment);
 
 static string[] GetAllowedCorsOrigins(IConfiguration configuration)
 {

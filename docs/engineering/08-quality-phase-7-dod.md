@@ -21,6 +21,7 @@ El gate ejecuta:
 - smoke HTTP de backend con repositorio `InMemory`;
 - smoke frontend sobre `dist/index.html` o sobre `-FrontendSmokeUrl` si se quiere validar un Vite/preview ya levantado;
 - Gitleaks, auditoria npm/NuGet y auditoria CORS;
+- validacion documental de roadmap, SDDs, CI y plantillas;
 - `git diff --check`.
 
 ## Definicion de done

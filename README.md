@@ -6,6 +6,7 @@ Decision critica: iLiniumTech no sera un runtime dinamico tipo AppBuilder. La me
 
 Documento principal:
 
+- [docs/ROADMAP_OBJETIVO_FINAL.md](docs/ROADMAP_OBJETIVO_FINAL.md)
 - [docs/DECISION_PRODUCTO_ARQUITECTURA.md](docs/DECISION_PRODUCTO_ARQUITECTURA.md)
 - [docs/APPBUILDER_ANALISIS_ARQUITECTURA.md](docs/APPBUILDER_ANALISIS_ARQUITECTURA.md)
 - [docs/APPBUILDER_FLUJO_CONEXIONES_BROKER_POLIZAS.md](docs/APPBUILDER_FLUJO_CONEXIONES_BROKER_POLIZAS.md)
@@ -148,6 +149,12 @@ Quality gate local de fase 7:
 
 Este gate ejecuta pruebas backend, formato/lint/tests/build frontend, auditorias de seguridad y `git diff --check`. Usar `-SkipSecurity` solo durante iteracion local rapida, nunca antes de cerrar una rama.
 Si el Node global no cumple `>=20.19.0`, usar `-NodeExe "C:\ruta\a\node.exe"`. El DoD completo queda en [docs/engineering/08-quality-phase-7-dod.md](docs/engineering/08-quality-phase-7-dod.md).
+
+Validacion documental rapida:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/quality/Test-DocumentationBaseline.ps1
+```
 
 ### Runbook demo MVP con backend
 

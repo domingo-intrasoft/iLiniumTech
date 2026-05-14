@@ -113,7 +113,7 @@ function clearFilters() {
       <section v-for="section in polizasSearchSections" :key="section.title" class="filter-section">
         <div class="filter-section-title">
           <h2>{{ section.title }}</h2>
-          <i class="pi pi-minus"></i>
+          <i class="pi pi-minus" aria-hidden="true"></i>
         </div>
 
         <div v-for="(row, rowIndex) in section.rows" :key="rowIndex" class="filter-row">

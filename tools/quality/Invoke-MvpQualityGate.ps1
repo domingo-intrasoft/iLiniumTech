@@ -24,7 +24,11 @@ function Invoke-Step {
     )
 
     Write-Host "==> $Name"
+    $global:LASTEXITCODE = 0
     & $Command
+    if ($global:LASTEXITCODE -ne 0) {
+        throw "$Name failed with exit code $global:LASTEXITCODE."
+    }
 }
 
 function Get-NodeVersion {
@@ -220,6 +224,10 @@ try {
         Invoke-Step "CORS audit" {
             & (Join-Path $repoRoot "tools\security\Invoke-CorsAudit.ps1") -FailOnFindings
         }
+    }
+
+    Invoke-Step "Documentation baseline" {
+        & (Join-Path $repoRoot "tools\quality\Test-DocumentationBaseline.ps1")
     }
 
     Invoke-Step "Git whitespace check" {

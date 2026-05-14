@@ -18,6 +18,7 @@ describe('session service', () => {
 
   it('fetches the current backend session context from /api/me', async () => {
     vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
     const { apiClient } = await import('./apiClient')
     vi.mocked(apiClient.get).mockResolvedValueOnce({
       data: {
@@ -49,6 +50,7 @@ describe('session service', () => {
 
   it('exposes broker and context through a shared composable state', async () => {
     vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
     const { apiClient } = await import('./apiClient')
     vi.mocked(apiClient.get).mockResolvedValueOnce({
       data: {
@@ -77,6 +79,7 @@ describe('session service', () => {
 
   it('keeps empty context available when /api/me has no broker yet', async () => {
     vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
     const { apiClient } = await import('./apiClient')
     vi.mocked(apiClient.get).mockResolvedValueOnce({
       data: {
@@ -121,6 +124,7 @@ describe('session service', () => {
 
   it('exposes a friendly error without leaking a failed session', async () => {
     vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
     const { apiClient } = await import('./apiClient')
     vi.mocked(apiClient.get).mockRejectedValueOnce(new Error('unauthorized'))
 
@@ -131,5 +135,18 @@ describe('session service', () => {
 
     expect(currentSession.session.value).toBeNull()
     expect(currentSession.error.value).toBe('No se pudo cargar la sesion.')
+  })
+
+  it('blocks backend session calls when the API key contract is incomplete', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', '__SET_IN_ENVIRONMENT__')
+    const { apiClient } = await import('./apiClient')
+    const { useSession } = await import('./session')
+    const currentSession = useSession()
+
+    await expect(currentSession.loadSession()).resolves.toBeNull()
+
+    expect(currentSession.error.value).toContain('VITE_ILINIUMTECH_API_KEY')
+    expect(apiClient.get).not.toHaveBeenCalled()
   })
 })

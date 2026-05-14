@@ -23,6 +23,7 @@ const {
   total,
   loading,
   error,
+  runtimeError,
   contextBlocked,
   filters,
   pagination,
@@ -173,7 +174,7 @@ async function clearFilters() {
         <span><i class="pi pi-database" aria-hidden="true"></i> {{ dataOriginLabel }}</span>
         <span v-if="contextBlocked" class="warning" role="alert">
           <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
-          Broker requerido
+          {{ runtimeError ?? 'Broker requerido' }}
         </span>
       </section>
 

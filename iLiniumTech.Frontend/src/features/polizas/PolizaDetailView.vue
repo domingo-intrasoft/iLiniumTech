@@ -2,6 +2,9 @@
 import { computed, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
+import { toPolizasUserMessage } from '@/services/apiErrors'
+import { getBlockingRuntimeConfigMessage } from '@/services/runtimeConfig'
+
 import { getPolizaById } from './polizasApi'
 import { polizaDetailSections, type PolizaDetailField } from './polizasConstants'
 import { POLIZA_EMPTY_VALUE, formatPolizaValue } from './polizasFormatters'
@@ -34,14 +37,21 @@ async function loadPoliza() {
   error.value = null
 
   try {
+    const runtimeConfigError = getBlockingRuntimeConfigMessage()
+    if (runtimeConfigError) {
+      error.value = runtimeConfigError
+      poliza.value = null
+      return
+    }
+
     const id = currentPolizaId()
     poliza.value = id ? await getPolizaById(id) : null
 
     if (!poliza.value) {
       error.value = 'Poliza no encontrada.'
     }
-  } catch {
-    error.value = 'No se pudo cargar la poliza.'
+  } catch (exception) {
+    error.value = toPolizasUserMessage(exception, 'No se pudo cargar la poliza.')
     poliza.value = null
   } finally {
     loading.value = false

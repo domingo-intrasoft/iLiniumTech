@@ -7,11 +7,11 @@ describe('apiClient headers', () => {
   })
 
   it('sends configured development broker id to the backend', async () => {
-    vi.stubEnv('VITE_BROKER_ID', 'dev-broker-1')
+    vi.stubEnv('VITE_BROKER_ID', '42')
 
     const { apiClient } = await import('./apiClient')
 
-    expect(apiClient.defaults.headers['X-Broker-Id']).toBe('dev-broker-1')
+    expect(apiClient.defaults.headers['X-Broker-Id']).toBe('42')
   })
 
   it('keeps broker header unset when no broker id is configured', async () => {
@@ -20,5 +20,21 @@ describe('apiClient headers', () => {
     const { apiClient } = await import('./apiClient')
 
     expect(apiClient.defaults.headers['X-Broker-Id']).toBeUndefined()
+  })
+
+  it('keeps invalid broker ids out of request headers', async () => {
+    vi.stubEnv('VITE_BROKER_ID', 'dev-broker-1')
+
+    const { apiClient } = await import('./apiClient')
+
+    expect(apiClient.defaults.headers['X-Broker-Id']).toBeUndefined()
+  })
+
+  it('does not send placeholder API keys', async () => {
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', '__SET_IN_ENVIRONMENT__')
+
+    const { apiClient } = await import('./apiClient')
+
+    expect(apiClient.defaults.headers['X-ILiniumTech-Api-Key']).toBeUndefined()
   })
 })

@@ -1,5 +1,7 @@
 import { onMounted, reactive, ref } from 'vue'
 
+import { toPolizasUserMessage } from '@/services/apiErrors'
+import { getBlockingRuntimeConfigMessage } from '@/services/runtimeConfig'
 import { useSession } from '@/services/session'
 
 import { getPolizasCatalogs, searchPolizas } from './polizasApi'
@@ -15,6 +17,7 @@ export function usePolizas() {
   const total = ref(0)
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const runtimeError = ref<string | null>(getBlockingRuntimeConfigMessage())
   const contextBlocked = ref(false)
   const filters = reactive<PolizasQueryFilters>({
     numero: '',
@@ -31,6 +34,16 @@ export function usePolizas() {
   })
 
   async function ensureBackendContext() {
+    runtimeError.value = getBlockingRuntimeConfigMessage()
+
+    if (runtimeError.value) {
+      error.value = runtimeError.value
+      contextBlocked.value = true
+      items.value = []
+      total.value = 0
+      return false
+    }
+
     const currentSession = await loadSession()
     if (
       import.meta.env.VITE_USE_BACKEND === 'true' &&
@@ -38,6 +51,7 @@ export function usePolizas() {
       currentSession.brokerId === null
     ) {
       error.value = 'Configura un broker para consultar polizas.'
+      runtimeError.value = error.value
       contextBlocked.value = true
       items.value = []
       total.value = 0
@@ -45,6 +59,7 @@ export function usePolizas() {
     }
 
     contextBlocked.value = false
+    runtimeError.value = null
     return true
   }
 
@@ -73,8 +88,8 @@ export function usePolizas() {
       total.value = result.total
       pagination.page = result.page
       pagination.pageSize = result.pageSize
-    } catch {
-      error.value = 'No se pudieron cargar las polizas.'
+    } catch (exception) {
+      error.value = toPolizasUserMessage(exception, 'No se pudieron cargar las polizas.')
       items.value = []
       total.value = 0
     } finally {
@@ -106,9 +121,18 @@ export function usePolizas() {
     catalogsError.value = null
 
     try {
+      const runtimeConfigError = getBlockingRuntimeConfigMessage()
+      if (runtimeConfigError) {
+        catalogsError.value = runtimeConfigError
+        return
+      }
+
       catalogs.value = await getPolizasCatalogs()
-    } catch {
-      catalogsError.value = 'No se pudieron cargar los catalogos de polizas.'
+    } catch (exception) {
+      catalogsError.value = toPolizasUserMessage(
+        exception,
+        'No se pudieron cargar los catalogos de polizas.',
+      )
     } finally {
       catalogsLoading.value = false
     }
@@ -130,6 +154,7 @@ export function usePolizas() {
     total,
     loading,
     error,
+    runtimeError,
     contextBlocked,
     filters,
     pagination,

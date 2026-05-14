@@ -39,6 +39,11 @@ if (-not $IncludeGitHistory) {
 }
 
 if (-not $NoReport) {
+  $reportDir = Split-Path -Parent $ReportPath
+  if (-not [string]::IsNullOrWhiteSpace($reportDir)) {
+    New-Item -ItemType Directory -Force -Path $reportDir | Out-Null
+  }
+
   $arguments += @(
     "--report-format", "json",
     "--report-path", $ReportPath

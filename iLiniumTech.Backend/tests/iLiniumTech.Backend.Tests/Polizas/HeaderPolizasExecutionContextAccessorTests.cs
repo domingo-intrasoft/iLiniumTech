@@ -3,6 +3,8 @@ using iLiniumTech.Backend.Api.Security;
 using iLiniumTech.Backend.Infrastructure.Polizas.Connections;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 
 namespace iLiniumTech.Backend.Tests.Polizas;
 
@@ -24,7 +26,8 @@ public sealed class HeaderPolizasExecutionContextAccessorTests
                 {
                     ["Polizas:AllowHeaderExecutionContext"] = "true"
                 })
-                .Build());
+                .Build(),
+            DevelopmentEnvironment());
 
         var current = accessor.Current;
 
@@ -50,7 +53,8 @@ public sealed class HeaderPolizasExecutionContextAccessorTests
             .Build();
         var accessor = new HeaderPolizasExecutionContextAccessor(
             new HttpContextAccessor { HttpContext = httpContext },
-            configuration);
+            configuration,
+            DevelopmentEnvironment());
 
         var current = accessor.Current;
 
@@ -72,7 +76,8 @@ public sealed class HeaderPolizasExecutionContextAccessorTests
             .Build();
         var accessor = new HeaderPolizasExecutionContextAccessor(
             new HttpContextAccessor { HttpContext = httpContext },
-            configuration);
+            configuration,
+            DevelopmentEnvironment());
 
         var act = () => accessor.Current;
 
@@ -95,7 +100,8 @@ public sealed class HeaderPolizasExecutionContextAccessorTests
             .Build();
         var accessor = new HeaderPolizasExecutionContextAccessor(
             new HttpContextAccessor { HttpContext = new DefaultHttpContext() },
-            configuration);
+            configuration,
+            DevelopmentEnvironment());
 
         var current = accessor.Current;
 
@@ -112,8 +118,68 @@ public sealed class HeaderPolizasExecutionContextAccessorTests
     {
         var accessor = new HeaderPolizasExecutionContextAccessor(
             new HttpContextAccessor { HttpContext = new DefaultHttpContext() },
-            new ConfigurationBuilder().Build());
+            new ConfigurationBuilder().Build(),
+            DevelopmentEnvironment());
 
         accessor.Current.Should().BeNull();
+    }
+
+    [Fact]
+    public void Current_ignores_header_context_outside_development_without_override()
+    {
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Headers[HeaderPolizasExecutionContextAccessor.BrokerIdHeaderName] = "42";
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Polizas:AllowHeaderExecutionContext"] = "true",
+                ["Polizas:BrokerId"] = "84"
+            })
+            .Build();
+        var accessor = new HeaderPolizasExecutionContextAccessor(
+            new HttpContextAccessor { HttpContext = httpContext },
+            configuration,
+            ProductionEnvironment());
+
+        var current = accessor.Current;
+
+        current.Should().NotBeNull();
+        current!.BrokerId.Should().Be(84);
+    }
+
+    [Fact]
+    public void Current_can_enable_header_context_outside_development_with_explicit_override()
+    {
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Headers[HeaderPolizasExecutionContextAccessor.BrokerIdHeaderName] = "42";
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Polizas:AllowHeaderExecutionContext"] = "true",
+                ["Polizas:AllowHeaderExecutionContextOutsideDevelopment"] = "true",
+                ["Polizas:BrokerId"] = "84"
+            })
+            .Build();
+        var accessor = new HeaderPolizasExecutionContextAccessor(
+            new HttpContextAccessor { HttpContext = httpContext },
+            configuration,
+            ProductionEnvironment());
+
+        var current = accessor.Current;
+
+        current.Should().NotBeNull();
+        current!.BrokerId.Should().Be(42);
+    }
+
+    private static IHostEnvironment DevelopmentEnvironment() => new TestHostEnvironment("Development");
+
+    private static IHostEnvironment ProductionEnvironment() => new TestHostEnvironment("Production");
+
+    private sealed class TestHostEnvironment(string environmentName) : IHostEnvironment
+    {
+        public string EnvironmentName { get; set; } = environmentName;
+        public string ApplicationName { get; set; } = "iLiniumTech.Backend.Tests";
+        public string ContentRootPath { get; set; } = AppContext.BaseDirectory;
+        public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
     }
 }
