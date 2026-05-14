@@ -349,6 +349,17 @@ Permitir que el coordinador lance una tarea concreta:
 - maximo `top=1`;
 - sin schedule automatico al principio.
 
+Primer corte manual:
+
+- workflow `.github/workflows/ai-codex-manual-worker.yml`;
+- script `tools/github/Start-AiManualWorker.ps1`;
+- `workflow_dispatch` con `issueNumber` obligatorio;
+- `dryRun=true` por defecto;
+- valida elegibilidad, locks, engine y app;
+- crea rama de handoff y mueve a `status:ai-in-progress` solo en modo real;
+- no ejecuta Codex automaticamente;
+- no abre PR si no hay cambios de codigo.
+
 ### Fase 3 - Agente programador
 
 Workflow por motor:

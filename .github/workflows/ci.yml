@@ -37,11 +37,14 @@ jobs:
           test -f .github/labels.json
           test -f .github/ISSUE_TEMPLATE/ai-epic.yml
           test -f .github/workflows/ai-issue-dispatcher.yml
+          test -f .github/workflows/ai-codex-manual-worker.yml
           test -f docs/ai/github-ai-policy.md
           test -f docs/ai/ai-engine-routing.md
           test -f docs/ai/multi-agent-orchestration.md
+          test -f docs/ai/manual-worker.md
           test -f tools/github/Sync-Labels.ps1
           test -f tools/github/Invoke-AiIssueDispatcherDiagnostics.ps1
+          test -f tools/github/Start-AiManualWorker.ps1
           python -m json.tool .github/labels.json >/dev/null
 
   backend:
