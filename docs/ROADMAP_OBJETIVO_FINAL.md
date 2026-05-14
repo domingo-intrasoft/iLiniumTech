@@ -11,6 +11,7 @@ Este documento es la guia canonica de calidad para llevar iLiniumTech desde el M
 - [engineering/README.md](engineering/README.md)
 - [PLAN_CICD_GITHUB_ONLY.md](PLAN_CICD_GITHUB_ONLY.md)
 - [sdd/specs/iLiniumTech](sdd/specs/iLiniumTech)
+- [sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md](sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md)
 
 Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadata heredada sirve para extraccion, trazabilidad, comparativa y scaffolding revisado; el producto final debe quedar como frontend Vue estatico y backend API explicita.
 
@@ -18,6 +19,7 @@ Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. L
 
 - Fase documental y decision de arquitectura: completada.
 - MVP read-only de polizas: implementado con frontend Vue, backend API, fixtures anonimizados, API key y pruebas base.
+- Autos Particulares queda definido como siguiente vertical explicito del MVP en `SDD-2026-006`: ruta `/autos-particulares`, API propia bajo `/api/autos-particulares`, read-only, ramo Autos y division Particulares cuando el dato exista; si la BBDD real no confirma division en listado, se permite fallback controlado con UAT pendiente.
 - Repositorio SQL read-only: implementado como backend configurable, parametrizado y con whitelist; pendiente de validar contra entorno real autorizado y auth real.
 - Extractor offline de metadata: implementado en `tools/extractor/polizas-metadata` con modos `Fixture`, `DryRun` y `Live`; pendiente de validar modo `Live` contra entorno autorizado y politica final de artefactos.
 - Frontend polizas: protegido por configuracion runtime y contexto `/api/me`; no consulta backend si falta API key/contexto de broker requerido.
@@ -129,6 +131,40 @@ DoD:
 - Build, lint, tests y auditorias base ejecutados.
 
 Estado: implementada; mantener regresion en CI.
+
+### Fase 1B - MVP Autos Particulares read-only
+
+SDD base: [SDD-2026-006 Autos Particulares MVP read-only](sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md).
+Evidencia QA: [autos-particulares-mvp-evidence.md](qa/autos-particulares-mvp-evidence.md).
+
+Objetivo: abrir `Autos Particulares` como vertical explicito del producto, reutilizando patrones de Polizas cuando aporte velocidad, pero con ruta, API, permisos y criterios de UAT propios.
+
+DoD:
+
+- Ruta frontend `/autos-particulares` implementada como Vue/TypeScript propio o componentes compartidos revisados.
+- Endpoints explicitos bajo `/api/autos-particulares`: `GET /api/autos-particulares/catalogs`, `GET /api/autos-particulares/polizas` y `GET /api/autos-particulares/polizas/{id}`.
+- Backend fija el alcance a ramo `Autos` mediante contrato/whitelist.
+- Division `Particulares` aplicada cuando exista campo o regla fiable validada con BBDD real.
+- Si la division no puede confirmarse en listado, el resultado queda marcado como fallback controlado y UAT pendiente; no se presenta como cierre funcional completo.
+- No hay runtime dinamico de metadata AppBuilder ni endpoints genericos de pantalla/datasource.
+- Datos personales y de vehiculo minimizados: sin documento legal, matricula completa, bastidor completo, telefono, email o direccion por defecto.
+- Permisos objetivo definidos para el vertical: `autosParticulares.catalogs`, `autosParticulares.read`, `autosParticulares.detail`.
+- Pruebas backend/frontend y smoke visual ejecutados cuando existan cambios de runtime.
+- UAT compara ramo, division y muestras contra entorno autorizado o registra bloqueo externo.
+
+Estado: primer incremento implementado en backend/frontend; pendiente de validacion DBA/UAT para cerrar division `Particulares` como filtro real.
+
+Pendiente tecnico:
+
+- Confirmar y aplicar campo o regla de division `Particulares` en SQL real.
+- Definir whitelist SQL/campos especificos de vehiculo para rellenar `vehiculoResumen` sin exponer matricula ni bastidor completos.
+- Confirmar si se comparte repositorio/base de Polizas o se crea repositorio propio manteniendo boundary de vertical.
+
+Bloqueado externo:
+
+- Falta confirmar campo, vista o regla autorizada para distinguir division `Particulares` en BBDD real.
+- Falta UAT funcional contra entorno autorizado.
+- Falta auth real para permisos productivos del vertical.
 
 ### Fase 2 - Calidad y CI baseline estable
 

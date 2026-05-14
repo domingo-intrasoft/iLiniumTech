@@ -6,7 +6,7 @@ public interface IPolizasService
 {
     Task<PagedResult<PolizaListItem>> SearchAsync(PolizasSearchRequest request, CancellationToken cancellationToken);
 
-    Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken);
+    Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken, string? ramo = null);
 
     Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken);
 }

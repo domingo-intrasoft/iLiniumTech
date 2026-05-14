@@ -37,14 +37,14 @@ public sealed class SqlPolizasRepository(
         return new PagedResult<PolizaListItem>(items, request.Page, request.PageSize, checked((int)total));
     }
 
-    public async Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken)
+    public async Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken, string? ramo = null)
     {
         var connectionString = await connectionStringProvider.GetConnectionStringAsync(cancellationToken);
         await using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
         await SqlServerSessionContext.ApplyAsync(connection, executionContextAccessor?.Current, cancellationToken);
 
-        await using var command = CreateCommand(connection, _queryBuilder.BuildDetailQuery(id));
+        await using var command = CreateCommand(connection, _queryBuilder.BuildDetailQuery(id, ramo));
         await using var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleRow, cancellationToken);
 
         return await reader.ReadAsync(cancellationToken)

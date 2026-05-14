@@ -1,6 +1,6 @@
 # Paquete de tareas para agentes Codex paralelos
 
-Este documento convierte el roadmap actual en tareas pequenas e independientes para agentes Codex. El objetivo grande concreto todavia debe sustituir el placeholder del prompt original. Hasta que se concrete, estas tareas se orientan al objetivo final documentado: avanzar el MVP de Polizas hacia una entrega profesional sin convertir iLiniumTech en un runtime dinamico tipo AppBuilder.
+Este documento convierte el roadmap actual en tareas pequenas e independientes para agentes Codex. El objetivo grande activo es ampliar el MVP hacia `Autos Particulares` como vertical explicito de producto, respaldado por `SDD-2026-006`, sin convertir iLiniumTech en un runtime dinamico tipo AppBuilder.
 
 Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea funcional debe estar respaldada por SDD, issue o decision documentada antes de implementarse.
 
@@ -16,11 +16,11 @@ Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea
 ## Tarea 0 - Definicion SDD del objetivo grande
 
 - **Nombre:** `producto-sdd-objetivo-grande`
-- **Alcance exacto:** convertir el objetivo grande en una SDD ejecutable con contexto, alcance, fuera de alcance, criterios de aceptacion, seguridad, pruebas y DoD.
+- **Alcance exacto:** mantener `SDD-2026-006 Autos Particulares MVP read-only` como SDD ejecutable con contexto, alcance, fuera de alcance, criterios de aceptacion, seguridad, pruebas, fallback de division y DoD.
 - **Archivos que puede tocar:** `docs/sdd/specs/iLiniumTech/**`, `docs/ROADMAP_OBJETIVO_FINAL.md`.
 - **Archivos que NO debe tocar:** `iLiniumTech.Backend/**`, `iLiniumTech.Frontend/**`, `.github/**`, `tools/**`.
-- **Dependencias:** objetivo funcional concreto del usuario; decision de prioridad frente a fases 3-8 del roadmap.
-- **Criterios de aceptacion:** la SDD identifica que es producto iLiniumTech y que es solo evidencia AppBuilder; no pide runtime dinamico; define DoD y UAT.
+- **Dependencias:** decision de prioridad frente a fases 3-8 del roadmap; confirmacion DBA/UAT para division `Particulares`.
+- **Criterios de aceptacion:** la SDD identifica que `Autos Particulares` es producto iLiniumTech; no pide runtime dinamico; define `/autos-particulares`, API propia bajo `/api/autos-particulares`, DoD, UAT y fallback controlado si la division no puede confirmarse en listado.
 - **Pruebas obligatorias:** `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`; `git diff --check`.
 - **Documentacion a actualizar:** SDD nueva o existente; roadmap si cambia la fase activa.
 - **Riesgo de conflicto con otras tareas:** bajo, salvo edicion concurrente de roadmap.
@@ -60,6 +60,30 @@ Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea
 - **Pruebas obligatorias:** `npm run format`; `npm run lint`; `npm run test:unit`; `npm run build`; smoke visual si cambia UI.
 - **Documentacion a actualizar:** `docs/qa/definition-of-done.md` solo si cambia el flujo UAT esperado.
 - **Riesgo de conflicto con otras tareas:** bajo-medio con backend si cambian DTOs o `/api/me`.
+
+## Tarea 3B - Frontend Autos Particulares read-only
+
+- **Nombre:** `frontend-autos-particulares-readonly`
+- **Alcance exacto:** implementar la ruta `/autos-particulares` como vertical Vue estatico read-only, con listado, detalle, filtros, estados de configuracion/permisos y consumo de API propia.
+- **Archivos que puede tocar:** `iLiniumTech.Frontend/**`.
+- **Archivos que NO debe tocar:** `iLiniumTech.Backend/**`, `.github/**`, `tools/**`, `docs/**` salvo evidencia UAT si el coordinador lo pide.
+- **Dependencias:** `SDD-2026-006`; contrato backend `/api/autos-particulares/polizas`; decision sobre `scope.divisionPendienteUat`.
+- **Criterios de aceptacion:** no consume metadata AppBuilder; usa ruta `/autos-particulares`; muestra vertical `Autos Particulares`; cubre `loading`, `empty`, `error`, configuracion incompleta y acceso denegado; no expone documento, matricula completa ni bastidor completo.
+- **Pruebas obligatorias:** `npm run format`; `npm run lint`; `npm run test:unit`; `npm run build`; smoke visual si cambia UI.
+- **Documentacion a actualizar:** normalmente ninguna; registrar evidencia visual en PR o cierre.
+- **Riesgo de conflicto con otras tareas:** medio con backend Autos si el DTO cambia; bajo con Polizas si se extraen componentes compartidos con cambios pequenos.
+
+## Tarea 3C - Backend Autos Particulares API
+
+- **Nombre:** `backend-autos-particulares-api`
+- **Alcance exacto:** implementar endpoints propios bajo `/api/autos-particulares`: `GET /api/autos-particulares/catalogs`, `GET /api/autos-particulares/polizas` y `GET /api/autos-particulares/polizas/{id}`, con scope ramo Autos y division Particulares cuando el dato exista.
+- **Archivos que puede tocar:** `iLiniumTech.Backend/**`.
+- **Archivos que NO debe tocar:** `iLiniumTech.Frontend/**`, `.github/**`, `tools/**`, `docs/**` salvo nota minima en `SDD-2026-006` si cambia un criterio documentado.
+- **Dependencias:** `SDD-2026-006`; patrones de `SDD-2026-003`; confirmacion DBA para campo/regla de division; `SDD-2026-005` para permisos futuros.
+- **Criterios de aceptacion:** API propia y explicita; filtros/sort por whitelist; SQL parametrizado si aplica; ramo Autos fijado por backend; fallback controlado si division no se confirma; errores sanitizados con `correlationId` cuando aplique; sin metadata runtime.
+- **Pruebas obligatorias:** `dotnet build .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release`; `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release`; secret scan si toca configuracion; CORS audit si toca API/config.
+- **Documentacion a actualizar:** SDD-2026-006 solo si se cierra o cambia un criterio; README si se introduce configuracion local nueva.
+- **Riesgo de conflicto con otras tareas:** medio con backend Polizas si se comparten repositorios/DTOs; medio con auth si se introducen permisos.
 
 ## Tarea 4 - Extractor offline de metadata sanitizada
 
@@ -109,17 +133,31 @@ Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea
 - **Documentacion a actualizar:** DoD, roadmap e informe de cierre si se crea.
 - **Riesgo de conflicto con otras tareas:** bajo; debe ir al final.
 
+## Tarea 8 - QA/UAT Autos Particulares
+
+- **Nombre:** `qa-uat-autos-particulares`
+- **Alcance exacto:** preparar matriz de aceptacion para `SDD-2026-006`, especialmente ramo Autos, division Particulares, fallback controlado, minimizacion PII y evidencia visual/API.
+- **Archivos que puede tocar:** `docs/qa/**`, `docs/workflows/**`, `docs/ROADMAP_OBJETIVO_FINAL.md`, `docs/sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md`.
+- **Archivos que NO debe tocar:** `iLiniumTech.Backend/**`, `iLiniumTech.Frontend/**`, `.github/**`, `tools/**`.
+- **Dependencias:** resultados de backend/frontend Autos; acceso a entorno autorizado o confirmacion de bloqueo externo por DBA/producto.
+- **Criterios de aceptacion:** UAT distingue `ramo Autos confirmado`, `division Particulares confirmada` y `division pendiente`; toda exposicion de documento, matricula, bastidor, telefono, email o direccion queda ausente, enmascarada o justificada por SDD futura.
+- **Pruebas obligatorias:** validacion documental; revision de `git diff --check`; revision de comandos reportados por backend/frontend.
+- **Documentacion a actualizar:** checklist de fase o SDD-2026-006 con evidencia/bloqueos.
+- **Riesgo de conflicto con otras tareas:** bajo; debe ejecutarse despues de cambios tecnicos.
+
 ## Orden recomendado
 
-1. Ejecutar Tarea 0 para concretar objetivo y SDD.
-2. En paralelo: Tarea 1, Tarea 3, Tarea 4 y Tarea 5 si sus dependencias estan claras.
-3. Ejecutar Tarea 2 como diseno si aun no hay proveedor auth.
-4. Ejecutar Tarea 6 tras los cambios tecnicos.
-5. Ejecutar Tarea 7 para cierre coordinado.
+1. Ejecutar Tarea 0 para mantener `SDD-2026-006` y roadmap alineados.
+2. En paralelo para Autos Particulares: Tarea 3B frontend y Tarea 3C backend, manteniendo contrato de SDD.
+3. En paralelo para la base existente: Tarea 1, Tarea 3, Tarea 4 y Tarea 5 si sus dependencias estan claras.
+4. Ejecutar Tarea 2 como diseno si aun no hay proveedor auth.
+5. Ejecutar Tarea 6 tras los cambios tecnicos.
+6. Ejecutar Tarea 8 para UAT especifico de Autos Particulares.
+7. Ejecutar Tarea 7 para cierre coordinado.
 
 ## Paquete minimo si el objetivo sigue sin concretar
 
-Si el objetivo grande no se concreta, solo deben ejecutarse tareas documentales y de preparacion:
+Si un objetivo futuro no se concreta, solo deben ejecutarse tareas documentales y de preparacion:
 
 - Tarea 0.
 - Tarea 2 en modo diseno.

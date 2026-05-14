@@ -11,14 +11,14 @@ public sealed class PolizasService(IPolizasRepository repository) : IPolizasServ
         return repository.SearchAsync(request, sort, cancellationToken);
     }
 
-    public Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken)
+    public Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken, string? ramo = null)
     {
         if (string.IsNullOrWhiteSpace(id))
         {
             throw new PolizasValidationException("Poliza id is required.");
         }
 
-        return repository.GetByIdAsync(id, cancellationToken);
+        return repository.GetByIdAsync(id.Trim(), cancellationToken, ramo?.Trim());
     }
 
     public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>

@@ -188,6 +188,17 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Autos_particulares_polizas_requires_api_key()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/api/autos-particulares/polizas");
+
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
     public async Task Me_requires_api_key()
     {
         await using var factory = new TestApiFactory();
@@ -371,6 +382,87 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Autos_particulares_search_returns_only_autos_fixture_data()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/autos-particulares/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"items\"");
+        body.Should().Contain("\"scope\"");
+        body.Should().Contain("POL-2026-0001");
+        body.Should().Contain("\"ramo\":\"Autos\"");
+        body.Should().Contain("\"divisionObjetivo\":\"Particulares\"");
+        body.Should().Contain("\"divisionFiltroAplicado\":false");
+        body.Should().Contain("\"divisionPendienteUat\":true");
+        body.Should().Contain("\"total\":1");
+        body.Should().NotContain("POL-2026-0002");
+        body.Should().NotContain("\"ramo\":\"Hogar\"");
+        body.Should().NotContain("QueryStatic");
+        body.Should().NotContain("Pantalla_Polizas");
+    }
+
+    [Fact]
+    public async Task Autos_particulares_catalogs_are_minimized_and_scoped()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/autos-particulares/catalogs");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"estado\"");
+        body.Should().Contain("\"compania\"");
+        body.Should().Contain("\"scope\"");
+        body.Should().Contain("\"ramo\":\"Autos\"");
+        body.Should().Contain("\"divisionPendienteUat\":true");
+        body.Should().NotContain("\"oficina\"");
+        body.Should().NotContain("\"gestor\"");
+        body.Should().NotContain("connectionString");
+        body.Should().NotContain("Pantalla_Polizas");
+    }
+
+    [Fact]
+    public async Task Autos_particulares_search_supports_pagination_and_basic_filters()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/autos-particulares/polizas?page=1&pageSize=1&numero=0001");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"page\":1");
+        body.Should().Contain("\"pageSize\":1");
+        body.Should().Contain("\"total\":1");
+        body.Should().Contain("POL-2026-0001");
+        body.Should().NotContain("POL-2026-0002");
+    }
+
+    [Fact]
+    public async Task Autos_particulares_search_keeps_autos_filter_even_when_query_asks_for_other_ramo()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/autos-particulares/polizas?ramo=Hogar");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("POL-2026-0001");
+        body.Should().NotContain("POL-2026-0002");
+        body.Should().NotContain("\"ramo\":\"Hogar\"");
+    }
+
+    [Fact]
     public async Task GetById_returns_poliza_detail()
     {
         await using var factory = new TestApiFactory();
@@ -383,6 +475,46 @@ public sealed class PolizasApiTests
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         body.Should().Contain("\"clienteNombre\"");
         body.Should().Contain("POL-2026-0001");
+    }
+
+    [Fact]
+    public async Task Autos_particulares_detail_returns_autos_and_hides_other_ramos()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var autosResponse = await client.GetAsync("/api/autos-particulares/polizas/POL-1001");
+        var autosBody = await autosResponse.Content.ReadAsStringAsync();
+        var hogarResponse = await client.GetAsync("/api/autos-particulares/polizas/POL-1002");
+
+        autosResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        autosBody.Should().Contain("\"item\"");
+        autosBody.Should().Contain("\"ramo\":\"Autos\"");
+        autosBody.Should().Contain("\"scope\"");
+        autosBody.Should().Contain("\"riesgo\":\"Vehiculo asegurado\"");
+        autosBody.Should().NotContain("1234 ABC");
+        autosBody.Should().NotContain("00000001A");
+        autosBody.Should().NotContain("+34 600");
+        hogarResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task Autos_particulares_does_not_expose_runtime_metadata_route()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/autos-particulares/polizas/metadata");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        body.Should().NotContain("AppBuilder");
+        body.Should().NotContain("QueryStatic");
+        body.Should().NotContain("Pantalla_Polizas");
+        body.Should().NotContain("rootComponentId");
+        body.Should().NotContain("dataSourceId");
     }
 
     [Fact]
@@ -402,6 +534,53 @@ public sealed class PolizasApiTests
         body.Should().Contain("\"correlationId\":\"test-correlation-polizas-validation\"");
         body.Contains("SELECT", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
         body.Contains("SecretTable", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Autos_particulares_validation_errors_are_sanitized()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "test-correlation-autos-validation");
+
+        var response = await client.GetAsync("/api/autos-particulares/polizas?sort=SELECT%20*%20FROM%20SecretTable:desc");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("test-correlation-autos-validation");
+        body.Should().Contain("AUTOS_PARTICULARES_VALIDATION_ERROR");
+        body.Should().Contain("\"correlationId\":\"test-correlation-autos-validation\"");
+        body.Should().NotContain("ConnectionStrings");
+        body.Should().NotContain("AppBuilder");
+        body.Should().NotContain("QueryStatic");
+        body.Contains("SELECT", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+        body.Contains("SecretTable", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Autos_particulares_configuration_errors_are_sanitized()
+    {
+        await using var factory = new TestApiFactory(configureServices: services =>
+        {
+            services.RemoveAll<IPolizasService>();
+            services.AddScoped<IPolizasService, ThrowingConfigurationPolizasService>();
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "test-correlation-autos-config");
+
+        var response = await client.GetAsync("/api/autos-particulares/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("test-correlation-autos-config");
+        body.Should().Contain("POLIZAS_CONFIGURATION_ERROR");
+        body.Should().Contain("\"correlationId\":\"test-correlation-autos-config\"");
+        body.Should().NotContain("ConnectionStrings");
+        body.Should().NotContain("PolizasReadOnly");
+        body.Should().NotContain("ILINIUMTECH");
+        body.Contains("Server=", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
     }
 
     [Fact]
@@ -515,7 +694,10 @@ public sealed class PolizasApiTests
             CancellationToken cancellationToken) =>
             throw new InvalidOperationException("ConnectionStrings:PolizasReadOnly is missing.");
 
-        public Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken) =>
+        public Task<PolizaDetail?> GetByIdAsync(
+            string id,
+            CancellationToken cancellationToken,
+            string? ramo = null) =>
             throw new InvalidOperationException("ConnectionStrings:PolizasReadOnly is missing.");
 
         public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>

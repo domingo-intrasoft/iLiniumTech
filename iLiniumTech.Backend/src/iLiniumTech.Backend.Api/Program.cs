@@ -7,6 +7,13 @@ using iLiniumTech.Backend.Infrastructure.Polizas.Connections;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
+const string AutosParticularesRamo = "Autos";
+var autosParticularesScope = new AutosParticularesScope(
+    Ramo: AutosParticularesRamo,
+    DivisionObjetivo: "Particulares",
+    DivisionFiltroAplicado: false,
+    DivisionPendienteUat: true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
@@ -132,6 +139,9 @@ app.MapGet("/api/me", (
 var polizas = app.MapGroup("/api/polizas")
     .RequireAuthorization();
 
+var autosParticulares = app.MapGroup("/api/autos-particulares")
+    .RequireAuthorization();
+
 polizas.MapGet("/metadata", (HttpContext httpContext) => Results.Json(
         new ErrorResponse(new ErrorBody(
             Code: "POLIZAS_METADATA_DEPRECATED",
@@ -205,6 +215,92 @@ polizas.MapGet("/{id}", async (HttpContext httpContext, [FromServices] IPolizasS
 .WithName("GetPolizaById")
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
+autosParticulares.MapGet("/catalogs", async (
+    [FromServices] IPolizasService service,
+    CancellationToken cancellationToken) =>
+{
+    var catalogs = await service.GetCatalogsAsync(cancellationToken);
+    return Results.Ok(new AutosParticularesCatalogsResponse(
+        Estado: catalogs.TipoPoliza,
+        Compania: catalogs.Compania,
+        Scope: autosParticularesScope));
+})
+.WithName("GetAutosParticularesCatalogs")
+.AddEndpointFilter(RequirePolizasExecutionContextAsync);
+
+autosParticulares.MapGet("/polizas", async (
+    HttpContext httpContext,
+    [FromServices] IPolizasService service,
+    [FromQuery] int? page,
+    [FromQuery] int? pageSize,
+    [FromQuery] string? sort,
+    [FromQuery] string? numero,
+    [FromQuery] string? cliente,
+    [FromQuery] string? estado,
+    [FromQuery] string? compania,
+    [FromQuery] DateOnly? fechaEfectoDesde,
+    [FromQuery] DateOnly? fechaEfectoHasta,
+    CancellationToken cancellationToken) =>
+{
+    var request = new PolizasSearchRequest(
+        Page: page is null or 0 ? 1 : page.Value,
+        PageSize: pageSize is null or 0 ? 25 : pageSize.Value,
+        Sort: sort,
+        Numero: numero,
+        Cliente: cliente,
+        Estado: estado,
+        Compania: compania,
+        Ramo: AutosParticularesRamo,
+        FechaEfectoDesde: fechaEfectoDesde,
+        FechaEfectoHasta: fechaEfectoHasta);
+
+    try
+    {
+        var result = await service.SearchAsync(request, cancellationToken);
+        return Results.Ok(new AutosParticularesPolizasResponse(
+            Items: result.Items,
+            Page: result.Page,
+            PageSize: result.PageSize,
+            Total: result.Total,
+            Scope: autosParticularesScope));
+    }
+    catch (PolizasValidationException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "AUTOS_PARTICULARES_VALIDATION_ERROR",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(httpContext))));
+    }
+})
+.WithName("SearchAutosParticularesPolizas")
+.AddEndpointFilter(RequirePolizasExecutionContextAsync);
+
+autosParticulares.MapGet("/polizas/{id}", async (
+    HttpContext httpContext,
+    [FromServices] IPolizasService service,
+    string id,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var result = await service.GetByIdAsync(id, cancellationToken, AutosParticularesRamo);
+        return result is null
+            ? Results.NotFound()
+            : Results.Ok(new AutosParticularesPolizaDetailResponse(
+                Item: SanitizeAutosParticularesDetail(result),
+                Scope: autosParticularesScope));
+    }
+    catch (PolizasValidationException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "AUTOS_PARTICULARES_VALIDATION_ERROR",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(httpContext))));
+    }
+})
+.WithName("GetAutosParticularesPolizaById")
+.AddEndpointFilter(RequirePolizasExecutionContextAsync);
+
 app.Run();
 
 static async ValueTask<object?> RequirePolizasExecutionContextAsync(
@@ -266,6 +362,16 @@ static bool IsKnownConfigurationException(InvalidOperationException exception) =
     exception.Message.Contains("connection", StringComparison.OrdinalIgnoreCase) ||
     exception.Message.Contains("AppBuilderMaster", StringComparison.OrdinalIgnoreCase) ||
     exception.Message.Contains("Polizas SQL repository", StringComparison.OrdinalIgnoreCase);
+
+static PolizaDetail SanitizeAutosParticularesDetail(PolizaDetail detail) =>
+    detail with
+    {
+        ClienteId = string.Empty,
+        Riesgo = string.IsNullOrWhiteSpace(detail.Riesgo) ? string.Empty : "Vehiculo asegurado",
+        Documento = string.Empty,
+        Email = string.Empty,
+        Telefono = string.Empty
+    };
 
 static Task WriteErrorAsync(HttpContext context, int statusCode, string code, string message)
 {
@@ -348,3 +454,25 @@ public sealed record MeResponse(
     bool? IsAdmin,
     bool HeaderExecutionContextEnabled,
     bool PolizasExecutionContextRequired);
+
+public sealed record AutosParticularesScope(
+    string Ramo,
+    string DivisionObjetivo,
+    bool DivisionFiltroAplicado,
+    bool DivisionPendienteUat);
+
+public sealed record AutosParticularesPolizasResponse(
+    IReadOnlyList<PolizaListItem> Items,
+    int Page,
+    int PageSize,
+    int Total,
+    AutosParticularesScope Scope);
+
+public sealed record AutosParticularesPolizaDetailResponse(
+    PolizaDetail Item,
+    AutosParticularesScope Scope);
+
+public sealed record AutosParticularesCatalogsResponse(
+    IReadOnlyList<PolizaCatalogOption> Estado,
+    IReadOnlyList<PolizaCatalogOption> Compania,
+    AutosParticularesScope Scope);

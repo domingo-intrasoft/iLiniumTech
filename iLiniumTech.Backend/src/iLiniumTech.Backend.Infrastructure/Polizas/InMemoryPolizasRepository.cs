@@ -87,9 +87,11 @@ public sealed class InMemoryPolizasRepository : IPolizasRepository
         return Task.FromResult(new PagedResult<PolizaListItem>(items, request.Page, request.PageSize, total));
     }
 
-    public Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken)
+    public Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken, string? ramo = null)
     {
-        var item = Items.FirstOrDefault(poliza => poliza.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
+        var item = Items.FirstOrDefault(poliza =>
+            poliza.Id.Equals(id, StringComparison.OrdinalIgnoreCase) &&
+            (string.IsNullOrWhiteSpace(ramo) || poliza.Ramo.Equals(ramo, StringComparison.OrdinalIgnoreCase)));
         if (item is null)
         {
             return Task.FromResult<PolizaDetail?>(null);
@@ -106,7 +108,7 @@ public sealed class InMemoryPolizasRepository : IPolizasRepository
             ClienteId: item.ClienteId,
             ClienteNombre: item.ClienteNombre,
             Compania: item.Compania,
-            Riesgo: item.Ramo == "Autos" ? "1234 ABC" : "Vivienda demo",
+            Riesgo: item.Ramo == "Autos" ? "Vehiculo particular demo" : "Vivienda demo",
             FechaEfecto: item.FechaEfecto,
             FechaVencimiento: item.FechaVencimiento,
             PrimaAnual: item.PrimaAnual,
@@ -121,7 +123,7 @@ public sealed class InMemoryPolizasRepository : IPolizasRepository
             CanalCobro: item.Ramo == "Autos" ? "Banco" : "Tarjeta",
             FraccionPago: item.Ramo == "Autos" ? "Anual" : "Semestral",
             Ccaa: "Canarias",
-            Documento: item.Ramo == "Autos" ? "00000001A" : "00000002B",
+            Documento: string.Empty,
             Apellido1: "Anonimo",
             Apellido2: item.Ramo == "Autos" ? "Uno" : "Dos",
             Nombre: "Cliente",
@@ -132,8 +134,8 @@ public sealed class InMemoryPolizasRepository : IPolizasRepository
             Hijos: item.Ramo == "Autos" ? 1 : 0,
             RegimenLaboral: item.Ramo == "Autos" ? "Cuenta ajena" : "Autonomo",
             Profesion: item.Ramo == "Autos" ? "Administracion" : "Ingenieria",
-            Email: item.Ramo == "Autos" ? "cliente1@example.test" : "cliente2@example.test",
-            Telefono: item.Ramo == "Autos" ? "+34 600 000 001" : "+34 600 000 002");
+            Email: string.Empty,
+            Telefono: string.Empty);
 
         return Task.FromResult<PolizaDetail?>(detail);
     }

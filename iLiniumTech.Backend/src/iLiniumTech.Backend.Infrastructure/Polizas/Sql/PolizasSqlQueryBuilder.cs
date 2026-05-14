@@ -111,15 +111,20 @@ public sealed class PolizasSqlQueryBuilder
         return new PolizasSqlQuery(commandText, where.Parameters);
     }
 
-    public PolizasSqlQuery BuildDetailQuery(string id)
+    public PolizasSqlQuery BuildDetailQuery(string id, string? ramo = null)
     {
+        var clauses = new List<string> { "[Poliza] = @id" };
+        var parameters = new List<PolizasSqlParameter> { new("@id", id) };
+
+        AddEquals(clauses, parameters, "[IdRamo]", "@ramo", ramo);
+
         var commandText = $"""
             {DetailSelect}
             FROM {SourceObject}
-            WHERE [Poliza] = @id;
+            WHERE {string.Join(" AND ", clauses)};
             """;
 
-        return new PolizasSqlQuery(commandText, [new PolizasSqlParameter("@id", id)]);
+        return new PolizasSqlQuery(commandText, parameters);
     }
 
     private static PolizasWhereClause BuildWhereClause(PolizasSearchRequest request)

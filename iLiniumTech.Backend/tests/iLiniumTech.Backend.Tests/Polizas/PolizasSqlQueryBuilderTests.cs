@@ -118,6 +118,16 @@ public sealed class PolizasSqlQueryBuilderTests
     }
 
     [Fact]
+    public void BuildDetailQuery_can_scope_detail_by_ramo()
+    {
+        var query = _builder.BuildDetailQuery("POL-1001", "Autos");
+
+        query.CommandText.Should().Contain("WHERE [Poliza] = @id AND [IdRamo] = @ramo");
+        query.Parameters.Should().Contain(parameter => parameter.Name == "@id" && (string)parameter.Value == "POL-1001");
+        query.Parameters.Should().Contain(parameter => parameter.Name == "@ramo" && (string)parameter.Value == "Autos");
+    }
+
+    [Fact]
     public void BuildDetailQuery_minimizes_legal_document_in_detail_projection()
     {
         var query = _builder.BuildDetailQuery("POL-1001");

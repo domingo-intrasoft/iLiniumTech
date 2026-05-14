@@ -22,6 +22,8 @@ Decision de arquitectura aplicable: el repositorio SQL forma parte del backend A
 
 Estado de implementacion: existe `SqlPolizasRepository` activable por configuracion, con query builder parametrizado, whitelist y pruebas unitarias. Tambien existe un resolver `AppBuilderMaster` que localiza la conexion `tipobd-MO` en `IAPM_Connection` por broker y puede descifrar campos con la clave de AppBuilder. El flujo MVP ya puede tomar broker/contexto por request mediante cabeceras solo con opt-in explicito, mantiene `Polizas:BrokerId` como fallback local temporal y aplica `SESSION_CONTEXT` parametrizado antes de consultar. La readiness bloquea entornos no Development si se habilitan headers MVP fuera de desarrollo sin opt-in demo explicito, y el resolver `AppBuilderMaster` no confia en certificados de servidor por defecto. Queda pendiente validarlo contra BBDD real de test o contenedor y sustituir cabeceras MVP por auth real.
 
+Incremento Autos Particulares: se anade un contrato backend explicito `GET /api/autos-particulares/polizas` y `GET /api/autos-particulares/polizas/{id}` que reutiliza `IPolizasService` con `ramo=Autos` fijado en backend. La division `Particulares` no se usa como filtro SQL adicional hasta confirmar con producto/DBA el campo fiable en datos reales.
+
 Dependencia de seguridad: `SDD-2026-005` define el modelo objetivo para sustituir headers MVP por claims/sesion backend, permisos efectivos y errores 401/403 sanitizados.
 
 ## Objetivo

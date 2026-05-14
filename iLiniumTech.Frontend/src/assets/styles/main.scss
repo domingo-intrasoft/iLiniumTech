@@ -261,6 +261,29 @@ select:focus-visible {
   background: #e8eef5;
 }
 
+.autos-toolbar {
+  min-height: 66px;
+}
+
+.autos-toolbar h1,
+.section-kicker {
+  margin: 0;
+}
+
+.autos-toolbar h1 {
+  color: #17324a;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.section-kicker {
+  color: #5d7188;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
 .toolbar-groups {
   flex-wrap: wrap;
   gap: 8px;
@@ -441,6 +464,10 @@ select:focus-visible {
   background: #f9fbfe;
 }
 
+.autos-criteria-card {
+  margin-left: 8px;
+}
+
 .filter-warning {
   margin: 0;
   border-bottom: 1px solid #e5c0c0;
@@ -612,6 +639,10 @@ tbody tr:hover {
   color: #006ea9;
   font-weight: 800;
   text-decoration: none;
+}
+
+.table-strong {
+  color: #006ea9;
 }
 
 .table-link:hover {
