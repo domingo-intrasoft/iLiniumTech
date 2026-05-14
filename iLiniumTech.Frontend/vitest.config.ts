@@ -7,6 +7,7 @@ export default mergeConfig(
     test: {
       environment: 'happy-dom',
       globals: false,
+      include: ['src/**/*.test.ts'],
       reporters: ['default'],
       outputFile: {
         junit: 'reports/vitest-junit.xml',
@@ -16,8 +17,9 @@ export default mergeConfig(
         reporter: ['text', 'html', 'lcov'],
         reportsDirectory: 'reports/coverage',
         include: ['src/**/*.{ts,vue}'],
-        exclude: ['src/**/*.test.ts', 'src/main.ts', 'src/router/**', 'src/types/**'],
+        exclude: ['src/**/*.test.ts', 'src/main.ts', 'src/router/**', 'src/types/**', 'e2e/**'],
       },
+      exclude: ['e2e/**'],
     },
   }),
 )
