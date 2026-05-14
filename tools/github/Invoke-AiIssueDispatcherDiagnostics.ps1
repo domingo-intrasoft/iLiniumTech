@@ -92,6 +92,24 @@ function Invoke-GitHubApi {
     Invoke-RestMethod @args
 }
 
+function ConvertTo-GitHubItems {
+    param([object]$Value)
+
+    if ($null -eq $Value) {
+        return
+    }
+
+    if ($Value -is [System.Array]) {
+        foreach ($item in $Value) {
+            $item
+        }
+
+        return
+    }
+
+    $Value
+}
+
 function Get-CandidateIssues {
     if ($UseMock) {
         return New-MockIssues
@@ -103,12 +121,12 @@ function Get-CandidateIssues {
 
     if ($IssueNumber -gt 0) {
         $uri = "https://api.github.com/repos/$Repository/issues/$IssueNumber"
-        return @(Invoke-GitHubApi -Method Get -Uri $uri)
+        return @(ConvertTo-GitHubItems -Value (Invoke-GitHubApi -Method Get -Uri $uri))
     }
 
     $encodedLabel = [System.Uri]::EscapeDataString($requiredReadyLabel)
     $uri = "https://api.github.com/repos/$Repository/issues?state=open&labels=$encodedLabel&sort=updated&direction=desc&per_page=100"
-    $issues = @(Invoke-GitHubApi -Method Get -Uri $uri)
+    $issues = @(ConvertTo-GitHubItems -Value (Invoke-GitHubApi -Method Get -Uri $uri))
     $issues |
         Where-Object { -not $_.pull_request } |
         Select-Object -First $Top
@@ -182,7 +200,7 @@ function Get-ActiveLocks {
 
     $encodedLabel = [System.Uri]::EscapeDataString("status:ai-in-progress")
     $uri = "https://api.github.com/repos/$Repository/issues?state=open&labels=$encodedLabel&sort=updated&direction=desc&per_page=100"
-    $activeIssues = @(Invoke-GitHubApi -Method Get -Uri $uri)
+    $activeIssues = @(ConvertTo-GitHubItems -Value (Invoke-GitHubApi -Method Get -Uri $uri))
 
     @($activeIssues |
         Where-Object { -not $_.pull_request } |
@@ -263,7 +281,7 @@ if ($Comment) {
     }
     else {
         $commentUri = "https://api.github.com/repos/$Repository/issues/$IssueNumber/comments"
-        $existingComments = @(Invoke-GitHubApi -Method Get -Uri $commentUri)
+        $existingComments = @(ConvertTo-GitHubItems -Value (Invoke-GitHubApi -Method Get -Uri $commentUri))
         $existingDiagnostic = $existingComments |
             Where-Object { [string]$_.body -like "<!-- ai-issue-dispatcher-diagnostics -->*" } |
             Sort-Object -Property created_at -Descending |
