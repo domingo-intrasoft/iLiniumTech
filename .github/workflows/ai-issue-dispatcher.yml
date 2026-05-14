@@ -1,0 +1,114 @@
+name: ai-issue-dispatcher
+
+on:
+  workflow_dispatch:
+    inputs:
+      issueNumber:
+        description: "Issue concreta a diagnosticar. Vacio lista candidatas."
+        required: false
+        default: ""
+      top:
+        description: "Maximo de issues candidatas a revisar cuando issueNumber esta vacio."
+        required: false
+        default: "10"
+      diagnosticsOnly:
+        description: "Mantener el dispatcher en modo diagnostico, sin lanzar agentes."
+        required: true
+        type: boolean
+        default: true
+      comment:
+        description: "Publicar el diagnostico como comentario. Requiere issueNumber."
+        required: true
+        type: boolean
+        default: false
+  schedule:
+    - cron: "42 5 * * 2"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-issue-dispatcher-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  diagnose:
+    name: diagnose AI issue candidates
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      issues: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run diagnostics
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.inputs.issueNumber }}
+          TOP: ${{ github.event.inputs.top }}
+          DIAGNOSTICS_ONLY: ${{ github.event.inputs.diagnosticsOnly }}
+        run: |
+          New-Item -ItemType Directory -Force -Path dispatcher-reports | Out-Null
+
+          $issueNumber = 0
+          if (-not [string]::IsNullOrWhiteSpace($env:ISSUE_NUMBER)) {
+              $issueNumber = [int]$env:ISSUE_NUMBER
+          }
+
+          $top = 10
+          if (-not [string]::IsNullOrWhiteSpace($env:TOP)) {
+              $top = [int]$env:TOP
+          }
+
+          $diagnosticsOnly = $true
+          if (-not [string]::IsNullOrWhiteSpace($env:DIAGNOSTICS_ONLY)) {
+              $diagnosticsOnly = [System.Boolean]::Parse($env:DIAGNOSTICS_ONLY)
+          }
+
+          .\tools\github\Invoke-AiIssueDispatcherDiagnostics.ps1 `
+              -IssueNumber $issueNumber `
+              -Top $top `
+              -DiagnosticsOnly $diagnosticsOnly `
+              -JsonOutputPath dispatcher-reports\ai-issue-dispatcher.json `
+              -MarkdownOutputPath dispatcher-reports\ai-issue-dispatcher.md
+
+      - name: Upload diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-issue-dispatcher-diagnostics
+          path: dispatcher-reports
+          if-no-files-found: error
+
+  comment:
+    name: comment diagnostics on issue
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.comment == true }}
+    needs: diagnose
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Post diagnostics comment
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ inputs.issueNumber }}
+          TOP: ${{ inputs.top }}
+          DIAGNOSTICS_ONLY: ${{ inputs.diagnosticsOnly }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:ISSUE_NUMBER)) {
+              throw "comment=true requires issueNumber so the workflow comments on one explicit issue."
+          }
+
+          $diagnosticsOnly = [System.Boolean]::Parse($env:DIAGNOSTICS_ONLY)
+
+          .\tools\github\Invoke-AiIssueDispatcherDiagnostics.ps1 `
+              -IssueNumber ([int]$env:ISSUE_NUMBER) `
+              -Top ([int]$env:TOP) `
+              -DiagnosticsOnly $diagnosticsOnly `
+              -Comment

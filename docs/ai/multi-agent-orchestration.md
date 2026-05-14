@@ -8,6 +8,8 @@ Montar un flujo de trabajo por eventos para que iLiniumTech avance de forma cont
 
 Este documento define el modelo operativo. Las automatizaciones concretas deben implementarse por fases en `.github/workflows/**` desde la rama `ci-cd`.
 
+En la rama `ci-cd`, este documento es la fuente operativa para la Fase 1 de orquestacion. El roadmap maestro de producto vive en `develop`; cuando se sincronizan ramas, ambos documentos deben quedar alineados.
+
 ## Flujo objetivo
 
 ```text
@@ -145,7 +147,18 @@ Reglas:
 - `merge-conflict-risk`
 - `human-decision-required`
 
-### Areas
+### Apps y areas
+
+El dispatcher usa exactamente una label `app:*` como ruta canonica de trabajo:
+
+- `app:api`
+- `app:frontend`
+- `app:extractor`
+- `app:infrastructure`
+- `app:docs`
+- `app:core`
+
+Las labels `area:*` son complementarias para riesgo y reporting, no sustituyen a `app:*`:
 
 - `area:backend`
 - `area:frontend`
@@ -221,7 +234,7 @@ Evento:
 Accion:
 
 1. Validar que tiene `ai-task` o cuelga de `ai-parent`.
-2. Validar area.
+2. Validar que existe exactamente una label canonica `app:*`.
 3. Validar paths permitidos/prohibidos.
 4. Validar locks y limite de paralelismo.
 5. Si OK, mover a `status:ai-in-progress` y lanzar agente.
@@ -315,6 +328,17 @@ Crear workflow manual/scheduled que:
 - valida labels, locks y bloqueos;
 - no lanza agentes;
 - comenta diagnostico.
+
+Implementacion inicial:
+
+- workflow `.github/workflows/ai-issue-dispatcher.yml`;
+- ejecucion manual con `workflow_dispatch`;
+- schedule conservador semanal solo en modo diagnostico;
+- job principal con permisos `contents: read` e `issues: read`;
+- job opcional de comentario con `issues: write`, limitado a `comment=true` y `issueNumber` explicito, porque GitHub requiere permiso de escritura para crear comentarios en issues;
+- comentarios idempotentes mediante marcador `ai-issue-dispatcher-diagnostics`, actualizando el comentario anterior si ya existe;
+- script `tools/github/Invoke-AiIssueDispatcherDiagnostics.ps1`;
+- no lanza agentes, no cambia labels, no crea ramas, no modifica codigo.
 
 ### Fase 2 - Dispatcher con `workflow_dispatch`
 
