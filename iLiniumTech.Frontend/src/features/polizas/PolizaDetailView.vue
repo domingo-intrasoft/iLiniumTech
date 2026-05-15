@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 
+import { useAuthSession } from '@/features/auth/authSession'
 import { toPolizasUserMessage } from '@/services/apiErrors'
 import { getBlockingRuntimeConfigMessage } from '@/services/runtimeConfig'
 
@@ -13,6 +14,8 @@ import { POLIZA_EMPTY_VALUE, formatPolizaValue } from './polizasFormatters'
 import type { PolizaDetail } from './polizasTypes'
 
 const route = useRoute()
+const router = useRouter()
+const { userLabel, logout } = useAuthSession()
 const poliza = ref<PolizaDetail | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -61,6 +64,11 @@ async function loadPoliza() {
   }
 }
 
+async function signOut() {
+  logout()
+  await router.replace({ name: 'login' })
+}
+
 watch(() => route.params.id, loadPoliza, { immediate: true })
 </script>
 
@@ -69,7 +77,9 @@ watch(() => route.params.id, loadPoliza, { immediate: true })
     content-id="poliza-detail-content"
     section-title="Polizas"
     :session-label="shellStatusLabel"
-    user-label="Detalle poliza"
+    :user-label="userLabel"
+    show-sign-out
+    @sign-out="signOut"
   >
     <div id="poliza-detail-content" class="poliza-detail-page">
       <header class="detail-topbar">

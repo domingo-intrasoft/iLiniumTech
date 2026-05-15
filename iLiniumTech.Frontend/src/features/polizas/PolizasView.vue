@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
+import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
 
 import PolizasFilters from './PolizasFilters.vue'
@@ -33,6 +35,8 @@ const {
   setPageSize,
 } = usePolizas()
 
+const router = useRouter()
+const { userLabel, logout } = useAuthSession()
 const isBackendMode = import.meta.env.VITE_USE_BACKEND === 'true'
 const dataOriginLabel = computed(() => (isBackendMode ? 'API polizas' : 'Fixture local'))
 
@@ -81,6 +85,11 @@ async function clearFilters() {
   pagination.page = 1
   await refresh()
 }
+
+async function signOut() {
+  logout()
+  await router.replace({ name: 'login' })
+}
 </script>
 
 <template>
@@ -90,8 +99,9 @@ async function clearFilters() {
     :session-label="sessionLabel"
     :session-needs-attention="sessionNeedsAttention"
     :top-badges="topBadges"
-    user-label="Domingo () (-1)"
+    :user-label="userLabel"
     show-sign-out
+    @sign-out="signOut"
   >
     <div id="polizas-content" class="polizas-toolbar">
       <h1 class="sr-only">Polizas</h1>

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import AppSideMenu from './AppSideMenu.vue'
 
+const emit = defineEmits<{
+  signOut: []
+}>()
+
 withDefaults(
   defineProps<{
     contentId: string
@@ -50,7 +54,13 @@ withDefaults(
           <button class="icon-button ghost" type="button" aria-label="Configuracion">
             <i class="pi pi-cog" aria-hidden="true"></i>
           </button>
-          <button v-if="showSignOut" class="icon-button ghost" type="button" aria-label="Salir">
+          <button
+            v-if="showSignOut"
+            class="icon-button ghost"
+            type="button"
+            aria-label="Salir"
+            @click="emit('signOut')"
+          >
             <i class="pi pi-sign-out" aria-hidden="true"></i>
           </button>
         </div>

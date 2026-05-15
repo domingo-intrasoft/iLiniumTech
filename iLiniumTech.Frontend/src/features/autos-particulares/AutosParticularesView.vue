@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
+import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
 
 import AutosParticularesFilters from './AutosParticularesFilters.vue'
@@ -29,6 +31,8 @@ const {
   setPageSize,
 } = useAutosParticulares()
 
+const router = useRouter()
+const { userLabel, logout } = useAuthSession()
 const isBackendMode = import.meta.env.VITE_USE_BACKEND === 'true'
 const dataOriginLabel = computed(() =>
   isBackendMode ? 'API autos particulares' : 'Fixture local autos',
@@ -83,6 +87,11 @@ async function clearFilters() {
   pagination.page = 1
   await refresh()
 }
+
+async function signOut() {
+  logout()
+  await router.replace({ name: 'login' })
+}
 </script>
 
 <template>
@@ -91,7 +100,9 @@ async function clearFilters() {
     section-title="Autos Particulares"
     :session-label="sessionLabel"
     :session-needs-attention="sessionNeedsAttention"
-    user-label="MVP Autos Particulares"
+    :user-label="userLabel"
+    show-sign-out
+    @sign-out="signOut"
   >
     <div id="autos-content" class="polizas-toolbar autos-toolbar">
       <div>

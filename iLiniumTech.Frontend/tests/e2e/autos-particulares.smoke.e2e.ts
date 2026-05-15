@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import { loginDemo } from './auth'
+
 const forbiddenRuntimeLeaks =
   /connectionString|SELECT \*|AppBuilder|QueryStatic|Pantalla_Polizas|metadata/i
 const forbiddenVehicleLeaks = /\b\d{4}\s?[A-Z]{3}\b/
@@ -20,7 +22,7 @@ test('autos particulares smoke uses local fixture and blocks backend calls', asy
     await route.abort()
   })
 
-  await page.goto('/autos-particulares')
+  await loginDemo(page, '/autos-particulares')
 
   await expect(page.getByRole('heading', { name: 'Autos Particulares' })).toBeVisible()
   await expect(page.getByText('Solo lectura')).toBeVisible()

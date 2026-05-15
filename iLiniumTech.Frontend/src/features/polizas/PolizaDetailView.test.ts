@@ -5,11 +5,13 @@ import { polizasDetailFixture } from './polizasFixture'
 
 const mocks = vi.hoisted(() => ({
   route: { path: '/polizas/POL-1001', params: { id: 'POL-1001' as string | string[] } },
+  router: { replace: vi.fn() },
   getPolizaById: vi.fn(),
 }))
 
 vi.mock('vue-router', () => ({
   useRoute: () => mocks.route,
+  useRouter: () => mocks.router,
   RouterLink: {
     props: ['to'],
     template: '<a href="#"><slot /></a>',
@@ -26,6 +28,7 @@ describe('PolizaDetailView', () => {
   beforeEach(() => {
     mocks.route.path = '/polizas/POL-1001'
     mocks.route.params = { id: 'POL-1001' }
+    mocks.router.replace.mockReset()
     mocks.getPolizaById.mockReset()
   })
 

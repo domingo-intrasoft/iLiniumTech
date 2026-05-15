@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import { loginDemo } from './auth'
+
 const forbiddenRuntimeLeaks = /connectionString|SELECT \*|AppBuilder|QueryStatic|Pantalla_Polizas/i
 
 test('polizas smoke uses local fixture without leaking AppBuilder runtime details', async ({
@@ -20,7 +22,7 @@ test('polizas smoke uses local fixture without leaking AppBuilder runtime detail
     await route.abort()
   })
 
-  await page.goto('/polizas')
+  await loginDemo(page, '/polizas')
 
   await expect(page.getByText('Solo lectura')).toBeVisible()
   await expect(page.getByText('Fixture local')).toBeVisible()
