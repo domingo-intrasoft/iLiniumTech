@@ -35,7 +35,9 @@ describe('session service', () => {
 
     const { getSessionContext } = await import('./session')
 
-    await expect(getSessionContext()).resolves.toMatchObject({
+    const context = await getSessionContext()
+
+    expect(context).toMatchObject({
       brokerId: 42,
       entityMainId: 42,
       userId: 7,
@@ -45,8 +47,8 @@ describe('session service', () => {
       headerExecutionContextEnabled: true,
       polizasExecutionContextRequired: true,
       allowedBrokerIds: [],
-      permissions: [],
     })
+    expect(context.permissions).toBeUndefined()
     expect(apiClient.get).toHaveBeenCalledWith('/api/me')
   })
 

@@ -1,12 +1,24 @@
 import { onMounted, reactive, ref } from 'vue'
 
-import { toPolizasUserMessage } from '@/services/apiErrors'
+import { isPolizasAccessError, toPolizasUserError } from '@/services/apiErrors'
 import { getBlockingRuntimeConfigMessage } from '@/services/runtimeConfig'
-import { useSession } from '@/services/session'
+import { type SessionContext, useSession } from '@/services/session'
 
 import { getPolizasCatalogs, searchPolizas } from './polizasApi'
 import { polizasCatalogsFixture } from './polizasFixture'
 import type { PolizaListItem, PolizasCatalogs, PolizasQueryFilters } from './polizasTypes'
+
+const POLIZAS_READ_PERMISSION = 'polizas.read'
+const POLIZAS_CATALOGS_PERMISSION = 'polizas.catalogs'
+const POLIZAS_ACCESS_DENIED_MESSAGE = 'La sesion actual no tiene permiso para consultar polizas.'
+
+function permissionIsAllowed(context: SessionContext, permission: string) {
+  return (
+    context.authMode === 'ApiKey' ||
+    !Array.isArray(context.permissions) ||
+    context.permissions.includes(permission)
+  )
+}
 
 export function usePolizas() {
   const { session, loading: sessionLoading, error: sessionError, loadSession } = useSession()
@@ -34,6 +46,7 @@ export function usePolizas() {
   })
 
   async function ensureBackendContext() {
+    const backendEnabled = import.meta.env.VITE_USE_BACKEND === 'true'
     runtimeError.value = getBlockingRuntimeConfigMessage()
 
     if (runtimeError.value) {
@@ -45,7 +58,13 @@ export function usePolizas() {
     }
 
     const currentSession = await loadSession()
-    if (import.meta.env.VITE_USE_BACKEND === 'true' && !currentSession) {
+    if (!backendEnabled) {
+      contextBlocked.value = false
+      runtimeError.value = null
+      return true
+    }
+
+    if (!currentSession) {
       error.value = sessionError.value ?? 'No se pudo validar la sesion antes de consultar polizas.'
       runtimeError.value = error.value
       contextBlocked.value = true
@@ -54,12 +73,17 @@ export function usePolizas() {
       return false
     }
 
-    if (
-      import.meta.env.VITE_USE_BACKEND === 'true' &&
-      currentSession?.polizasExecutionContextRequired &&
-      currentSession.brokerId === null
-    ) {
+    if (currentSession.polizasExecutionContextRequired && currentSession.brokerId === null) {
       error.value = 'Configura un broker para consultar polizas.'
+      runtimeError.value = error.value
+      contextBlocked.value = true
+      items.value = []
+      total.value = 0
+      return false
+    }
+
+    if (!permissionIsAllowed(currentSession, POLIZAS_READ_PERMISSION)) {
+      error.value = POLIZAS_ACCESS_DENIED_MESSAGE
       runtimeError.value = error.value
       contextBlocked.value = true
       items.value = []
@@ -98,7 +122,12 @@ export function usePolizas() {
       pagination.page = result.page
       pagination.pageSize = result.pageSize
     } catch (exception) {
-      error.value = toPolizasUserMessage(exception, 'No se pudieron cargar las polizas.')
+      const userError = toPolizasUserError(exception, 'No se pudieron cargar las polizas.')
+      error.value = userError.message
+      if (isPolizasAccessError(userError)) {
+        runtimeError.value = userError.message
+        contextBlocked.value = true
+      }
       items.value = []
       total.value = 0
     } finally {
@@ -136,12 +165,31 @@ export function usePolizas() {
         return
       }
 
+      if (import.meta.env.VITE_USE_BACKEND === 'true') {
+        const currentSession = await loadSession()
+        if (!currentSession) {
+          catalogsError.value =
+            sessionError.value ?? 'No se pudo validar la sesion antes de cargar catalogos.'
+          return
+        }
+
+        if (!permissionIsAllowed(currentSession, POLIZAS_CATALOGS_PERMISSION)) {
+          catalogsError.value = POLIZAS_ACCESS_DENIED_MESSAGE
+          return
+        }
+      }
+
       catalogs.value = await getPolizasCatalogs()
     } catch (exception) {
-      catalogsError.value = toPolizasUserMessage(
+      const userError = toPolizasUserError(
         exception,
         'No se pudieron cargar los catalogos de polizas.',
       )
+      catalogsError.value = userError.message
+      if (userError.kind === 'unauthenticated') {
+        runtimeError.value = userError.message
+        contextBlocked.value = true
+      }
     } finally {
       catalogsLoading.value = false
     }

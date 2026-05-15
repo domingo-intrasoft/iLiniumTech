@@ -45,6 +45,40 @@ describe('api error presenter', () => {
     expect(message).not.toContain('SELECT')
   })
 
+  it('maps 401 responses to session copy without exposing backend detail', () => {
+    const message = toPolizasUserMessage(
+      axiosError(401, {
+        error: {
+          message: 'Missing or invalid API key',
+          correlationId: 'auth-401',
+        },
+      }),
+      'fallback',
+    )
+
+    expect(message).toBe(
+      'La sesion no esta autorizada para consultar polizas. Inicia sesion de nuevo si el problema continua. Ref: auth-401.',
+    )
+    expect(message).not.toContain('API key')
+  })
+
+  it('maps 403 responses to access denied copy with safe correlation id', () => {
+    const message = toPolizasUserMessage(
+      axiosError(403, {
+        error: {
+          message: 'User lacks polizas.read',
+          correlationId: 'forbidden-1',
+        },
+      }),
+      'fallback',
+    )
+
+    expect(message).toBe(
+      'La sesion actual no tiene permiso para consultar polizas. Ref: forbidden-1.',
+    )
+    expect(message).not.toContain('polizas.read')
+  })
+
   it('surfaces frontend runtime contract errors directly', () => {
     const message = toPolizasUserMessage(
       new RuntimeConfigError('VITE_ILINIUMTECH_API_KEY debe configurarse.'),

@@ -152,18 +152,20 @@ iLiniumTech necesita un contrato mucho menor y mas estable:
 Backend:
 
 - Usa `ApiKeyAuthenticationHandler` con `X-ILiniumTech-Api-Key`.
-- `/api/me` esta protegido por API key y devuelve contexto de polizas desde `IPolizasExecutionContextAccessor`.
+- `/api/me` puede responder desde API key MVP o desde `demo-session` backend segun configuracion de entorno.
 - El contexto de polizas puede venir de configuracion o de cabeceras MVP si esta permitido.
 - Las cabeceras MVP (`X-Broker-Id`, `X-User-Id`, `X-Profile-Id`, `X-Profile-Type-Id`, `X-Is-Admin`) no prueban identidad ni permisos.
-- Los endpoints `/api/polizas/*` requieren autorizacion por API key y contexto de broker cuando aplica.
+- Los endpoints `/api/polizas/*` requieren proteccion temporal por API key o sesion demo y contexto de broker cuando aplica.
+- El siguiente incremento debe mover la decision funcional a politicas backend `polizas.catalogs`, `polizas.read` y `polizas.detail`, con broker autorizado validado contra `allowedBrokerIds`.
 
 Frontend:
 
-- No hay pantalla de login.
-- La raiz redirige a `/polizas`.
+- Hay pantalla `/login`, guard de rutas y logout MVP.
+- La raiz entra en el flujo autenticado y termina en `/polizas` cuando hay sesion.
 - `/polizas` y detalle viven dentro de `AppShell` con menu lateral estatico.
-- `useSession()` consume `/api/me` solo si `VITE_USE_BACKEND=true`; en modo local crea una sesion fixture desde `VITE_BROKER_ID`.
-- El cliente aun depende de API key de entorno en modo backend.
+- `useSession()` consume `/api/me` cuando corresponde; en modo local/demo crea o valida una sesion MVP controlada.
+- El modo `VITE_AUTH_MODE=demo-session` usa cookie `HttpOnly` y evita exponer API key en el frontend.
+- Si se usa API key en modo backend, sigue siendo compatibilidad MVP temporal, no autenticacion productiva.
 
 ## Decision de diseno para el MVP de login
 
@@ -290,6 +292,8 @@ Alcance:
 - permisos `polizas.catalogs`, `polizas.read`, `polizas.detail`;
 - headers MVP solo fallback local/demo.
 
+Estado para el proximo incremento: aplicar estas politicas en backend y validar broker autorizado antes de resolver conexion o leer datos. La API key MVP y `demo-session` pueden convivir durante la transicion, pero no deben documentarse ni probarse como auth productiva real.
+
 ### Paso 4: seleccion de broker si hay multiples
 
 Objetivo: permitir que un usuario con varios brokers elija uno antes de entrar a polizas.
@@ -338,3 +342,5 @@ Avanzar en permisos efectivos sobre la base demo-session:
 - definir politicas `polizas.catalogs`, `polizas.read` y `polizas.detail`;
 - validar broker activo contra brokers permitidos de la sesion;
 - mantener headers MVP solo como fallback local/demo hasta retirada controlada.
+- mantener API key MVP solo como compatibilidad tecnica temporal;
+- completar evidencia QA con resultados reales de gates y pruebas de permisos cuando se implementen.

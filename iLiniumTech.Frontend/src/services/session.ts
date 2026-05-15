@@ -53,7 +53,7 @@ function normalizeSessionContext(data: SessionContext): SessionContext {
     user: data.user ?? null,
     application: data.application ?? null,
     allowedBrokerIds: data.allowedBrokerIds ?? [],
-    permissions: data.permissions ?? [],
+    permissions: Array.isArray(data.permissions) ? data.permissions : undefined,
     authMode: data.authMode,
   }
 }

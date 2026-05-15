@@ -106,6 +106,7 @@ npm run format
 npm run lint
 npm run test:unit
 npm run build
+npm run test:e2e
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-CorsAudit.ps1 -FailOnFindings
@@ -140,3 +141,75 @@ Riesgos residuales:
 
 - El modo backend demo no es autenticacion productiva.
 - Falta decision de proveedor auth real y reglas finales de permisos/brokers.
+
+## Incremento permisos y broker autorizado
+
+Fecha: 2026-05-15
+
+Alcance implementado:
+
+- Politicas objetivo: `polizas.catalogs`, `polizas.read` y `polizas.detail`.
+- Endpoints protegidos por politica: catalogos, listado y detalle de polizas.
+- Validacion: `currentBrokerId` debe pertenecer a `allowedBrokerIds` para sesiones con claims antes de consultar catalogos, listado o detalle.
+- Compatibilidad temporal: API key MVP y `demo-session` pueden seguir usandose para desarrollo/demo mientras se implementa auth real.
+- Limite explicito: no hay autenticacion productiva real, proveedor de identidad aprobado ni matriz funcional definitiva de permisos.
+- La metadata AppBuilder se mantiene como evidencia de migracion y no como contrato runtime de permisos, pantallas o queries.
+- Frontend clasifica 401/403 como acceso denegado o sesion no autorizada sin exponer mensajes internos.
+
+Pruebas cubiertas:
+
+- `GET /api/polizas/catalogs` sin `polizas.catalogs` devuelve 403 sanitizado.
+- `GET /api/polizas` sin `polizas.read` devuelve 403 sanitizado.
+- `GET /api/polizas/{id}` sin `polizas.detail` devuelve 403 sanitizado.
+- Broker solicitado fuera de `allowedBrokerIds` devuelve 403 antes de crear sesion.
+- API key MVP queda como compatibilidad legacy explicita para no romper el MVP actual.
+- `demo-session` solo concede permisos demo configurados para entorno controlado.
+- 401/403 incluyen `correlationId` cuando aplique y no exponen trazas, SQL, broker ajeno ni existencia de poliza.
+- Frontend muestra acceso denegado o estado de configuracion sin recurrir a fixtures silenciosos.
+
+Evidencia ejecutada:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release
+npm run format
+npm run lint
+npm run test:unit
+npm run build
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
+```
+
+Resultado:
+
+- Tests backend: 79 correctos.
+- Formato frontend correcto.
+- Lint frontend correcto.
+- Unit tests frontend: 79 correctos.
+- Build frontend correcto.
+- E2E frontend: 2 correctos.
+- Documentation baseline correcto.
+
+Gate final integrado:
+
+```powershell
+.\tools\quality\Invoke-MvpQualityGate.ps1 -NodeExe "C:\Users\DomingoCabezaGuerra\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" -SkipSmoke
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-CorsAudit.ps1 -FailOnFindings
+```
+
+Resultado:
+
+- Gate local con `-SkipSmoke`: correcto.
+- Backend restore/build/tests dentro del gate: 79 tests correctos.
+- Frontend install, formato, lint, unit tests y build dentro del gate: correctos.
+- Secret scan: sin leaks.
+- Dependency audit: 0 findings.
+- CORS audit: sin findings.
+- Extractor tests: correctos.
+- Documentation baseline: correcto.
+
+Riesgos residuales del siguiente incremento:
+
+- API key MVP y `demo-session` pueden confundirse con seguridad productiva si no se etiquetan en UI, PR y evidencia.
+- Falta proveedor auth real y matriz validada de permisos por broker, perfil, oficina, gestor y usuario.
+- Falta confirmar con DBA las claves finales de `SESSION_CONTEXT` y restricciones reales por broker.
+- Falta UAT contra entorno autorizado para demostrar que broker cruzado no filtra datos.

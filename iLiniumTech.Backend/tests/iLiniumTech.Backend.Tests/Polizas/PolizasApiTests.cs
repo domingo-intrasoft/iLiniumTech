@@ -276,6 +276,30 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Demo_login_rejects_requested_broker_outside_allowed_brokers()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:AllowedBrokerIds:0"] = "84"
+        });
+        using var client = factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            username = "demo",
+            password = "demo",
+            brokerId = 42
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.Headers.TryGetValues("Set-Cookie", out _).Should().BeFalse();
+        body.Should().Contain("AUTH_BROKER_FORBIDDEN");
+        body.Should().NotContain("84");
+        body.Should().NotContain("42");
+    }
+
+    [Fact]
     public async Task Demo_login_is_disabled_outside_development_without_explicit_opt_in()
     {
         await using var factory = new TestApiFactory(
@@ -318,6 +342,89 @@ public sealed class PolizasApiTests
             .Should().Contain(cookie =>
                 cookie.Contains(ApiAuthenticationSchemes.DemoSessionCookieName) &&
                 cookie.Contains("expires=", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task Demo_session_without_required_permission_returns_forbidden()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Catalogs
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "permission-denied");
+
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        body.Should().Contain("POLIZAS_ACCESS_DENIED");
+        body.Should().Contain("\"correlationId\":\"permission-denied\"");
+        body.Should().NotContain(PolizasPermissions.Read);
+    }
+
+    [Fact]
+    public async Task Demo_session_with_catalogs_permission_can_read_catalogs()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Catalogs
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var response = await client.GetAsync("/api/polizas/catalogs");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"tipoPoliza\"");
+    }
+
+    [Fact]
+    public async Task Demo_session_without_catalogs_permission_cannot_read_catalogs()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Read
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var response = await client.GetAsync("/api/polizas/catalogs");
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task Demo_session_read_permission_does_not_allow_detail()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Read
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var search = await client.GetAsync("/api/polizas");
+        var detail = await client.GetAsync("/api/polizas/POL-1001");
+
+        search.StatusCode.Should().Be(HttpStatusCode.OK);
+        detail.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task Api_key_mvp_remains_legacy_compatibility_for_policy_protected_polizas()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+
+        var response = await client.GetAsync("/api/polizas/POL-1001");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("POL-2026-0001");
     }
 
     [Fact]
@@ -776,6 +883,17 @@ public sealed class PolizasApiTests
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         body.Should().Contain("POLIZAS_CONTEXT_INVALID");
+    }
+
+    private static async Task LoginDemoAsync(HttpClient client)
+    {
+        var login = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            username = "demo",
+            password = "demo"
+        });
+
+        login.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     private sealed class TestApiFactory(

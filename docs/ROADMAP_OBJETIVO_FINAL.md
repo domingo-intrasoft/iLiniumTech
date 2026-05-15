@@ -18,11 +18,11 @@ Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. L
 ## Estado de partida
 
 - Fase documental y decision de arquitectura: completada.
-- MVP read-only de polizas: implementado con frontend Vue, backend API, fixtures anonimizados, API key y pruebas base.
+- MVP read-only de polizas: implementado con frontend Vue, backend API, fixtures anonimizados, API key temporal y pruebas base.
 - Autos Particulares queda definido como siguiente vertical explicito del MVP en `SDD-2026-006`: ruta `/autos-particulares`, API propia bajo `/api/autos-particulares`, read-only, ramo Autos y division Particulares cuando el dato exista; si la BBDD real no confirma division en listado, se permite fallback controlado con UAT pendiente.
 - Repositorio SQL read-only: implementado como backend configurable, parametrizado y con whitelist; pendiente de validar contra entorno real autorizado y auth real.
 - Extractor offline de metadata: implementado en `tools/extractor/polizas-metadata` con modos `Fixture`, `DryRun` y `Live`; pendiente de validar modo `Live` contra entorno autorizado y politica final de artefactos.
-- Frontend polizas: protegido por configuracion runtime y contexto `/api/me`; no consulta backend si falta API key/contexto de broker requerido.
+- Frontend polizas: protegido por configuracion runtime y contexto `/api/me`; no consulta backend si falta API key temporal, sesion demo o contexto de broker requerido.
 - CI GitHub: baseline disponible con `ci.yml`, `security.yml`, PR template e issue form SDD.
 - Gate local fase 7: disponible y actualizado en `tools/quality/Invoke-MvpQualityGate.ps1` con backend, frontend, smoke, auditorias, validacion documental y `git diff --check`.
 - Fase 7 plataforma: CI publica artefacto de calidad documental, seguridad tiene schedule, CodeQL esta definido y preview queda como dry-run manual sin secrets ni deploy real.
@@ -124,7 +124,7 @@ Objetivo: primer corte vertical de polizas con UI estatica, API backend, fixture
 DoD:
 
 - `GET /health`, `GET /api/polizas/catalogs`, `GET /api/polizas`, `GET /api/polizas/{id}` disponibles.
-- `/api/polizas/*` protegido por API key de entorno.
+- `/api/polizas/*` protegido por API key de entorno como compatibilidad MVP temporal hasta aplicar politicas de permisos.
 - Frontend `/polizas` y detalle read-only implementados como Vue/TypeScript propio.
 - Sort y filtros limitados por contrato/whitelist.
 - Fixtures sin datos personales reales.
@@ -285,10 +285,19 @@ Entregado:
 - El contexto de polizas ya prioriza claims/sesion cuando existe autenticacion demo backend.
 - Evidencia QA documentada en [login-mvp-evidence.md](qa/login-mvp-evidence.md).
 
+Proximo incremento preparado:
+
+- Politicas backend explicitas para `polizas.catalogs`, `polizas.read` y `polizas.detail`.
+- Validacion de broker autorizado antes de resolver conexion o leer polizas.
+- Compatibilidad temporal: API key MVP y `demo-session` pueden seguir existiendo solo para desarrollo/demo y no equivalen a auth productiva real.
+- `/api/me` debe seguir siendo el contrato del frontend para permisos efectivos, broker activo, brokers permitidos y modo de autenticacion.
+- La metadata AppBuilder sigue siendo evidencia de migracion, nunca contrato runtime para permisos, pantallas o queries.
+
 Pendiente de implementacion:
 
 - Elegir e integrar mecanismo auth aprobado.
-- Crear politicas backend por permisos efectivos como `polizas.read`, `polizas.detail` y `polizas.catalogs`.
+- Crear politicas backend por permisos efectivos `polizas.catalogs`, `polizas.read` y `polizas.detail`.
+- Validar `currentBrokerId` contra `allowedBrokerIds` antes de consultar catalogos, listado o detalle.
 - Aplicar 401/403 sanitizados con `correlationId` y logs seguros.
 - Conectar `SESSION_CONTEXT` a valores autenticados, no a headers manipulables.
 - Cubrir pruebas de acceso anonimo, token invalido, broker cruzado y falta de permiso.
@@ -306,6 +315,7 @@ Siguientes pasos recomendados:
 - Resolver decision humana de proveedor auth antes de programar runtime.
 - Levantar matriz funcional de permisos por broker, perfil, oficina, gestor y usuario.
 - Implementar primero contrato de contexto y pruebas 401/403; despues retirar headers MVP de preview/produccion.
+- En el siguiente PR tecnico, documentar en evidencia QA que la API key y `demo-session` son compatibilidad temporal y completar los resultados reales de gates antes de marcar Done.
 
 ### Fase 6 - Funcionalidad explicita posterior al MVP
 

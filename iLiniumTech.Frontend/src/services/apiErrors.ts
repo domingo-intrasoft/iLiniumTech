@@ -10,6 +10,23 @@ interface BackendErrorResponse {
   }
 }
 
+export type PolizasUserErrorKind =
+  | 'runtime'
+  | 'unauthenticated'
+  | 'forbidden'
+  | 'notFound'
+  | 'validation'
+  | 'configuration'
+  | 'server'
+  | 'timeout'
+  | 'unknown'
+
+export interface PolizasUserError {
+  kind: PolizasUserErrorKind
+  message: string
+  status?: number
+}
+
 const SAFE_BACKEND_MESSAGES = new Map<string, string>([
   ['POLIZAS_CONTEXT_REQUIRED', 'Configura un broker antes de consultar polizas.'],
   ['POLIZAS_CONTEXT_INVALID', 'El contexto de broker no es valido.'],
@@ -31,13 +48,17 @@ function withCorrelationId(message: string, correlationId: string | null | undef
   return safeId ? `${message} Ref: ${safeId}.` : message
 }
 
-export function toPolizasUserMessage(error: unknown, fallback: string) {
+export function isPolizasAccessError(error: PolizasUserError) {
+  return error.kind === 'unauthenticated' || error.kind === 'forbidden'
+}
+
+export function toPolizasUserError(error: unknown, fallback: string): PolizasUserError {
   if (error instanceof RuntimeConfigError) {
-    return error.message
+    return { kind: 'runtime', message: error.message }
   }
 
   if (!axios.isAxiosError<BackendErrorResponse>(error)) {
-    return fallback
+    return { kind: 'unknown', message: fallback }
   }
 
   const status = error.response?.status
@@ -45,35 +66,78 @@ export function toPolizasUserMessage(error: unknown, fallback: string) {
   const backendCode = backendError?.code
 
   if (backendCode && SAFE_BACKEND_MESSAGES.has(backendCode)) {
-    return withCorrelationId(SAFE_BACKEND_MESSAGES.get(backendCode)!, backendError?.correlationId)
+    const kind: PolizasUserErrorKind =
+      backendCode === 'POLIZAS_VALIDATION_ERROR'
+        ? 'validation'
+        : backendCode === 'POLIZAS_CONFIGURATION_ERROR'
+          ? 'configuration'
+          : 'unknown'
+
+    return {
+      kind,
+      status,
+      message: withCorrelationId(
+        SAFE_BACKEND_MESSAGES.get(backendCode)!,
+        backendError?.correlationId,
+      ),
+    }
   }
 
   if (status === 401) {
-    return 'No se pudo autenticar con la API de polizas. Revisa la API key del entorno.'
+    return {
+      kind: 'unauthenticated',
+      status,
+      message: withCorrelationId(
+        'La sesion no esta autorizada para consultar polizas. Inicia sesion de nuevo si el problema continua.',
+        backendError?.correlationId,
+      ),
+    }
   }
 
   if (status === 403) {
-    return 'La sesion actual no tiene permiso para consultar polizas.'
+    return {
+      kind: 'forbidden',
+      status,
+      message: withCorrelationId(
+        'La sesion actual no tiene permiso para consultar polizas.',
+        backendError?.correlationId,
+      ),
+    }
   }
 
   if (status === 404) {
-    return 'No se encontro la poliza solicitada.'
+    return { kind: 'notFound', status, message: 'No se encontro la poliza solicitada.' }
   }
 
   if (status === 400) {
-    return withCorrelationId('La API rechazo la consulta de polizas.', backendError?.correlationId)
+    return {
+      kind: 'validation',
+      status,
+      message: withCorrelationId(
+        'La API rechazo la consulta de polizas.',
+        backendError?.correlationId,
+      ),
+    }
   }
 
   if (status && status >= 500) {
-    return withCorrelationId(
-      'La API de polizas no esta disponible temporalmente.',
-      backendError?.correlationId,
-    )
+    return {
+      kind: 'server',
+      status,
+      message: withCorrelationId(
+        'La API de polizas no esta disponible temporalmente.',
+        backendError?.correlationId,
+      ),
+    }
   }
 
   if (error.code === 'ECONNABORTED') {
-    return 'La API de polizas tardo demasiado en responder.'
+    return { kind: 'timeout', message: 'La API de polizas tardo demasiado en responder.' }
   }
 
-  return fallback
+  return { kind: 'unknown', status, message: fallback }
+}
+
+export function toPolizasUserMessage(error: unknown, fallback: string) {
+  return toPolizasUserError(error, fallback).message
 }

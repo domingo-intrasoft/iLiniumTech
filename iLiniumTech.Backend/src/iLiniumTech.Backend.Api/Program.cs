@@ -6,6 +6,8 @@ using iLiniumTech.Backend.Infrastructure;
 using iLiniumTech.Backend.Infrastructure.Polizas.Connections;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Policy;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -59,7 +61,17 @@ builder.Services.AddAuthentication(options =>
         };
     })
     .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.SchemeName, _ => { });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(PolizasAuthorizationPolicies.Catalogs, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(PolizasPermissions.Catalogs)));
+    options.AddPolicy(PolizasAuthorizationPolicies.Read, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(PolizasPermissions.Read)));
+    options.AddPolicy(PolizasAuthorizationPolicies.Detail, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(PolizasPermissions.Detail)));
+});
+builder.Services.AddSingleton<IAuthorizationHandler, PolizasPermissionAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, SanitizedAuthorizationMiddlewareResultHandler>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IPolizasExecutionContextAccessor, HeaderPolizasExecutionContextAccessor>();
 builder.Services.AddCors(options =>
@@ -183,6 +195,17 @@ app.MapPost("/api/auth/login", async (
     }
 
     var session = CreateDemoSession(username, request.BrokerId, configuration);
+    if (session.CurrentBrokerId is not null &&
+        session.AllowedBrokerIds.Count > 0 &&
+        !session.AllowedBrokerIds.Contains(session.CurrentBrokerId.Value))
+    {
+        return ErrorResult(
+            httpContext,
+            StatusCodes.Status403Forbidden,
+            "AUTH_BROKER_FORBIDDEN",
+            "The selected broker is not available for this session.");
+    }
+
     await httpContext.SignInAsync(
         AuthenticationSchemes.DemoSession,
         CreateDemoPrincipal(session),
@@ -258,6 +281,7 @@ polizas.MapGet("/metadata", (HttpContext httpContext) => Results.Json(
 polizas.MapGet("/catalogs", async ([FromServices] IPolizasService service, CancellationToken cancellationToken) =>
         Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
     .WithName("GetPolizasCatalogs")
+    .RequireAuthorization(PolizasAuthorizationPolicies.Catalogs)
     .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
 polizas.MapGet("/", async (
@@ -300,6 +324,7 @@ polizas.MapGet("/", async (
     }
 })
 .WithName("SearchPolizas")
+.RequireAuthorization(PolizasAuthorizationPolicies.Read)
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
 polizas.MapGet("/{id}", async (HttpContext httpContext, [FromServices] IPolizasService service, string id, CancellationToken cancellationToken) =>
@@ -320,6 +345,7 @@ polizas.MapGet("/{id}", async (HttpContext httpContext, [FromServices] IPolizasS
     }
 })
 .WithName("GetPolizaById")
+.RequireAuthorization(PolizasAuthorizationPolicies.Detail)
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
 autosParticulares.MapGet("/catalogs", async (
@@ -333,6 +359,7 @@ autosParticulares.MapGet("/catalogs", async (
         Scope: autosParticularesScope));
 })
 .WithName("GetAutosParticularesCatalogs")
+.RequireAuthorization(PolizasAuthorizationPolicies.Catalogs)
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
 autosParticulares.MapGet("/polizas", async (
@@ -380,6 +407,7 @@ autosParticulares.MapGet("/polizas", async (
     }
 })
 .WithName("SearchAutosParticularesPolizas")
+.RequireAuthorization(PolizasAuthorizationPolicies.Read)
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
 autosParticulares.MapGet("/polizas/{id}", async (
@@ -406,6 +434,7 @@ autosParticulares.MapGet("/polizas/{id}", async (
     }
 })
 .WithName("GetAutosParticularesPolizaById")
+.RequireAuthorization(PolizasAuthorizationPolicies.Detail)
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
 app.Run();
@@ -415,19 +444,13 @@ static async ValueTask<object?> RequirePolizasExecutionContextAsync(
     EndpointFilterDelegate next)
 {
     var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-    if (!RequiresPolizasExecutionContext(configuration))
-    {
-        return await next(context);
-    }
-
+    var requiresExecutionContext = RequiresPolizasExecutionContext(configuration);
     var executionContextAccessor = context.HttpContext.RequestServices
         .GetRequiredService<IPolizasExecutionContextAccessor>();
+    PolizasExecutionContext? executionContext;
     try
     {
-        if (executionContextAccessor.Current is not null)
-        {
-            return await next(context);
-        }
+        executionContext = executionContextAccessor.Current;
     }
     catch (PolizasExecutionContextException exception)
     {
@@ -437,10 +460,40 @@ static async ValueTask<object?> RequirePolizasExecutionContextAsync(
             CorrelationId: EnsureCorrelationId(context.HttpContext))));
     }
 
-    return Results.BadRequest(new ErrorResponse(new ErrorBody(
-        Code: "POLIZAS_CONTEXT_REQUIRED",
-        Message: "Broker context is required for SQL polizas requests.",
-        CorrelationId: EnsureCorrelationId(context.HttpContext))));
+    if (executionContext is null)
+    {
+        return requiresExecutionContext
+            ? Results.BadRequest(new ErrorResponse(new ErrorBody(
+                Code: "POLIZAS_CONTEXT_REQUIRED",
+                Message: "Broker context is required for SQL polizas requests.",
+                CorrelationId: EnsureCorrelationId(context.HttpContext))))
+            : await next(context);
+    }
+
+    if (!IsBrokerAllowedForAuthenticatedContext(context.HttpContext.User, executionContext.BrokerId))
+    {
+        return ErrorResult(
+            context.HttpContext,
+            StatusCodes.Status403Forbidden,
+            "POLIZAS_BROKER_FORBIDDEN",
+            "The active broker is not available for this session.");
+    }
+
+    return await next(context);
+}
+
+static bool IsBrokerAllowedForAuthenticatedContext(ClaimsPrincipal user, int brokerId)
+{
+    if (string.Equals(
+            user.Identity?.AuthenticationType,
+            ApiKeyAuthenticationHandler.SchemeName,
+            StringComparison.Ordinal))
+    {
+        return true;
+    }
+
+    var allowedBrokerIds = ReadIntClaims(user, PolizasContextClaimTypes.AllowedBrokerId);
+    return allowedBrokerIds.Contains(brokerId);
 }
 
 static string EnsureCorrelationId(HttpContext context)
@@ -563,13 +616,8 @@ static LoginResponse CreateDemoSession(string username, int? requestedBrokerId, 
         ProfileId: profileId,
         ProfileTypeId: string.IsNullOrWhiteSpace(profileTypeId) ? null : profileTypeId,
         IsAdmin: isAdmin,
-        AllowedBrokerIds: brokerId is null ? [] : [brokerId.Value],
-        Permissions:
-        [
-            "polizas.catalogs",
-            "polizas.read",
-            "polizas.detail"
-        ]);
+        AllowedBrokerIds: ReadDemoAllowedBrokerIds(configuration, brokerId),
+        Permissions: ReadDemoPermissions(configuration));
 }
 
 static ClaimsPrincipal CreateDemoPrincipal(LoginResponse session)
@@ -644,6 +692,40 @@ static IReadOnlyList<string> ReadStringClaims(ClaimsPrincipal user, string claim
         .Where(value => !string.IsNullOrWhiteSpace(value))
         .Distinct(StringComparer.Ordinal)
         .ToArray();
+
+static IReadOnlyList<string> ReadDemoPermissions(IConfiguration configuration)
+{
+    var configuredPermissions = configuration.GetSection("Auth:Demo:Permissions");
+    if (configuredPermissions.Exists())
+    {
+        return configuredPermissions.Get<string[]>()?
+            .Where(permission => !string.IsNullOrWhiteSpace(permission))
+            .Select(permission => permission.Trim())
+            .Distinct(StringComparer.Ordinal)
+            .ToArray() ?? [];
+    }
+
+    return
+    [
+        PolizasPermissions.Catalogs,
+        PolizasPermissions.Read,
+        PolizasPermissions.Detail
+    ];
+}
+
+static IReadOnlyList<int> ReadDemoAllowedBrokerIds(IConfiguration configuration, int? brokerId)
+{
+    var configuredBrokerIds = configuration.GetSection("Auth:Demo:AllowedBrokerIds");
+    if (configuredBrokerIds.Exists())
+    {
+        return configuredBrokerIds.Get<int[]>()?
+            .Where(value => value > 0)
+            .Distinct()
+            .ToArray() ?? [];
+    }
+
+    return brokerId is null ? [] : [brokerId.Value];
+}
 
 static int? ReadPositiveIntConfiguration(IConfiguration configuration, string key) =>
     int.TryParse(configuration[key], out var parsed) && parsed > 0 ? parsed : null;

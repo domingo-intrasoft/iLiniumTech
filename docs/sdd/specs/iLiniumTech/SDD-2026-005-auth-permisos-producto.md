@@ -14,7 +14,7 @@
 
 ## Contexto
 
-El MVP de polizas usa una API key y cabeceras temporales para acelerar la demo multi-broker y el `SESSION_CONTEXT`: `X-Broker-Id`, `X-User-Id`, `X-Profile-Id`, `X-Profile-Type-Id` y `X-Is-Admin`. Esas cabeceras no prueban identidad, perfil ni permisos. Solo son bootstrap de desarrollo/demo mientras no exista autenticacion real.
+El MVP de polizas usa una API key, `demo-session` y cabeceras temporales para acelerar la demo multi-broker y el `SESSION_CONTEXT`: `X-Broker-Id`, `X-User-Id`, `X-Profile-Id`, `X-Profile-Type-Id` y `X-Is-Admin`. Esas entradas no prueban identidad productiva, perfil ni permisos reales. Solo son bootstrap de desarrollo/demo mientras no exista autenticacion real.
 
 iLiniumTech debe evolucionar a un modelo profesional donde el backend derive usuario, broker, perfil, roles y permisos desde claims o sesion backend validada. El frontend Vue debe seguir consumiendo una API explicita y estable; no debe conocer ni interpretar metadata AppBuilder para decidir permisos.
 
@@ -67,31 +67,47 @@ El backend debe construir un contexto interno por request con estos campos norma
 - `allowedBrokerIds`: brokers que el usuario puede seleccionar o consultar.
 - `displayName` y `email`: opcionales para UI; tratar como datos personales y no loguear salvo necesidad justificada.
 
-Nombres de permisos iniciales propuestos:
+Nombres de permisos iniciales propuestos para el proximo incremento:
 
+- `polizas.catalogs`: permite consultar catalogos necesarios para filtros.
 - `polizas.read`: permite consultar listado read-only.
 - `polizas.detail`: permite consultar detalle read-only.
-- `polizas.catalogs`: permite consultar catalogos necesarios para filtros.
 - `polizas.export`: reservado para exportacion futura; no concedido por defecto.
 - `admin.security.view`: reservado para diagnostico administrativo futuro; no forma parte del MVP.
 
-Los nombres definitivos deben cerrarse con producto/UAT antes de implementar escrituras o exportaciones.
+Estos tres permisos de polizas son el contrato objetivo del incremento de permisos/broker autorizado. Pueden alimentarse temporalmente desde `demo-session` en entornos controlados, pero deben modelarse como politicas backend explicitas y no como metadata AppBuilder runtime. Los nombres definitivos para escrituras, exportaciones o administracion deben cerrarse con producto/UAT antes de implementarlos.
 
-### Headers MVP
+### Incremento permisos/broker autorizado
 
-Estos headers quedan permitidos solo como bootstrap temporal y no confiable:
+El siguiente incremento tecnico debe aplicar estas reglas minimas:
+
+- `GET /api/polizas/catalogs` requiere `polizas.catalogs`.
+- `GET /api/polizas` requiere `polizas.read`.
+- `GET /api/polizas/{id}` requiere `polizas.detail`.
+- Antes de resolver conexion SQL o ejecutar repositorio real, `currentBrokerId` debe existir y pertenecer a `allowedBrokerIds`.
+- El detalle no debe permitir leer una poliza de otro broker aunque el usuario tenga `polizas.detail`.
+- API key MVP puede seguir protegiendo rutas durante la transicion, pero no concede permisos por si sola.
+- `demo-session` puede emitir permisos demo para desarrollo/UAT controlada, pero no sustituye proveedor auth productivo.
+- Headers MVP solo pueden completar contexto local/demo con opt-in y no pueden elevar permisos, broker, perfil ni `isAdmin`.
+
+### Compatibilidad temporal API key, demo-session y headers MVP
+
+Estos mecanismos quedan permitidos solo como bootstrap temporal y no confiable para produccion:
 
 - `X-ILiniumTech-Api-Key`: proteccion actual de desarrollo/demo. No identifica usuario final ni reemplaza autenticacion real.
+- `demo-session`: sesion backend demo con cookie `HttpOnly` para revisar flujo login, `/api/me`, permisos y broker autorizado sin proveedor productivo.
 - `X-Broker-Id`: seleccion temporal de broker si `Polizas:AllowHeaderExecutionContext=true`.
 - `X-User-Id`, `X-Profile-Id`, `X-Profile-Type-Id`, `X-Is-Admin`: contexto temporal para `SESSION_CONTEXT` en entornos controlados.
 
 Reglas obligatorias:
 
-- fuera de desarrollo/demo no deben habilitarse como fuente de identidad o permisos;
+- fuera de desarrollo/demo no deben habilitarse como fuente de identidad o permisos productivos;
 - si se habilitan fuera de Development mediante override temporal, `/ready` debe quedar `not_ready` salvo opt-in demo exacto y visible: `Polizas:AllowHeaderExecutionContextDemoOptIn=DEMO_ONLY_NOT_FOR_REAL_DATA` o `ILINIUMTECH__ALLOW_HEADER_EXECUTION_CONTEXT_DEMO_OPT_IN=DEMO_ONLY_NOT_FOR_REAL_DATA`;
 - si coexisten con autenticacion real, los claims/sesion tienen prioridad;
 - cualquier valor de header debe validarse contra el contexto autenticado antes de influir en datos;
 - `X-Is-Admin` nunca concede permisos por si solo;
+- API key MVP solo demuestra conocimiento de una clave tecnica de entorno, no usuario final, broker autorizado ni permiso funcional;
+- `demo-session` debe quedar claramente etiquetada como demo y reemplazable por el proveedor auth aprobado;
 - los logs pueden registrar que se uso modo MVP, pero no valores personales o sensibles.
 
 ### Contexto SQL
@@ -130,9 +146,13 @@ Los valores anteriores son ejemplos sanitizados, no datos reales.
 - Autorizacion siempre en backend por endpoint y operacion; la UI solo mejora experiencia, no protege datos.
 - El broker efectivo debe estar dentro de `allowedBrokerIds`.
 - Un usuario autenticado sin broker efectivo valido no puede leer polizas.
+- Un usuario autenticado con broker no incluido en `allowedBrokerIds` no puede consultar catalogos, listado ni detalle.
+- Un usuario con broker valido pero sin permiso `polizas.catalogs` no puede consultar catalogos.
 - Un usuario con broker valido pero sin permiso `polizas.read` no puede listar polizas.
+- Un usuario con broker valido pero sin permiso `polizas.detail` no puede consultar detalle.
 - `currentUserId` y `currentBrokerId` deben existir antes de resolver conexion SQL real.
 - La API key MVP no se considera identidad de usuario.
+- `demo-session` no se considera autenticacion productiva real.
 - Roles agrupan permisos, pero las politicas backend deben comprobar permisos efectivos.
 - Los permisos heredados de AppBuilder pueden usarse como referencia de analisis o migracion, no como motor runtime generico.
 - No se deben loguear tokens, cookies, claims completos, email, nombre, connection strings, SQL ni datos personales de polizas.
@@ -144,10 +164,15 @@ Los valores anteriores son ejemplos sanitizados, no datos reales.
 - [ ] Los headers MVP solo funcionan con opt-in de entorno controlado y no conceden permisos de produccion.
 - [ ] Si coexisten headers y auth real, el backend prioriza claims/sesion y valida cualquier seleccion de broker.
 - [ ] `GET /api/me` o contrato equivalente expone contexto minimo para frontend sin datos sensibles innecesarios.
+- [ ] `GET /api/polizas/catalogs` exige `polizas.catalogs`.
+- [ ] `GET /api/polizas` exige `polizas.read`.
+- [ ] `GET /api/polizas/{id}` exige `polizas.detail`.
+- [ ] Broker activo validado contra `allowedBrokerIds` antes de acceder a datos.
 - [ ] Sin credenciales devuelve 401 sanitizado.
 - [ ] Token o sesion invalida/caducada devuelve 401 sanitizado.
 - [ ] Usuario autenticado sin broker valido devuelve 403 sanitizado.
 - [ ] Usuario autenticado sin permiso requerido devuelve 403 sanitizado.
+- [ ] Usuario autenticado con broker cruzado devuelve 403 sanitizado y no revela existencia de poliza.
 - [ ] Errores publicos incluyen `correlationId` cuando aplique y no incluyen trazas internas.
 - [ ] Logs de auth/autorizacion registran decision, politica, resultado y `correlationId` sin secretos ni datos personales innecesarios.
 - [ ] La UI no consume metadata AppBuilder para permisos runtime.
@@ -208,6 +233,7 @@ Documentacion:
    - `polizas.catalogs`, `polizas.read` y `polizas.detail` se aplican en backend.
    - Broker solicitado o activo se valida contra `allowedBrokerIds`.
    - `SESSION_CONTEXT` se construye desde contexto autenticado.
+   - API key MVP y `demo-session` se mantienen solo como compatibilidad temporal documentada mientras no exista proveedor auth real.
 
 5. Cerrar compatibilidad insegura.
    - Desactivar headers MVP en preview/produccion.
@@ -223,17 +249,23 @@ Esta migracion no debe romper el contrato del frontend de polizas: los endpoints
   - permisos efectivos desde roles y overrides;
   - validacion de `currentBrokerId` contra `allowedBrokerIds`.
 - Integracion:
+  - usuario sin `polizas.catalogs` no puede consultar catalogos;
   - sin credenciales devuelve 401;
   - token invalido o caducado devuelve 401;
   - usuario autenticado sin broker valido devuelve 403;
+  - usuario con broker no incluido en `allowedBrokerIds` devuelve 403 antes de leer datos;
   - usuario sin `polizas.read` devuelve 403;
   - usuario con `polizas.read` y broker valido puede listar;
+  - usuario sin `polizas.detail` devuelve 403 en detalle;
+  - usuario con `polizas.detail` no puede leer detalle de broker cruzado;
   - `SESSION_CONTEXT` usa valores autenticados y no headers manipulados.
 - E2E/smoke:
   - UI muestra estado de acceso denegado sin fixtures silenciosos;
   - cambio de broker autorizado refresca contexto y listado;
   - broker no autorizado no filtra datos.
 - Seguridad:
+  - API key MVP no concede permisos si falta contexto autorizado;
+  - `demo-session` solo emite permisos demo en entornos controlados;
   - no se loguean tokens, cookies, emails, connection strings ni SQL;
   - 401/403 incluyen `correlationId` y mensaje generico;
   - payloads de headers MVP manipulados no elevan permisos.
@@ -246,6 +278,7 @@ Esta migracion no debe romper el contrato del frontend de polizas: los endpoints
 - Mapa funcional de permisos incompleto: puede provocar sobreexposicion o falsos denegados.
 - Permisos AppBuilder no equivalen automaticamente a permisos iLiniumTech: requieren interpretacion funcional.
 - Modo dual puede perpetuar headers MVP si no se fija fecha de retirada.
+- API key MVP y `demo-session` pueden confundirse con seguridad productiva si la evidencia no lo declara en cada corte.
 - `SESSION_CONTEXT` real puede requerir claves adicionales no confirmadas.
 - Diferencias entre brokers pueden requerir permisos por oficina, gestor o cartera ademas de broker.
 

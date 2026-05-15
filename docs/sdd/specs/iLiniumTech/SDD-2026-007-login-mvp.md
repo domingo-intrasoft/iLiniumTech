@@ -20,6 +20,8 @@ AppBuilder mezcla en el login conceptos que iLiniumTech debe separar: usuario, b
 
 Esta SDD complementa `SDD-2026-005 Auth y permisos de producto`. La autenticacion productiva completa sigue pendiente de decision de proveedor, pero se define un primer MVP revisable.
 
+El incremento siguiente de permisos debe apoyarse en este login solo como `demo-session`: una sesion backend de desarrollo/demo que permite probar `/api/me`, broker autorizado y politicas `polizas.catalogs`, `polizas.read` y `polizas.detail`. No es auth productiva real.
+
 ## Objetivo
 
 Crear un MVP de login que permita revisar el flujo:
@@ -92,7 +94,7 @@ El segundo incremento mantiene un contrato propio de iLiniumTech y no reutiliza 
 - permisos efectivos;
 - indicadores de contexto requerido para polizas.
 
-La cookie de sesion demo es `HttpOnly`, no contiene metadata de pantalla y el backend prioriza claims/sesion para construir el contexto de polizas cuando existe autenticacion. El modo frontend `VITE_AUTH_MODE=demo-session` usa cookie y no exige `VITE_ILINIUMTECH_API_KEY`.
+La cookie de sesion demo es `HttpOnly`, no contiene metadata de pantalla y el backend prioriza claims/sesion para construir el contexto de polizas cuando existe autenticacion. El modo frontend `VITE_AUTH_MODE=demo-session` usa cookie y no exige `VITE_ILINIUMTECH_API_KEY`. Si la API key MVP sigue activa durante la transicion, debe tratarse como compatibilidad tecnica y no como identidad ni permiso funcional.
 
 ## Reglas de negocio
 
@@ -105,6 +107,8 @@ La cookie de sesion demo es `HttpOnly`, no contiene metadata de pantalla y el ba
 - Si hay multiples brokers en un futuro, el broker elegido debe validarse en backend antes de consultar datos.
 - La UI no debe enviar permisos, perfil o bandera admin como autoridad.
 - La API sigue autorizando en backend; el guard frontend solo mejora la experiencia.
+- El backend debe ser la autoridad de `allowedBrokerIds` y de las politicas `polizas.catalogs`, `polizas.read` y `polizas.detail`.
+- `demo-session` puede declarar permisos demo para pruebas controladas, pero esos permisos deben reemplazarse por claims/sesion validados cuando exista proveedor auth real.
 
 ## Criterios de aceptacion
 
@@ -135,6 +139,13 @@ Backend segundo incremento:
 - ampliacion de `/api/me` con usuario, aplicacion, brokers permitidos, permisos y modo de auth;
 - contexto autenticado por claims para sustituir headers MVP cuando exista sesion;
 - politicas por permisos de polizas.
+
+Backend siguiente incremento de permisos:
+
+- politicas explicitas `polizas.catalogs`, `polizas.read` y `polizas.detail`;
+- validacion de `currentBrokerId` contra `allowedBrokerIds`;
+- 401/403 sanitizados con `correlationId`;
+- compatibilidad temporal con API key MVP y `demo-session`, sin presentarlas como auth productiva.
 
 Documentacion:
 
@@ -169,6 +180,13 @@ Documentacion:
   - completar login demo;
   - validar que aparece la pantalla de polizas;
   - cerrar sesion y comprobar redireccion.
+- Pruebas esperadas para el incremento de permisos:
+  - sin sesion ni API key valida devuelve 401 o redirige segun capa probada;
+  - sesion demo sin `polizas.catalogs` recibe 403 en catalogos;
+  - sesion demo sin `polizas.read` recibe 403 en listado;
+  - sesion demo sin `polizas.detail` recibe 403 en detalle;
+  - broker no incluido en `allowedBrokerIds` recibe 403 antes de leer datos;
+  - los errores publicos incluyen `correlationId` cuando aplique y no revelan existencia de poliza o broker.
 - Seguridad:
   - secret scan limpio;
   - no aparecen passwords reales ni connection strings;
@@ -182,6 +200,7 @@ Documentacion:
 - Un guard frontend puede confundirse con autorizacion real: se documenta que backend sigue siendo autoridad.
 - Si se mete seleccion de broker demasiado pronto, puede parecer validada aunque no lo este: aplazar hasta backend.
 - Mantener API key y login demo a la vez puede ser confuso: mostrar claramente el modo en UI y documentacion.
+- El proximo incremento puede dejar una falsa sensacion de seguridad si no se separa `demo-session` de auth productiva real.
 - Reintroducir metadata AppBuilder seria una regresion arquitectonica.
 
 ## Work Items
