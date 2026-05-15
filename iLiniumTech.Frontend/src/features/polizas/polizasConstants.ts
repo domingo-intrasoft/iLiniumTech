@@ -27,26 +27,6 @@ export interface PolizaDetailSection {
   fields: PolizaDetailField[]
 }
 
-export const sideItems: ShellAction[] = [
-  { label: 'Agenda', icon: 'pi pi-calendar' },
-  { label: 'Clientes', icon: 'pi pi-user' },
-  { label: 'Propuestas', icon: 'pi pi-folder-open' },
-  { label: 'Polizas', icon: 'pi pi-briefcase', active: true },
-  { label: 'Recibos', icon: 'pi pi-money-bill' },
-  { label: 'Suplementos', icon: 'pi pi-link' },
-  { label: 'Siniestros', icon: 'pi pi-exclamation-triangle' },
-  { label: 'Liq.Cia', icon: 'pi pi-list' },
-  { label: 'Liq.Col', icon: 'pi pi-list-check' },
-  { label: 'Informes', icon: 'pi pi-file' },
-  { label: 'Controles', icon: 'pi pi-home' },
-  { label: 'Estadisticas', icon: 'pi pi-chart-bar' },
-  { label: 'Administracion', icon: 'pi pi-table' },
-  { label: 'Configuracion', icon: 'pi pi-cog' },
-  { label: 'Conectividad', icon: 'pi pi-code' },
-  { label: 'By Aunna', icon: 'pi pi-sitemap' },
-  { label: 'Logs', icon: 'pi pi-database' },
-]
-
 export const moduleActions: ShellAction[] = [
   { label: 'Autos', icon: 'pi pi-car', active: true },
   { label: 'Gestion', icon: 'pi pi-id-card' },

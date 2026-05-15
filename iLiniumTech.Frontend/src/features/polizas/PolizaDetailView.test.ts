@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { polizasDetailFixture } from './polizasFixture'
 
 const mocks = vi.hoisted(() => ({
-  route: { params: { id: 'POL-1001' as string | string[] } },
+  route: { path: '/polizas/POL-1001', params: { id: 'POL-1001' as string | string[] } },
   getPolizaById: vi.fn(),
 }))
 
@@ -24,6 +24,7 @@ import PolizaDetailView from './PolizaDetailView.vue'
 
 describe('PolizaDetailView', () => {
   beforeEach(() => {
+    mocks.route.path = '/polizas/POL-1001'
     mocks.route.params = { id: 'POL-1001' }
     mocks.getPolizaById.mockReset()
   })
@@ -35,6 +36,8 @@ describe('PolizaDetailView', () => {
     await flushPromises()
 
     expect(wrapper.get('h1').text()).toBe('POL-2026-0001')
+    expect(wrapper.text()).toContain('Inicio')
+    expect(wrapper.text()).toContain('Detalle / POL-2026-0001')
     expect(wrapper.text()).toContain('Solo lectura')
     expect(wrapper.text()).toContain('Fixture local')
     expect(wrapper.text()).toContain('Sin workflows heredados')

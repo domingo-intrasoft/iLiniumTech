@@ -41,17 +41,6 @@ export interface AutosSearchSection {
   rows: AutosSearchField[][]
 }
 
-export const autosParticularesSideItems: ShellAction[] = [
-  { label: 'Agenda', icon: 'pi pi-calendar' },
-  { label: 'Clientes', icon: 'pi pi-user' },
-  { label: 'Polizas', icon: 'pi pi-briefcase' },
-  { label: 'Autos Particulares', icon: 'pi pi-car', active: true },
-  { label: 'Recibos', icon: 'pi pi-money-bill' },
-  { label: 'Siniestros', icon: 'pi pi-exclamation-triangle' },
-  { label: 'Informes', icon: 'pi pi-file' },
-  { label: 'Configuracion', icon: 'pi pi-cog' },
-]
-
 export const autosModuleActions: ShellAction[] = [
   { label: 'Autos Particulares', icon: 'pi pi-car', active: true },
   { label: 'Flotas', icon: 'pi pi-truck' },

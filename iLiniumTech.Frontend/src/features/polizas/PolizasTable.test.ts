@@ -40,8 +40,17 @@ describe('PolizasTable', () => {
 
     expect(wrapper.attributes('aria-busy')).toBe('true')
     expect(wrapper.find('[role="status"]').exists()).toBe(true)
-    expect(wrapper.findAll('thead th')).toHaveLength(9)
+    expect(wrapper.findAll('thead th')).toHaveLength(10)
     expect(wrapper.findAll('tbody tr')).toHaveLength(5)
+  })
+
+  it('renders explicit detail actions for each row', () => {
+    const wrapper = mountTable()
+
+    const detailActions = wrapper.findAll('.table-icon-action')
+
+    expect(detailActions).toHaveLength(polizasFixture.items.length)
+    expect(detailActions[0].attributes('aria-label')).toContain('Ver detalle de poliza')
   })
 
   it('renders an error state and emits retry', async () => {

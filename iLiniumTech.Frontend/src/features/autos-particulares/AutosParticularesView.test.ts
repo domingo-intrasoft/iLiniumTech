@@ -1,4 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
+import { createMemoryHistory, createRouter } from 'vue-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useSession } from '@/services/session'
@@ -6,8 +7,22 @@ import { useSession } from '@/services/session'
 import AutosParticularesView from './AutosParticularesView.vue'
 import { autosParticularesFixture } from './autosParticularesFixture'
 
-function mountAutosView() {
-  return mount(AutosParticularesView)
+async function mountAutosView() {
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/polizas', component: { template: '<div />' } },
+      { path: '/autos-particulares', component: AutosParticularesView },
+    ],
+  })
+  await router.push('/autos-particulares')
+  await router.isReady()
+
+  return mount(AutosParticularesView, {
+    global: {
+      plugins: [router],
+    },
+  })
 }
 
 async function settleAutosView() {
@@ -28,7 +43,7 @@ describe('AutosParticularesView smoke', () => {
   })
 
   it('renders the Autos read-only shell, filters fixture rows, and exposes no unsafe runtime details', async () => {
-    const wrapper = mountAutosView()
+    const wrapper = await mountAutosView()
     await settleAutosView()
 
     expect(wrapper.text()).toContain('Autos Particulares')

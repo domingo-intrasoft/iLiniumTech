@@ -71,6 +71,7 @@ function retrySearch() {
       <table>
         <thead>
           <tr>
+            <th scope="col">Acciones</th>
             <th v-for="column in polizasTableColumns" :key="column.key" scope="col">
               {{ column.label }}
             </th>
@@ -78,6 +79,9 @@ function retrySearch() {
         </thead>
         <tbody>
           <tr v-for="row in loadingRows" :key="row" class="skeleton-row">
+            <td>
+              <span class="skeleton-cell compact">{{ POLIZA_EMPTY_VALUE }}</span>
+            </td>
             <td v-for="column in polizasTableColumns" :key="column.key">
               <span class="skeleton-cell">{{ POLIZA_EMPTY_VALUE }}</span>
             </td>
@@ -110,6 +114,7 @@ function retrySearch() {
       <table>
         <thead>
           <tr>
+            <th scope="col">Acciones</th>
             <th v-for="column in polizasTableColumns" :key="column.key" scope="col">
               {{ column.label }}
             </th>
@@ -117,6 +122,16 @@ function retrySearch() {
         </thead>
         <tbody>
           <tr v-for="item in items" :key="item.id">
+            <td>
+              <RouterLink
+                class="table-icon-action"
+                :to="{ name: 'poliza-detail', params: { id: item.id } }"
+                :aria-label="`Ver detalle de poliza ${item.numero}`"
+                title="Ver detalle"
+              >
+                <i class="pi pi-eye" aria-hidden="true"></i>
+              </RouterLink>
+            </td>
             <td v-for="column in polizasTableColumns" :key="column.key">
               <RouterLink
                 v-if="column.key === 'numero'"

@@ -1,4 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
+import { createMemoryHistory, createRouter } from 'vue-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useSession } from '@/services/session'
@@ -6,15 +7,21 @@ import { useSession } from '@/services/session'
 import PolizasView from './PolizasView.vue'
 import { polizasFixture } from './polizasFixture'
 
-function mountPolizasView() {
+async function mountPolizasView() {
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/polizas', component: PolizasView },
+      { path: '/autos-particulares', component: { template: '<div />' } },
+      { path: '/polizas/:id', name: 'poliza-detail', component: { template: '<div />' } },
+    ],
+  })
+  await router.push('/polizas')
+  await router.isReady()
+
   return mount(PolizasView, {
     global: {
-      stubs: {
-        RouterLink: {
-          props: ['to'],
-          template: '<a href="#"><slot /></a>',
-        },
-      },
+      plugins: [router],
     },
   })
 }
@@ -37,7 +44,7 @@ describe('PolizasView smoke', () => {
   })
 
   it('renders the local read-only shell, filters fixture rows, and exposes no runtime metadata', async () => {
-    const wrapper = mountPolizasView()
+    const wrapper = await mountPolizasView()
     await settlePolizasView()
 
     expect(wrapper.text()).toContain('Solo lectura')
