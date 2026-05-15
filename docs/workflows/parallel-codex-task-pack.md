@@ -1,6 +1,8 @@
 # Paquete de tareas para agentes Codex paralelos
 
-Este documento convierte el roadmap actual en tareas pequenas e independientes para agentes Codex. El objetivo grande activo es ampliar el MVP hacia `Autos Particulares` como vertical explicito de producto, respaldado por `SDD-2026-006`, sin convertir iLiniumTech en un runtime dinamico tipo AppBuilder.
+Este documento convierte el objetivo vigente en tareas pequenas e independientes para agentes Codex. El paquete anterior orientado a `Autos Particulares` queda aparcado: no debe ejecutarse como objetivo activo salvo nueva confirmacion funcional, SDD actualizada y UAT.
+
+Objetivo grande activo: consolidar el MVP actual con login, shell/menu lateral y pantalla de Polizas read-only, preparando auth productiva, multi-tenant/broker, datos reales controlados y QA/preview profesional, sin convertir iLiniumTech en un runtime dinamico tipo AppBuilder.
 
 Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea funcional debe estar respaldada por SDD, issue o decision documentada antes de implementarse.
 
@@ -12,6 +14,96 @@ Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea
 - Las ramas de agentes deben usar prefijo `codex/`.
 - Cada agente debe reportar comandos ejecutados, resultado, rutas tocadas, riesgos residuales y bloqueos.
 - El coordinador integra resultados, ejecuta gates y prepara el cierre.
+
+## Paquete vigente - MVP login, menu y Polizas
+
+### Tarea A - Producto, SDD y plan maestro
+
+- **Nombre:** `producto-plan-maestro-mvp-polizas`
+- **Alcance exacto:** mantener alineados `docs/PLAN_MAESTRO_IA.md`, roadmap, SDD y objetivo vigente. Registrar objetivos aparcados y preguntas obligatorias.
+- **Archivos que puede tocar:** `docs/**`, `AGENTS.md`, `PLANS.md`.
+- **Archivos que NO debe tocar:** `iLiniumTech.Backend/**`, `iLiniumTech.Frontend/**`, `.github/**`, `tools/**`.
+- **Dependencias:** decisiones de producto y UAT.
+- **Criterios de aceptacion:** el objetivo vigente queda claro; Autos Particulares no aparece como fase activa; cada pendiente se clasifica como tecnico o bloqueo externo.
+- **Pruebas obligatorias:** validacion documental; `git diff --check`; secret scan si se documentan entornos.
+- **Documentacion a actualizar:** plan maestro, roadmap, SDD afectada.
+- **Riesgo de conflicto:** bajo, salvo edicion concurrente de docs canonicos.
+
+### Tarea B - Login y sesion
+
+- **Nombre:** `frontend-backend-login-session-hardening`
+- **Alcance exacto:** endurecer `/login`, `DemoSession`, `/api/me`, guard de rutas, logout, refresh, 401/403 y estados de sesion.
+- **Archivos que puede tocar:** `iLiniumTech.Frontend/**`, `iLiniumTech.Backend/**` solo en auth/session, `docs/qa/**` si aporta evidencia.
+- **Archivos que NO debe tocar:** extractor, SQL real, `.github/**` salvo coordinacion.
+- **Dependencias:** contrato `/api/me` y decision pendiente de auth productiva.
+- **Criterios de aceptacion:** `/login` queda fuera del shell; rutas protegidas redirigen bien; logout limpia sesion; errores son sanitizados.
+- **Pruebas obligatorias:** tests backend auth; tests frontend auth/guard; smoke login -> polizas -> logout; secret scan si toca configuracion.
+- **Documentacion a actualizar:** evidencia QA y roadmap si cambia estado.
+- **Riesgo de conflicto:** medio con permisos y shell.
+
+### Tarea C - Shell, menu lateral y broker UX
+
+- **Nombre:** `frontend-shell-side-menu-broker`
+- **Alcance exacto:** consolidar shell estatico, menu lateral, visibilidad por permisos iLiniumTech y estados de broker/permisos.
+- **Archivos que puede tocar:** `iLiniumTech.Frontend/**`, `docs/appbuilder/**` si documenta analisis, `docs/qa/**`.
+- **Archivos que NO debe tocar:** backend salvo contrato coordinado; metadata/extractor productivo.
+- **Dependencias:** `/api/me`, permisos efectivos, futuro endpoint de cambio de broker.
+- **Criterios de aceptacion:** menu en codigo fuente; no consume metadata AppBuilder; usuario ve capacidades coherentes con permisos; responsive sin solapes.
+- **Pruebas obligatorias:** format/lint/unit/build frontend; smoke visual desktop/mobile si cambia UI.
+- **Documentacion a actualizar:** analisis de menu y evidencia visual si aplica.
+- **Riesgo de conflicto:** medio con Polizas si se extraen componentes compartidos.
+
+### Tarea D - Polizas listado y detalle profesional
+
+- **Nombre:** `frontend-backend-polizas-readonly-quality`
+- **Alcance exacto:** mejorar listado, filtros, busqueda, paginacion, detalle, errores, empty/loading/no-permission y contrato API read-only.
+- **Archivos que puede tocar:** `iLiniumTech.Frontend/**`, `iLiniumTech.Backend/**` en Polizas, `docs/qa/**`.
+- **Archivos que NO debe tocar:** auth provider real salvo coordinacion; Autos Particulares salvo correccion menor de regresion.
+- **Dependencias:** politicas `polizas.*`, contrato de DTOs, UAT de columnas/filtros.
+- **Criterios de aceptacion:** filtros y detalle funcionan sin metadata runtime; no se revelan datos sensibles; 403/404 no filtran existencia cruzada.
+- **Pruebas obligatorias:** backend build/test; frontend format/lint/unit/build; smoke `/polizas` y detalle.
+- **Documentacion a actualizar:** evidencia QA y SDD si cambia contrato.
+- **Riesgo de conflicto:** medio con login/permisos y componentes compartidos.
+
+### Tarea E - Auth productiva, permisos y broker seguro
+
+- **Nombre:** `backend-auth-permissions-broker-design-implementation`
+- **Alcance exacto:** decidir proveedor auth, modelar contexto interno, retirar headers/API key de entornos reales y validar broker permitido antes de datos.
+- **Archivos que puede tocar:** `iLiniumTech.Backend/**`, `docs/sdd/**`, `docs/engineering/**`.
+- **Archivos que NO debe tocar:** frontend salvo contrato pactado; extractor; workflows de deploy salvo coordinacion.
+- **Dependencias:** decision humana de proveedor auth y matriz de permisos.
+- **Criterios de aceptacion:** identidad viene de claims/sesion validada; API key no concede permisos; broker activo pertenece a `allowedBrokerIds`.
+- **Pruebas obligatorias:** 401/403, token invalido, broker cruzado, permiso ausente, logs sanitizados.
+- **Documentacion a actualizar:** SDD auth, roadmap, README si cambia ejecucion local.
+- **Riesgo de conflicto:** alto; requiere coordinacion con frontend y SQL.
+
+### Tarea F - Datos reales, SQL y DBA
+
+- **Nombre:** `backend-sql-real-readonly-dba`
+- **Alcance exacto:** validar resolver maestro, conexion modelo, whitelists SQL, `SESSION_CONTEXT`, PII y repositorio Polizas con entorno autorizado.
+- **Archivos que puede tocar:** `iLiniumTech.Backend/**`, `docs/sdd/**`, `docs/qa/**`.
+- **Archivos que NO debe tocar:** frontend salvo DTO coordinado; archivos con secretos; artefactos de datos reales.
+- **Dependencias:** DBA, BBDD test/UAT, cuentas read-only, claves de contexto.
+- **Criterios de aceptacion:** no se consulta SQL antes de broker/permisos; no se loguean secretos; datos sensibles minimizados.
+- **Pruebas obligatorias:** backend build/test; tests de payloads maliciosos; integracion SQL si hay entorno; secret scan.
+- **Documentacion a actualizar:** evidencia DBA/UAT, riesgos y bloqueos externos.
+- **Riesgo de conflicto:** alto con auth/broker.
+
+### Tarea G - QA, CI, seguridad y preview
+
+- **Nombre:** `qa-ci-security-preview-readiness`
+- **Alcance exacto:** mantener gates, CI, security, CodeQL, preview dry-run, evidencia de cierre y DoD.
+- **Archivos que puede tocar:** `.github/**`, `tools/**`, `docs/qa/**`, `docs/engineering/**`, `docs/PLAN_CICD_GITHUB_ONLY.md`.
+- **Archivos que NO debe tocar:** runtime backend/frontend salvo correccion pactada de smoke.
+- **Dependencias:** destino preview, environments, secrets y checks verdes.
+- **Criterios de aceptacion:** gates reproducibles; artifacts revisables; no secrets; preview real bloqueado hasta environment protegido.
+- **Pruebas obligatorias:** gate local aplicable; validacion documental; secret/dependency/CORS audit; `git diff --check`.
+- **Documentacion a actualizar:** DoD, roadmap, plan CI/CD, evidencias de cierre.
+- **Riesgo de conflicto:** medio con workflows y seguridad.
+
+## Paquete historico aparcado - Autos Particulares
+
+Las tareas siguientes pertenecen al objetivo anterior `Autos Particulares`. Se conservan por trazabilidad, pero no son el plan activo. Solo deben reactivarse si producto lo confirma explicitamente y se actualiza `SDD-2026-006`.
 
 ## Tarea 0 - Definicion SDD del objetivo grande
 
@@ -145,7 +237,9 @@ Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea
 - **Documentacion a actualizar:** checklist de fase o SDD-2026-006 con evidencia/bloqueos.
 - **Riesgo de conflicto con otras tareas:** bajo; debe ejecutarse despues de cambios tecnicos.
 
-## Orden recomendado
+## Orden historico para Autos si se reactiva
+
+No usar este orden como plan activo. El orden vigente esta en `docs/PLAN_MAESTRO_IA.md` y en el paquete vigente de este documento.
 
 1. Ejecutar Tarea 0 para mantener `SDD-2026-006` y roadmap alineados.
 2. En paralelo para Autos Particulares: Tarea 3B frontend y Tarea 3C backend, manteniendo contrato de SDD.

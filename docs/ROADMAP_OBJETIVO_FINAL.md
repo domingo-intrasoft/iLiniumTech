@@ -1,12 +1,13 @@
 # Roadmap objetivo final iLiniumTech
 
-Fecha: 2026-05-14
+Fecha: 2026-05-15
 
 ## Proposito
 
 Este documento es la guia canonica de calidad para llevar iLiniumTech desde el MVP de polizas hasta una fase final profesional. Consolida los documentos existentes sin sustituirlos:
 
 - [MVP_POLIZAS_PLAN.md](MVP_POLIZAS_PLAN.md)
+- [PLAN_MAESTRO_IA.md](PLAN_MAESTRO_IA.md)
 - [DECISION_PRODUCTO_ARQUITECTURA.md](DECISION_PRODUCTO_ARQUITECTURA.md)
 - [engineering/README.md](engineering/README.md)
 - [PLAN_CICD_GITHUB_ONLY.md](PLAN_CICD_GITHUB_ONLY.md)
@@ -19,7 +20,7 @@ Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. L
 
 - Fase documental y decision de arquitectura: completada.
 - MVP read-only de polizas: implementado con frontend Vue, backend API, fixtures anonimizados, API key temporal y pruebas base.
-- Autos Particulares queda definido como siguiente vertical explicito del MVP en `SDD-2026-006`: ruta `/autos-particulares`, API propia bajo `/api/autos-particulares`, read-only, ramo Autos y division Particulares cuando el dato exista; si la BBDD real no confirma division en listado, se permite fallback controlado con UAT pendiente.
+- Autos Particulares existe como incremento tecnico anterior documentado en `SDD-2026-006`, pero queda aparcado y no es el objetivo MVP vigente. No debe ampliarse ni presentarse como objetivo principal sin nueva confirmacion funcional, SDD actualizada y UAT.
 - Repositorio SQL read-only: implementado como backend configurable, parametrizado y con whitelist; pendiente de validar contra entorno real autorizado y auth real.
 - Extractor offline de metadata: implementado en `tools/extractor/polizas-metadata` con modos `Fixture`, `DryRun` y `Live`; pendiente de validar modo `Live` contra entorno autorizado y politica final de artefactos.
 - Frontend polizas: protegido por configuracion runtime y contexto `/api/me`; no consulta backend si falta API key temporal, sesion demo o contexto de broker requerido.
@@ -132,12 +133,14 @@ DoD:
 
 Estado: implementada; mantener regresion en CI.
 
-### Fase 1B - MVP Autos Particulares read-only
+### Fase 1B - Incremento Autos Particulares aparcado
 
 SDD base: [SDD-2026-006 Autos Particulares MVP read-only](sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md).
 Evidencia QA: [autos-particulares-mvp-evidence.md](qa/autos-particulares-mvp-evidence.md).
 
-Objetivo: abrir `Autos Particulares` como vertical explicito del producto, reutilizando patrones de Polizas cuando aporte velocidad, pero con ruta, API, permisos y criterios de UAT propios.
+Estado de producto actual: este incremento queda aparcado. El MVP vigente se centra en login, shell/menu lateral y Polizas. Si producto decide reactivar `Autos Particulares`, debe confirmarse de nuevo el alcance funcional, la regla de BBDD, los permisos y la UAT antes de programar mas trabajo.
+
+Objetivo si se reactiva: abrir `Autos Particulares` como vertical explicito del producto, reutilizando patrones de Polizas cuando aporte velocidad, pero con ruta, API, permisos y criterios de UAT propios.
 
 DoD:
 
@@ -152,7 +155,7 @@ DoD:
 - Pruebas backend/frontend y smoke visual ejecutados cuando existan cambios de runtime.
 - UAT compara ramo, division y muestras contra entorno autorizado o registra bloqueo externo.
 
-Estado: primer incremento implementado en backend/frontend; pendiente de validacion DBA/UAT para cerrar division `Particulares` como filtro real.
+Estado: primer incremento implementado en backend/frontend; aparcado por decision de producto y pendiente de validacion DBA/UAT para cerrar division `Particulares` como filtro real si se retoma.
 
 Pendiente tecnico:
 
@@ -284,21 +287,25 @@ Entregado:
 - Primer contrato backend demo-session implementado: `POST /api/auth/login`, `POST /api/auth/logout` y `/api/me` ampliado.
 - El contexto de polizas ya prioriza claims/sesion cuando existe autenticacion demo backend.
 - Evidencia QA documentada en [login-mvp-evidence.md](qa/login-mvp-evidence.md).
-
-Proximo incremento preparado:
-
-- Politicas backend explicitas para `polizas.catalogs`, `polizas.read` y `polizas.detail`.
-- Validacion de broker autorizado antes de resolver conexion o leer polizas.
+- Politicas backend explicitas entregadas para `polizas.catalogs`, `polizas.read` y `polizas.detail`.
+- Validacion basica de broker autorizado antes de resolver conexion o leer polizas cuando existe sesion autenticada.
 - Compatibilidad temporal: API key MVP y `demo-session` pueden seguir existiendo solo para desarrollo/demo y no equivalen a auth productiva real.
 - `/api/me` debe seguir siendo el contrato del frontend para permisos efectivos, broker activo, brokers permitidos y modo de autenticacion.
 - La metadata AppBuilder sigue siendo evidencia de migracion, nunca contrato runtime para permisos, pantallas o queries.
 
+Proximo incremento preparado:
+
+- Endurecer login/sesion: expiracion, 401/403, logout, refresh y pruebas.
+- Implementar cambio de broker activo mediante endpoint validado por backend, no header libre.
+- Preparar decision de proveedor auth y matriz real de permisos.
+- Retirar gradualmente API key/headers MVP de entornos preview/produccion.
+
 Pendiente de implementacion:
 
 - Elegir e integrar mecanismo auth aprobado.
-- Crear politicas backend por permisos efectivos `polizas.catalogs`, `polizas.read` y `polizas.detail`.
-- Validar `currentBrokerId` contra `allowedBrokerIds` antes de consultar catalogos, listado o detalle.
-- Aplicar 401/403 sanitizados con `correlationId` y logs seguros.
+- Sustituir API key MVP y headers manipulables por claims/sesion backend en entornos con datos reales.
+- Endurecer `currentBrokerId` contra `allowedBrokerIds` para cambio de broker, catalogos, listado y detalle.
+- Completar cobertura 401/403 sanitizada con `correlationId` y logs seguros para auth real.
 - Conectar `SESSION_CONTEXT` a valores autenticados, no a headers manipulables.
 - Cubrir pruebas de acceso anonimo, token invalido, broker cruzado y falta de permiso.
 

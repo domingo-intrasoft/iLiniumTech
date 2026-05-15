@@ -2,7 +2,7 @@
 
 Plantilla de planificacion para trabajo con IA en iLiniumTech.
 
-Usa esta plantilla antes de iniciar cambios no triviales. El plan debe ser breve cuando la tarea sea pequena y mas detallado cuando toque contratos, seguridad, datos reales, CI o UX visible.
+Usa esta plantilla antes de iniciar cambios no triviales. El plan debe ser breve cuando la tarea sea pequena y mas detallado cuando toque contratos, seguridad, datos reales, CI o UX visible. Para objetivos grandes, alinea el plan con `docs/PLAN_MAESTRO_IA.md`.
 
 ## Plantilla
 
@@ -12,6 +12,7 @@ Usa esta plantilla antes de iniciar cambios no triviales. El plan debe ser breve
 - Rama:
 - SDD / issue / decision relacionada:
 - Documentos leidos:
+- Plan maestro IA consultado:
 - Area afectada:
 
 ### 2. Objetivo

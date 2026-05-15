@@ -16,7 +16,7 @@ iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadata heredada se u
 
 ## Reglas para todos los agentes
 
-- Lee `README.md`, `docs/ROADMAP_OBJETIVO_FINAL.md`, `docs/DECISION_PRODUCTO_ARQUITECTURA.md` y la SDD relacionada antes de cambiar comportamiento.
+- Lee `README.md`, `docs/PLAN_MAESTRO_IA.md`, `docs/ROADMAP_OBJETIVO_FINAL.md`, `docs/DECISION_PRODUCTO_ARQUITECTURA.md` y la SDD relacionada antes de cambiar comportamiento.
 - No guardes secretos, connection strings reales, dumps, capturas sensibles ni datos personales reales.
 - No borres archivos ni reviertas cambios ajenos sin orden explicita.
 - No refactorices fuera del alcance de la tarea.
@@ -50,6 +50,7 @@ Documentacion:
 - Specs SDD en `docs/sdd/specs/iLiniumTech`.
 - Plantillas SDD y security review en `docs/sdd/templates`.
 - Decisiones y reglas de ingenieria en `docs/engineering`.
+- Plan maestro IA en `docs/PLAN_MAESTRO_IA.md`.
 - Roadmap canonico en `docs/ROADMAP_OBJETIVO_FINAL.md`.
 
 ## Comandos base

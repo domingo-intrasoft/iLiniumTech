@@ -1,6 +1,6 @@
 # Flujo de trabajo con IA
 
-Este flujo define como deben trabajar agentes IA y colaboradores humanos en iLiniumTech. Complementa `AGENTS.md`, `PLANS.md`, el roadmap y las plantillas SDD.
+Este flujo define como deben trabajar agentes IA y colaboradores humanos en iLiniumTech. Complementa `AGENTS.md`, `PLANS.md`, `docs/PLAN_MAESTRO_IA.md`, el roadmap y las plantillas SDD.
 
 Para repartir trabajo entre agentes paralelos, usar tambien `docs/workflows/parallel-codex-task-pack.md`.
 
@@ -29,6 +29,7 @@ Si el cambio afecta comportamiento de producto, datos, seguridad, permisos o UX 
    - `README.md`
    - `AGENTS.md`
    - `PLANS.md`
+   - `docs/PLAN_MAESTRO_IA.md`
    - `docs/ROADMAP_OBJETIVO_FINAL.md`
    - `docs/DECISION_PRODUCTO_ARQUITECTURA.md`
    - SDD relacionada
