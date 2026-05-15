@@ -153,6 +153,8 @@ async function clearFilters() {
       :catalogs="catalogs"
       :loading="catalogsLoading"
       :error="catalogsError"
+      :search-disabled="contextBlocked"
+      :blocked-message="runtimeError"
       @search="executeSearch"
       @clear="clearFilters"
     />

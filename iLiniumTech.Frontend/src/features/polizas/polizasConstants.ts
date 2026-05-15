@@ -144,6 +144,18 @@ export const polizasFilterKeys = [
 export type PolizasFilterKey = (typeof polizasFilterKeys)[number]
 export type PolizasFilterForm = Record<PolizasFilterKey, string>
 
+export const polizasSupportedFilterKeys: PolizasFilterKey[] = [
+  'poliza',
+  'tipoPoliza',
+  'cia',
+  'ramo',
+  'efectoInicial',
+  'efectoFinal',
+  'nombreCompleto',
+  'documento',
+  'nombre',
+]
+
 export interface PolizasSearchField {
   key: PolizasFilterKey
   label: string

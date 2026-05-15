@@ -51,8 +51,19 @@ public sealed class PolizasSqlQueryBuilderTests
             new PolizasSearchRequest(Page: 1, PageSize: 25),
             new PolizasSort("primaAnual", Descending: false));
 
-        query.CommandText.Should().Contain("ORDER BY [PAnualCartera] ASC");
+        query.CommandText.Should().Contain("ORDER BY [PAnualCartera] ASC, [Poliza] ASC");
         query.CommandText.Should().NotContain("primaAnual ASC");
+    }
+
+    [Fact]
+    public void BuildSearchQuery_does_not_duplicate_numero_tie_breaker()
+    {
+        var query = _builder.BuildSearchQuery(
+            new PolizasSearchRequest(Page: 1, PageSize: 25),
+            new PolizasSort("numero", Descending: false));
+
+        query.CommandText.Should().Contain("ORDER BY [Poliza] ASC");
+        query.CommandText.Should().NotContain("ORDER BY [Poliza] ASC, [Poliza] ASC");
     }
 
     [Fact]

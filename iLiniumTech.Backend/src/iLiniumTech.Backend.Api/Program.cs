@@ -202,7 +202,9 @@ polizas.MapGet("/{id}", async (HttpContext httpContext, [FromServices] IPolizasS
     try
     {
         var result = await service.GetByIdAsync(id, cancellationToken);
-        return result is null ? Results.NotFound() : Results.Ok(result);
+        return result is null
+            ? ErrorResult(httpContext, StatusCodes.Status404NotFound, "POLIZAS_NOT_FOUND", "Poliza no encontrada.")
+            : Results.Ok(result);
     }
     catch (PolizasValidationException exception)
     {
@@ -376,14 +378,16 @@ static PolizaDetail SanitizeAutosParticularesDetail(PolizaDetail detail) =>
 static Task WriteErrorAsync(HttpContext context, int statusCode, string code, string message)
 {
     context.Response.StatusCode = statusCode;
-    return Results.Json(
-            new ErrorResponse(new ErrorBody(
-                Code: code,
-                Message: message,
-                CorrelationId: EnsureCorrelationId(context))),
-            statusCode: statusCode)
-        .ExecuteAsync(context);
+    return ErrorResult(context, statusCode, code, message).ExecuteAsync(context);
 }
+
+static IResult ErrorResult(HttpContext context, int statusCode, string code, string message) =>
+    Results.Json(
+        new ErrorResponse(new ErrorBody(
+            Code: code,
+            Message: message,
+            CorrelationId: EnsureCorrelationId(context))),
+        statusCode: statusCode);
 
 static bool RequiresPolizasExecutionContext(IConfiguration configuration)
 {

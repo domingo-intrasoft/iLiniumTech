@@ -478,6 +478,25 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task GetById_returns_sanitized_not_found_error_with_correlation_id()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "test-correlation-polizas-not-found");
+
+        var response = await client.GetAsync("/api/polizas/POL-NO-EXISTE");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("test-correlation-polizas-not-found");
+        body.Should().Contain("POLIZAS_NOT_FOUND");
+        body.Should().Contain("\"correlationId\":\"test-correlation-polizas-not-found\"");
+        body.Should().NotContain("SELECT");
+        body.Should().NotContain("Pantalla_Polizas");
+    }
+
+    [Fact]
     public async Task Autos_particulares_detail_returns_autos_and_hides_other_ramos()
     {
         await using var factory = new TestApiFactory();

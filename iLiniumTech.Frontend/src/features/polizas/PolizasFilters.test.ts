@@ -57,4 +57,28 @@ describe('PolizasFilters', () => {
     expect(wrapper.get('#polizas-filter-poliza').attributes('disabled')).toBeUndefined()
     expect(wrapper.get('#polizas-filter-tipoPoliza').attributes('disabled')).toBeDefined()
   })
+
+  it('marks filters outside the current API contract as unavailable', () => {
+    const wrapper = mountFilters()
+
+    expect(wrapper.get('#polizas-filter-poliza').attributes('disabled')).toBeUndefined()
+    expect(wrapper.get('#polizas-filter-riesgo').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('label[for="polizas-filter-riesgo"]').attributes('title')).toContain(
+      'Pendiente de contrato API',
+    )
+  })
+
+  it('blocks search actions when the execution context is not ready', async () => {
+    const wrapper = mountFilters({
+      searchDisabled: true,
+      blockedMessage: 'Configura un broker para consultar polizas.',
+    })
+
+    expect(wrapper.get('#polizas-filter-poliza').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('.primary-action').attributes('disabled')).toBeDefined()
+
+    await wrapper.get('.primary-action').trigger('click')
+
+    expect(wrapper.emitted('search')).toBeUndefined()
+  })
 })

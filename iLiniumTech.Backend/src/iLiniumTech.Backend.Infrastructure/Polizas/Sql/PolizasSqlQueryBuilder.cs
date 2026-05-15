@@ -88,11 +88,14 @@ public sealed class PolizasSqlQueryBuilder
 
         var orderColumn = SortColumns[sort.Field];
         var direction = sort.Descending ? "DESC" : "ASC";
+        var tieBreaker = sort.Field.Equals("numero", StringComparison.OrdinalIgnoreCase)
+            ? string.Empty
+            : ", [Poliza] ASC";
         var commandText = $"""
             {ListSelect}
             FROM {SourceObject}
             {where.Clause}
-            ORDER BY {orderColumn} {direction}
+            ORDER BY {orderColumn} {direction}{tieBreaker}
             OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY;
             """;
 

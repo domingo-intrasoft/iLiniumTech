@@ -1,19 +1,30 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 
 import {
   createEmptyPolizasFilterForm,
+  polizasSupportedFilterKeys,
   polizasSearchSections,
   type PolizasSearchCriteria,
   type PolizasSearchField,
 } from './polizasConstants'
 import type { PolizasCatalogs } from './polizasTypes'
 
-const props = defineProps<{
-  catalogs: PolizasCatalogs
-  loading?: boolean
-  error?: string | null
-}>()
+const props = withDefaults(
+  defineProps<{
+    catalogs: PolizasCatalogs
+    loading?: boolean
+    error?: string | null
+    searchDisabled?: boolean
+    blockedMessage?: string | null
+  }>(),
+  {
+    loading: false,
+    error: null,
+    searchDisabled: false,
+    blockedMessage: null,
+  },
+)
 
 const emit = defineEmits<{
   search: [criteria: PolizasSearchCriteria]
@@ -21,6 +32,7 @@ const emit = defineEmits<{
 }>()
 
 const searchValues = reactive(createEmptyPolizasFilterForm())
+const canSearch = computed(() => !props.loading && !props.searchDisabled)
 
 function fieldStyle(field: PolizasSearchField) {
   return { gridColumn: `span ${field.span}` }
@@ -42,11 +54,31 @@ function catalogOptions(field: PolizasSearchField) {
   return props.catalogs[field.catalogKey]
 }
 
+function fieldIsSupported(field: PolizasSearchField) {
+  return polizasSupportedFilterKeys.includes(field.key)
+}
+
 function fieldDisabled(field: PolizasSearchField) {
-  return props.loading === true && field.control === 'select'
+  return (
+    props.searchDisabled ||
+    !fieldIsSupported(field) ||
+    (props.loading && field.control === 'select')
+  )
+}
+
+function fieldTitle(field: PolizasSearchField) {
+  if (props.searchDisabled && props.blockedMessage) {
+    return props.blockedMessage
+  }
+
+  return fieldIsSupported(field) ? undefined : 'Pendiente de contrato API de polizas'
 }
 
 function executeSearch() {
+  if (!canSearch.value) {
+    return
+  }
+
   emit('search', {
     numero: searchValue('poliza'),
     cliente: searchValue('nombreCompleto') || searchValue('nombre') || searchValue('documento'),
@@ -74,12 +106,7 @@ function clearFilters() {
   >
     <header class="search-actions">
       <div class="search-action-buttons">
-        <button
-          type="button"
-          class="primary-action"
-          :disabled="props.loading"
-          @click="executeSearch"
-        >
+        <button type="button" class="primary-action" :disabled="!canSearch" @click="executeSearch">
           <i class="pi pi-search" aria-hidden="true"></i>
           Buscar
         </button>
@@ -133,8 +160,10 @@ function clearFilters() {
             v-for="field in row"
             :key="field.key"
             class="filter-field"
+            :class="{ 'unsupported-filter': !fieldIsSupported(field) }"
             :for="fieldControlId(field)"
             :style="fieldStyle(field)"
+            :title="fieldTitle(field)"
           >
             <span>{{ field.label }}</span>
             <span class="field-control">
@@ -161,6 +190,7 @@ function clearFilters() {
                 v-model="searchValues[field.key]"
                 :type="field.control === 'date' ? 'date' : 'search'"
                 :aria-label="field.label"
+                :disabled="fieldDisabled(field)"
               />
               <button type="button" :aria-label="`Opciones de filtro para ${field.label}`" disabled>
                 <i class="pi pi-filter" aria-hidden="true"></i>
