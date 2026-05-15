@@ -2,14 +2,54 @@
 import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
-import { appNavigation, isNavigationItemActive, type AppNavigationItem } from './appNavigation'
+import { useSession } from '@/services/session'
+
+import {
+  appNavigation,
+  getNavigationUnavailableReason,
+  isNavigationItemActive,
+  type AppNavigationItem,
+} from './appNavigation'
 
 const route = useRoute()
+const { session } = useSession()
 
 const activePath = computed(() => route.path)
 
+function itemUnavailable(item: AppNavigationItem) {
+  return getNavigationUnavailableReason(item, session.value) !== null
+}
+
+function childUnavailable(parent: AppNavigationItem, child: AppNavigationItem) {
+  return itemUnavailable(parent) || itemUnavailable(child)
+}
+
 function itemTitle(item: AppNavigationItem) {
-  return item.disabled ? `${item.label} no disponible en el MVP` : item.label
+  const unavailableReason = getNavigationUnavailableReason(item, session.value)
+
+  if (unavailableReason === 'disabled') {
+    return `${item.label} no disponible en el MVP`
+  }
+
+  if (unavailableReason === 'permission') {
+    return `${item.label} no disponible para la sesion actual`
+  }
+
+  return item.label
+}
+
+function childTitle(parent: AppNavigationItem, child: AppNavigationItem) {
+  const parentReason = getNavigationUnavailableReason(parent, session.value)
+
+  if (parentReason === 'disabled') {
+    return `${child.label} no disponible en el MVP`
+  }
+
+  if (parentReason === 'permission') {
+    return `${child.label} no disponible para la sesion actual`
+  }
+
+  return itemTitle(child)
 }
 </script>
 
@@ -31,7 +71,7 @@ function itemTitle(item: AppNavigationItem) {
           }"
         >
           <RouterLink
-            v-if="item.to"
+            v-if="item.to && !itemUnavailable(item)"
             :to="item.to"
             :title="itemTitle(item)"
             :aria-current="item.to === activePath ? 'page' : undefined"
@@ -39,7 +79,12 @@ function itemTitle(item: AppNavigationItem) {
             <i :class="item.icon" aria-hidden="true"></i>
             <span>{{ item.label }}</span>
           </RouterLink>
-          <span v-else class="side-nav-disabled" :title="itemTitle(item)" aria-disabled="true">
+          <span
+            v-else
+            class="side-nav-disabled"
+            :title="itemTitle(item)"
+            :aria-disabled="itemUnavailable(item) ? 'true' : undefined"
+          >
             <i :class="item.icon" aria-hidden="true"></i>
             <span>{{ item.label }}</span>
           </span>
@@ -47,15 +92,20 @@ function itemTitle(item: AppNavigationItem) {
           <ul v-if="item.children?.length" class="side-subnav">
             <li v-for="child in item.children" :key="child.label">
               <RouterLink
-                v-if="child.to"
+                v-if="child.to && !childUnavailable(item, child)"
                 :to="child.to"
-                :title="itemTitle(child)"
+                :title="childTitle(item, child)"
                 :aria-current="child.to === activePath ? 'page' : undefined"
               >
                 <i :class="child.icon" aria-hidden="true"></i>
                 <span>{{ child.label }}</span>
               </RouterLink>
-              <span v-else class="side-nav-disabled" :title="itemTitle(child)" aria-disabled="true">
+              <span
+                v-else
+                class="side-nav-disabled"
+                :title="childTitle(item, child)"
+                :aria-disabled="childUnavailable(item, child) ? 'true' : undefined"
+              >
                 <i :class="child.icon" aria-hidden="true"></i>
                 <span>{{ child.label }}</span>
               </span>

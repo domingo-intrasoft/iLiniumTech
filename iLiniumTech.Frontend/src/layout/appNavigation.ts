@@ -3,7 +3,13 @@ export interface AppNavigationItem {
   icon: string
   to?: string
   disabled?: boolean
+  requiredPermission?: string
   children?: AppNavigationItem[]
+}
+
+export interface AppNavigationSessionState {
+  authMode?: string
+  permissions?: readonly string[]
 }
 
 export const appNavigation: AppNavigationItem[] = [
@@ -14,8 +20,9 @@ export const appNavigation: AppNavigationItem[] = [
     label: 'Polizas',
     icon: 'pi pi-briefcase',
     to: '/polizas',
+    requiredPermission: 'polizas.read',
     children: [
-      { label: 'Autos Particulares', icon: 'pi pi-car', to: '/autos-particulares' },
+      { label: 'Autos Particulares', icon: 'pi pi-car', to: '/autos-particulares', disabled: true },
       { label: 'Flotas', icon: 'pi pi-truck', disabled: true },
       { label: 'Colectivas', icon: 'pi pi-users', disabled: true },
     ],
@@ -41,4 +48,30 @@ export function isNavigationItemActive(item: AppNavigationItem, path: string): b
   }
 
   return item.children?.some((child) => isNavigationItemActive(child, path)) ?? false
+}
+
+export function hasNavigationPermission(
+  item: AppNavigationItem,
+  session?: AppNavigationSessionState | null,
+) {
+  if (!item.requiredPermission) {
+    return true
+  }
+
+  if (session?.authMode === 'ApiKey' || !Array.isArray(session?.permissions)) {
+    return true
+  }
+
+  return session.permissions.includes(item.requiredPermission)
+}
+
+export function getNavigationUnavailableReason(
+  item: AppNavigationItem,
+  session?: AppNavigationSessionState | null,
+) {
+  if (item.disabled) {
+    return 'disabled'
+  }
+
+  return hasNavigationPermission(item, session) ? null : 'permission'
 }

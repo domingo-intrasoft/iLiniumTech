@@ -1,6 +1,6 @@
 import { computed, readonly, ref } from 'vue'
 
-import { toPolizasUserMessage } from './apiErrors'
+import { toPolizasUserError, type PolizasUserErrorKind } from './apiErrors'
 import { apiClient } from './apiClient'
 import { assertRuntimeConfigReady } from './runtimeConfig'
 
@@ -29,6 +29,7 @@ export interface SessionContext {
 const session = ref<SessionContext | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
+const errorKind = ref<PolizasUserErrorKind | null>(null)
 let pendingRequest: Promise<SessionContext> | null = null
 
 function readPositiveInteger(value: string | undefined): number | null {
@@ -94,6 +95,7 @@ export function useSession() {
 
     loading.value = true
     error.value = null
+    errorKind.value = null
 
     pendingRequest ??= getSessionContext().finally(() => {
       pendingRequest = null
@@ -103,8 +105,10 @@ export function useSession() {
       session.value = await pendingRequest
       return session.value
     } catch (exception) {
+      const userError = toPolizasUserError(exception, 'No se pudo cargar la sesion.')
       session.value = null
-      error.value = toPolizasUserMessage(exception, 'No se pudo cargar la sesion.')
+      error.value = userError.message
+      errorKind.value = userError.kind
       return null
     } finally {
       loading.value = false
@@ -114,6 +118,7 @@ export function useSession() {
   function resetSession() {
     session.value = null
     error.value = null
+    errorKind.value = null
     pendingRequest = null
   }
 
@@ -123,6 +128,7 @@ export function useSession() {
     hasBrokerContext,
     loading: readonly(loading),
     error: readonly(error),
+    errorKind: readonly(errorKind),
     loadSession,
     resetSession,
   }

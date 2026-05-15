@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { useSession } from '@/services/session'
 
 import AppSideMenu from './AppSideMenu.vue'
 
@@ -28,21 +30,25 @@ async function mountMenu(path = '/polizas') {
 }
 
 describe('AppSideMenu', () => {
+  beforeEach(() => {
+    useSession().resetSession()
+  })
+
   it('exposes static navigation to existing screens without runtime metadata', async () => {
     const wrapper = await mountMenu()
 
     expect(wrapper.get('.side-nav a[href="/polizas"]').text()).toContain('Polizas')
-    expect(wrapper.get('.side-nav a[href="/autos-particulares"]').text()).toContain(
-      'Autos Particulares',
-    )
+    expect(wrapper.find('.side-nav a[href="/autos-particulares"]').exists()).toBe(false)
+    expect(wrapper.get('.side-subnav .side-nav-disabled').text()).toContain('Autos Particulares')
     expect(wrapper.get('.side-nav [aria-current="page"]').text()).toContain('Polizas')
     expect(wrapper.text()).not.toMatch(/IAP_|QueryStatic|ComponentDataSource|metadata/i)
   })
 
-  it('marks nested Autos Particulares route as current', async () => {
+  it('keeps parked Autos Particulares disabled even when the direct route is open', async () => {
     const wrapper = await mountMenu('/autos-particulares')
 
-    expect(wrapper.get('[aria-current="page"]').text()).toContain('Autos Particulares')
+    expect(wrapper.find('[aria-current="page"]').exists()).toBe(false)
+    expect(wrapper.get('.side-subnav .side-nav-disabled').text()).toContain('Autos Particulares')
     expect(wrapper.get('.has-children').classes()).toContain('active')
   })
 

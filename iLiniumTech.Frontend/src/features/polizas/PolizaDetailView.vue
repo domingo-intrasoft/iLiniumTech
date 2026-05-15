@@ -2,8 +2,8 @@
 import { computed, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
-import { useAuthSession } from '@/features/auth/authSession'
-import { toPolizasUserMessage } from '@/services/apiErrors'
+import { clearAuthSession, useAuthSession } from '@/features/auth/authSession'
+import { toPolizasUserError } from '@/services/apiErrors'
 import { getBlockingRuntimeConfigMessage } from '@/services/runtimeConfig'
 
 import AppShell from '@/layout/AppShell.vue'
@@ -57,7 +57,11 @@ async function loadPoliza() {
       error.value = 'Poliza no encontrada.'
     }
   } catch (exception) {
-    error.value = toPolizasUserMessage(exception, 'No se pudo cargar la poliza.')
+    const userError = toPolizasUserError(exception, 'No se pudo cargar la poliza.')
+    if (userError.kind === 'unauthenticated') {
+      clearAuthSession()
+    }
+    error.value = userError.message
     poliza.value = null
   } finally {
     loading.value = false
@@ -65,7 +69,7 @@ async function loadPoliza() {
 }
 
 async function signOut() {
-  logout()
+  await logout()
   await router.replace({ name: 'login' })
 }
 

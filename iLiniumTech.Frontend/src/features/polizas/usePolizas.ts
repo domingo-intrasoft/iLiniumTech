@@ -1,5 +1,6 @@
 import { onMounted, reactive, ref } from 'vue'
 
+import { clearAuthSession } from '@/features/auth/authSession'
 import { isPolizasAccessError, toPolizasUserError } from '@/services/apiErrors'
 import { getBlockingRuntimeConfigMessage } from '@/services/runtimeConfig'
 import { type SessionContext, useSession } from '@/services/session'
@@ -21,7 +22,13 @@ function permissionIsAllowed(context: SessionContext, permission: string) {
 }
 
 export function usePolizas() {
-  const { session, loading: sessionLoading, error: sessionError, loadSession } = useSession()
+  const {
+    session,
+    loading: sessionLoading,
+    error: sessionError,
+    errorKind: sessionErrorKind,
+    loadSession,
+  } = useSession()
   const catalogs = ref<PolizasCatalogs>(polizasCatalogsFixture)
   const catalogsLoading = ref(false)
   const catalogsError = ref<string | null>(null)
@@ -65,6 +72,10 @@ export function usePolizas() {
     }
 
     if (!currentSession) {
+      if (sessionErrorKind.value === 'unauthenticated') {
+        clearAuthSession()
+      }
+
       error.value = sessionError.value ?? 'No se pudo validar la sesion antes de consultar polizas.'
       runtimeError.value = error.value
       contextBlocked.value = true
@@ -124,6 +135,9 @@ export function usePolizas() {
     } catch (exception) {
       const userError = toPolizasUserError(exception, 'No se pudieron cargar las polizas.')
       error.value = userError.message
+      if (userError.kind === 'unauthenticated') {
+        clearAuthSession()
+      }
       if (isPolizasAccessError(userError)) {
         runtimeError.value = userError.message
         contextBlocked.value = true
@@ -187,6 +201,7 @@ export function usePolizas() {
       )
       catalogsError.value = userError.message
       if (userError.kind === 'unauthenticated') {
+        clearAuthSession()
         runtimeError.value = userError.message
         contextBlocked.value = true
       }

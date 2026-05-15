@@ -6,6 +6,16 @@ vi.mock('./apiClient', () => ({
   },
 }))
 
+function axiosError(status: number, data: unknown) {
+  return {
+    isAxiosError: true,
+    response: {
+      status,
+      data,
+    },
+  }
+}
+
 describe('session service', () => {
   beforeEach(() => {
     vi.resetModules()
@@ -143,6 +153,29 @@ describe('session service', () => {
 
     expect(currentSession.session.value).toBeNull()
     expect(currentSession.error.value).toBe('No se pudo cargar la sesion.')
+    expect(currentSession.errorKind.value).toBe('unknown')
+  })
+
+  it('tracks unauthenticated backend session failures for callers', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    const { apiClient } = await import('./apiClient')
+    vi.mocked(apiClient.get).mockRejectedValueOnce(
+      axiosError(401, {
+        error: {
+          message: 'Expired demo-session cookie.',
+          correlationId: 'auth-401',
+        },
+      }),
+    )
+
+    const { useSession } = await import('./session')
+    const currentSession = useSession()
+
+    await expect(currentSession.loadSession()).resolves.toBeNull()
+
+    expect(currentSession.errorKind.value).toBe('unauthenticated')
+    expect(currentSession.error.value).toContain('Ref: auth-401.')
   })
 
   it('blocks backend session calls when the API key contract is incomplete', async () => {
@@ -155,6 +188,7 @@ describe('session service', () => {
     await expect(currentSession.loadSession()).resolves.toBeNull()
 
     expect(currentSession.error.value).toContain('VITE_ILINIUMTECH_API_KEY')
+    expect(currentSession.errorKind.value).toBe('runtime')
     expect(apiClient.get).not.toHaveBeenCalled()
   })
 })

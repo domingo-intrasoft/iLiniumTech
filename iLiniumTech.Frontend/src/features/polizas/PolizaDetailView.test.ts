@@ -1,6 +1,8 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { clearAuthSession, hasAuthSession, loginDemo } from '@/features/auth/authSession'
+
 import { polizasDetailFixture } from './polizasFixture'
 
 const mocks = vi.hoisted(() => ({
@@ -24,12 +26,23 @@ vi.mock('./polizasApi', () => ({
 
 import PolizaDetailView from './PolizaDetailView.vue'
 
+function axiosError(status: number, data: unknown) {
+  return {
+    isAxiosError: true,
+    response: {
+      status,
+      data,
+    },
+  }
+}
+
 describe('PolizaDetailView', () => {
   beforeEach(() => {
     mocks.route.path = '/polizas/POL-1001'
     mocks.route.params = { id: 'POL-1001' }
     mocks.router.replace.mockReset()
     mocks.getPolizaById.mockReset()
+    clearAuthSession()
   })
 
   it('renders an honest read-only detail from local data', async () => {
@@ -65,5 +78,25 @@ describe('PolizaDetailView', () => {
 
     expect(wrapper.find('[role="alert"]').text()).toContain('No se pudo cargar la poliza.')
     expect(wrapper.text()).not.toContain('SELECT *')
+  })
+
+  it('clears the MVP session when the backend rejects detail with 401', async () => {
+    loginDemo({ username: 'domingo', password: 'demo' })
+    mocks.getPolizaById.mockRejectedValueOnce(
+      axiosError(401, {
+        error: {
+          message: 'Expired demo-session cookie.',
+          correlationId: 'auth-401',
+        },
+      }),
+    )
+
+    const wrapper = mount(PolizaDetailView)
+    await flushPromises()
+
+    expect(hasAuthSession()).toBe(false)
+    expect(wrapper.find('[role="alert"]').text()).toContain(
+      'La sesion no esta autorizada para consultar polizas.',
+    )
   })
 })

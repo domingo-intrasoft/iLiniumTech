@@ -10,10 +10,16 @@ const mocks = vi.hoisted(() => ({
   session: { value: null as SessionContext | null },
   sessionLoading: { value: false },
   sessionError: { value: null as string | null },
+  sessionErrorKind: { value: null as 'unauthenticated' | null },
   loadSession: vi.fn(),
+  clearAuthSession: vi.fn(),
   getBlockingRuntimeConfigMessage: vi.fn(),
   searchPolizas: vi.fn(),
   getPolizasCatalogs: vi.fn(),
+}))
+
+vi.mock('@/features/auth/authSession', () => ({
+  clearAuthSession: mocks.clearAuthSession,
 }))
 
 vi.mock('@/services/session', () => ({
@@ -21,6 +27,7 @@ vi.mock('@/services/session', () => ({
     session: mocks.session,
     loading: mocks.sessionLoading,
     error: mocks.sessionError,
+    errorKind: mocks.sessionErrorKind,
     loadSession: mocks.loadSession,
   }),
 }))
@@ -77,7 +84,9 @@ describe('usePolizas', () => {
     mocks.session.value = null
     mocks.sessionLoading.value = false
     mocks.sessionError.value = null
+    mocks.sessionErrorKind.value = null
     mocks.loadSession.mockReset()
+    mocks.clearAuthSession.mockReset()
     mocks.getBlockingRuntimeConfigMessage.mockReset()
     mocks.searchPolizas.mockReset()
     mocks.getPolizasCatalogs.mockReset()
@@ -98,6 +107,20 @@ describe('usePolizas', () => {
     expect(wrapper.vm.polizas.error.value).toBe(
       'La sesion actual no tiene permiso para consultar polizas.',
     )
+  })
+
+  it('clears local auth when backend session validation returns 401', async () => {
+    mocks.sessionError.value =
+      'La sesion no esta autorizada para consultar polizas. Inicia sesion de nuevo si el problema continua.'
+    mocks.sessionErrorKind.value = 'unauthenticated'
+    mocks.loadSession.mockResolvedValue(null)
+
+    const wrapper = mount(Harness)
+    await flushPromises()
+
+    expect(mocks.searchPolizas).not.toHaveBeenCalled()
+    expect(mocks.clearAuthSession).toHaveBeenCalledTimes(1)
+    expect(wrapper.vm.polizas.contextBlocked.value).toBe(true)
   })
 
   it('blocks backend searches when runtime configuration is incomplete', async () => {

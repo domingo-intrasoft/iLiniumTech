@@ -238,6 +238,16 @@ app.MapGet("/api/me", (
     try
     {
         var executionContext = executionContextAccessor.Current;
+        if (executionContext is not null &&
+            !IsBrokerAllowedForAuthenticatedContext(httpContext.User, executionContext.BrokerId))
+        {
+            return ErrorResult(
+                httpContext,
+                StatusCodes.Status403Forbidden,
+                "POLIZAS_BROKER_FORBIDDEN",
+                "The active broker is not available for this session.");
+        }
+
         return Results.Ok(new MeResponse(
             BrokerId: executionContext?.BrokerId,
             EntityMainId: executionContext?.EntityMainId,

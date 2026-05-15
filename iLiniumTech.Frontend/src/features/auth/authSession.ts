@@ -94,7 +94,7 @@ function normalizeStoredSession(value: unknown): AuthMvpSession | null {
     return null
   }
 
-  return {
+  const normalized: AuthMvpSession = {
     mode: 'demo',
     source: candidate.source === 'backend' ? 'backend' : 'local',
     sessionId: candidate.sessionId,
@@ -111,19 +111,42 @@ function normalizeStoredSession(value: unknown): AuthMvpSession | null {
     currentBrokerId: candidate.currentBrokerId ?? null,
     permissions: Array.isArray(candidate.permissions) ? candidate.permissions : DEMO_PERMISSIONS,
   }
+
+  return isAuthSessionExpired(normalized) ? null : normalized
+}
+
+export function isAuthSessionExpired(candidate: Pick<AuthMvpSession, 'expiresAt'>) {
+  if (!candidate.expiresAt) {
+    return false
+  }
+
+  const expiresAt = Date.parse(candidate.expiresAt)
+  return !Number.isFinite(expiresAt) || expiresAt <= Date.now()
 }
 
 export function readStoredSession(): AuthMvpSession | null {
+  const store = storage()
   try {
-    const rawSession = storage()?.getItem(SESSION_STORAGE_KEY)
-    return rawSession ? normalizeStoredSession(JSON.parse(rawSession)) : null
+    const rawSession = store?.getItem(SESSION_STORAGE_KEY)
+    if (!rawSession) {
+      return null
+    }
+
+    const storedSession = normalizeStoredSession(JSON.parse(rawSession))
+    if (!storedSession) {
+      store?.removeItem(SESSION_STORAGE_KEY)
+    }
+
+    return storedSession
   } catch {
+    store?.removeItem(SESSION_STORAGE_KEY)
     return null
   }
 }
 
 export function hasAuthSession() {
-  return readStoredSession() !== null
+  session.value = readStoredSession()
+  return session.value !== null
 }
 
 export function loginDemo(credentials: LoginCredentials): AuthMvpSession {
@@ -233,12 +256,14 @@ export function clearAuthSession() {
 
 export async function logoutAuthSession() {
   const runtimeConfig = getRuntimeConfig()
-  try {
-    if (runtimeConfig.backendEnabled && runtimeConfig.authMode === 'demo-session') {
+  clearAuthSession()
+
+  if (runtimeConfig.backendEnabled && runtimeConfig.authMode === 'demo-session') {
+    try {
       await apiClient.post('/api/auth/logout')
+    } catch {
+      // Local logout must not keep the user trapped if the backend endpoint is unavailable.
     }
-  } finally {
-    clearAuthSession()
   }
 }
 

@@ -1,15 +1,19 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Security.Claims;
 using FluentAssertions;
 using iLiniumTech.Backend.Api.Security;
 using iLiniumTech.Backend.Application.Polizas;
 using iLiniumTech.Backend.Domain.Polizas;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using ApiAuthenticationSchemes = iLiniumTech.Backend.Api.Security.AuthenticationSchemes;
 
 namespace iLiniumTech.Backend.Tests.Polizas;
@@ -183,10 +187,17 @@ public sealed class PolizasApiTests
     {
         await using var factory = new TestApiFactory();
         using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "anonymous-polizas");
 
         var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("anonymous-polizas");
+        body.Should().Contain("POLIZAS_AUTH_REQUIRED");
+        body.Should().Contain("\"correlationId\":\"anonymous-polizas\"");
+        body.Should().NotContain("ApiSecurity");
+        body.Should().NotContain("API key header");
     }
 
     [Fact]
@@ -411,6 +422,33 @@ public sealed class PolizasApiTests
 
         search.StatusCode.Should().Be(HttpStatusCode.OK);
         detail.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task Me_rejects_demo_session_when_current_broker_is_not_allowed()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        var cookie = CreateDemoSessionCookie(
+            factory,
+            currentBrokerId: 42,
+            allowedBrokerIds: [84],
+            permissions: [PolizasPermissions.Catalogs, PolizasPermissions.Read, PolizasPermissions.Detail]);
+        client.DefaultRequestHeaders.Add(
+            "Cookie",
+            $"{ApiAuthenticationSchemes.DemoSessionCookieName}={cookie}");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "broker-not-allowed");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("broker-not-allowed");
+        body.Should().Contain("POLIZAS_BROKER_FORBIDDEN");
+        body.Should().Contain("\"correlationId\":\"broker-not-allowed\"");
+        body.Should().NotContain("42");
+        body.Should().NotContain("84");
+        body.Should().NotContain(PolizasPermissions.Read);
     }
 
     [Fact]
@@ -894,6 +932,43 @@ public sealed class PolizasApiTests
         });
 
         login.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    private static string CreateDemoSessionCookie(
+        TestApiFactory factory,
+        int currentBrokerId,
+        IReadOnlyCollection<int> allowedBrokerIds,
+        IReadOnlyCollection<string> permissions)
+    {
+        var options = factory.Services
+            .GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>()
+            .Get(ApiAuthenticationSchemes.DemoSession);
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, "demo:broker-test"),
+            new(ClaimTypes.Name, "broker-test"),
+            new(PolizasContextClaimTypes.ApplicationKey, "iliniumtech"),
+            new(PolizasContextClaimTypes.ApplicationName, "iLiniumTech"),
+            new(PolizasContextClaimTypes.BrokerId, currentBrokerId.ToString()),
+            new(PolizasContextClaimTypes.UserId, "10"),
+            new(PolizasContextClaimTypes.IsAdmin, bool.FalseString)
+        };
+        claims.AddRange(allowedBrokerIds
+            .Select(brokerId => new Claim(PolizasContextClaimTypes.AllowedBrokerId, brokerId.ToString())));
+        claims.AddRange(permissions
+            .Select(permission => new Claim(PolizasContextClaimTypes.Permission, permission)));
+
+        var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, ApiAuthenticationSchemes.DemoSession));
+        var ticket = new AuthenticationTicket(
+            principal,
+            new AuthenticationProperties
+            {
+                IssuedUtc = DateTimeOffset.UtcNow,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+            },
+            ApiAuthenticationSchemes.DemoSession);
+
+        return options.TicketDataFormat.Protect(ticket);
     }
 
     private sealed class TestApiFactory(

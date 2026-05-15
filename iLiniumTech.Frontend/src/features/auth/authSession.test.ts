@@ -5,8 +5,10 @@ import { apiClient } from '@/services/apiClient'
 import {
   clearAuthSession,
   hasAuthSession,
+  isAuthSessionExpired,
   loginAuthSession,
   loginDemo,
+  logoutAuthSession,
   readStoredSession,
 } from './authSession'
 
@@ -53,6 +55,23 @@ describe('authSession MVP', () => {
     expect(hasAuthSession()).toBe(false)
   })
 
+  it('discards expired stored sessions before route guards trust them', () => {
+    const session = loginDemo({ username: 'demo', password: 'demo' })
+    const storageKey = window.sessionStorage.key(0)
+
+    expect(storageKey).toBeTruthy()
+    expect(isAuthSessionExpired(session)).toBe(false)
+
+    window.sessionStorage.setItem(
+      storageKey!,
+      JSON.stringify({ ...session, expiresAt: '2000-01-01T00:00:00.000Z' }),
+    )
+
+    expect(readStoredSession()).toBeNull()
+    expect(window.sessionStorage.getItem(storageKey!)).toBeNull()
+    expect(hasAuthSession()).toBe(false)
+  })
+
   it('creates a backend demo session when cookie auth mode is configured', async () => {
     vi.stubEnv('VITE_USE_BACKEND', 'true')
     vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
@@ -60,7 +79,7 @@ describe('authSession MVP', () => {
       data: {
         session: {
           mode: 'demo',
-          expiresAt: '2026-05-15T12:00:00Z',
+          expiresAt: '2099-05-15T12:00:00Z',
         },
         user: {
           id: 'demo:domingo',
@@ -87,7 +106,7 @@ describe('authSession MVP', () => {
     })
     expect(session.source).toBe('backend')
     expect(session.user.displayName).toBe('domingo')
-    expect(session.expiresAt).toBe('2026-05-15T12:00:00Z')
+    expect(session.expiresAt).toBe('2099-05-15T12:00:00Z')
     expect(readStoredSession()?.source).toBe('backend')
   })
 
@@ -113,6 +132,18 @@ describe('authSession MVP', () => {
         password: 'wrong',
       }),
     ).rejects.toThrow('Credenciales no validas.')
+    expect(hasAuthSession()).toBe(false)
+  })
+
+  it('clears the local session even when backend logout cannot complete', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    loginDemo({ username: 'domingo', password: 'demo' })
+    vi.mocked(apiClient.post).mockRejectedValueOnce(new Error('backend unavailable'))
+
+    await expect(logoutAuthSession()).resolves.toBeUndefined()
+
+    expect(apiClient.post).toHaveBeenCalledWith('/api/auth/logout')
     expect(hasAuthSession()).toBe(false)
   })
 })

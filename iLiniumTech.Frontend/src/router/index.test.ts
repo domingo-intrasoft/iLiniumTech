@@ -30,6 +30,22 @@ describe('router auth guard', () => {
     expect(router.currentRoute.value.name).toBe('polizas')
   })
 
+  it('redirects protected routes when the stored MVP session has expired', async () => {
+    const session = loginDemo({ username: 'demo', password: 'demo' })
+    const storageKey = window.sessionStorage.key(0)
+    window.sessionStorage.setItem(
+      storageKey!,
+      JSON.stringify({ ...session, expiresAt: '2000-01-01T00:00:00.000Z' }),
+    )
+    const router = createIliniumRouter(createMemoryHistory())
+
+    await router.push('/polizas')
+    await router.isReady()
+
+    expect(router.currentRoute.value.name).toBe('login')
+    expect(router.currentRoute.value.query.redirect).toBe('/polizas')
+  })
+
   it('redirects authenticated users away from login', async () => {
     loginDemo({ username: 'demo', password: 'demo' })
     const router = createIliniumRouter(createMemoryHistory())
