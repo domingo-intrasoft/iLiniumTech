@@ -1,4 +1,8 @@
 import { computed, readonly, ref } from 'vue'
+import axios from 'axios'
+
+import { apiClient } from '@/services/apiClient'
+import { getRuntimeConfig } from '@/services/runtimeConfig'
 
 export interface AuthUser {
   id: string
@@ -12,8 +16,10 @@ export interface AuthApplication {
 
 export interface AuthMvpSession {
   mode: 'demo'
+  source: 'local' | 'backend'
   sessionId: string
   createdAt: string
+  expiresAt: string | null
   user: AuthUser
   application: AuthApplication
   currentBrokerId: number | null
@@ -28,6 +34,24 @@ export interface LoginCredentials {
 const SESSION_STORAGE_KEY = 'iliniumtech.auth.mvp-session'
 const DEMO_PERMISSIONS = ['polizas.catalogs', 'polizas.read', 'polizas.detail']
 const session = ref<AuthMvpSession | null>(readStoredSession())
+
+interface BackendLoginResponse {
+  session: {
+    mode: 'demo'
+    expiresAt: string
+  }
+  user: AuthUser
+  application: AuthApplication
+  currentBrokerId: number | null
+  permissions: string[]
+}
+
+interface BackendAuthErrorResponse {
+  error?: {
+    code?: string
+    message?: string
+  }
+}
 
 function readPositiveInteger(value: string | undefined): number | null {
   if (!value) {
@@ -72,8 +96,10 @@ function normalizeStoredSession(value: unknown): AuthMvpSession | null {
 
   return {
     mode: 'demo',
+    source: candidate.source === 'backend' ? 'backend' : 'local',
     sessionId: candidate.sessionId,
     createdAt: candidate.createdAt,
+    expiresAt: candidate.expiresAt ?? null,
     user: {
       id: candidate.user.id,
       displayName: candidate.user.displayName,
@@ -108,10 +134,12 @@ export function loginDemo(credentials: LoginCredentials): AuthMvpSession {
 
   const nextSession: AuthMvpSession = {
     mode: 'demo',
+    source: 'local',
     sessionId: createSessionId(),
     createdAt: new Date().toISOString(),
+    expiresAt: null,
     user: {
-      id: `demo:${username.toLowerCase()}`,
+      id: `demo:${displayNameFromUsername(username).toLowerCase()}`,
       displayName: displayNameFromUsername(username),
     },
     application: {
@@ -127,9 +155,91 @@ export function loginDemo(credentials: LoginCredentials): AuthMvpSession {
   return nextSession
 }
 
+function toBackendSession(data: BackendLoginResponse): AuthMvpSession {
+  return {
+    mode: 'demo',
+    source: 'backend',
+    sessionId: `backend-${Date.now()}`,
+    createdAt: new Date().toISOString(),
+    expiresAt: data.session.expiresAt,
+    user: data.user,
+    application: data.application,
+    currentBrokerId: data.currentBrokerId,
+    permissions: data.permissions,
+  }
+}
+
+function toBackendLoginMessage(error: unknown) {
+  if (!axios.isAxiosError<BackendAuthErrorResponse>(error)) {
+    return 'No se pudo iniciar sesion.'
+  }
+
+  const status = error.response?.status
+  const code = error.response?.data?.error?.code
+
+  if (status === 400 || code === 'AUTH_VALIDATION_ERROR') {
+    return 'Introduce usuario y contrasena.'
+  }
+
+  if (status === 401 || code === 'AUTH_INVALID_CREDENTIALS') {
+    return 'Credenciales no validas.'
+  }
+
+  if (status === 403 || code === 'AUTH_DEMO_DISABLED') {
+    return 'El login demo backend no esta habilitado en este entorno.'
+  }
+
+  return 'No se pudo iniciar sesion.'
+}
+
+export async function loginWithBackendDemo(credentials: LoginCredentials): Promise<AuthMvpSession> {
+  const username = credentials.username.trim()
+  if (!username || !credentials.password) {
+    throw new Error('Introduce usuario y contrasena.')
+  }
+
+  const brokerId = readPositiveInteger(import.meta.env.VITE_BROKER_ID)
+  let response
+  try {
+    response = await apiClient.post<BackendLoginResponse>('/api/auth/login', {
+      username,
+      password: credentials.password,
+      brokerId,
+    })
+  } catch (error) {
+    const translatedError = new Error(toBackendLoginMessage(error)) as Error & { cause?: unknown }
+    translatedError.cause = error
+    throw translatedError
+  }
+
+  const nextSession = toBackendSession(response.data)
+
+  storage()?.setItem(SESSION_STORAGE_KEY, JSON.stringify(nextSession))
+  session.value = nextSession
+  return nextSession
+}
+
+export async function loginAuthSession(credentials: LoginCredentials): Promise<AuthMvpSession> {
+  const runtimeConfig = getRuntimeConfig()
+  return runtimeConfig.backendEnabled && runtimeConfig.authMode === 'demo-session'
+    ? loginWithBackendDemo(credentials)
+    : loginDemo(credentials)
+}
+
 export function clearAuthSession() {
   storage()?.removeItem(SESSION_STORAGE_KEY)
   session.value = null
+}
+
+export async function logoutAuthSession() {
+  const runtimeConfig = getRuntimeConfig()
+  try {
+    if (runtimeConfig.backendEnabled && runtimeConfig.authMode === 'demo-session') {
+      await apiClient.post('/api/auth/logout')
+    }
+  } finally {
+    clearAuthSession()
+  }
 }
 
 export function useAuthSession() {
@@ -145,8 +255,8 @@ export function useAuthSession() {
     session: readonly(session),
     isAuthenticated,
     userLabel,
-    login: loginDemo,
-    logout: clearAuthSession,
+    login: loginAuthSession,
+    logout: logoutAuthSession,
     reloadSession,
   }
 }

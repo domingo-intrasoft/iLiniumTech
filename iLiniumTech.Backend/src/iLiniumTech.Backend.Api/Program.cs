@@ -5,7 +5,9 @@ using iLiniumTech.Backend.Domain.Polizas;
 using iLiniumTech.Backend.Infrastructure;
 using iLiniumTech.Backend.Infrastructure.Polizas.Connections;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 const string AutosParticularesRamo = "Autos";
 var autosParticularesScope = new AutosParticularesScope(
@@ -17,7 +19,45 @@ var autosParticularesScope = new AutosParticularesScope(
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
-builder.Services.AddAuthentication(ApiKeyAuthenticationHandler.SchemeName)
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = AuthenticationSchemes.ApiKeyOrDemoSession;
+    options.DefaultChallengeScheme = AuthenticationSchemes.ApiKeyOrDemoSession;
+    options.DefaultForbidScheme = AuthenticationSchemes.ApiKeyOrDemoSession;
+})
+    .AddPolicyScheme(AuthenticationSchemes.ApiKeyOrDemoSession, "API key or demo session", options =>
+    {
+        options.ForwardDefaultSelector = context =>
+            context.Request.Headers.ContainsKey(ApiKeyAuthenticationHandler.HeaderName)
+                ? ApiKeyAuthenticationHandler.SchemeName
+                : context.Request.Cookies.ContainsKey(AuthenticationSchemes.DemoSessionCookieName)
+                    ? AuthenticationSchemes.DemoSession
+                    : ApiKeyAuthenticationHandler.SchemeName;
+    })
+    .AddCookie(AuthenticationSchemes.DemoSession, options =>
+    {
+        options.Cookie.Name = AuthenticationSchemes.DemoSessionCookieName;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+            ? CookieSecurePolicy.SameAsRequest
+            : CookieSecurePolicy.Always;
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
+            },
+            OnRedirectToAccessDenied = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return Task.CompletedTask;
+            }
+        };
+    })
     .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.SchemeName, _ => { });
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
@@ -28,7 +68,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(GetAllowedCorsOrigins(builder.Configuration))
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -106,6 +147,65 @@ app.MapGet("/ready", ([FromServices] IConfiguration configuration, [FromServices
 })
 .AllowAnonymous();
 
+app.MapPost("/api/auth/login", async (
+    HttpContext httpContext,
+    [FromBody] LoginRequest request,
+    [FromServices] IConfiguration configuration,
+    [FromServices] IHostEnvironment environment) =>
+{
+    if (!IsDemoAuthEnabled(configuration, environment))
+    {
+        return ErrorResult(
+            httpContext,
+            StatusCodes.Status403Forbidden,
+            "AUTH_DEMO_DISABLED",
+            "Demo authentication is not enabled for this environment.");
+    }
+
+    var username = request.Username?.Trim();
+    if (string.IsNullOrWhiteSpace(username) || string.IsNullOrEmpty(request.Password))
+    {
+        return ErrorResult(
+            httpContext,
+            StatusCodes.Status400BadRequest,
+            "AUTH_VALIDATION_ERROR",
+            "Username and password are required.");
+    }
+
+    var expectedPassword = configuration["Auth:Demo:Password"] ?? "demo";
+    if (!string.Equals(request.Password, expectedPassword, StringComparison.Ordinal))
+    {
+        return ErrorResult(
+            httpContext,
+            StatusCodes.Status401Unauthorized,
+            "AUTH_INVALID_CREDENTIALS",
+            "Invalid credentials.");
+    }
+
+    var session = CreateDemoSession(username, request.BrokerId, configuration);
+    await httpContext.SignInAsync(
+        AuthenticationSchemes.DemoSession,
+        CreateDemoPrincipal(session),
+        new AuthenticationProperties
+        {
+            IsPersistent = false,
+            IssuedUtc = DateTimeOffset.UtcNow,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+        });
+
+    return Results.Ok(session);
+})
+.AllowAnonymous()
+.WithName("LoginDemo");
+
+app.MapPost("/api/auth/logout", async (HttpContext httpContext) =>
+{
+    await httpContext.SignOutAsync(AuthenticationSchemes.DemoSession);
+    return Results.NoContent();
+})
+.AllowAnonymous()
+.WithName("LogoutDemo");
+
 app.MapGet("/api/me", (
     HttpContext httpContext,
     [FromServices] IPolizasExecutionContextAccessor executionContextAccessor,
@@ -123,7 +223,12 @@ app.MapGet("/api/me", (
             ProfileTypeId: executionContext?.ProfileTypeId,
             IsAdmin: executionContext?.IsAdmin,
             HeaderExecutionContextEnabled: IsHeaderExecutionContextEnabled(configuration, environment),
-            PolizasExecutionContextRequired: RequiresPolizasExecutionContext(configuration)));
+            PolizasExecutionContextRequired: RequiresPolizasExecutionContext(configuration),
+            User: CreateAuthUserResponse(httpContext.User),
+            Application: CreateApplicationResponse(httpContext.User),
+            AllowedBrokerIds: ReadIntClaims(httpContext.User, PolizasContextClaimTypes.AllowedBrokerId),
+            Permissions: ReadStringClaims(httpContext.User, PolizasContextClaimTypes.Permission),
+            AuthMode: httpContext.User.Identity?.AuthenticationType ?? "unknown"));
     }
     catch (PolizasExecutionContextException exception)
     {
@@ -411,10 +516,161 @@ static bool RequiresPolizasExecutionContext(IConfiguration configuration)
 static bool IsHeaderExecutionContextEnabled(IConfiguration configuration, IHostEnvironment environment) =>
     HeaderExecutionContextPolicy.IsEnabled(configuration, environment);
 
+static bool IsDemoAuthEnabled(IConfiguration configuration, IHostEnvironment environment)
+{
+    var configured = bool.TryParse(configuration["Auth:Demo:Enabled"], out var enabled) && enabled;
+    if (environment.IsDevelopment())
+    {
+        return configuration["Auth:Demo:Enabled"] is null || configured;
+    }
+
+    return configured &&
+        string.Equals(
+            configuration["Auth:Demo:OptIn"],
+            HeaderExecutionContextPolicy.DemoOptInRequiredValue,
+            StringComparison.Ordinal);
+}
+
+static LoginResponse CreateDemoSession(string username, int? requestedBrokerId, IConfiguration configuration)
+{
+    var brokerId = requestedBrokerId is > 0
+        ? requestedBrokerId
+        : ReadPositiveIntConfiguration(configuration, "Auth:Demo:BrokerId")
+            ?? ReadPositiveIntConfiguration(configuration, "Polizas:BrokerId");
+    var userId = ReadPositiveIntConfiguration(configuration, "Auth:Demo:UserId")
+        ?? ReadPositiveIntConfiguration(configuration, "Polizas:UserId")
+        ?? 1;
+    var profileId = ReadPositiveIntConfiguration(configuration, "Auth:Demo:ProfileId")
+        ?? ReadPositiveIntConfiguration(configuration, "Polizas:ProfileId");
+    var profileTypeId = configuration["Auth:Demo:ProfileTypeId"]
+        ?? configuration["Polizas:ProfileTypeId"];
+    var isAdmin = bool.TryParse(configuration["Auth:Demo:IsAdmin"] ?? configuration["Polizas:IsAdmin"], out var parsedIsAdmin)
+        ? parsedIsAdmin
+        : false;
+
+    return new LoginResponse(
+        Session: new LoginSessionResponse(
+            Mode: "demo",
+            ExpiresAt: DateTimeOffset.UtcNow.AddHours(8)),
+        User: new AuthUserResponse(
+            Id: $"demo:{SanitizeIdentifier(DisplayNameFromUsername(username))}",
+            DisplayName: DisplayNameFromUsername(username)),
+        Application: new AuthApplicationResponse(
+            Key: "iliniumtech",
+            Name: "iLiniumTech"),
+        CurrentBrokerId: brokerId,
+        UserId: userId,
+        ProfileId: profileId,
+        ProfileTypeId: string.IsNullOrWhiteSpace(profileTypeId) ? null : profileTypeId,
+        IsAdmin: isAdmin,
+        AllowedBrokerIds: brokerId is null ? [] : [brokerId.Value],
+        Permissions:
+        [
+            "polizas.catalogs",
+            "polizas.read",
+            "polizas.detail"
+        ]);
+}
+
+static ClaimsPrincipal CreateDemoPrincipal(LoginResponse session)
+{
+    var claims = new List<Claim>
+    {
+        new(ClaimTypes.NameIdentifier, session.User.Id),
+        new(ClaimTypes.Name, session.User.DisplayName),
+        new(PolizasContextClaimTypes.ApplicationKey, session.Application.Key),
+        new(PolizasContextClaimTypes.ApplicationName, session.Application.Name),
+        new(PolizasContextClaimTypes.UserId, session.UserId.ToString()),
+        new(PolizasContextClaimTypes.IsAdmin, session.IsAdmin.ToString())
+    };
+
+    if (session.CurrentBrokerId is not null)
+    {
+        claims.Add(new Claim(PolizasContextClaimTypes.BrokerId, session.CurrentBrokerId.Value.ToString()));
+    }
+
+    if (session.ProfileId is not null)
+    {
+        claims.Add(new Claim(PolizasContextClaimTypes.ProfileId, session.ProfileId.Value.ToString()));
+    }
+
+    if (!string.IsNullOrWhiteSpace(session.ProfileTypeId))
+    {
+        claims.Add(new Claim(PolizasContextClaimTypes.ProfileTypeId, session.ProfileTypeId));
+    }
+
+    foreach (var brokerId in session.AllowedBrokerIds)
+    {
+        claims.Add(new Claim(PolizasContextClaimTypes.AllowedBrokerId, brokerId.ToString()));
+    }
+
+    foreach (var permission in session.Permissions)
+    {
+        claims.Add(new Claim(PolizasContextClaimTypes.Permission, permission));
+    }
+
+    return new ClaimsPrincipal(new ClaimsIdentity(claims, AuthenticationSchemes.DemoSession));
+}
+
+static AuthUserResponse? CreateAuthUserResponse(ClaimsPrincipal user)
+{
+    var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    var displayName = user.FindFirstValue(ClaimTypes.Name);
+    return string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(displayName)
+        ? null
+        : new AuthUserResponse(id, displayName);
+}
+
+static AuthApplicationResponse? CreateApplicationResponse(ClaimsPrincipal user)
+{
+    var key = user.FindFirstValue(PolizasContextClaimTypes.ApplicationKey);
+    var name = user.FindFirstValue(PolizasContextClaimTypes.ApplicationName);
+    return string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(name)
+        ? null
+        : new AuthApplicationResponse(key, name);
+}
+
+static IReadOnlyList<int> ReadIntClaims(ClaimsPrincipal user, string claimType) =>
+    user.FindAll(claimType)
+        .Select(claim => int.TryParse(claim.Value, out var parsed) ? parsed : (int?)null)
+        .Where(value => value is > 0)
+        .Select(value => value!.Value)
+        .Distinct()
+        .ToArray();
+
+static IReadOnlyList<string> ReadStringClaims(ClaimsPrincipal user, string claimType) =>
+    user.FindAll(claimType)
+        .Select(claim => claim.Value)
+        .Where(value => !string.IsNullOrWhiteSpace(value))
+        .Distinct(StringComparer.Ordinal)
+        .ToArray();
+
+static int? ReadPositiveIntConfiguration(IConfiguration configuration, string key) =>
+    int.TryParse(configuration[key], out var parsed) && parsed > 0 ? parsed : null;
+
+static string DisplayNameFromUsername(string username)
+{
+    var atIndex = username.IndexOf('@', StringComparison.Ordinal);
+    return atIndex > 0 ? username[..atIndex] : username;
+}
+
+static string SanitizeIdentifier(string value)
+{
+    var cleaned = new string(value
+        .Where(character => char.IsLetterOrDigit(character) || character is '-' or '_')
+        .ToArray());
+    return string.IsNullOrWhiteSpace(cleaned) ? "user" : cleaned.ToLowerInvariant();
+}
+
 static string[] GetAllowedCorsOrigins(IConfiguration configuration)
 {
     var origins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-        ?? ["http://localhost:5173"];
+        ?? [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://localhost:5174",
+            "http://127.0.0.1:5174"
+        ];
     var normalizedOrigins = origins
         .Where(origin => !string.IsNullOrWhiteSpace(origin))
         .Select(origin => origin.Trim())
@@ -457,7 +713,32 @@ public sealed record MeResponse(
     string? ProfileTypeId,
     bool? IsAdmin,
     bool HeaderExecutionContextEnabled,
-    bool PolizasExecutionContextRequired);
+    bool PolizasExecutionContextRequired,
+    AuthUserResponse? User,
+    AuthApplicationResponse? Application,
+    IReadOnlyList<int> AllowedBrokerIds,
+    IReadOnlyList<string> Permissions,
+    string AuthMode);
+
+public sealed record LoginRequest(string? Username, string? Password, int? BrokerId);
+
+public sealed record LoginSessionResponse(string Mode, DateTimeOffset ExpiresAt);
+
+public sealed record AuthUserResponse(string Id, string DisplayName);
+
+public sealed record AuthApplicationResponse(string Key, string Name);
+
+public sealed record LoginResponse(
+    LoginSessionResponse Session,
+    AuthUserResponse User,
+    AuthApplicationResponse Application,
+    int? CurrentBrokerId,
+    int UserId,
+    int? ProfileId,
+    string? ProfileTypeId,
+    bool IsAdmin,
+    IReadOnlyList<int> AllowedBrokerIds,
+    IReadOnlyList<string> Permissions);
 
 public sealed record AutosParticularesScope(
     string Ramo,

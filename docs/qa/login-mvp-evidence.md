@@ -84,3 +84,59 @@ Smoke visual:
 - La sesion es demo/local y no representa autenticacion productiva.
 - El backend sigue pendiente de login real y de sustituir cabeceras MVP por claims/sesion validada.
 - El proveedor de identidad productivo sigue pendiente de decision funcional/tecnica.
+
+## Incremento backend demo-session
+
+Fecha: 2026-05-15
+
+Alcance implementado:
+
+- `POST /api/auth/login` crea una sesion demo backend mediante cookie `HttpOnly`.
+- `POST /api/auth/logout` limpia la cookie demo.
+- `/api/me` devuelve usuario, aplicacion, brokers permitidos, permisos y modo de autenticacion.
+- El contexto efectivo de polizas prioriza claims/sesion y conserva el fallback MVP por API key/cabeceras.
+- Frontend soporta `VITE_AUTH_MODE=demo-session` con `withCredentials` y sin exponer API key.
+- La UI de login sigue siendo Vue compilado y no consume metadata AppBuilder.
+
+Evidencia ejecutada:
+
+```powershell
+.\tools\quality\Invoke-MvpQualityGate.ps1 -NodeExe "C:\Users\DomingoCabezaGuerra\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" -SkipSmoke
+npm run format
+npm run lint
+npm run test:unit
+npm run build
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-CorsAudit.ps1 -FailOnFindings
+```
+
+Resultado:
+
+- Gate local con `-SkipSmoke`: correcto.
+- Backend restore/build/tests dentro del gate: 73 tests correctos.
+- Formato frontend correcto.
+- Lint frontend correcto.
+- Unit tests frontend: 73 correctos.
+- Build frontend correcto.
+- Secret scan: sin leaks.
+- CORS audit: sin findings.
+- Documentation baseline: correcto.
+
+Validacion backend:
+
+```powershell
+dotnet build .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release
+```
+
+Resultado:
+
+- Build backend Release correcto con SDK .NET 10.0.300.
+- Tests backend: 73 correctos.
+- Se han anadido pruebas backend para login demo, credenciales invalidas, opt-in fuera de Development, logout y `/api/me` con sesion cookie.
+
+Riesgos residuales:
+
+- El modo backend demo no es autenticacion productiva.
+- Falta decision de proveedor auth real y reglas finales de permisos/brokers.

@@ -322,15 +322,19 @@ Alcance:
 - Riesgo: no distinguir aplicacion de tenant.
   - Mitigacion: aplicacion = producto/capacidades; broker = alcance/conexion/datos.
 
+## Estado incremental iLiniumTech
+
+Fecha: 2026-05-15
+
+- Paso 1 entregado: login visual estatico, guard de rutas, sesion local demo, logout y pruebas frontend.
+- Paso 2 implementado como demo-session backend: `POST /api/auth/login`, `POST /api/auth/logout` y `/api/me` ampliado.
+- Paso 3 iniciado: `IPolizasExecutionContextAccessor` prioriza claims/sesion antes que cabeceras MVP.
+- Evidencia QA: `docs/qa/login-mvp-evidence.md`.
+
 ## Siguiente tarea recomendada
 
-Implementar solo el Paso 1:
+Avanzar en permisos efectivos sobre la base demo-session:
 
-- login visual estatico;
-- guard de rutas;
-- sesion demo local;
-- logout;
-- tests unitarios del guard y del servicio de sesion demo;
-- smoke visual en `http://127.0.0.1:5174/login`.
-
-Antes de tocar backend conviene validar visualmente con producto que el flujo login -> menu lateral -> polizas es el esperado.
+- definir politicas `polizas.catalogs`, `polizas.read` y `polizas.detail`;
+- validar broker activo contra brokers permitidos de la sesion;
+- mantener headers MVP solo como fallback local/demo hasta retirada controlada.

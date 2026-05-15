@@ -14,6 +14,7 @@ describe('runtime config contract', () => {
     const config = getRuntimeConfig()
 
     expect(config.backendEnabled).toBe(false)
+    expect(config.authMode).toBe('api-key')
     expect(config.issues).toEqual([])
     expect(getBlockingRuntimeConfigMessage(config)).toBeNull()
   })
@@ -29,6 +30,31 @@ describe('runtime config contract', () => {
     expect(config.issues.map((issue) => issue.code)).toContain('ILINIUMTECH_API_KEY_MISSING')
     expect(getBlockingRuntimeConfigMessage(config)).toContain('VITE_ILINIUMTECH_API_KEY')
     expect(getApiHeaders(config)['X-ILiniumTech-Api-Key']).toBeUndefined()
+  })
+
+  it('allows backend demo-session mode without exposing an API key', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', '')
+
+    const { getApiHeaders, getBlockingRuntimeConfigMessage, getRuntimeConfig } =
+      await import('./runtimeConfig')
+    const config = getRuntimeConfig()
+
+    expect(config.authMode).toBe('demo-session')
+    expect(config.issues).toEqual([])
+    expect(getBlockingRuntimeConfigMessage(config)).toBeNull()
+    expect(getApiHeaders(config)['X-ILiniumTech-Api-Key']).toBeUndefined()
+  })
+
+  it('reports invalid frontend auth modes', async () => {
+    vi.stubEnv('VITE_AUTH_MODE', 'metadata-runtime')
+
+    const { getRuntimeConfig } = await import('./runtimeConfig')
+    const config = getRuntimeConfig()
+
+    expect(config.authMode).toBe('api-key')
+    expect(config.issues.map((issue) => issue.code)).toContain('ILINIUMTECH_AUTH_MODE_INVALID')
   })
 
   it('keeps backend broker context compatible with the API integer contract', async () => {

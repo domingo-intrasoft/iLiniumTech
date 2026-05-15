@@ -72,17 +72,17 @@ Reglas:
 - En modo backend, `/api/me` seguira siendo la autoridad del contexto de polizas.
 - No se deben almacenar tokens productivos en `localStorage`.
 
-### Login backend futuro
+### Login backend MVP demo
 
-Cuando se aborde el segundo incremento, el contrato recomendado sera:
+El segundo incremento mantiene un contrato propio de iLiniumTech y no reutiliza el login AppBuilder. En modo demo backend se expone:
 
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
 - `GET /api/me`
 
-`POST /api/auth/login` debe aceptar credenciales o federacion segun proveedor aprobado. Si se usa modo demo backend, debe estar activado por configuracion explicita y desactivado por defecto fuera de Development.
+`POST /api/auth/login` acepta credenciales demo solo para facilitar el MVP revisable. En Development queda disponible por defecto salvo `Auth:Demo:Enabled=false`; fuera de Development requiere `Auth:Demo:Enabled=true` y opt-in explicito `Auth:Demo:OptIn` con el valor demo aprobado por las politicas de contexto. Este contrato no sustituye la decision pendiente de proveedor productivo.
 
-`GET /api/me` debe devolver, como minimo:
+`GET /api/me` devuelve, como minimo:
 
 - usuario visible minimo;
 - aplicacion activa;
@@ -91,6 +91,8 @@ Cuando se aborde el segundo incremento, el contrato recomendado sera:
 - perfil efectivo si aplica;
 - permisos efectivos;
 - indicadores de contexto requerido para polizas.
+
+La cookie de sesion demo es `HttpOnly`, no contiene metadata de pantalla y el backend prioriza claims/sesion para construir el contexto de polizas cuando existe autenticacion. El modo frontend `VITE_AUTH_MODE=demo-session` usa cookie y no exige `VITE_ILINIUMTECH_API_KEY`.
 
 ## Reglas de negocio
 
@@ -129,9 +131,9 @@ Frontend primer incremento:
 
 Backend segundo incremento:
 
-- endpoint de login/logout si se decide avanzar mas alla de demo local;
-- ampliacion de `/api/me`;
-- contexto autenticado para sustituir headers MVP;
+- endpoint de login/logout demo controlado por configuracion;
+- ampliacion de `/api/me` con usuario, aplicacion, brokers permitidos, permisos y modo de auth;
+- contexto autenticado por claims para sustituir headers MVP cuando exista sesion;
 - politicas por permisos de polizas.
 
 Documentacion:

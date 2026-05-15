@@ -15,7 +15,7 @@ public sealed class ApiKeyAuthenticationHandler(
     : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
     public const string SchemeName = "ApiKey";
-    private const string HeaderName = "X-ILiniumTech-Api-Key";
+    public const string HeaderName = "X-ILiniumTech-Api-Key";
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {

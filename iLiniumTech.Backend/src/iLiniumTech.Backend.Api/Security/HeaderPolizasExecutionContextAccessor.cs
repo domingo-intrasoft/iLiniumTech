@@ -19,6 +19,12 @@ public sealed class HeaderPolizasExecutionContextAccessor(
     {
         get
         {
+            var claimsContext = ReadClaimsContext();
+            if (claimsContext is not null)
+            {
+                return claimsContext;
+            }
+
             var allowHeaderContext = HeaderExecutionContextPolicy.IsEnabled(configuration, environment);
             var brokerId = (allowHeaderContext ? ReadPositiveIntHeader(BrokerIdHeaderName) : null)
                 ?? ReadIntConfiguration("Polizas:BrokerId", "ILINIUMTECH:BROKER_ID");
@@ -35,6 +41,25 @@ public sealed class HeaderPolizasExecutionContextAccessor(
                     IsAdmin: (allowHeaderContext ? ReadBoolHeader(IsAdminHeaderName) : null)
                         ?? ReadBoolConfiguration("Polizas:IsAdmin", "ILINIUMTECH:IS_ADMIN"));
         }
+    }
+
+    private PolizasExecutionContext? ReadClaimsContext()
+    {
+        var user = httpContextAccessor.HttpContext?.User;
+        if (user?.Identity?.IsAuthenticated != true)
+        {
+            return null;
+        }
+
+        var brokerId = ReadPositiveIntClaim(PolizasContextClaimTypes.BrokerId);
+        return brokerId is null
+            ? null
+            : new PolizasExecutionContext(
+                BrokerId: brokerId.Value,
+                UserId: ReadPositiveIntClaim(PolizasContextClaimTypes.UserId),
+                ProfileId: ReadPositiveIntClaim(PolizasContextClaimTypes.ProfileId),
+                ProfileTypeId: ReadStringClaim(PolizasContextClaimTypes.ProfileTypeId),
+                IsAdmin: ReadBoolClaim(PolizasContextClaimTypes.IsAdmin));
     }
 
     private int? ReadPositiveIntHeader(string headerName)
@@ -64,6 +89,21 @@ public sealed class HeaderPolizasExecutionContextAccessor(
     }
 
     private string? ReadStringHeader(string headerName) => ReadStringHeader(headerName, out _);
+
+    private int? ReadPositiveIntClaim(string claimType)
+    {
+        var value = ReadStringClaim(claimType);
+        return int.TryParse(value, out var parsed) && parsed > 0 ? parsed : null;
+    }
+
+    private bool? ReadBoolClaim(string claimType)
+    {
+        var value = ReadStringClaim(claimType);
+        return bool.TryParse(value, out var parsed) ? parsed : null;
+    }
+
+    private string? ReadStringClaim(string claimType) =>
+        httpContextAccessor.HttpContext?.User.FindFirst(claimType)?.Value;
 
     private string? ReadStringHeader(string headerName, out bool wasPresent)
     {

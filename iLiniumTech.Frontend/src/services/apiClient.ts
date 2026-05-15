@@ -8,6 +8,7 @@ const headers = getApiHeaders(runtimeConfig)
 export const apiClient = axios.create({
   baseURL: runtimeConfig.apiBaseUrl,
   timeout: 10_000,
+  withCredentials: runtimeConfig.authMode === 'demo-session',
   headers: Object.keys(headers).length > 0 ? headers : undefined,
 })
 

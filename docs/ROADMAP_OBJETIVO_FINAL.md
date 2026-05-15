@@ -271,7 +271,7 @@ DoD:
 - Pruebas de acceso sin token, con token invalido, sin broker y sin permiso.
 - Documentacion de migracion desde cabeceras MVP.
 
-Estado real a 2026-05-14:
+Estado real a 2026-05-15:
 
 Entregado:
 
@@ -280,11 +280,14 @@ Entregado:
 - Estrategia incremental definida para pasar de API key/headers a claims o sesion backend sin romper contratos del frontend.
 - Contrato conceptual de contexto definido: `currentUserId`, `currentBrokerId`, perfil, roles, permisos, brokers permitidos y `correlationId`.
 - Regla reafirmada: permisos AppBuilder pueden servir como evidencia o migracion, nunca como motor runtime dinamico.
+- Login MVP frontend entregado con ruta `/login`, guard, logout y sesion local demo.
+- Primer contrato backend demo-session implementado: `POST /api/auth/login`, `POST /api/auth/logout` y `/api/me` ampliado.
+- El contexto de polizas ya prioriza claims/sesion cuando existe autenticacion demo backend.
+- Evidencia QA documentada en [login-mvp-evidence.md](qa/login-mvp-evidence.md).
 
 Pendiente de implementacion:
 
 - Elegir e integrar mecanismo auth aprobado.
-- Normalizar claims/sesion a contexto backend por request.
 - Crear politicas backend por permisos efectivos como `polizas.read`, `polizas.detail` y `polizas.catalogs`.
 - Aplicar 401/403 sanitizados con `correlationId` y logs seguros.
 - Conectar `SESSION_CONTEXT` a valores autenticados, no a headers manipulables.

@@ -3,11 +3,15 @@ export interface RuntimeConfigIssue {
     | 'ILINIUMTECH_API_KEY_MISSING'
     | 'ILINIUMTECH_API_BASE_URL_INVALID'
     | 'ILINIUMTECH_BROKER_ID_INVALID'
+    | 'ILINIUMTECH_AUTH_MODE_INVALID'
   message: string
 }
 
+export type RuntimeAuthMode = 'api-key' | 'demo-session'
+
 export interface RuntimeConfig {
   backendEnabled: boolean
+  authMode: RuntimeAuthMode
   apiBaseUrl: string
   apiKey: string | null
   brokerId: string | null
@@ -62,9 +66,23 @@ function readBrokerId(value: string | undefined, issues: RuntimeConfigIssue[]) {
   return brokerId
 }
 
+function readAuthMode(value: string | undefined, issues: RuntimeConfigIssue[]): RuntimeAuthMode {
+  const authMode = cleanValue(value) ?? 'api-key'
+  if (authMode === 'api-key' || authMode === 'demo-session') {
+    return authMode
+  }
+
+  issues.push({
+    code: 'ILINIUMTECH_AUTH_MODE_INVALID',
+    message: 'VITE_AUTH_MODE debe ser api-key o demo-session.',
+  })
+  return 'api-key'
+}
+
 export function getRuntimeConfig(): RuntimeConfig {
   const issues: RuntimeConfigIssue[] = []
   const backendEnabled = import.meta.env.VITE_USE_BACKEND === 'true'
+  const authMode = readAuthMode(import.meta.env.VITE_AUTH_MODE, issues)
   const rawApiBaseUrl = cleanValue(import.meta.env.VITE_API_BASE_URL) ?? DEFAULT_API_BASE_URL
   const configuredApiKey = cleanValue(import.meta.env.VITE_ILINIUMTECH_API_KEY)
   const apiKeyIsPlaceholder = configuredApiKey
@@ -80,7 +98,7 @@ export function getRuntimeConfig(): RuntimeConfig {
     })
   }
 
-  if (backendEnabled && !apiKey) {
+  if (backendEnabled && authMode === 'api-key' && !apiKey) {
     issues.push({
       code: 'ILINIUMTECH_API_KEY_MISSING',
       message: 'VITE_ILINIUMTECH_API_KEY debe configurarse fuera de Git para usar la API.',
@@ -89,6 +107,7 @@ export function getRuntimeConfig(): RuntimeConfig {
 
   return {
     backendEnabled,
+    authMode,
     apiBaseUrl: isValidHttpUrl(rawApiBaseUrl) ? rawApiBaseUrl : DEFAULT_API_BASE_URL,
     apiKey,
     brokerId,

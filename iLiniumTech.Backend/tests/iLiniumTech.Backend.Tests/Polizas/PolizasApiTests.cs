@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Json;
 using FluentAssertions;
 using iLiniumTech.Backend.Api.Security;
 using iLiniumTech.Backend.Application.Polizas;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using ApiAuthenticationSchemes = iLiniumTech.Backend.Api.Security.AuthenticationSchemes;
 
 namespace iLiniumTech.Backend.Tests.Polizas;
 
@@ -207,6 +209,115 @@ public sealed class PolizasApiTests
         var response = await client.GetAsync("/api/me");
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Demo_login_creates_cookie_session_and_me_context_without_api_key()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:BrokerId"] = "84",
+            ["Polizas:UserId"] = "10",
+            ["Polizas:ProfileId"] = "11",
+            ["Polizas:ProfileTypeId"] = "configured-profile",
+            ["Polizas:IsAdmin"] = "false"
+        });
+        using var client = factory.CreateClient();
+
+        var login = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            username = "demo@iliniumtech.local",
+            password = "demo",
+            brokerId = 42
+        });
+        var loginBody = await login.Content.ReadAsStringAsync();
+
+        login.StatusCode.Should().Be(HttpStatusCode.OK);
+        login.Headers.GetValues("Set-Cookie")
+            .Should().Contain(cookie => cookie.Contains(ApiAuthenticationSchemes.DemoSessionCookieName));
+        loginBody.Should().Contain("\"currentBrokerId\":42");
+        loginBody.Should().Contain("\"displayName\":\"demo\"");
+        loginBody.Should().Contain("polizas.read");
+        loginBody.Should().NotContain("demo@iliniumtech.local");
+        loginBody.Should().NotContain("password");
+
+        var me = await client.GetAsync("/api/me");
+        var meBody = await me.Content.ReadAsStringAsync();
+
+        me.StatusCode.Should().Be(HttpStatusCode.OK);
+        meBody.Should().Contain("\"brokerId\":42");
+        meBody.Should().Contain("\"entityMainId\":42");
+        meBody.Should().Contain("\"userId\":10");
+        meBody.Should().Contain("\"profileId\":11");
+        meBody.Should().Contain("\"profileTypeId\":\"configured-profile\"");
+        meBody.Should().Contain("\"displayName\":\"demo\"");
+        meBody.Should().Contain("\"application\":{\"key\":\"iliniumtech\",\"name\":\"iLiniumTech\"}");
+        meBody.Should().Contain("polizas.detail");
+        meBody.Should().Contain("\"authMode\":\"DemoSession\"");
+    }
+
+    [Fact]
+    public async Task Demo_login_rejects_invalid_credentials_without_setting_session_cookie()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            username = "demo",
+            password = "wrong"
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        response.Headers.TryGetValues("Set-Cookie", out _).Should().BeFalse();
+        body.Should().Contain("AUTH_INVALID_CREDENTIALS");
+        body.Should().NotContain("wrong");
+    }
+
+    [Fact]
+    public async Task Demo_login_is_disabled_outside_development_without_explicit_opt_in()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["Auth:Demo:Enabled"] = "true"
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            username = "demo",
+            password = "demo"
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        body.Should().Contain("AUTH_DEMO_DISABLED");
+        response.Headers.TryGetValues("Set-Cookie", out _).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Demo_logout_clears_cookie_session()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+
+        var login = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            username = "demo",
+            password = "demo"
+        });
+        login.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var logout = await client.PostAsync("/api/auth/logout", null);
+
+        logout.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        logout.Headers.GetValues("Set-Cookie")
+            .Should().Contain(cookie =>
+                cookie.Contains(ApiAuthenticationSchemes.DemoSessionCookieName) &&
+                cookie.Contains("expires=", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]

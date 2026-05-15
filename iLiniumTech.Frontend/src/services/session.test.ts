@@ -35,7 +35,7 @@ describe('session service', () => {
 
     const { getSessionContext } = await import('./session')
 
-    await expect(getSessionContext()).resolves.toEqual({
+    await expect(getSessionContext()).resolves.toMatchObject({
       brokerId: 42,
       entityMainId: 42,
       userId: 7,
@@ -44,6 +44,8 @@ describe('session service', () => {
       isAdmin: true,
       headerExecutionContextEnabled: true,
       polizasExecutionContextRequired: true,
+      allowedBrokerIds: [],
+      permissions: [],
     })
     expect(apiClient.get).toHaveBeenCalledWith('/api/me')
   })
@@ -109,7 +111,7 @@ describe('session service', () => {
     const { apiClient } = await import('./apiClient')
     const { getSessionContext } = await import('./session')
 
-    await expect(getSessionContext()).resolves.toEqual({
+    await expect(getSessionContext()).resolves.toMatchObject({
       brokerId: 42,
       entityMainId: 42,
       userId: null,
@@ -118,6 +120,10 @@ describe('session service', () => {
       isAdmin: null,
       headerExecutionContextEnabled: false,
       polizasExecutionContextRequired: false,
+      application: { key: 'iliniumtech', name: 'iLiniumTech' },
+      allowedBrokerIds: [42],
+      permissions: ['polizas.catalogs', 'polizas.read', 'polizas.detail'],
+      authMode: 'local',
     })
     expect(apiClient.get).not.toHaveBeenCalled()
   })

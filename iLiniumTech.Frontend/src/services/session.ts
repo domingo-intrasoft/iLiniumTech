@@ -13,6 +13,17 @@ export interface SessionContext {
   isAdmin: boolean | null
   headerExecutionContextEnabled: boolean
   polizasExecutionContextRequired: boolean
+  user?: {
+    id: string
+    displayName: string
+  } | null
+  application?: {
+    key: string
+    name: string
+  } | null
+  allowedBrokerIds?: number[]
+  permissions?: string[]
+  authMode?: string
 }
 
 const session = ref<SessionContext | null>(null)
@@ -39,6 +50,11 @@ function normalizeSessionContext(data: SessionContext): SessionContext {
     isAdmin: data.isAdmin ?? null,
     headerExecutionContextEnabled: data.headerExecutionContextEnabled,
     polizasExecutionContextRequired: data.polizasExecutionContextRequired,
+    user: data.user ?? null,
+    application: data.application ?? null,
+    allowedBrokerIds: data.allowedBrokerIds ?? [],
+    permissions: data.permissions ?? [],
+    authMode: data.authMode,
   }
 }
 
@@ -54,6 +70,11 @@ export async function getSessionContext(): Promise<SessionContext> {
       isAdmin: null,
       headerExecutionContextEnabled: false,
       polizasExecutionContextRequired: false,
+      user: null,
+      application: { key: 'iliniumtech', name: 'iLiniumTech' },
+      allowedBrokerIds: brokerId ? [brokerId] : [],
+      permissions: ['polizas.catalogs', 'polizas.read', 'polizas.detail'],
+      authMode: 'local',
     })
   }
 

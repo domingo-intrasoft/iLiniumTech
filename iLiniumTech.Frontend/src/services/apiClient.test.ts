@@ -37,4 +37,12 @@ describe('apiClient headers', () => {
 
     expect(apiClient.defaults.headers['X-ILiniumTech-Api-Key']).toBeUndefined()
   })
+
+  it('uses credentials when backend auth is cookie based', async () => {
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+
+    const { apiClient } = await import('./apiClient')
+
+    expect(apiClient.defaults.withCredentials).toBe(true)
+  })
 })

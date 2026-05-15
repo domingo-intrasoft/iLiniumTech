@@ -31,7 +31,7 @@ async function submitLogin() {
 
   loading.value = true
   try {
-    login({ username: username.value, password: password.value })
+    await login({ username: username.value, password: password.value })
     await router.replace(targetAfterLogin())
   } catch (exception) {
     error.value = exception instanceof Error ? exception.message : 'No se pudo iniciar sesion.'
