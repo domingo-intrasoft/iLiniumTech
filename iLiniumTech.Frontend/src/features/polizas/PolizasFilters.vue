@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed, reactive, watch } from 'vue'
 
 import {
   createEmptyPolizasFilterForm,
@@ -13,12 +13,14 @@ import type { PolizasCatalogs } from './polizasTypes'
 const props = withDefaults(
   defineProps<{
     catalogs: PolizasCatalogs
+    criteria?: PolizasSearchCriteria
     loading?: boolean
     error?: string | null
     searchDisabled?: boolean
     blockedMessage?: string | null
   }>(),
   {
+    criteria: undefined,
     loading: false,
     error: null,
     searchDisabled: false,
@@ -33,6 +35,24 @@ const emit = defineEmits<{
 
 const searchValues = reactive(createEmptyPolizasFilterForm())
 const canSearch = computed(() => !props.loading && !props.searchDisabled)
+
+function applyCriteria(criteria: PolizasSearchCriteria | undefined) {
+  Object.keys(searchValues).forEach((key) => {
+    searchValues[key as keyof typeof searchValues] = ''
+  })
+
+  if (!criteria) {
+    return
+  }
+
+  searchValues.poliza = criteria.numero
+  searchValues.nombreCompleto = criteria.cliente
+  searchValues.tipoPoliza = criteria.estado
+  searchValues.cia = criteria.compania
+  searchValues.ramo = criteria.ramo
+  searchValues.efectoInicial = criteria.fechaEfectoDesde
+  searchValues.efectoFinal = criteria.fechaEfectoHasta
+}
 
 function fieldStyle(field: PolizasSearchField) {
   return { gridColumn: `span ${field.span}` }
@@ -96,6 +116,8 @@ function clearFilters() {
   })
   emit('clear')
 }
+
+watch(() => props.criteria, applyCriteria, { immediate: true, deep: true })
 </script>
 
 <template>

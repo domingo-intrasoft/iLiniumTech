@@ -294,6 +294,7 @@ public sealed class PolizasApiTests
             ["Auth:Demo:AllowedBrokerIds:0"] = "84"
         });
         using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "login-broker-forbidden");
 
         var response = await client.PostAsJsonAsync("/api/auth/login", new
         {
@@ -353,6 +354,166 @@ public sealed class PolizasApiTests
             .Should().Contain(cookie =>
                 cookie.Contains(ApiAuthenticationSchemes.DemoSessionCookieName) &&
                 cookie.Contains("expires=", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task Demo_session_can_switch_to_allowed_broker_and_me_reflects_it()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:AllowedBrokerIds:0"] = "42",
+            ["Auth:Demo:AllowedBrokerIds:1"] = "84",
+            ["Polizas:UserId"] = "10",
+            ["Polizas:ProfileId"] = "11",
+            ["Polizas:ProfileTypeId"] = "configured-profile",
+            ["Polizas:IsAdmin"] = "false"
+        });
+        using var client = factory.CreateClient();
+
+        var login = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            username = "demo@iliniumtech.local",
+            password = "demo",
+            brokerId = 42
+        });
+        login.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var broker = await client.PostAsJsonAsync("/api/auth/broker", new
+        {
+            brokerId = 84
+        });
+        var brokerBody = await broker.Content.ReadAsStringAsync();
+
+        broker.StatusCode.Should().Be(HttpStatusCode.OK);
+        broker.Headers.GetValues("Set-Cookie")
+            .Should().Contain(cookie => cookie.Contains(ApiAuthenticationSchemes.DemoSessionCookieName));
+        brokerBody.Should().Contain("\"currentBrokerId\":84");
+        brokerBody.Should().Contain("\"userId\":10");
+        brokerBody.Should().Contain("\"profileId\":11");
+        brokerBody.Should().Contain("\"profileTypeId\":\"configured-profile\"");
+        brokerBody.Should().Contain("\"displayName\":\"demo\"");
+        brokerBody.Should().Contain("\"application\":{\"key\":\"iliniumtech\",\"name\":\"iLiniumTech\"}");
+        brokerBody.Should().Contain("polizas.read");
+        brokerBody.Should().NotContain("demo@iliniumtech.local");
+        brokerBody.Should().NotContain("password");
+
+        var me = await client.GetAsync("/api/me");
+        var meBody = await me.Content.ReadAsStringAsync();
+
+        me.StatusCode.Should().Be(HttpStatusCode.OK);
+        meBody.Should().Contain("\"brokerId\":84");
+        meBody.Should().Contain("\"entityMainId\":84");
+        meBody.Should().Contain("\"userId\":10");
+        meBody.Should().Contain("\"profileId\":11");
+        meBody.Should().Contain("\"profileTypeId\":\"configured-profile\"");
+        meBody.Should().Contain("\"authMode\":\"DemoSession\"");
+    }
+
+    [Fact]
+    public async Task Demo_session_rejects_non_positive_broker_switch_with_sanitized_error()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "broker-validation");
+
+        var response = await client.PostAsJsonAsync("/api/auth/broker", new
+        {
+            brokerId = 0
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("broker-validation");
+        body.Should().Contain("AUTH_BROKER_VALIDATION_ERROR");
+        body.Should().Contain("\"correlationId\":\"broker-validation\"");
+        body.Should().NotContain("ApiSecurity");
+        body.Should().NotContain("test-key");
+        body.Should().NotContain("password");
+    }
+
+    [Fact]
+    public async Task Demo_session_rejects_broker_switch_outside_allowed_brokers_without_exposing_ids()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:AllowedBrokerIds:0"] = "42"
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client, brokerId: 42);
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "broker-forbidden");
+
+        var response = await client.PostAsJsonAsync("/api/auth/broker", new
+        {
+            brokerId = 84
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.Headers.TryGetValues("Set-Cookie", out _).Should().BeFalse();
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("broker-forbidden");
+        body.Should().Contain("AUTH_BROKER_FORBIDDEN");
+        body.Should().Contain("\"correlationId\":\"broker-forbidden\"");
+        body.Should().NotContain("42");
+        body.Should().NotContain("84");
+        body.Should().NotContain(PolizasPermissions.Read);
+        body.Should().NotContain("ApiSecurity");
+        body.Should().NotContain("test-key");
+        body.Should().NotContain("password");
+    }
+
+    [Fact]
+    public async Task Demo_session_rejects_broker_switch_when_allowed_brokers_are_missing()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        var cookie = CreateDemoSessionCookie(
+            factory,
+            currentBrokerId: 42,
+            allowedBrokerIds: [],
+            permissions: [PolizasPermissions.Catalogs, PolizasPermissions.Read, PolizasPermissions.Detail]);
+        client.DefaultRequestHeaders.Add(
+            "Cookie",
+            $"{ApiAuthenticationSchemes.DemoSessionCookieName}={cookie}");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "broker-no-allowed");
+
+        var response = await client.PostAsJsonAsync("/api/auth/broker", new
+        {
+            brokerId = 42
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.Headers.TryGetValues("Set-Cookie", out _).Should().BeFalse();
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("broker-no-allowed");
+        body.Should().Contain("AUTH_BROKER_FORBIDDEN");
+        body.Should().Contain("\"correlationId\":\"broker-no-allowed\"");
+        body.Should().NotContain("42");
+        body.Should().NotContain(PolizasPermissions.Read);
+        body.Should().NotContain("test-key");
+    }
+
+    [Fact]
+    public async Task Api_key_alone_cannot_switch_demo_session_broker()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "broker-api-key-only");
+
+        var response = await client.PostAsJsonAsync("/api/auth/broker", new
+        {
+            brokerId = 42
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("broker-api-key-only");
+        body.Should().Contain("POLIZAS_AUTH_REQUIRED");
+        body.Should().Contain("\"correlationId\":\"broker-api-key-only\"");
+        body.Should().NotContain("42");
+        body.Should().NotContain("ApiSecurity");
+        body.Should().NotContain("test-key");
     }
 
     [Fact]
@@ -923,12 +1084,13 @@ public sealed class PolizasApiTests
         body.Should().Contain("POLIZAS_CONTEXT_INVALID");
     }
 
-    private static async Task LoginDemoAsync(HttpClient client)
+    private static async Task LoginDemoAsync(HttpClient client, int? brokerId = null)
     {
         var login = await client.PostAsJsonAsync("/api/auth/login", new
         {
             username = "demo",
-            password = "demo"
+            password = "demo",
+            brokerId
         });
 
         login.StatusCode.Should().Be(HttpStatusCode.OK);

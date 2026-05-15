@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, type LocationQueryRaw } from 'vue-router'
 
 import { polizasTableColumns, type PolizaTableColumn } from './polizasConstants'
 import { POLIZA_EMPTY_VALUE, formatPolizaValue } from './polizasFormatters'
@@ -13,6 +13,7 @@ const props = defineProps<{
   error: string | null
   page: number
   pageSize: number
+  detailQuery?: LocationQueryRaw
 }>()
 
 const emit = defineEmits<{
@@ -47,6 +48,14 @@ function changePageSize(event: Event) {
 function retrySearch() {
   if (!props.loading) {
     emit('retry')
+  }
+}
+
+function detailRoute(item: PolizaListItem) {
+  return {
+    name: 'poliza-detail',
+    params: { id: item.id },
+    query: props.detailQuery,
   }
 }
 </script>
@@ -125,7 +134,7 @@ function retrySearch() {
             <td>
               <RouterLink
                 class="table-icon-action"
-                :to="{ name: 'poliza-detail', params: { id: item.id } }"
+                :to="detailRoute(item)"
                 :aria-label="`Ver detalle de poliza ${item.numero}`"
                 title="Ver detalle"
               >
@@ -133,11 +142,7 @@ function retrySearch() {
               </RouterLink>
             </td>
             <td v-for="column in polizasTableColumns" :key="column.key">
-              <RouterLink
-                v-if="column.key === 'numero'"
-                class="table-link"
-                :to="{ name: 'poliza-detail', params: { id: item.id } }"
-              >
+              <RouterLink v-if="column.key === 'numero'" class="table-link" :to="detailRoute(item)">
                 {{ formatPolizaValue(tableCellValue(item, column), column.type, item.moneda) }}
               </RouterLink>
               <span v-else>

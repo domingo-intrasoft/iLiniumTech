@@ -1,13 +1,22 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { clearAuthSession, hasAuthSession, loginDemo } from '@/features/auth/authSession'
+import type { SessionContext } from '@/services/session'
 
 import { polizasDetailFixture } from './polizasFixture'
 
 const mocks = vi.hoisted(() => ({
-  route: { path: '/polizas/POL-1001', params: { id: 'POL-1001' as string | string[] } },
+  route: {
+    path: '/polizas/POL-1001',
+    params: { id: 'POL-1001' as string | string[] },
+    query: {} as Record<string, string>,
+  },
   router: { replace: vi.fn() },
+  session: { value: null as SessionContext | null },
+  sessionError: { value: null as string | null },
+  sessionErrorKind: { value: null as 'unauthenticated' | null },
+  loadSession: vi.fn(),
   getPolizaById: vi.fn(),
 }))
 
@@ -16,8 +25,18 @@ vi.mock('vue-router', () => ({
   useRouter: () => mocks.router,
   RouterLink: {
     props: ['to'],
-    template: '<a href="#"><slot /></a>',
+    template:
+      '<a href="#" :data-to-name="to.name" :data-query-numero="to.query?.numero ?? \'\'" :data-query-page="to.query?.page ?? \'\'"><slot /></a>',
   },
+}))
+
+vi.mock('@/services/session', () => ({
+  useSession: () => ({
+    session: mocks.session,
+    error: mocks.sessionError,
+    errorKind: mocks.sessionErrorKind,
+    loadSession: mocks.loadSession,
+  }),
 }))
 
 vi.mock('./polizasApi', () => ({
@@ -36,13 +55,43 @@ function axiosError(status: number, data: unknown) {
   }
 }
 
+function backendSession(overrides: Partial<SessionContext> = {}): SessionContext {
+  return {
+    brokerId: 42,
+    entityMainId: 42,
+    userId: 7,
+    profileId: 9,
+    profileTypeId: 'mvp-profile',
+    isAdmin: false,
+    headerExecutionContextEnabled: true,
+    polizasExecutionContextRequired: true,
+    permissions: ['polizas.catalogs', 'polizas.read', 'polizas.detail'],
+    ...overrides,
+  }
+}
+
+function enableBackendDemoSessionMode() {
+  vi.stubEnv('VITE_USE_BACKEND', 'true')
+  vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+}
+
 describe('PolizaDetailView', () => {
   beforeEach(() => {
+    vi.stubEnv('VITE_USE_BACKEND', 'false')
     mocks.route.path = '/polizas/POL-1001'
     mocks.route.params = { id: 'POL-1001' }
+    mocks.route.query = {}
     mocks.router.replace.mockReset()
+    mocks.session.value = null
+    mocks.sessionError.value = null
+    mocks.sessionErrorKind.value = null
+    mocks.loadSession.mockReset()
     mocks.getPolizaById.mockReset()
     clearAuthSession()
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
   })
 
   it('renders an honest read-only detail from local data', async () => {
@@ -57,6 +106,19 @@ describe('PolizaDetailView', () => {
     expect(wrapper.text()).toContain('Solo lectura')
     expect(wrapper.text()).toContain('Fixture local')
     expect(wrapper.text()).toContain('Sin workflows heredados')
+  })
+
+  it('preserves the original polizas query in the back link', async () => {
+    mocks.route.query = { numero: '0002', page: '2', pageSize: '10' }
+    mocks.getPolizaById.mockResolvedValueOnce(polizasDetailFixture[1])
+
+    const wrapper = mount(PolizaDetailView)
+    await flushPromises()
+
+    const backLink = wrapper.get('.detail-back')
+    expect(backLink.attributes('data-to-name')).toBe('polizas')
+    expect(backLink.attributes('data-query-numero')).toBe('0002')
+    expect(backLink.attributes('data-query-page')).toBe('2')
   })
 
   it('shows a loading state while the detail request is pending', () => {
@@ -81,6 +143,8 @@ describe('PolizaDetailView', () => {
   })
 
   it('clears the MVP session when the backend rejects detail with 401', async () => {
+    enableBackendDemoSessionMode()
+    mocks.loadSession.mockResolvedValueOnce(backendSession())
     loginDemo({ username: 'domingo', password: 'demo' })
     mocks.getPolizaById.mockRejectedValueOnce(
       axiosError(401, {
@@ -97,6 +161,50 @@ describe('PolizaDetailView', () => {
     expect(hasAuthSession()).toBe(false)
     expect(wrapper.find('[role="alert"]').text()).toContain(
       'La sesion no esta autorizada para consultar polizas.',
+    )
+  })
+
+  it('does not call detail API when backend session cannot be validated', async () => {
+    enableBackendDemoSessionMode()
+    mocks.sessionError.value =
+      'La sesion no esta autorizada para consultar polizas. Inicia sesion de nuevo si el problema continua.'
+    mocks.sessionErrorKind.value = 'unauthenticated'
+    mocks.loadSession.mockResolvedValueOnce(null)
+    loginDemo({ username: 'domingo', password: 'demo' })
+
+    const wrapper = mount(PolizaDetailView)
+    await flushPromises()
+
+    expect(mocks.getPolizaById).not.toHaveBeenCalled()
+    expect(hasAuthSession()).toBe(false)
+    expect(wrapper.find('[role="alert"]').text()).toContain(
+      'La sesion no esta autorizada para consultar polizas.',
+    )
+  })
+
+  it('does not call detail API when backend session is missing broker context', async () => {
+    enableBackendDemoSessionMode()
+    mocks.loadSession.mockResolvedValueOnce(backendSession({ brokerId: null, entityMainId: null }))
+
+    const wrapper = mount(PolizaDetailView)
+    await flushPromises()
+
+    expect(mocks.getPolizaById).not.toHaveBeenCalled()
+    expect(wrapper.find('[role="alert"]').text()).toContain(
+      'Configura un broker para consultar polizas.',
+    )
+  })
+
+  it('does not call detail API when backend session lacks polizas.detail permission', async () => {
+    enableBackendDemoSessionMode()
+    mocks.loadSession.mockResolvedValueOnce(backendSession({ permissions: ['polizas.read'] }))
+
+    const wrapper = mount(PolizaDetailView)
+    await flushPromises()
+
+    expect(mocks.getPolizaById).not.toHaveBeenCalled()
+    expect(wrapper.find('[role="alert"]').text()).toContain(
+      'La sesion actual no tiene permiso para consultar el detalle de polizas.',
     )
   })
 })

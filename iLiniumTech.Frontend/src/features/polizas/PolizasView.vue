@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter, type LocationQuery, type LocationQueryRaw } from 'vue-router'
 
 import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
@@ -14,6 +14,11 @@ import {
   type PolizasSearchCriteria,
 } from './polizasConstants'
 import { usePolizas } from './usePolizas'
+import type { PolizasQueryFilters } from './polizasTypes'
+
+const DEFAULT_PAGE = 1
+const DEFAULT_PAGE_SIZE = 25
+const POLIZAS_PAGE_SIZES = new Set([10, 25, 50])
 
 const {
   session,
@@ -31,14 +36,154 @@ const {
   filters,
   pagination,
   refresh,
-  setPage,
-  setPageSize,
 } = usePolizas()
 
+const route = useRoute()
 const router = useRouter()
 const { userLabel, logout } = useAuthSession()
 const isBackendMode = import.meta.env.VITE_USE_BACKEND === 'true'
 const dataOriginLabel = computed(() => (isBackendMode ? 'API polizas' : 'Fixture local'))
+
+interface PolizasRouteState {
+  filters: PolizasQueryFilters
+  page: number
+  pageSize: number
+}
+
+function firstQueryValue(value: LocationQuery[string] | undefined) {
+  const item = Array.isArray(value) ? value[0] : value
+  return typeof item === 'string' ? item.trim() : ''
+}
+
+function readPositiveInteger(
+  query: LocationQuery,
+  key: string,
+  fallback: number,
+  allowedValues?: Set<number>,
+) {
+  const rawValue = firstQueryValue(query[key])
+  const parsed = Number(rawValue)
+  const allowed = !allowedValues || allowedValues.has(parsed)
+  return Number.isInteger(parsed) && parsed > 0 && allowed ? parsed : fallback
+}
+
+function readIsoDateQueryValue(value: LocationQuery[string] | undefined) {
+  const rawValue = firstQueryValue(value)
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(rawValue)
+  if (!match) {
+    return ''
+  }
+
+  const year = Number(match[1])
+  const month = Number(match[2])
+  const day = Number(match[3])
+  const candidate = new Date(Date.UTC(year, month - 1, day))
+  return candidate.getUTCFullYear() === year &&
+    candidate.getUTCMonth() === month - 1 &&
+    candidate.getUTCDate() === day
+    ? rawValue
+    : ''
+}
+
+function parsePolizasRouteQuery(query: LocationQuery): PolizasRouteState {
+  return {
+    filters: {
+      numero: firstQueryValue(query.numero),
+      cliente: firstQueryValue(query.cliente),
+      estado: firstQueryValue(query.estado),
+      compania: firstQueryValue(query.compania),
+      ramo: firstQueryValue(query.ramo),
+      fechaEfectoDesde: readIsoDateQueryValue(query.fechaEfectoDesde),
+      fechaEfectoHasta: readIsoDateQueryValue(query.fechaEfectoHasta),
+    },
+    page: readPositiveInteger(query, 'page', DEFAULT_PAGE),
+    pageSize: readPositiveInteger(query, 'pageSize', DEFAULT_PAGE_SIZE, POLIZAS_PAGE_SIZES),
+  }
+}
+
+function addQueryValue(query: LocationQueryRaw, key: string, value: string) {
+  const cleanValue = value.trim()
+  if (cleanValue) {
+    query[key] = cleanValue
+  }
+}
+
+function buildPolizasRouteQuery(
+  currentFilters: PolizasQueryFilters,
+  currentPagination: { page: number; pageSize: number },
+): LocationQueryRaw {
+  const query: LocationQueryRaw = {
+    page: String(currentPagination.page),
+    pageSize: String(currentPagination.pageSize),
+  }
+
+  addQueryValue(query, 'numero', currentFilters.numero)
+  addQueryValue(query, 'cliente', currentFilters.cliente)
+  addQueryValue(query, 'estado', currentFilters.estado)
+  addQueryValue(query, 'compania', currentFilters.compania)
+  addQueryValue(query, 'ramo', currentFilters.ramo)
+  addQueryValue(query, 'fechaEfectoDesde', currentFilters.fechaEfectoDesde)
+  addQueryValue(query, 'fechaEfectoHasta', currentFilters.fechaEfectoHasta)
+
+  return query
+}
+
+function queryFingerprint(query: LocationQuery | LocationQueryRaw) {
+  return Object.entries(query)
+    .flatMap(([key, value]) => {
+      const values = Array.isArray(value) ? value : [value]
+      return values
+        .filter((item) => item !== null && item !== undefined)
+        .map((item) => [key, String(item)] as const)
+    })
+    .sort(([leftKey, leftValue], [rightKey, rightValue]) =>
+      leftKey === rightKey ? leftValue.localeCompare(rightValue) : leftKey.localeCompare(rightKey),
+    )
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&')
+}
+
+function applyRouteState(state: PolizasRouteState) {
+  filters.numero = state.filters.numero
+  filters.cliente = state.filters.cliente
+  filters.estado = state.filters.estado
+  filters.compania = state.filters.compania
+  filters.ramo = state.filters.ramo
+  filters.fechaEfectoDesde = state.filters.fechaEfectoDesde
+  filters.fechaEfectoHasta = state.filters.fechaEfectoHasta
+  pagination.page = state.page
+  pagination.pageSize = state.pageSize
+}
+
+function stateMatchesCurrentPolizas(state: PolizasRouteState) {
+  return (
+    filters.numero === state.filters.numero &&
+    filters.cliente === state.filters.cliente &&
+    filters.estado === state.filters.estado &&
+    filters.compania === state.filters.compania &&
+    filters.ramo === state.filters.ramo &&
+    filters.fechaEfectoDesde === state.filters.fechaEfectoDesde &&
+    filters.fechaEfectoHasta === state.filters.fechaEfectoHasta &&
+    pagination.page === state.page &&
+    pagination.pageSize === state.pageSize
+  )
+}
+
+async function replacePolizasRouteQuery() {
+  const query = buildPolizasRouteQuery(filters, pagination)
+
+  if (queryFingerprint(route.query) !== queryFingerprint(query)) {
+    await router.replace({ name: 'polizas', query })
+  }
+}
+
+async function refreshWithRouteState() {
+  await replacePolizasRouteQuery()
+  await refresh()
+  await replacePolizasRouteQuery()
+}
+
+applyRouteState(parsePolizasRouteQuery(route.query))
 
 const sessionLabel = computed(() => {
   if (sessionLoading.value) {
@@ -62,6 +207,18 @@ const sessionNeedsAttention = computed(
     Boolean(session.value?.polizasExecutionContextRequired && !session.value.brokerId),
 )
 
+const filterCriteria = computed<PolizasSearchCriteria>(() => ({
+  numero: filters.numero,
+  cliente: filters.cliente,
+  estado: filters.estado,
+  compania: filters.compania,
+  ramo: filters.ramo,
+  fechaEfectoDesde: filters.fechaEfectoDesde,
+  fechaEfectoHasta: filters.fechaEfectoHasta,
+}))
+
+const detailQuery = computed(() => buildPolizasRouteQuery(filters, pagination))
+
 async function executeSearch(criteria: PolizasSearchCriteria) {
   filters.numero = criteria.numero
   filters.cliente = criteria.cliente
@@ -71,7 +228,7 @@ async function executeSearch(criteria: PolizasSearchCriteria) {
   filters.fechaEfectoDesde = criteria.fechaEfectoDesde
   filters.fechaEfectoHasta = criteria.fechaEfectoHasta
   pagination.page = 1
-  await refresh()
+  await refreshWithRouteState()
 }
 
 async function clearFilters() {
@@ -83,13 +240,51 @@ async function clearFilters() {
   filters.fechaEfectoDesde = ''
   filters.fechaEfectoHasta = ''
   pagination.page = 1
-  await refresh()
+  await refreshWithRouteState()
+}
+
+async function changePage(page: number) {
+  if (page === pagination.page || loading.value) {
+    return
+  }
+
+  pagination.page = page
+  await refreshWithRouteState()
+}
+
+async function changePageSize(pageSize: number) {
+  if (pageSize === pagination.pageSize || loading.value) {
+    return
+  }
+
+  pagination.page = 1
+  pagination.pageSize = pageSize
+  await refreshWithRouteState()
 }
 
 async function signOut() {
   await logout()
   await router.replace({ name: 'login' })
 }
+
+watch(
+  () => route.query,
+  async (query) => {
+    const routeState = parsePolizasRouteQuery(query)
+
+    if (stateMatchesCurrentPolizas(routeState)) {
+      return
+    }
+
+    applyRouteState(routeState)
+    await refresh()
+    await replacePolizasRouteQuery()
+  },
+)
+
+onMounted(() => {
+  void replacePolizasRouteQuery()
+})
 </script>
 
 <template>
@@ -161,6 +356,7 @@ async function signOut() {
 
     <PolizasFilters
       :catalogs="catalogs"
+      :criteria="filterCriteria"
       :loading="catalogsLoading"
       :error="catalogsError"
       :search-disabled="contextBlocked"
@@ -175,8 +371,9 @@ async function signOut() {
       :error="error"
       :page="pagination.page"
       :page-size="pagination.pageSize"
-      @page-change="setPage"
-      @page-size-change="setPageSize"
+      :detail-query="detailQuery"
+      @page-change="changePage"
+      @page-size-change="changePageSize"
       @retry="refresh"
     />
   </AppShell>

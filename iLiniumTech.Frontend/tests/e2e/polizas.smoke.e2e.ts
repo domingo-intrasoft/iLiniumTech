@@ -28,7 +28,8 @@ test('polizas smoke uses local fixture without leaking AppBuilder runtime detail
   await expect(page.getByText('Fixture local')).toBeVisible()
   await expect(page.getByRole('table')).toBeVisible()
   await expect(page.getByRole('link', { name: 'Polizas', exact: true })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Autos Particulares', exact: true })).toBeVisible()
+  await expect(page.getByText('Autos Particulares', { exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Autos Particulares', exact: true })).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'POL-2026-0001', exact: true })).toBeVisible()
   await expect(page.getByRole('link', { name: 'POL-2026-0002', exact: true })).toBeVisible()
   await expect(
@@ -48,6 +49,15 @@ test('polizas smoke uses local fixture without leaking AppBuilder runtime detail
   await expect(page.getByRole('link', { name: 'POL-2026-0002', exact: true })).toBeVisible()
   await expect(page.getByRole('link', { name: 'POL-2026-0001', exact: true })).toHaveCount(0)
   await expect(page.getByText('1 poliza')).toBeVisible()
+  await expect(page).toHaveURL(/numero=0002/)
+
+  await page.getByRole('link', { name: 'Ver detalle de poliza POL-2026-0002', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'POL-2026-0002' })).toBeVisible()
+  await expect(page).toHaveURL(/numero=0002/)
+  await page.locator('#poliza-detail-content').getByRole('link', { name: 'Polizas' }).click()
+  await expect(page).toHaveURL(/numero=0002/)
+  await expect(page.getByRole('link', { name: 'POL-2026-0002', exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'POL-2026-0001', exact: true })).toHaveCount(0)
 
   await page.getByRole('button', { name: 'Limpiar Filtros' }).click()
 

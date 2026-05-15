@@ -221,6 +221,50 @@ app.MapPost("/api/auth/login", async (
 .AllowAnonymous()
 .WithName("LoginDemo");
 
+app.MapPost("/api/auth/broker", async (
+    HttpContext httpContext,
+    [FromBody] BrokerSelectionRequest? request) =>
+{
+    if (request?.BrokerId is null || request.BrokerId <= 0)
+    {
+        return ErrorResult(
+            httpContext,
+            StatusCodes.Status400BadRequest,
+            "AUTH_BROKER_VALIDATION_ERROR",
+            "A positive broker identifier is required.");
+    }
+
+    var requestedBrokerId = request.BrokerId.Value;
+    var allowedBrokerIds = ReadIntClaims(httpContext.User, PolizasContextClaimTypes.AllowedBrokerId);
+    if (allowedBrokerIds.Count == 0 || !allowedBrokerIds.Contains(requestedBrokerId))
+    {
+        return ErrorResult(
+            httpContext,
+            StatusCodes.Status403Forbidden,
+            "AUTH_BROKER_FORBIDDEN",
+            "The selected broker is not available for this session.");
+    }
+
+    var session = CreateDemoSessionFromCurrentPrincipal(httpContext.User, requestedBrokerId);
+    await httpContext.SignInAsync(
+        AuthenticationSchemes.DemoSession,
+        CreateDemoPrincipal(session),
+        new AuthenticationProperties
+        {
+            IsPersistent = false,
+            IssuedUtc = DateTimeOffset.UtcNow,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+        });
+
+    return Results.Ok(session);
+})
+.RequireAuthorization(policy =>
+{
+    policy.AddAuthenticationSchemes(AuthenticationSchemes.DemoSession);
+    policy.RequireAuthenticatedUser();
+})
+.WithName("SwitchDemoBroker");
+
 app.MapPost("/api/auth/logout", async (HttpContext httpContext) =>
 {
     await httpContext.SignOutAsync(AuthenticationSchemes.DemoSession);
@@ -630,6 +674,23 @@ static LoginResponse CreateDemoSession(string username, int? requestedBrokerId, 
         Permissions: ReadDemoPermissions(configuration));
 }
 
+static LoginResponse CreateDemoSessionFromCurrentPrincipal(ClaimsPrincipal user, int brokerId)
+{
+    return new LoginResponse(
+        Session: new LoginSessionResponse(
+            Mode: "demo",
+            ExpiresAt: DateTimeOffset.UtcNow.AddHours(8)),
+        User: CreateAuthUserResponse(user) ?? new AuthUserResponse("demo:user", "demo"),
+        Application: CreateApplicationResponse(user) ?? new AuthApplicationResponse("iliniumtech", "iLiniumTech"),
+        CurrentBrokerId: brokerId,
+        UserId: ReadFirstIntClaim(user, PolizasContextClaimTypes.UserId) ?? 1,
+        ProfileId: ReadFirstIntClaim(user, PolizasContextClaimTypes.ProfileId),
+        ProfileTypeId: ReadFirstStringClaim(user, PolizasContextClaimTypes.ProfileTypeId),
+        IsAdmin: ReadBoolClaim(user, PolizasContextClaimTypes.IsAdmin) ?? false,
+        AllowedBrokerIds: ReadIntClaims(user, PolizasContextClaimTypes.AllowedBrokerId),
+        Permissions: ReadStringClaims(user, PolizasContextClaimTypes.Permission));
+}
+
 static ClaimsPrincipal CreateDemoPrincipal(LoginResponse session)
 {
     var claims = new List<Claim>
@@ -695,6 +756,21 @@ static IReadOnlyList<int> ReadIntClaims(ClaimsPrincipal user, string claimType) 
         .Select(value => value!.Value)
         .Distinct()
         .ToArray();
+
+static int? ReadFirstIntClaim(ClaimsPrincipal user, string claimType)
+{
+    var values = ReadIntClaims(user, claimType);
+    return values.Count == 0 ? null : values[0];
+}
+
+static bool? ReadBoolClaim(ClaimsPrincipal user, string claimType)
+{
+    var value = ReadFirstStringClaim(user, claimType);
+    return bool.TryParse(value, out var parsed) ? parsed : null;
+}
+
+static string? ReadFirstStringClaim(ClaimsPrincipal user, string claimType) =>
+    user.FindFirstValue(claimType);
 
 static IReadOnlyList<string> ReadStringClaims(ClaimsPrincipal user, string claimType) =>
     user.FindAll(claimType)
@@ -813,6 +889,8 @@ public sealed record MeResponse(
     string AuthMode);
 
 public sealed record LoginRequest(string? Username, string? Password, int? BrokerId);
+
+public sealed record BrokerSelectionRequest(int? BrokerId);
 
 public sealed record LoginSessionResponse(string Mode, DateTimeOffset ExpiresAt);
 

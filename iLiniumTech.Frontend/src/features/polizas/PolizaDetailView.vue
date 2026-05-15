@@ -5,6 +5,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { clearAuthSession, useAuthSession } from '@/features/auth/authSession'
 import { toPolizasUserError } from '@/services/apiErrors'
 import { getBlockingRuntimeConfigMessage } from '@/services/runtimeConfig'
+import { type SessionContext, useSession } from '@/services/session'
 
 import AppShell from '@/layout/AppShell.vue'
 
@@ -16,6 +17,7 @@ import type { PolizaDetail } from './polizasTypes'
 const route = useRoute()
 const router = useRouter()
 const { userLabel, logout } = useAuthSession()
+const { error: sessionError, errorKind: sessionErrorKind, loadSession } = useSession()
 const poliza = ref<PolizaDetail | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -24,6 +26,10 @@ const isBackendMode = import.meta.env.VITE_USE_BACKEND === 'true'
 const dataOriginLabel = computed(() => (isBackendMode ? 'API polizas' : 'Fixture local'))
 const shellStatusLabel = computed(() => (isBackendMode ? 'API polizas' : 'Modo local'))
 const detailTitle = computed(() => poliza.value?.numero ?? 'Detalle de poliza')
+const polizasBackTarget = computed(() => ({ name: 'polizas', query: route.query }))
+const POLIZAS_DETAIL_PERMISSION = 'polizas.detail'
+const POLIZAS_DETAIL_ACCESS_DENIED_MESSAGE =
+  'La sesion actual no tiene permiso para consultar el detalle de polizas.'
 
 function currentPolizaId() {
   const id = route.params.id
@@ -38,15 +44,58 @@ function isMissingDetailValue(item: PolizaDetail, field: PolizaDetailField) {
   return detailValue(item, field) === POLIZA_EMPTY_VALUE
 }
 
+function permissionIsAllowed(context: SessionContext, permission: string) {
+  return (
+    context.authMode === 'ApiKey' ||
+    !Array.isArray(context.permissions) ||
+    context.permissions.includes(permission)
+  )
+}
+
+async function ensureBackendDetailContext() {
+  const runtimeConfigError = getBlockingRuntimeConfigMessage()
+  if (runtimeConfigError) {
+    error.value = runtimeConfigError
+    poliza.value = null
+    return false
+  }
+
+  if (!isBackendMode) {
+    return true
+  }
+
+  const currentSession = await loadSession()
+  if (!currentSession) {
+    if (sessionErrorKind.value === 'unauthenticated') {
+      clearAuthSession()
+    }
+
+    error.value = sessionError.value ?? 'No se pudo validar la sesion antes de consultar polizas.'
+    poliza.value = null
+    return false
+  }
+
+  if (currentSession.polizasExecutionContextRequired && currentSession.brokerId === null) {
+    error.value = 'Configura un broker para consultar polizas.'
+    poliza.value = null
+    return false
+  }
+
+  if (!permissionIsAllowed(currentSession, POLIZAS_DETAIL_PERMISSION)) {
+    error.value = POLIZAS_DETAIL_ACCESS_DENIED_MESSAGE
+    poliza.value = null
+    return false
+  }
+
+  return true
+}
+
 async function loadPoliza() {
   loading.value = true
   error.value = null
 
   try {
-    const runtimeConfigError = getBlockingRuntimeConfigMessage()
-    if (runtimeConfigError) {
-      error.value = runtimeConfigError
-      poliza.value = null
+    if (!(await ensureBackendDetailContext())) {
       return
     }
 
@@ -87,7 +136,7 @@ watch(() => route.params.id, loadPoliza, { immediate: true })
   >
     <div id="poliza-detail-content" class="poliza-detail-page">
       <header class="detail-topbar">
-        <RouterLink class="detail-back" :to="{ name: 'polizas' }">
+        <RouterLink class="detail-back" :to="polizasBackTarget">
           <i class="pi pi-arrow-left" aria-hidden="true"></i>
           Polizas
         </RouterLink>
