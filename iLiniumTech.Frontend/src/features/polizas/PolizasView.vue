@@ -43,6 +43,7 @@ const router = useRouter()
 const { userLabel, logout } = useAuthSession()
 const isBackendMode = import.meta.env.VITE_USE_BACKEND === 'true'
 const dataOriginLabel = computed(() => (isBackendMode ? 'API polizas' : 'Fixture local'))
+const POLIZAS_DETAIL_PERMISSION = 'polizas.detail'
 
 interface PolizasRouteState {
   filters: PolizasQueryFilters
@@ -218,6 +219,22 @@ const filterCriteria = computed<PolizasSearchCriteria>(() => ({
 }))
 
 const detailQuery = computed(() => buildPolizasRouteQuery(filters, pagination))
+const canOpenPolizaDetail = computed(() => {
+  if (!isBackendMode) {
+    return true
+  }
+
+  const currentSession = session.value
+  if (!currentSession) {
+    return false
+  }
+
+  return (
+    currentSession.authMode === 'ApiKey' ||
+    !Array.isArray(currentSession.permissions) ||
+    currentSession.permissions.includes(POLIZAS_DETAIL_PERMISSION)
+  )
+})
 
 async function executeSearch(criteria: PolizasSearchCriteria) {
   filters.numero = criteria.numero
@@ -372,6 +389,7 @@ onMounted(() => {
       :page="pagination.page"
       :page-size="pagination.pageSize"
       :detail-query="detailQuery"
+      :can-open-detail="canOpenPolizaDetail"
       @page-change="changePage"
       @page-size-change="changePageSize"
       @retry="refresh"

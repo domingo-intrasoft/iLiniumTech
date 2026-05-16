@@ -6,15 +6,22 @@ import { polizasTableColumns, type PolizaTableColumn } from './polizasConstants'
 import { POLIZA_EMPTY_VALUE, formatPolizaValue } from './polizasFormatters'
 import type { PolizaListItem } from './polizasTypes'
 
-const props = defineProps<{
-  items: PolizaListItem[]
-  total: number
-  loading: boolean
-  error: string | null
-  page: number
-  pageSize: number
-  detailQuery?: LocationQueryRaw
-}>()
+const props = withDefaults(
+  defineProps<{
+    items: PolizaListItem[]
+    total: number
+    loading: boolean
+    error: string | null
+    page: number
+    pageSize: number
+    detailQuery?: LocationQueryRaw
+    canOpenDetail?: boolean
+  }>(),
+  {
+    detailQuery: undefined,
+    canOpenDetail: true,
+  },
+)
 
 const emit = defineEmits<{
   'page-change': [page: number]
@@ -30,6 +37,7 @@ const lastVisible = computed(() => Math.min(props.page * props.pageSize, props.t
 const canGoPrevious = computed(() => props.page > 1 && !props.loading)
 const canGoNext = computed(() => props.page < totalPages.value && !props.loading)
 const resultLabel = computed(() => (props.total === 1 ? 'poliza' : 'polizas'))
+const canOpenDetail = computed(() => props.canOpenDetail ?? true)
 
 function tableCellValue(item: PolizaListItem, column: PolizaTableColumn) {
   return item[column.key]
@@ -133,6 +141,7 @@ function detailRoute(item: PolizaListItem) {
           <tr v-for="item in items" :key="item.id">
             <td>
               <RouterLink
+                v-if="canOpenDetail"
                 class="table-icon-action"
                 :to="detailRoute(item)"
                 :aria-label="`Ver detalle de poliza ${item.numero}`"
@@ -140,11 +149,28 @@ function detailRoute(item: PolizaListItem) {
               >
                 <i class="pi pi-eye" aria-hidden="true"></i>
               </RouterLink>
+              <button
+                v-else
+                class="table-icon-action"
+                type="button"
+                :aria-label="`Detalle no disponible para poliza ${item.numero}`"
+                title="Detalle no disponible"
+                disabled
+              >
+                <i class="pi pi-eye-slash" aria-hidden="true"></i>
+              </button>
             </td>
             <td v-for="column in polizasTableColumns" :key="column.key">
-              <RouterLink v-if="column.key === 'numero'" class="table-link" :to="detailRoute(item)">
+              <RouterLink
+                v-if="column.key === 'numero' && canOpenDetail"
+                class="table-link"
+                :to="detailRoute(item)"
+              >
                 {{ formatPolizaValue(tableCellValue(item, column), column.type, item.moneda) }}
               </RouterLink>
+              <span v-else-if="column.key === 'numero'">
+                {{ formatPolizaValue(tableCellValue(item, column), column.type, item.moneda) }}
+              </span>
               <span v-else>
                 {{ formatPolizaValue(tableCellValue(item, column), column.type, item.moneda) }}
               </span>

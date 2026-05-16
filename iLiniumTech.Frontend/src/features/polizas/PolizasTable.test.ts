@@ -53,6 +53,18 @@ describe('PolizasTable', () => {
     expect(detailActions[0].attributes('aria-label')).toContain('Ver detalle de poliza')
   })
 
+  it('renders disabled detail actions without navigable links when detail permission is denied', () => {
+    const wrapper = mountTable({ canOpenDetail: false })
+
+    const disabledActions = wrapper.findAll('button.table-icon-action')
+
+    expect(disabledActions).toHaveLength(polizasFixture.items.length)
+    expect(disabledActions[0].attributes('disabled')).toBeDefined()
+    expect(disabledActions[0].attributes('aria-label')).toContain('Detalle no disponible')
+    expect(wrapper.find('a.table-icon-action').exists()).toBe(false)
+    expect(wrapper.find('a.table-link').exists()).toBe(false)
+  })
+
   it('renders an error state and emits retry', async () => {
     const wrapper = mountTable({ items: [], total: 0, error: 'No se pudieron cargar las polizas.' })
 

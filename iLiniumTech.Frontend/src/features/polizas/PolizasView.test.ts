@@ -2,10 +2,22 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { SessionContext } from '@/services/session'
+
+const mocks = vi.hoisted(() => ({
+  apiGet: vi.fn(),
+}))
+
+vi.mock('@/services/apiClient', () => ({
+  apiClient: {
+    get: mocks.apiGet,
+  },
+}))
+
 import { useSession } from '@/services/session'
 
 import PolizasView from './PolizasView.vue'
-import { polizasFixture } from './polizasFixture'
+import { polizasCatalogsFixture, polizasFixture } from './polizasFixture'
 
 async function mountPolizasView(path = '/polizas') {
   const router = createRouter({
@@ -33,10 +45,44 @@ async function settlePolizasView() {
   await flushPromises()
 }
 
+function backendSession(overrides: Partial<SessionContext> = {}): SessionContext {
+  return {
+    brokerId: 42,
+    entityMainId: 42,
+    userId: 7,
+    profileId: 9,
+    profileTypeId: 'mvp-profile',
+    isAdmin: false,
+    headerExecutionContextEnabled: true,
+    polizasExecutionContextRequired: true,
+    permissions: ['polizas.catalogs', 'polizas.read', 'polizas.detail'],
+    ...overrides,
+  }
+}
+
+function setupBackendApi(session: SessionContext) {
+  mocks.apiGet.mockImplementation((url: string) => {
+    if (url === '/api/me') {
+      return Promise.resolve({ data: session })
+    }
+
+    if (url === '/api/polizas') {
+      return Promise.resolve({ data: polizasFixture })
+    }
+
+    if (url === '/api/polizas/catalogs') {
+      return Promise.resolve({ data: polizasCatalogsFixture })
+    }
+
+    return Promise.reject(new Error(`Unexpected API call: ${url}`))
+  })
+}
+
 describe('PolizasView smoke', () => {
   beforeEach(() => {
     vi.stubEnv('VITE_USE_BACKEND', 'false')
     vi.stubEnv('VITE_BROKER_ID', '')
+    mocks.apiGet.mockReset()
     useSession().resetSession()
   })
 
@@ -118,6 +164,42 @@ describe('PolizasView smoke', () => {
     expect(wrapper.get('.summary-header').text()).toContain('1 poliza')
     expect(wrapper.text()).toContain('POL-2026-0001')
     expect(wrapper.text()).not.toContain('POL-2026-0002')
+  })
+
+  it('keeps detail navigation available when backend session grants polizas.detail', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
+    setupBackendApi(backendSession())
+
+    const { wrapper } = await mountPolizasView()
+    await settlePolizasView()
+
+    expect(wrapper.findAll('a.table-icon-action')).toHaveLength(polizasFixture.items.length)
+    expect(wrapper.findAll('a.table-link')).toHaveLength(polizasFixture.items.length)
+    expect(wrapper.get('a.table-icon-action').attributes('aria-label')).toContain(
+      'Ver detalle de poliza',
+    )
+  })
+
+  it('disables detail navigation when backend session omits polizas.detail', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
+    setupBackendApi(
+      backendSession({
+        permissions: ['polizas.catalogs', 'polizas.read'],
+      }),
+    )
+
+    const { wrapper } = await mountPolizasView()
+    await settlePolizasView()
+
+    const disabledDetailActions = wrapper.findAll('button.table-icon-action')
+
+    expect(disabledDetailActions).toHaveLength(polizasFixture.items.length)
+    expect(disabledDetailActions[0].attributes('disabled')).toBeDefined()
+    expect(disabledDetailActions[0].attributes('aria-label')).toContain('Detalle no disponible')
+    expect(wrapper.find('a.table-icon-action').exists()).toBe(false)
+    expect(wrapper.find('a.table-link').exists()).toBe(false)
   })
 
   it('normalizes unsupported page sizes, invalid pages, invalid dates, and unknown query keys', async () => {

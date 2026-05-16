@@ -136,11 +136,18 @@ watch(() => route.params.id, loadPoliza, { immediate: true })
   >
     <div id="poliza-detail-content" class="poliza-detail-page">
       <header class="detail-topbar">
-        <RouterLink class="detail-back" :to="polizasBackTarget">
+        <RouterLink
+          class="detail-back"
+          :to="polizasBackTarget"
+          aria-label="Volver al listado de polizas"
+        >
           <i class="pi pi-arrow-left" aria-hidden="true"></i>
-          Polizas
+          Volver a Polizas
         </RouterLink>
-        <span class="detail-breadcrumb">Detalle / {{ detailTitle }}</span>
+        <nav class="detail-breadcrumb" aria-label="Ruta de poliza">
+          <span>Polizas / Detalle / </span>
+          <span aria-current="page">{{ detailTitle }}</span>
+        </nav>
       </header>
 
       <section

@@ -26,7 +26,7 @@ vi.mock('vue-router', () => ({
   RouterLink: {
     props: ['to'],
     template:
-      '<a href="#" :data-to-name="to.name" :data-query-numero="to.query?.numero ?? \'\'" :data-query-page="to.query?.page ?? \'\'"><slot /></a>',
+      '<a href="#" :data-to-name="to.name" :data-query-numero="to.query?.numero ?? \'\'" :data-query-page="to.query?.page ?? \'\'" :data-query-page-size="to.query?.pageSize ?? \'\'"><slot /></a>',
   },
 }))
 
@@ -103,6 +103,8 @@ describe('PolizaDetailView', () => {
     expect(wrapper.get('h1').text()).toBe('POL-2026-0001')
     expect(wrapper.text()).toContain('Inicio')
     expect(wrapper.text()).toContain('Detalle / POL-2026-0001')
+    expect(wrapper.get('.detail-breadcrumb').attributes('aria-label')).toBe('Ruta de poliza')
+    expect(wrapper.get('.detail-breadcrumb [aria-current="page"]').text()).toBe('POL-2026-0001')
     expect(wrapper.text()).toContain('Solo lectura')
     expect(wrapper.text()).toContain('Fixture local')
     expect(wrapper.text()).toContain('Sin workflows heredados')
@@ -119,6 +121,8 @@ describe('PolizaDetailView', () => {
     expect(backLink.attributes('data-to-name')).toBe('polizas')
     expect(backLink.attributes('data-query-numero')).toBe('0002')
     expect(backLink.attributes('data-query-page')).toBe('2')
+    expect(backLink.attributes('data-query-page-size')).toBe('10')
+    expect(backLink.attributes('aria-label')).toBe('Volver al listado de polizas')
   })
 
   it('shows a loading state while the detail request is pending', () => {
