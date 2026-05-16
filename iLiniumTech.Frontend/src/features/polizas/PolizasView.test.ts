@@ -23,9 +23,27 @@ async function mountPolizasView(path = '/polizas') {
   const router = createRouter({
     history: createMemoryHistory(),
     routes: [
+      { path: '/agenda', component: { template: '<div />' } },
+      { path: '/clientes', component: { template: '<div />' } },
+      { path: '/propuestas', component: { template: '<div />' } },
       { path: '/polizas', name: 'polizas', component: PolizasView },
       { path: '/autos-particulares', component: { template: '<div />' } },
+      { path: '/polizas/flotas', component: { template: '<div />' } },
+      { path: '/polizas/colectivas', component: { template: '<div />' } },
       { path: '/polizas/:id', name: 'poliza-detail', component: { template: '<div />' } },
+      { path: '/recibos', component: { template: '<div />' } },
+      { path: '/suplementos', component: { template: '<div />' } },
+      { path: '/siniestros', component: { template: '<div />' } },
+      { path: '/liq-cia', component: { template: '<div />' } },
+      { path: '/liq-col', component: { template: '<div />' } },
+      { path: '/informes', component: { template: '<div />' } },
+      { path: '/controles', component: { template: '<div />' } },
+      { path: '/estadisticas', component: { template: '<div />' } },
+      { path: '/administracion', component: { template: '<div />' } },
+      { path: '/configuracion', component: { template: '<div />' } },
+      { path: '/conectividad', component: { template: '<div />' } },
+      { path: '/by-aunna', component: { template: '<div />' } },
+      { path: '/logs', component: { template: '<div />' } },
     ],
   })
   await router.push(path)

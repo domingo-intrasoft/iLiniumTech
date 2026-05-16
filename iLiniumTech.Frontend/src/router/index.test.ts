@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { clearAuthSession, loginDemo } from '@/features/auth/authSession'
 
-import { createIliniumRouter } from './index'
+import { createIliniumRouter, routes } from './index'
 
 describe('router auth guard', () => {
   beforeEach(() => {
@@ -24,10 +24,10 @@ describe('router auth guard', () => {
     loginDemo({ username: 'demo', password: 'demo' })
     const router = createIliniumRouter(createMemoryHistory())
 
-    await router.push('/polizas')
+    await router.push('/clientes')
     await router.isReady()
 
-    expect(router.currentRoute.value.name).toBe('polizas')
+    expect(router.currentRoute.value.name).toBe('clientes')
   })
 
   it('redirects protected routes when the stored MVP session has expired', async () => {
@@ -54,5 +54,33 @@ describe('router auth guard', () => {
     await router.isReady()
 
     expect(router.currentRoute.value.name).toBe('polizas')
+  })
+
+  it('registers MVP routes for the menu pages without exposing metadata routes', () => {
+    const routePaths = routes.map((route) => route.path)
+
+    expect(routePaths).toEqual(
+      expect.arrayContaining([
+        '/agenda',
+        '/clientes',
+        '/propuestas',
+        '/recibos',
+        '/suplementos',
+        '/siniestros',
+        '/liq-cia',
+        '/liq-col',
+        '/informes',
+        '/controles',
+        '/estadisticas',
+        '/administracion',
+        '/configuracion',
+        '/conectividad',
+        '/by-aunna',
+        '/logs',
+        '/polizas/flotas',
+        '/polizas/colectivas',
+      ]),
+    )
+    expect(JSON.stringify(routes)).not.toMatch(/IAP_|QueryStatic|ComponentDataSource/)
   })
 })

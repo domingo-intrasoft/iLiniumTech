@@ -13,9 +13,9 @@ export interface AppNavigationSessionState {
 }
 
 export const appNavigation: AppNavigationItem[] = [
-  { label: 'Agenda', icon: 'pi pi-calendar', disabled: true },
-  { label: 'Clientes', icon: 'pi pi-user', disabled: true },
-  { label: 'Propuestas', icon: 'pi pi-folder-open', disabled: true },
+  { label: 'Agenda', icon: 'pi pi-calendar', to: '/agenda' },
+  { label: 'Clientes', icon: 'pi pi-user', to: '/clientes' },
+  { label: 'Propuestas', icon: 'pi pi-folder-open', to: '/propuestas' },
   {
     label: 'Polizas',
     icon: 'pi pi-briefcase',
@@ -23,23 +23,23 @@ export const appNavigation: AppNavigationItem[] = [
     requiredPermission: 'polizas.read',
     children: [
       { label: 'Autos Particulares', icon: 'pi pi-car', to: '/autos-particulares', disabled: true },
-      { label: 'Flotas', icon: 'pi pi-truck', disabled: true },
-      { label: 'Colectivas', icon: 'pi pi-users', disabled: true },
+      { label: 'Flotas', icon: 'pi pi-truck', to: '/polizas/flotas' },
+      { label: 'Colectivas', icon: 'pi pi-users', to: '/polizas/colectivas' },
     ],
   },
-  { label: 'Recibos', icon: 'pi pi-money-bill', disabled: true },
-  { label: 'Suplementos', icon: 'pi pi-link', disabled: true },
-  { label: 'Siniestros', icon: 'pi pi-exclamation-triangle', disabled: true },
-  { label: 'Liq.Cia', icon: 'pi pi-list', disabled: true },
-  { label: 'Liq.Col', icon: 'pi pi-list-check', disabled: true },
-  { label: 'Informes', icon: 'pi pi-file', disabled: true },
-  { label: 'Controles', icon: 'pi pi-home', disabled: true },
-  { label: 'Estadisticas', icon: 'pi pi-chart-bar', disabled: true },
-  { label: 'Administracion', icon: 'pi pi-table', disabled: true },
-  { label: 'Configuracion', icon: 'pi pi-cog', disabled: true },
-  { label: 'Conectividad', icon: 'pi pi-code', disabled: true },
-  { label: 'By Aunna', icon: 'pi pi-sitemap', disabled: true },
-  { label: 'Logs', icon: 'pi pi-database', disabled: true },
+  { label: 'Recibos', icon: 'pi pi-money-bill', to: '/recibos' },
+  { label: 'Suplementos', icon: 'pi pi-link', to: '/suplementos' },
+  { label: 'Siniestros', icon: 'pi pi-exclamation-triangle', to: '/siniestros' },
+  { label: 'Liq.Cia', icon: 'pi pi-list', to: '/liq-cia' },
+  { label: 'Liq.Col', icon: 'pi pi-list-check', to: '/liq-col' },
+  { label: 'Informes', icon: 'pi pi-file', to: '/informes' },
+  { label: 'Controles', icon: 'pi pi-home', to: '/controles' },
+  { label: 'Estadisticas', icon: 'pi pi-chart-bar', to: '/estadisticas' },
+  { label: 'Administracion', icon: 'pi pi-table', to: '/administracion' },
+  { label: 'Configuracion', icon: 'pi pi-cog', to: '/configuracion' },
+  { label: 'Conectividad', icon: 'pi pi-code', to: '/conectividad' },
+  { label: 'By Aunna', icon: 'pi pi-sitemap', to: '/by-aunna' },
+  { label: 'Logs', icon: 'pi pi-database', to: '/logs' },
 ]
 
 export function isNavigationItemActive(item: AppNavigationItem, path: string): boolean {

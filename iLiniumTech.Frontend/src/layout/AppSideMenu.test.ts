@@ -10,9 +10,27 @@ function createTestRouter() {
   return createRouter({
     history: createMemoryHistory(),
     routes: [
+      { path: '/agenda', component: { template: '<div />' } },
+      { path: '/clientes', component: { template: '<div />' } },
+      { path: '/propuestas', component: { template: '<div />' } },
       { path: '/polizas', component: { template: '<div />' } },
       { path: '/polizas/:id', component: { template: '<div />' } },
       { path: '/autos-particulares', component: { template: '<div />' } },
+      { path: '/polizas/flotas', component: { template: '<div />' } },
+      { path: '/polizas/colectivas', component: { template: '<div />' } },
+      { path: '/recibos', component: { template: '<div />' } },
+      { path: '/suplementos', component: { template: '<div />' } },
+      { path: '/siniestros', component: { template: '<div />' } },
+      { path: '/liq-cia', component: { template: '<div />' } },
+      { path: '/liq-col', component: { template: '<div />' } },
+      { path: '/informes', component: { template: '<div />' } },
+      { path: '/controles', component: { template: '<div />' } },
+      { path: '/estadisticas', component: { template: '<div />' } },
+      { path: '/administracion', component: { template: '<div />' } },
+      { path: '/configuracion', component: { template: '<div />' } },
+      { path: '/conectividad', component: { template: '<div />' } },
+      { path: '/by-aunna', component: { template: '<div />' } },
+      { path: '/logs', component: { template: '<div />' } },
     ],
   })
 }
@@ -40,6 +58,9 @@ describe('AppSideMenu', () => {
     expect(wrapper.get('.side-nav a[href="/polizas"]').text()).toContain('Polizas')
     expect(wrapper.find('.side-nav a[href="/autos-particulares"]').exists()).toBe(false)
     expect(wrapper.get('.side-subnav .side-nav-disabled').text()).toContain('Autos Particulares')
+    expect(wrapper.get('.side-nav a[href="/clientes"]').text()).toContain('Clientes')
+    expect(wrapper.get('.side-nav a[href="/recibos"]').text()).toContain('Recibos')
+    expect(wrapper.get('.side-subnav a[href="/polizas/flotas"]').text()).toContain('Flotas')
     expect(wrapper.get('.side-nav [aria-current="page"]').text()).toContain('Polizas')
     expect(wrapper.text()).not.toMatch(/IAP_|QueryStatic|ComponentDataSource|metadata/i)
   })
@@ -57,5 +78,11 @@ describe('AppSideMenu', () => {
 
     expect(wrapper.get('.has-children').classes()).toContain('active')
     expect(wrapper.find('[aria-current="page"]').exists()).toBe(false)
+  })
+
+  it('marks MVP pages active from the static menu', async () => {
+    const wrapper = await mountMenu('/clientes')
+
+    expect(wrapper.get('.side-nav [aria-current="page"]').text()).toContain('Clientes')
   })
 })

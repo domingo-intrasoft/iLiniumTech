@@ -25,32 +25,33 @@ Detalle operativo para futuras IA: [`development-readiness.md`](development-read
 
 Resumen ejecutivo:
 
-- Solo `Polizas` queda `Lista para desarrollo inicial`.
-- `Clientes`, `Recibos`, `Siniestros`, `Suplementos`, `Liq.Cia`, `Liq.Col` y paginas similares tienen evidencia de dominio o busqueda heredada, pero no layout, `ComponentId`, pestanas, submenus ni permisos confirmados para programar una pantalla.
-- Las entradas administrativas, tecnicas o genericas (`Administracion`, `Configuracion`, `Conectividad`, `Controles`, `Logs`, `By Aunna`, etc.) quedan bloqueadas mientras no exista metadata real de pagina y SDD aprobada. Varias de ellas son especialmente sensibles porque podrian reintroducir el Builder como runtime.
+- `Polizas` queda como pagina funcional inicial con busqueda/listado/detalle.
+- El resto de entradas principales del menu quedan desbloqueadas como `MVP estatico visible`: ruta Vue protegida, contenido especifico de modulo, acciones deshabilitadas y sin consumo runtime de metadata.
+- `MVP estatico visible` no significa datos reales ni paridad AppBuilder. Para conectar API, filtros, acciones, PII, importes o workflows siguen haciendo falta SDD, permisos, DBA/UAT y contrato backend explicito.
+- Las entradas administrativas, tecnicas o genericas (`Administracion`, `Configuracion`, `Conectividad`, `Controles`, `Logs`, `By Aunna`, etc.) son especialmente sensibles: se muestran como superficies bloqueadas para orientar al usuario, pero no replican Builder ni habilitan configuracion real.
 
 | Entrada de menu actual | Estado de readiness | Documento |
 | --- | --- | --- |
-| Agenda | Investigacion parcial; bloqueada para desarrollo | [`agenda/README.md`](agenda/README.md) |
-| Clientes | Investigacion parcial; bloqueada para desarrollo final | [`clientes/README.md`](clientes/README.md) |
-| Propuestas | Bloqueada por falta de metadata de pagina | [`propuestas/README.md`](propuestas/README.md) |
+| Agenda | MVP estatico visible; datos/API pendientes | [`agenda/README.md`](agenda/README.md) |
+| Clientes | MVP estatico visible; datos/API/PII pendientes | [`clientes/README.md`](clientes/README.md) |
+| Propuestas | MVP estatico visible; datos/API pendientes | [`propuestas/README.md`](propuestas/README.md) |
 | Polizas | Lista para desarrollo inicial | [`polizas/README.md`](polizas/README.md) |
 | Polizas / Autos Particulares | Aparcada; no es readiness AppBuilder confirmada | Sin documento de pagina en esta carpeta; ver [`SDD-2026-006`](../../sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md) |
-| Polizas / Flotas | Bloqueada por falta de metadata de pagina | Pendiente |
-| Polizas / Colectivas | Bloqueada por falta de metadata de pagina | Pendiente |
-| Recibos | Investigacion parcial; bloqueada para desarrollo funcional | [`recibos/README.md`](recibos/README.md) |
-| Suplementos | Investigacion parcial; bloqueada para desarrollo funcional | [`suplementos/README.md`](suplementos/README.md) |
-| Siniestros | Investigacion parcial; bloqueada para desarrollo funcional | [`siniestros/README.md`](siniestros/README.md) |
-| Liq.Cia | Investigacion parcial; bloqueada para desarrollo funcional | [`liq-cia/README.md`](liq-cia/README.md) |
-| Liq.Col | Investigacion parcial; bloqueada para desarrollo funcional | [`liq-col/README.md`](liq-col/README.md) |
-| Informes | Bloqueada por falta de inventario funcional validado | [`informes/README.md`](informes/README.md) |
-| Controles | Bloqueada por falta de metadata de pagina | [`controles/README.md`](controles/README.md) |
-| Estadisticas | Bloqueada por falta de metadata de pagina | [`estadisticas/README.md`](estadisticas/README.md) |
-| Administracion | Bloqueada por falta de metadata de pagina y riesgo de replicar Builder | [`administracion/README.md`](administracion/README.md) |
-| Configuracion | Bloqueada por falta de metadata de pagina | [`configuracion/README.md`](configuracion/README.md) |
-| Conectividad | Bloqueada por falta de metadata de pagina y riesgo REST/SOAP heredado | [`conectividad/README.md`](conectividad/README.md) |
-| By Aunna | Bloqueada por falta de metadata de pagina | [`by-aunna/README.md`](by-aunna/README.md) |
-| Logs | Bloqueada por falta de metadata de pagina | [`logs/README.md`](logs/README.md) |
+| Polizas / Flotas | MVP estatico visible; reglas/API pendientes | Pendiente |
+| Polizas / Colectivas | MVP estatico visible; reglas/API pendientes | Pendiente |
+| Recibos | MVP estatico visible; datos/API/importes pendientes | [`recibos/README.md`](recibos/README.md) |
+| Suplementos | MVP estatico visible; datos/API pendientes | [`suplementos/README.md`](suplementos/README.md) |
+| Siniestros | MVP estatico visible; datos/API/PII pendientes | [`siniestros/README.md`](siniestros/README.md) |
+| Liq.Cia | MVP estatico visible; datos/API/importes pendientes | [`liq-cia/README.md`](liq-cia/README.md) |
+| Liq.Col | MVP estatico visible; datos/API/importes pendientes | [`liq-col/README.md`](liq-col/README.md) |
+| Informes | MVP estatico visible; inventario funcional/API pendientes | [`informes/README.md`](informes/README.md) |
+| Controles | MVP estatico visible; alcance funcional pendiente | [`controles/README.md`](controles/README.md) |
+| Estadisticas | MVP estatico visible; casos analiticos/API pendientes | [`estadisticas/README.md`](estadisticas/README.md) |
+| Administracion | MVP estatico visible; acciones bloqueadas por riesgo Builder | [`administracion/README.md`](administracion/README.md) |
+| Configuracion | MVP estatico visible; acciones bloqueadas por riesgo configuracion | [`configuracion/README.md`](configuracion/README.md) |
+| Conectividad | MVP estatico visible; acciones bloqueadas por riesgo REST/SOAP heredado | [`conectividad/README.md`](conectividad/README.md) |
+| By Aunna | MVP estatico visible; definicion funcional pendiente | [`by-aunna/README.md`](by-aunna/README.md) |
+| Logs | MVP estatico visible; retencion/permisos/API pendientes | [`logs/README.md`](logs/README.md) |
 
 ## Documentos de componentes ya existentes
 
