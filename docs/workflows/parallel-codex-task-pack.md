@@ -101,6 +101,71 @@ Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea
 - **Documentacion a actualizar:** DoD, roadmap, plan CI/CD, evidencias de cierre.
 - **Riesgo de conflicto:** medio con workflows y seguridad.
 
+## Paquete operativo - paginas estaticas del menu
+
+Este paquete ordena el siguiente avance de paginas del menu a partir de `docs/appbuilder/pages/development-readiness.md`. No autoriza programar backend, crear APIs, tocar paquetes, cambiar router/navegacion ni activar datos reales. Sirve para repartir trabajo si producto decide enriquecer las paginas estaticas ya existentes.
+
+### Regla de carriles
+
+- **Carril A - Desarrollable ahora con fixture/estatico:** solo pagina Vue protegida, contenido especifico de modulo, acciones deshabilitadas, tests de vista/ruta y trazabilidad documental. No hay datos reales ni contratos nuevos.
+- **Carril B - Requiere contrato backend/SDD:** cualquier dato real, filtro funcional, catalogo, detalle, exportacion, importes, PII, logs operativos, workflow, escritura o permiso nuevo.
+
+### Tarea H - Coordinacion de paginas estaticas
+
+- **Nombre:** `producto-menu-static-pages-readiness`
+- **Alcance exacto:** mantener la matriz operativa de paginas, priorizar carriles y resolver dudas de alcance antes de que agentes frontend toquen UI.
+- **Archivos que puede tocar:** `docs/appbuilder/pages/development-readiness.md`, `docs/workflows/parallel-codex-task-pack.md`, `docs/qa/phase-closure-checklist.md` si hace falta.
+- **Archivos que NO debe tocar:** `iLiniumTech.Frontend/**`, `iLiniumTech.Backend/**`, package files, `appNavigation.ts`, `router/index.ts`.
+- **Dependencias:** documentacion AppBuilder disponible y estado real reportado por agentes frontend/QA.
+- **Criterios de aceptacion:** cada pagina queda clasificada como placeholder estatico o bloqueada por SDD/API; riesgos y dependencias visibles; no se inventan contratos.
+- **Pruebas obligatorias:** validacion documental si se cambia estructura; `git diff --check`.
+- **Documentacion a actualizar:** readiness de paginas y este pack.
+- **Riesgo de conflicto:** bajo; coordinar si otros agentes editan los mismos docs.
+
+### Tarea I - Placeholders de dominio del menu
+
+- **Nombre:** `frontend-menu-domain-static-placeholders`
+- **Alcance exacto:** enriquecer solo paginas estaticas de dominio ya existentes: `Agenda`, `Clientes`, `Propuestas`, `Recibos`, `Suplementos`, `Siniestros`, `Liq.Cia`, `Liq.Col`, `Informes`, `Estadisticas`, `Polizas / Flotas` y `Polizas / Colectivas`.
+- **Archivos que puede tocar:** carpetas frontend de esas features y tests asociados, `docs/qa/**` solo para evidencia.
+- **Archivos que NO debe tocar:** backend, servicios API nuevos, package files, `appNavigation.ts`, `router/index.ts`, extractor, SDDs salvo evidencia coordinada.
+- **Dependencias:** matriz en `docs/appbuilder/pages/development-readiness.md`; no depende de DBA ni API porque el alcance es estatico.
+- **Criterios de aceptacion:** las paginas muestran estado de modulo, alcance, proximos pasos y riesgos; acciones no operativas estan deshabilitadas; no hay llamadas a APIs nuevas ni metadata runtime.
+- **Pruebas obligatorias:** `npm run format`; `npm run lint`; `npm run test:unit`; `npm run build`; smoke visual si cambia layout de menu/shell.
+- **Documentacion a actualizar:** evidencia QA si se ejecuta smoke visual.
+- **Riesgo de conflicto:** medio con agentes frontend que trabajen shell/menu o Polizas.
+
+### Tarea J - Superficies tecnicas bloqueadas
+
+- **Nombre:** `frontend-menu-technical-blocked-pages`
+- **Alcance exacto:** mantener `Administracion`, `Configuracion`, `Conectividad`, `Controles`, `By Aunna` y `Logs` como paginas informativas bloqueadas, sin habilitar acciones reales.
+- **Archivos que puede tocar:** carpetas frontend de esas features y tests asociados, `docs/qa/**` solo para evidencia.
+- **Archivos que NO debe tocar:** backend, configuracion real, conectores, logs reales, workflows, package files, `appNavigation.ts`, `router/index.ts`.
+- **Dependencias:** decision de arquitectura que prohibe AppBuilder runtime.
+- **Criterios de aceptacion:** cada pagina comunica bloqueo y dependencia de SDD/seguridad; no expone secretos, payloads, rutas internas sensibles ni acciones ejecutables.
+- **Pruebas obligatorias:** `npm run format`; `npm run lint`; `npm run test:unit`; `npm run build`; secret scan si se documentan nombres de entorno o integraciones.
+- **Documentacion a actualizar:** evidencia QA si se toca UI.
+- **Riesgo de conflicto:** bajo-medio; alto impacto si alguien intenta activar funcionalidad real.
+
+### Tarea K - SDD/API futura por pagina
+
+- **Nombre:** `producto-sdd-api-pages-backlog`
+- **Alcance exacto:** preparar backlog documental para paginas que quieran salir del placeholder: problema de negocio, owner UAT, datos, permisos, PII, contratos API y pruebas esperadas.
+- **Archivos que puede tocar:** `docs/sdd/**`, `docs/appbuilder/pages/**`, `docs/ROADMAP_OBJETIVO_FINAL.md` si cambia prioridad.
+- **Archivos que NO debe tocar:** frontend/backend runtime salvo coordinacion posterior; package files; router/navegacion.
+- **Dependencias:** producto, DBA/UAT, metadata sanitizada o evidencia funcional suficiente.
+- **Criterios de aceptacion:** ninguna pagina pasa a datos reales sin SDD; queda claro si requiere API read-only, auth/permisos, broker, minimizacion PII o auditoria.
+- **Pruebas obligatorias:** validacion documental; secret scan si se mencionan entornos/configuracion.
+- **Documentacion a actualizar:** SDD de pagina o issue documental; readiness si cambia estado.
+- **Riesgo de conflicto:** medio con roadmap/SDD si hay varias prioridades abiertas.
+
+### Orden de ejecucion recomendado para paginas estaticas
+
+1. Ejecutar Tarea H para confirmar la matriz y detectar cambios concurrentes.
+2. Ejecutar Tarea I si el objetivo es mejorar paginas de dominio visibles sin datos reales.
+3. Ejecutar Tarea J si el objetivo es endurecer superficies tecnicas bloqueadas.
+4. Ejecutar Tarea K solo cuando producto quiera conectar datos o acciones reales de una pagina.
+5. Ejecutar QA/cierre con Tarea G o Tarea 7 segun el alcance tocado.
+
 ## Paquete historico aparcado - Autos Particulares
 
 Las tareas siguientes pertenecen al objetivo anterior `Autos Particulares`. Se conservan por trazabilidad, pero no son el plan activo. Solo deben reactivarse si producto lo confirma explicitamente y se actualiza `SDD-2026-006`.

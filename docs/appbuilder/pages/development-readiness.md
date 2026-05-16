@@ -39,6 +39,55 @@ Este documento consolida el estado de readiness de las paginas del menu actual d
 | By Aunna | MVP estatico visible; bloqueada para datos reales | Referencias de marca/tenant/tema | No hay menu, ruta, componente, datasource, permisos ni workflow de pagina | Validar si es pagina real o solo branding |
 | Logs | MVP estatico visible; bloqueada para datos reales | Dominio tecnico de logs AppBuilder | No hay pantalla migrable confirmada ni permisos/filtros/retencion definidos | Abrir SDD de auditoria/observabilidad si producto lo necesita |
 
+## Plan operacional para el siguiente avance de paginas estaticas
+
+Objetivo del siguiente avance: estabilizar el resto del menu como paginas Vue estaticas y protegidas, con contenido especifico por modulo, acciones no operativas y trazabilidad a esta documentacion. Este avance no autoriza APIs nuevas, datos reales, permisos finos, escrituras, workflows, SQL ni consumo runtime de metadata AppBuilder.
+
+Decision de producto: separar dos carriles.
+
+- `Desarrollable ahora con fixture/estatico`: se permite mejorar o completar la pagina visible con informacion documental, estados bloqueados, acciones deshabilitadas, tests de vista/ruta y sin llamadas a backend nuevo.
+- `Requiere contrato backend/SDD`: cualquier listado con datos, detalle, filtros reales, catalogos, exportacion, importes, PII, auditoria, logs operativos o accion funcional necesita SDD, permisos iLiniumTech, contrato API, DBA/UAT si aplica y pruebas backend/frontend.
+
+### Orden recomendado
+
+1. Revisar smoke de menu/rutas para las paginas estaticas ya existentes y cerrar gaps visuales sin ampliar alcance funcional.
+2. Enriquecer primero paginas de dominio con documentacion util y menor riesgo operativo: `Agenda`, `Propuestas`, `Clientes`, `Recibos`, `Suplementos`, `Siniestros`, `Liq.Cia`, `Liq.Col`, `Informes`, `Estadisticas`, `Polizas / Flotas` y `Polizas / Colectivas`.
+3. Mantener como superficies bloqueadas, no como modulos operativos, las paginas tecnicas o de alto riesgo: `Administracion`, `Configuracion`, `Conectividad`, `Controles`, `By Aunna` y `Logs`.
+4. No reactivar `Autos Particulares` salvo decision explicita de producto, SDD actualizada y UAT/DBA para la regla de division.
+
+### Matriz de incrementos explicitos
+
+| Pagina | Estado actual | Archivos frontend existentes | Documentacion AppBuilder disponible | Carril permitido ahora | Pruebas esperadas | Riesgo y dependencia |
+| --- | --- | --- | --- | --- | --- | --- |
+| Agenda | Ruta/pagina estatica protegida; evidencia parcial sin SDD funcional | `src/features/agenda/AgendaView.vue`, `AgendaView.test.ts` | `docs/appbuilder/pages/agenda/README.md` | Desarrollable ahora como placeholder enriquecido; API de eventos requiere SDD | Test de vista, router/nav, build frontend si se toca UI | Riesgo de calendarios con PII; depende de metadata real, permisos y UAT para datos |
+| Clientes | Ruta/pagina estatica protegida; evidencia tecnica parcial | `src/features/clientes/ClientesView.vue`, `ClientesView.test.ts` | `clientes/README.md` y `clientes/components/*.md` | Placeholder enriquecido ahora; busqueda/listado/detalle reales requieren SDD/API | Test de vista, estados bloqueados, no llamadas API nuevas | PII alta; depende de pantalla real, campos visibles, permisos y DBA/UAT |
+| Propuestas | Ruta/pagina estatica protegida; sin metadata concreta | `src/features/propuestas/PropuestasView.vue`, `PropuestasView.test.ts` | `propuestas/README.md` | Placeholder enriquecido ahora; datos/acciones requieren SDD/API | Test de vista, ruta y acciones deshabilitadas | Falta `componentId`, datasource y permisos; no inferir flujo comercial |
+| Polizas | Pagina funcional inicial con listado/detalle/API existentes | `src/features/polizas/**` | `polizas/README.md`, `polizas/components/*.md`, SDDs de Polizas | No es placeholder: solo incrementos pequenos con SDD/decision si cambia contrato o UX visible | Unit frontend/backend, smoke `/polizas` y detalle, auditorias aplicables | Pendiente auth real, broker, DBA/UAT y PII; no romper MVP vigente |
+| Autos Particulares | Incremento tecnico previo aparcado | `src/features/autos-particulares/**` | SDD-2026-006; sin README de pagina en esta carpeta | No desarrollar ahora | Solo regresion si cambios ajenos lo afectan | Requiere decision de producto, SDD actualizada, regla de division y UAT/DBA |
+| Polizas / Flotas | Ruta/pagina estatica protegida; scope aparcado | `src/features/polizas-scopes/PolizasFlotasView.vue`, `PolizasScopesView.test.ts` | Submenus de Polizas; README especifico pendiente | Placeholder enriquecido ahora; filtro/listado real requiere SDD/API | Test compartido de scope, ruta y acciones deshabilitadas | Falta regla funcional de Flotas, permisos y datos autorizados |
+| Polizas / Colectivas | Ruta/pagina estatica protegida; scope aparcado | `src/features/polizas-scopes/PolizasColectivasView.vue`, `PolizasScopesView.test.ts` | Submenus de Polizas; README especifico pendiente | Placeholder enriquecido ahora; filtro/listado real requiere SDD/API | Test compartido de scope, ruta y acciones deshabilitadas | Falta regla funcional de Colectivas, permisos y datos autorizados |
+| Recibos | Ruta/pagina estatica protegida; bloqueada hasta SDD/API | `src/features/recibos/RecibosView.vue`, `RecibosView.test.ts` | `recibos/README.md` | Placeholder enriquecido ahora; importes, filtros y detalle requieren SDD/API | Test de vista, importes no operativos, no API real | Riesgo financiero/PII; depende de columnas, permisos, broker y UAT |
+| Suplementos | Ruta/pagina estatica protegida; bloqueada hasta SDD/API | `src/features/suplementos/SuplementosView.vue`, `SuplementosView.test.ts` | `suplementos/README.md` | Placeholder enriquecido ahora; listado/detalle requieren SDD/API | Test de vista, acciones no operativas, no metadata runtime | PII y workflows; depende de metadata real, catalogos y permisos |
+| Siniestros | Ruta/pagina estatica protegida; bloqueada hasta SDD/API | `src/features/siniestros/SiniestrosView.vue`, `SiniestrosView.test.ts` | `siniestros/README.md` | Placeholder enriquecido ahora; expedientes reales requieren SDD/API | Test de vista, estados bloqueados, sin datos sensibles | PII alta y datos de siniestro; depende de permisos, broker, DBA/UAT |
+| Liq.Cia | Ruta/pagina estatica protegida; MVP estatico sin API real | `src/features/liquidaciones-compania/LiquidacionesCompaniaView.vue`, test asociado | `liq-cia/README.md` | Placeholder enriquecido ahora; importes/liquidacion real requieren SDD/API | Test de vista, acciones deshabilitadas, no importes reales | Riesgo financiero; depende de owner funcional, permisos y conciliacion |
+| Liq.Col | Ruta/pagina estatica protegida; MVP estatico sin API real | `src/features/liquidaciones-colaborador/LiquidacionesColaboradorView.vue`, test asociado | `liq-col/README.md` | Placeholder enriquecido ahora; importes/liquidacion real requieren SDD/API | Test de vista, acciones deshabilitadas, no importes reales | Riesgo financiero y multi-tenant; depende de reglas por colaborador |
+| Informes | Ruta/pagina estatica protegida; MVP estatico sin API real | `src/features/informes/InformesView.vue`, `InformesView.test.ts` | `informes/README.md` | Placeholder enriquecido ahora; informes ejecutables requieren SDD/API | Test de vista, parametros no operativos, sin descargas reales | Riesgo de reporting con PII/exportacion; depende de inventario de informes |
+| Controles | Ruta/pagina estatica protegida; bloqueado externo | `src/features/controles/ControlesView.vue`, `ControlesView.test.ts` | `controles/README.md` | Solo placeholder bloqueado; no construir motor de controles | Test de vista bloqueada y ausencia de acciones | Alto riesgo de recrear AppBuilder; requiere pagina real y decision |
+| Estadisticas | Ruta/pagina estatica protegida; MVP estatico sin API real | `src/features/estadisticas/EstadisticasView.vue`, `EstadisticasView.test.ts` | `estadisticas/README.md` | Placeholder enriquecido ahora; metricas reales requieren SDD/API | Test de vista, graficos no conectados a datos reales | Riesgo analitico/PII; depende de caso analitico y contrato de agregados |
+| Administracion | Ruta/pagina estatica protegida; bloqueado externo | `src/features/administracion/AdministracionView.vue`, `AdministracionView.test.ts` | `administracion/README.md` | Solo placeholder bloqueado; no activar administracion operativa | Test de vista bloqueada y acciones deshabilitadas | Riesgo critico de reintroducir Builder; requiere decision arquitectura/seguridad |
+| Configuracion | Ruta/pagina estatica protegida; bloqueado externo | `src/features/configuracion/ConfiguracionView.vue`, `ConfiguracionView.test.ts` | `configuracion/README.md` | Solo placeholder bloqueado; no editar configuracion real | Test de vista bloqueada y sin secretos | Riesgo de secretos/config runtime; requiere SDD y threat review |
+| Conectividad | Ruta/pagina estatica protegida; bloqueado externo | `src/features/conectividad/ConectividadView.vue`, `ConectividadView.test.ts` | `conectividad/README.md` | Solo placeholder bloqueado; no ejecutar conectores | Test de vista bloqueada y acciones no operativas | Riesgo REST/SOAP/workflows heredados; requiere SDD y seguridad |
+| By Aunna | Ruta/pagina estatica protegida; bloqueado externo | `src/features/by-aunna/ByAunnaView.vue`, `ByAunnaView.test.ts` | `by-aunna/README.md` | Solo placeholder bloqueado hasta definicion funcional | Test de vista bloqueada y copy de alcance | Falta pagina real; depende de decision si es branding o modulo |
+| Logs | Ruta/pagina estatica protegida; bloqueado externo | `src/features/logs/LogsView.vue`, `LogsView.test.ts` | `logs/README.md` | Solo placeholder bloqueado; logs operativos requieren SDD/API | Test de vista bloqueada, sin datos reales ni payloads | Riesgo de PII, secretos y retencion; depende de politica de auditoria |
+
+### Reglas de salida para agentes frontend
+
+- Si una pagina esta en carril `placeholder enriquecido`, el agente solo puede mejorar la experiencia estatica existente: copy especifico, tarjetas de estado, acciones deshabilitadas, estados bloqueados y tests de vista/ruta.
+- No crear servicios, composables de API, DTOs de datos reales, filtros funcionales, exportaciones, detalle real ni permisos nuevos sin SDD.
+- No tocar `appNavigation.ts` ni `router/index.ts` en una tarea documental o de placeholder salvo que el coordinador lo asigne explicitamente.
+- Si la pagina necesita datos, el resultado del agente debe ser una propuesta de SDD/API y lista de bloqueos, no codigo conectado.
+- Todo cierre debe indicar que no se consume metadata AppBuilder en runtime.
+
 ## Regla especial para Polizas
 
 Polizas es la unica pagina lista para desarrollo inicial porque ya tiene:

@@ -1,56 +1,125 @@
-import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
+import { createMemoryHistory, createRouter } from 'vue-router'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { useSession } from '@/services/session'
 
 import SiniestrosView from './SiniestrosView.vue'
 
 const runtimeMarkers =
-  /IAP_|QueryStatic|ComponentDataSource|connectionString|SELECT \*|Pantalla_|AppBuilder|appsettings/i
+  /IAP_|QueryStatic|ComponentDataSource|connectionString|SELECT \*|Pantalla_|AppBuilder|appsettings|metadata/i
 
-const shellStub = {
-  props: ['page'],
-  template: `
-    <section data-test="mvp-shell">
-      <h1>{{ page.title }}</h1>
-      <p>{{ page.subtitle }}</p>
-      <p>{{ page.status }}</p>
-      <button v-for="action in page.actions" :key="action.label" type="button" disabled>
-        {{ action.label }}
-      </button>
-      <article v-for="metric in page.metrics" :key="metric.label">
-        {{ metric.label }} {{ metric.value }}
-      </article>
-      <section>
-        <h2>{{ page.scope.title }}</h2>
-        <p v-for="item in page.scope.items" :key="item">{{ item }}</p>
-      </section>
-      <section>
-        <h2>{{ page.nextSteps.title }}</h2>
-        <p v-for="item in page.nextSteps.items" :key="item">{{ item }}</p>
-      </section>
-      <section>
-        <h2>{{ page.risks.title }}</h2>
-        <p v-for="item in page.risks.items" :key="item">{{ item }}</p>
-      </section>
-      <footer>{{ page.source }}</footer>
-    </section>
-  `,
+async function mountSiniestrosView() {
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/login', name: 'login', component: { template: '<div />' } },
+      { path: '/agenda', component: { template: '<div />' } },
+      { path: '/clientes', component: { template: '<div />' } },
+      { path: '/propuestas', component: { template: '<div />' } },
+      { path: '/polizas', component: { template: '<div />' } },
+      { path: '/autos-particulares', component: { template: '<div />' } },
+      { path: '/polizas/flotas', component: { template: '<div />' } },
+      { path: '/polizas/colectivas', component: { template: '<div />' } },
+      { path: '/recibos', component: { template: '<div />' } },
+      { path: '/suplementos', component: { template: '<div />' } },
+      { path: '/siniestros', component: SiniestrosView },
+      { path: '/liq-cia', component: { template: '<div />' } },
+      { path: '/liq-col', component: { template: '<div />' } },
+      { path: '/informes', component: { template: '<div />' } },
+      { path: '/controles', component: { template: '<div />' } },
+      { path: '/estadisticas', component: { template: '<div />' } },
+      { path: '/administracion', component: { template: '<div />' } },
+      { path: '/configuracion', component: { template: '<div />' } },
+      { path: '/conectividad', component: { template: '<div />' } },
+      { path: '/by-aunna', component: { template: '<div />' } },
+      { path: '/logs', component: { template: '<div />' } },
+    ],
+  })
+  await router.push('/siniestros')
+  await router.isReady()
+
+  return mount(SiniestrosView, {
+    global: {
+      plugins: [router],
+    },
+  })
 }
 
-describe('SiniestrosView', () => {
-  it('renders a static blocked MVP page with disabled actions and no runtime markers', () => {
-    const wrapper = mount(SiniestrosView, {
-      global: {
-        stubs: {
-          MvpPageShell: shellStub,
-        },
-      },
-    })
+async function settleSiniestrosView() {
+  await flushPromises()
+  await flushPromises()
+}
 
-    expect(wrapper.get('h1').text()).toBe('Siniestros')
-    expect(wrapper.text()).toContain('Sensibilidad Alta')
-    expect(wrapper.text()).toContain('Intervinientes')
-    expect(wrapper.text()).toContain('EIAC')
-    expect(wrapper.findAll('button[disabled]')).toHaveLength(3)
-    expect(wrapper.html()).not.toMatch(runtimeMarkers)
+describe('SiniestrosView smoke', () => {
+  beforeEach(() => {
+    vi.stubEnv('VITE_USE_BACKEND', 'false')
+    vi.stubEnv('VITE_BROKER_ID', '')
+    useSession().resetSession()
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    useSession().resetSession()
+  })
+
+  it('renders the read-only fixture shell, filters rows, and exposes no unsafe runtime details', async () => {
+    const wrapper = await mountSiniestrosView()
+    await settleSiniestrosView()
+
+    expect(wrapper.text()).toContain('Siniestros')
+    expect(wrapper.text()).toContain('Solo lectura')
+    expect(wrapper.text()).toContain('Fixture local sin API')
+    expect(wrapper.text()).toContain('Datos sanitizados')
+    expect(wrapper.text()).toContain('Detalle y exportacion pendientes')
+    expect(wrapper.text()).toContain('Modo fixture')
+    expect(wrapper.get('.summary-header').text()).toContain('3 siniestros')
+    expect(wrapper.findAll('tbody tr')).toHaveLength(3)
+    expect(wrapper.text()).toContain('SIN-2026-0001')
+    expect(wrapper.text()).toContain('Cliente anonimo 2')
+    expect(wrapper.text()).toContain('Equipo tramitacion C')
+
+    await wrapper.get('#siniestros-filter-referencia').setValue('0002')
+    await wrapper.get('.search-action-buttons .primary-action').trigger('click')
+    await settleSiniestrosView()
+
+    expect(wrapper.get('.summary-header').text()).toContain('1 siniestro')
+    expect(wrapper.findAll('tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).toContain('SIN-2026-0002')
+    expect(wrapper.text()).toContain('Cliente anonimo 2')
+    expect(wrapper.text()).not.toContain('SIN-2026-0001')
+
+    const clearButton = wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Limpiar Filtros'))
+    expect(clearButton).toBeDefined()
+    await clearButton!.trigger('click')
+    await settleSiniestrosView()
+
+    expect(wrapper.get('.summary-header').text()).toContain('3 siniestros')
+    expect(wrapper.findAll('tbody tr')).toHaveLength(3)
+
+    const disabledActions = wrapper.findAll('button[disabled]')
+    expect(disabledActions.length).toBeGreaterThanOrEqual(7)
+    expect(wrapper.findAll('button.table-icon-action[disabled]')).toHaveLength(3)
+
+    const smokeDom = wrapper.html()
+    expect(smokeDom).not.toMatch(runtimeMarkers)
+    expect(smokeDom).not.toMatch(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)
+    expect(smokeDom).not.toMatch(/\b\d{4}\s?[A-Z]{3}\b/)
+  })
+
+  it('shows the empty state for unsupported fixture filters', async () => {
+    const wrapper = await mountSiniestrosView()
+    await settleSiniestrosView()
+
+    await wrapper.get('#siniestros-filter-estado').setValue('Cerrado')
+    await wrapper.get('#siniestros-filter-fecha').setValue('2026-04-01')
+    await wrapper.get('.search-action-buttons .primary-action').trigger('click')
+    await settleSiniestrosView()
+
+    expect(wrapper.get('.summary-header').text()).toContain('0 siniestros')
+    expect(wrapper.text()).toContain('Sin resultados')
+    expect(wrapper.text()).toContain('No hay siniestros fixture para los filtros actuales.')
   })
 })
