@@ -1,51 +1,434 @@
 <script setup lang="ts">
-import MvpPageShell from '@/features/mvp-pages/MvpPageShell.vue'
+import { computed, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 
-import type { MvpPageDefinition } from '@/features/mvp-pages/mvpPageTypes'
+import { useAuthSession } from '@/features/auth/authSession'
+import AppShell from '@/layout/AppShell.vue'
 
-const page: MvpPageDefinition = {
-  sectionTitle: 'Logs',
-  title: 'Logs',
-  subtitle:
-    'Superficie sensible aparcada: no replica Builder/runtime ni muestra payloads, trazas o datos personales.',
-  status: 'Bloqueado externo',
-  source: 'Fuente: inventario documental sanitizado de Logs.',
-  actions: [
-    { label: 'Filtrar logs', icon: 'pi pi-filter' },
-    { label: 'Exportar', icon: 'pi pi-download' },
-  ],
-  metrics: [
-    { label: 'Superficie', value: 'Sensible', tone: 'risk' },
-    { label: 'Datos', value: 'Redaccion obligatoria', tone: 'risk' },
-    { label: 'Acciones', value: 'Deshabilitadas', tone: 'pending' },
-  ],
-  scope: {
-    title: 'Alcance MVP',
-    items: [
-      'Vista estatica para bloquear una futura consulta segura de auditoria y operacion.',
-      'No consulta tablas de logs, cuerpos de mensajes, payloads, tokens ni trazas.',
-      'No permite detalle, descarga, reintento, borrado ni exportacion real.',
-    ],
+type LogArea = 'Auditoria' | 'Errores' | 'Servicios' | 'Comunicaciones'
+type LogState = 'Redactado' | 'Bloqueado' | 'Pendiente'
+type LogRisk = 'Alto' | 'Medio' | 'Bajo'
+
+interface LogItem {
+  id: string
+  area: LogArea
+  category: string
+  state: LogState
+  risk: LogRisk
+  result: string
+  date: string
+  minimization: string
+}
+
+interface LogFilters {
+  text: string
+  area: '' | LogArea
+  state: '' | LogState
+  risk: '' | LogRisk
+}
+
+const logsFixture: LogItem[] = [
+  {
+    id: 'LOG-DEMO-001',
+    area: 'Auditoria',
+    category: 'Acceso demo',
+    state: 'Redactado',
+    risk: 'Medio',
+    result: 'Evento minimizado sin usuario real',
+    date: '2026-05-16',
+    minimization: 'Sin IP, agente, payload ni enlace externo',
   },
-  nextSteps: {
-    title: 'Siguientes pasos',
-    items: [
-      'Definir owner, fuente autorizada, retencion, rango maximo y minimizacion.',
-      'Crear matriz de permisos para auditoria, errores, servicios, mail y SMS.',
-      'Disenar API explicita con filtros parametrizados y errores sanitizados.',
-    ],
+  {
+    id: 'LOG-DEMO-002',
+    area: 'Errores',
+    category: 'Error tecnico candidato',
+    state: 'Bloqueado',
+    risk: 'Alto',
+    result: 'Traza completa no disponible',
+    date: '2026-05-16',
+    minimization: 'Secretos, logs, payloads y enlaces externos bloqueados',
   },
-  risks: {
-    title: 'Riesgos',
-    items: [
-      'Fuga de PII, secretos, endpoints internos, cookies o detalles de infraestructura.',
-      'Enumeracion masiva de actividad sin rango temporal ni paginacion estricta.',
-      'Reintroducir Builder/runtime mediante lectura generica de logs heredados.',
-    ],
+  {
+    id: 'LOG-DEMO-003',
+    area: 'Servicios',
+    category: 'Integracion demo',
+    state: 'Pendiente',
+    risk: 'Alto',
+    result: 'Request y response no expuestos',
+    date: '2026-05-16',
+    minimization: 'Sin endpoints reales ni URLs internas',
   },
+  {
+    id: 'LOG-DEMO-004',
+    area: 'Comunicaciones',
+    category: 'Aviso demo',
+    state: 'Redactado',
+    risk: 'Bajo',
+    result: 'Contenido sustituido por resumen anonimo',
+    date: '2026-05-16',
+    minimization: 'Sin destinatarios, telefonos ni cuerpos reales',
+  },
+]
+
+const pageSizeOptions = [2, 4]
+const topBadges = ['Read-only', 'Fixture', 'Redactado']
+const moduleActions = [
+  { label: 'Filtrar logs', icon: 'pi pi-search', active: true },
+  { label: 'Detalle bloqueado', icon: 'pi pi-eye-slash' },
+  { label: 'Exportar bloqueado', icon: 'pi pi-download' },
+]
+
+const filters = reactive<LogFilters>({
+  text: '',
+  area: '',
+  state: '',
+  risk: '',
+})
+
+const draftFilters = reactive<LogFilters>({
+  text: '',
+  area: '',
+  state: '',
+  risk: '',
+})
+
+const pagination = reactive({
+  page: 1,
+  pageSize: 2,
+})
+
+const router = useRouter()
+const { session, userLabel, logout } = useAuthSession()
+
+const sessionLabel = computed(() => {
+  return session.value?.currentBrokerId ? `Broker ${session.value.currentBrokerId}` : 'Modo fixture'
+})
+
+const sessionNeedsAttention = computed(() => false)
+
+const filteredItems = computed(() => {
+  const text = normalizeText(filters.text)
+
+  return logsFixture.filter((item) => {
+    const matchesText =
+      !text ||
+      normalizeText(item.id).includes(text) ||
+      normalizeText(item.category).includes(text) ||
+      normalizeText(item.result).includes(text) ||
+      normalizeText(item.minimization).includes(text)
+    const matchesArea = !filters.area || item.area === filters.area
+    const matchesState = !filters.state || item.state === filters.state
+    const matchesRisk = !filters.risk || item.risk === filters.risk
+
+    return matchesText && matchesArea && matchesState && matchesRisk
+  })
+})
+
+const total = computed(() => filteredItems.value.length)
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pagination.pageSize)))
+const pagedItems = computed(() => {
+  const start = (pagination.page - 1) * pagination.pageSize
+  return filteredItems.value.slice(start, start + pagination.pageSize)
+})
+const firstVisible = computed(() =>
+  total.value === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1,
+)
+const lastVisible = computed(() => Math.min(pagination.page * pagination.pageSize, total.value))
+const resultLabel = computed(() => (total.value === 1 ? 'log demo' : 'logs demo'))
+const canGoPrevious = computed(() => pagination.page > 1)
+const canGoNext = computed(() => pagination.page < totalPages.value)
+
+function normalizeText(value: string) {
+  return value.trim().toLocaleLowerCase('es-ES')
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat('es-ES').format(new Date(`${value}T00:00:00`))
+}
+
+function copyFilters(target: LogFilters, source: LogFilters) {
+  target.text = source.text
+  target.area = source.area
+  target.state = source.state
+  target.risk = source.risk
+}
+
+function searchLogs() {
+  copyFilters(filters, draftFilters)
+  pagination.page = 1
+}
+
+function clearFilters() {
+  copyFilters(draftFilters, {
+    text: '',
+    area: '',
+    state: '',
+    risk: '',
+  })
+  copyFilters(filters, draftFilters)
+  pagination.page = 1
+}
+
+function changePage(page: number) {
+  if (page >= 1 && page <= totalPages.value) {
+    pagination.page = page
+  }
+}
+
+function changePageSize(event: Event) {
+  pagination.pageSize = Number((event.target as HTMLSelectElement).value)
+  pagination.page = 1
+}
+
+async function signOut() {
+  await logout()
+  await router.replace({ name: 'login' })
 }
 </script>
 
 <template>
-  <MvpPageShell :page="page" />
+  <AppShell
+    content-id="logs-content"
+    section-title="Logs"
+    :session-label="sessionLabel"
+    :session-needs-attention="sessionNeedsAttention"
+    :top-badges="topBadges"
+    :user-label="userLabel"
+    show-sign-out
+    @sign-out="signOut"
+  >
+    <div id="logs-content" class="polizas-toolbar">
+      <div>
+        <p class="section-kicker">MVP read-only</p>
+        <h1>Logs</h1>
+      </div>
+
+      <div class="toolbar-groups">
+        <div class="action-group">
+          <button
+            v-for="action in moduleActions"
+            :key="action.label"
+            class="square-action"
+            :class="{ active: action.active }"
+            type="button"
+            :aria-label="action.label"
+            disabled
+          >
+            <i :class="action.icon" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section class="runtime-strip" aria-label="Contexto de logs">
+      <span><i class="pi pi-lock" aria-hidden="true"></i> Solo lectura</span>
+      <span><i class="pi pi-database" aria-hidden="true"></i> Fixture local sin API</span>
+      <span><i class="pi pi-shield" aria-hidden="true"></i> Datos redactados y sanitizados</span>
+      <span
+        ><i class="pi pi-ban" aria-hidden="true"></i> Secretos, logs, payloads y enlaces externos
+        bloqueados</span
+      >
+      <span
+        ><i class="pi pi-download" aria-hidden="true"></i> Detalle y exportacion
+        deshabilitados</span
+      >
+    </section>
+
+    <section class="search-panel" aria-label="Filtros locales de logs">
+      <header class="search-actions">
+        <div class="search-action-buttons">
+          <button type="button" class="primary-action" @click="searchLogs">
+            <i class="pi pi-search" aria-hidden="true"></i>
+            Buscar
+          </button>
+          <button type="button" @click="clearFilters">
+            <i class="pi pi-trash" aria-hidden="true"></i>
+            Limpiar Filtros
+          </button>
+          <button type="button" disabled>
+            <i class="pi pi-eye-slash" aria-hidden="true"></i>
+            Detalle
+          </button>
+          <button type="button" disabled>
+            <i class="pi pi-download" aria-hidden="true"></i>
+            Exportar
+          </button>
+        </div>
+        <i class="pi pi-chevron-up" aria-hidden="true"></i>
+      </header>
+
+      <div class="criteria-card">
+        <section class="filter-section">
+          <div class="filter-section-title">
+            <h2>Busqueda read-only</h2>
+            <i class="pi pi-minus" aria-hidden="true"></i>
+          </div>
+
+          <div class="filter-row">
+            <label class="filter-field" for="logs-filter-text" style="grid-column: span 3">
+              <span>Texto</span>
+              <span class="field-control">
+                <input
+                  id="logs-filter-text"
+                  v-model="draftFilters.text"
+                  type="search"
+                  aria-label="Texto de logs"
+                />
+                <button type="button" aria-label="Opciones de texto" disabled>
+                  <i class="pi pi-filter" aria-hidden="true"></i>
+                </button>
+              </span>
+            </label>
+
+            <label class="filter-field" for="logs-filter-area" style="grid-column: span 2">
+              <span>Area</span>
+              <span class="field-control">
+                <select id="logs-filter-area" v-model="draftFilters.area" aria-label="Area">
+                  <option value=""></option>
+                  <option>Auditoria</option>
+                  <option>Errores</option>
+                  <option>Servicios</option>
+                  <option>Comunicaciones</option>
+                </select>
+                <button type="button" aria-label="Opciones de area" disabled>
+                  <i class="pi pi-filter" aria-hidden="true"></i>
+                </button>
+              </span>
+            </label>
+
+            <label class="filter-field" for="logs-filter-state" style="grid-column: span 2">
+              <span>Estado</span>
+              <span class="field-control">
+                <select id="logs-filter-state" v-model="draftFilters.state" aria-label="Estado">
+                  <option value=""></option>
+                  <option>Redactado</option>
+                  <option>Bloqueado</option>
+                  <option>Pendiente</option>
+                </select>
+                <button type="button" aria-label="Opciones de estado" disabled>
+                  <i class="pi pi-filter" aria-hidden="true"></i>
+                </button>
+              </span>
+            </label>
+
+            <label class="filter-field" for="logs-filter-risk" style="grid-column: span 2">
+              <span>Riesgo</span>
+              <span class="field-control">
+                <select id="logs-filter-risk" v-model="draftFilters.risk" aria-label="Riesgo">
+                  <option value=""></option>
+                  <option>Alto</option>
+                  <option>Medio</option>
+                  <option>Bajo</option>
+                </select>
+                <button type="button" aria-label="Opciones de riesgo" disabled>
+                  <i class="pi pi-filter" aria-hidden="true"></i>
+                </button>
+              </span>
+            </label>
+          </div>
+
+          <div class="filter-row">
+            <label class="filter-field unsupported-filter" style="grid-column: span 5">
+              <span>Detalle, payloads, trazas y descarga</span>
+              <span class="field-control">
+                <input
+                  type="search"
+                  value="Bloqueado: sin API, sin datos personales, sin exportacion"
+                  disabled
+                  aria-label="Detalle y exportacion bloqueados"
+                />
+                <button type="button" aria-label="Detalle y exportacion bloqueados" disabled>
+                  <i class="pi pi-lock" aria-hidden="true"></i>
+                </button>
+              </span>
+            </label>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="results-summary" aria-labelledby="logs-results-title" aria-live="polite">
+      <div class="summary-header">
+        <h2 id="logs-results-title">Resultado</h2>
+        <span
+          ><strong>{{ total }}</strong> {{ resultLabel }}</span
+        >
+        <span>{{ firstVisible }}-{{ lastVisible }} visibles</span>
+      </div>
+
+      <div v-if="pagedItems.length === 0" class="state state-box empty" role="status">
+        <i class="pi pi-inbox" aria-hidden="true"></i>
+        <div>
+          <strong>Sin resultados</strong>
+          <p>No hay logs fixture para los filtros actuales.</p>
+        </div>
+      </div>
+
+      <div v-else class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Acciones</th>
+              <th scope="col">Id demo</th>
+              <th scope="col">Area</th>
+              <th scope="col">Categoria</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Riesgo</th>
+              <th scope="col">Resultado</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Minimizacion</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in pagedItems" :key="item.id">
+              <td>
+                <button
+                  class="table-icon-action"
+                  type="button"
+                  :aria-label="`Detalle bloqueado para ${item.id}`"
+                  title="Detalle pendiente de SDD/API"
+                  disabled
+                >
+                  <i class="pi pi-eye-slash" aria-hidden="true"></i>
+                </button>
+              </td>
+              <td>
+                <strong class="table-strong">{{ item.id }}</strong>
+              </td>
+              <td>{{ item.area }}</td>
+              <td>{{ item.category }}</td>
+              <td>{{ item.state }}</td>
+              <td>{{ item.risk }}</td>
+              <td>{{ item.result }}</td>
+              <td>{{ formatDate(item.date) }}</td>
+              <td>{{ item.minimization }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="pagination-bar" aria-label="Paginacion de logs">
+        <div class="page-size-control">
+          <label for="logs-page-size">Filas</label>
+          <select id="logs-page-size" :value="pagination.pageSize" @change="changePageSize">
+            <option v-for="option in pageSizeOptions" :key="option" :value="option">
+              {{ option }}
+            </option>
+          </select>
+        </div>
+
+        <div class="page-controls">
+          <button type="button" :disabled="!canGoPrevious" @click="changePage(pagination.page - 1)">
+            <i class="pi pi-chevron-left" aria-hidden="true"></i>
+            Anterior
+          </button>
+          <span>Pagina {{ pagination.page }} de {{ totalPages }}</span>
+          <button type="button" :disabled="!canGoNext" @click="changePage(pagination.page + 1)">
+            Siguiente
+            <i class="pi pi-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </footer>
+    </section>
+  </AppShell>
 </template>

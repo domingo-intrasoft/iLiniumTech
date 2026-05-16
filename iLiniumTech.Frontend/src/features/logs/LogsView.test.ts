@@ -1,48 +1,154 @@
-import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
+import { createMemoryHistory, createRouter } from 'vue-router'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { useSession } from '@/services/session'
 
 import LogsView from './LogsView.vue'
 
-const runtimeMarkers = /AppBuilder|IAP_|QueryStatic|ComponentDataSource|connectionString|SELECT \*/i
+const unsafeRuntimeMarkers =
+  /IAP_|QueryStatic|ComponentDataSource|connectionString|SELECT \*|Pantalla_|appsettings|metadata heredada/i
+const secretOrRealDataMarkers =
+  /BEGIN (RSA|OPENSSH|PRIVATE) KEY|password=|pwd=|bearer|api[-_ ]?key|token|https?:\/\/|@|\b\d{8}[A-Z]\b/i
 
-function mountView() {
+async function mountLogsView() {
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/login', name: 'login', component: { template: '<div />' } },
+      { path: '/agenda', component: { template: '<div />' } },
+      { path: '/clientes', component: { template: '<div />' } },
+      { path: '/propuestas', component: { template: '<div />' } },
+      { path: '/polizas', component: { template: '<div />' } },
+      { path: '/autos-particulares', component: { template: '<div />' } },
+      { path: '/polizas/flotas', component: { template: '<div />' } },
+      { path: '/polizas/colectivas', component: { template: '<div />' } },
+      { path: '/recibos', component: { template: '<div />' } },
+      { path: '/suplementos', component: { template: '<div />' } },
+      { path: '/siniestros', component: { template: '<div />' } },
+      { path: '/liq-cia', component: { template: '<div />' } },
+      { path: '/liq-col', component: { template: '<div />' } },
+      { path: '/informes', component: { template: '<div />' } },
+      { path: '/controles', component: { template: '<div />' } },
+      { path: '/estadisticas', component: { template: '<div />' } },
+      { path: '/administracion', component: { template: '<div />' } },
+      { path: '/configuracion', component: { template: '<div />' } },
+      { path: '/conectividad', component: { template: '<div />' } },
+      { path: '/by-aunna', component: { template: '<div />' } },
+      { path: '/logs', component: LogsView },
+    ],
+  })
+  await router.push('/logs')
+  await router.isReady()
+
   return mount(LogsView, {
     global: {
-      stubs: {
-        MvpPageShell: {
-          props: ['page'],
-          template: `
-            <section>
-              <h1>{{ page.title }}</h1>
-              <p>{{ page.status }}</p>
-              <p>{{ page.subtitle }}</p>
-              <button v-for="action in page.actions" :key="action.label" type="button" disabled>
-                {{ action.label }}
-              </button>
-              <span v-for="metric in page.metrics" :key="metric.label">
-                {{ metric.label }} {{ metric.value }}
-              </span>
-              <ul>
-                <li v-for="item in page.scope.items" :key="item">{{ item }}</li>
-                <li v-for="item in page.nextSteps.items" :key="item">{{ item }}</li>
-                <li v-for="item in page.risks.items" :key="item">{{ item }}</li>
-              </ul>
-            </section>
-          `,
-        },
-      },
+      plugins: [router],
     },
   })
 }
 
-describe('LogsView', () => {
-  it('renders the sensitive static Logs surface without runtime markers', () => {
-    const wrapper = mountView()
+async function settleView() {
+  await flushPromises()
+  await flushPromises()
+}
 
-    expect(wrapper.get('h1').text()).toBe('Logs')
-    expect(wrapper.text()).toContain('payloads, trazas o datos personales')
-    expect(wrapper.text()).toContain('Datos Redaccion obligatoria')
-    expect(wrapper.findAll('button[disabled]')).toHaveLength(2)
-    expect(wrapper.text()).not.toMatch(runtimeMarkers)
+describe('LogsView smoke', () => {
+  beforeEach(() => {
+    vi.stubEnv('VITE_USE_BACKEND', 'false')
+    vi.stubEnv('VITE_BROKER_ID', '')
+    useSession().resetSession()
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    useSession().resetSession()
+  })
+
+  it('renders the read-only logs MVP with redacted fixture data and pagination', async () => {
+    const wrapper = await mountLogsView()
+    await settleView()
+
+    expect(wrapper.text()).toContain('Logs')
+    expect(wrapper.text()).toContain('Solo lectura')
+    expect(wrapper.text()).toContain('Fixture local sin API')
+    expect(wrapper.text()).toContain('Datos redactados y sanitizados')
+    expect(wrapper.text()).toContain('Secretos, logs, payloads y enlaces externos bloqueados')
+    expect(wrapper.text()).toContain('Detalle y exportacion deshabilitados')
+    expect(wrapper.text()).toContain('Modo fixture')
+    expect(wrapper.get('.summary-header').text()).toContain('4 logs demo')
+    expect(wrapper.findAll('tbody tr')).toHaveLength(2)
+    expect(wrapper.text()).toContain('LOG-DEMO-001')
+    expect(wrapper.text()).toContain('LOG-DEMO-002')
+    expect(wrapper.text()).toContain('Pagina 1 de 2')
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Siguiente'))!
+      .trigger('click')
+    await settleView()
+
+    expect(wrapper.text()).toContain('LOG-DEMO-003')
+    expect(wrapper.text()).toContain('LOG-DEMO-004')
+    expect(wrapper.text()).toContain('Pagina 2 de 2')
+  })
+
+  it('filters logs locally by text, area, state, and risk', async () => {
+    const wrapper = await mountLogsView()
+    await settleView()
+
+    await wrapper.get('#logs-filter-text').setValue('request')
+    await wrapper.get('#logs-filter-area').setValue('Servicios')
+    await wrapper.get('#logs-filter-state').setValue('Pendiente')
+    await wrapper.get('#logs-filter-risk').setValue('Alto')
+    await wrapper.get('.search-action-buttons .primary-action').trigger('click')
+    await settleView()
+
+    expect(wrapper.get('.summary-header').text()).toContain('1 log demo')
+    expect(wrapper.findAll('tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).toContain('LOG-DEMO-003')
+    expect(wrapper.text()).toContain('Request y response no expuestos')
+    expect(wrapper.text()).not.toContain('LOG-DEMO-001')
+  })
+
+  it('shows an empty state when local filters have no fixture matches', async () => {
+    const wrapper = await mountLogsView()
+    await settleView()
+
+    await wrapper.get('#logs-filter-text').setValue('descarga aprobada')
+    await wrapper.get('#logs-filter-area').setValue('Auditoria')
+    await wrapper.get('#logs-filter-risk').setValue('Bajo')
+    await wrapper.get('.search-action-buttons .primary-action').trigger('click')
+    await settleView()
+
+    expect(wrapper.get('.summary-header').text()).toContain('0 logs demo')
+    expect(wrapper.text()).toContain('Sin resultados')
+    expect(wrapper.text()).toContain('No hay logs fixture para los filtros actuales.')
+  })
+
+  it('keeps detail and export disabled without real payloads, traces, or identities', async () => {
+    const wrapper = await mountLogsView()
+    await settleView()
+
+    const detailButton = wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Detalle'))
+    const exportButton = wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Exportar'))
+
+    expect(detailButton?.attributes('disabled')).toBeDefined()
+    expect(exportButton?.attributes('disabled')).toBeDefined()
+    expect(wrapper.findAll('button.table-icon-action[disabled]')).toHaveLength(2)
+    expect(
+      (
+        wrapper.get('input[aria-label="Detalle y exportacion bloqueados"]')
+          .element as HTMLInputElement
+      ).value,
+    ).toBe('Bloqueado: sin API, sin datos personales, sin exportacion')
+
+    const smokeDom = wrapper.html()
+    expect(smokeDom).not.toMatch(unsafeRuntimeMarkers)
+    expect(smokeDom).not.toMatch(secretOrRealDataMarkers)
   })
 })
