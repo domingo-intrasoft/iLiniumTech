@@ -2,15 +2,18 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { clearAuthSession, hasAuthSession, loginDemo } from '@/features/auth/authSession'
 import type { SessionContext } from '@/services/session'
 
 const mocks = vi.hoisted(() => ({
   apiGet: vi.fn(),
+  apiPost: vi.fn(),
 }))
 
 vi.mock('@/services/apiClient', () => ({
   apiClient: {
     get: mocks.apiGet,
+    post: mocks.apiPost,
   },
 }))
 
@@ -24,6 +27,7 @@ async function mountPolizasView(path = '/polizas') {
     history: createMemoryHistory(),
     routes: [
       { path: '/agenda', component: { template: '<div />' } },
+      { path: '/login', name: 'login', component: { template: '<div />' } },
       { path: '/clientes', component: { template: '<div />' } },
       { path: '/propuestas', component: { template: '<div />' } },
       { path: '/polizas', name: 'polizas', component: PolizasView },
@@ -73,6 +77,8 @@ function backendSession(overrides: Partial<SessionContext> = {}): SessionContext
     isAdmin: false,
     headerExecutionContextEnabled: true,
     polizasExecutionContextRequired: true,
+    authMode: 'DemoSession',
+    allowedBrokerIds: [42],
     permissions: ['polizas.catalogs', 'polizas.read', 'polizas.detail'],
     ...overrides,
   }
@@ -101,11 +107,14 @@ describe('PolizasView smoke', () => {
     vi.stubEnv('VITE_USE_BACKEND', 'false')
     vi.stubEnv('VITE_BROKER_ID', '')
     mocks.apiGet.mockReset()
+    mocks.apiPost.mockReset()
+    clearAuthSession()
     useSession().resetSession()
   })
 
   afterEach(() => {
     vi.unstubAllEnvs()
+    clearAuthSession()
     useSession().resetSession()
   })
 
@@ -197,6 +206,120 @@ describe('PolizasView smoke', () => {
     expect(wrapper.get('a.table-icon-action').attributes('aria-label')).toContain(
       'Ver detalle de poliza',
     )
+  })
+
+  it('switches active broker through backend and refreshes polizas state', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
+    loginDemo({ username: 'domingo', password: 'demo' })
+
+    const initialSession = backendSession({
+      brokerId: 42,
+      entityMainId: 42,
+      allowedBrokerIds: [42, 84],
+    })
+    const switchedSession = backendSession({
+      brokerId: 84,
+      entityMainId: 84,
+      allowedBrokerIds: [42, 84],
+    })
+    let meCalls = 0
+    mocks.apiGet.mockImplementation((url: string) => {
+      if (url === '/api/me') {
+        meCalls += 1
+        return Promise.resolve({ data: meCalls === 1 ? initialSession : switchedSession })
+      }
+
+      if (url === '/api/polizas') {
+        return Promise.resolve({ data: polizasFixture })
+      }
+
+      if (url === '/api/polizas/catalogs') {
+        return Promise.resolve({ data: polizasCatalogsFixture })
+      }
+
+      return Promise.reject(new Error(`Unexpected API call: ${url}`))
+    })
+    mocks.apiPost.mockResolvedValueOnce({ data: {} })
+
+    const { wrapper } = await mountPolizasView()
+    await settlePolizasView()
+
+    const selector = wrapper.get('select[aria-label="Broker activo"]')
+    expect((selector.element as HTMLSelectElement).value).toBe('42')
+
+    await selector.setValue('84')
+    await settlePolizasView()
+
+    expect(mocks.apiPost).toHaveBeenCalledWith('/api/auth/broker', { brokerId: 84 })
+    expect(mocks.apiGet).toHaveBeenCalledWith('/api/me')
+    expect(mocks.apiGet.mock.calls.filter(([url]) => url === '/api/polizas')).toHaveLength(2)
+    expect(mocks.apiGet.mock.calls.filter(([url]) => url === '/api/polizas/catalogs')).toHaveLength(
+      2,
+    )
+    expect(wrapper.text()).toContain('Broker 84')
+    expect(hasAuthSession()).toBe(true)
+  })
+
+  it('does not send broker switches outside allowed broker options', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
+    loginDemo({ username: 'domingo', password: 'demo' })
+    setupBackendApi(
+      backendSession({
+        allowedBrokerIds: [42, 84],
+      }),
+    )
+
+    const { wrapper } = await mountPolizasView()
+    await settlePolizasView()
+    mocks.apiPost.mockClear()
+
+    const selector = wrapper.get('select[aria-label="Broker activo"]')
+    const tamperedOption = document.createElement('option')
+    tamperedOption.value = '777'
+    selector.element.appendChild(tamperedOption)
+    ;(selector.element as HTMLSelectElement).value = '777'
+    await selector.trigger('change')
+    await settlePolizasView()
+
+    expect(mocks.apiPost).not.toHaveBeenCalled()
+    expect(wrapper.text()).toContain('El broker seleccionado no esta disponible')
+  })
+
+  it('clears auth and redirects to login when broker switch returns 401', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
+    loginDemo({ username: 'domingo', password: 'demo' })
+    setupBackendApi(
+      backendSession({
+        allowedBrokerIds: [42, 84],
+      }),
+    )
+    mocks.apiPost.mockRejectedValueOnce({
+      isAxiosError: true,
+      response: {
+        status: 401,
+        data: {
+          error: {
+            code: 'AUTH_SESSION_EXPIRED',
+            correlationId: 'broker-switch-401',
+          },
+        },
+      },
+    })
+
+    const { router, wrapper } = await mountPolizasView()
+    await settlePolizasView()
+
+    await wrapper.get('select[aria-label="Broker activo"]').setValue('84')
+    await settlePolizasView()
+
+    expect(hasAuthSession()).toBe(false)
+    expect(router.currentRoute.value.name).toBe('login')
   })
 
   it('disables detail navigation when backend session omits polizas.detail', async () => {

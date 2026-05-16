@@ -292,20 +292,20 @@ Entregado:
 - Compatibilidad temporal: API key MVP y `demo-session` pueden seguir existiendo solo para desarrollo/demo y no equivalen a auth productiva real.
 - `/api/me` debe seguir siendo el contrato del frontend para permisos efectivos, broker activo, brokers permitidos y modo de autenticacion.
 - La metadata AppBuilder sigue siendo evidencia de migracion, nunca contrato runtime para permisos, pantallas o queries.
+- Login/sesion endurecido con limpieza de 401, logout seguro y confirmacion backend antes de confiar en storage local.
+- Cambio de broker activo entregado mediante `POST /api/auth/broker`, selector frontend limitado a `allowedBrokerIds`, relectura de `/api/me`, refresco de Polizas e invalidacion segura en detalle.
+- Evidencia QA documentada en [qa/login-session-hardening-checklist.md](qa/login-session-hardening-checklist.md) y [qa/active-broker-change-checklist.md](qa/active-broker-change-checklist.md).
 
 Proximo incremento preparado:
 
-- Endurecer login/sesion: expiracion, 401/403, logout, refresh y pruebas.
-- Implementar cambio de broker activo mediante endpoint validado por backend, no header libre.
 - Preparar decision de proveedor auth y matriz real de permisos.
 - Retirar gradualmente API key/headers MVP de entornos preview/produccion.
-- Usar [qa/login-session-hardening-checklist.md](qa/login-session-hardening-checklist.md) como evidencia corta del incremento, completando solo resultados reales.
+- Preparar UAT de broker/permisos con datos reales sanitizados y DBA.
 
 Pendiente de implementacion:
 
 - Elegir e integrar mecanismo auth aprobado.
 - Sustituir API key MVP y headers manipulables por claims/sesion backend en entornos con datos reales.
-- Endurecer `currentBrokerId` contra `allowedBrokerIds` para cambio de broker, catalogos, listado y detalle.
 - Completar cobertura 401/403 sanitizada con `correlationId` y logs seguros para auth real.
 - Conectar `SESSION_CONTEXT` a valores autenticados, no a headers manipulables.
 - Cubrir pruebas de acceso anonimo, token invalido, broker cruzado y falta de permiso.

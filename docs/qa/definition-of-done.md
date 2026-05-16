@@ -103,6 +103,7 @@ Aplican al incremento Fase 2 login/sesion robusto y a cualquier cambio que toque
 Evidencia operativa:
 
 - [login-session-hardening-checklist.md](login-session-hardening-checklist.md)
+- [active-broker-change-checklist.md](active-broker-change-checklist.md)
 
 ## Gate recomendado antes de cerrar rama
 

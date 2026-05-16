@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter, type LocationQuery, type LocationQueryRaw } from 'vue-router'
 
-import { useAuthSession } from '@/features/auth/authSession'
+import { clearAuthSession, switchAuthBroker, useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
+import { toPolizasUserError } from '@/services/apiErrors'
 
 import PolizasFilters from './PolizasFilters.vue'
 import PolizasTable from './PolizasTable.vue'
@@ -36,6 +37,7 @@ const {
   filters,
   pagination,
   refresh,
+  loadCatalogs,
 } = usePolizas()
 
 const route = useRoute()
@@ -44,6 +46,8 @@ const { userLabel, logout } = useAuthSession()
 const isBackendMode = import.meta.env.VITE_USE_BACKEND === 'true'
 const dataOriginLabel = computed(() => (isBackendMode ? 'API polizas' : 'Fixture local'))
 const POLIZAS_DETAIL_PERMISSION = 'polizas.detail'
+const brokerChanging = ref(false)
+const brokerError = ref<string | null>(null)
 
 interface PolizasRouteState {
   filters: PolizasQueryFilters
@@ -205,8 +209,22 @@ const sessionLabel = computed(() => {
 const sessionNeedsAttention = computed(
   () =>
     Boolean(sessionError.value) ||
+    Boolean(brokerError.value) ||
     Boolean(session.value?.polizasExecutionContextRequired && !session.value.brokerId),
 )
+
+const brokerOptions = computed(() => {
+  if (!isBackendMode || session.value?.authMode !== 'DemoSession') {
+    return []
+  }
+
+  const brokerIds = session.value.allowedBrokerIds ?? []
+  const uniqueBrokerIds = Array.from(
+    new Set(brokerIds.filter((brokerId) => Number.isInteger(brokerId) && brokerId > 0)),
+  )
+
+  return uniqueBrokerIds.length > 1 ? uniqueBrokerIds : []
+})
 
 const filterCriteria = computed<PolizasSearchCriteria>(() => ({
   numero: filters.numero,
@@ -279,6 +297,36 @@ async function changePageSize(pageSize: number) {
   await refreshWithRouteState()
 }
 
+async function changeBroker(brokerId: number) {
+  if (brokerChanging.value || brokerId === session.value?.brokerId) {
+    return
+  }
+
+  if (!brokerOptions.value.includes(brokerId)) {
+    brokerError.value = 'El broker seleccionado no esta disponible para la sesion actual.'
+    return
+  }
+
+  brokerChanging.value = true
+  brokerError.value = null
+
+  try {
+    await switchAuthBroker(brokerId)
+    pagination.page = 1
+    await refreshWithRouteState()
+    await loadCatalogs()
+  } catch (exception) {
+    const userError = toPolizasUserError(exception, 'No se pudo cambiar el broker activo.')
+    brokerError.value = userError.message
+    if (userError.kind === 'unauthenticated') {
+      clearAuthSession()
+      await router.replace({ name: 'login' })
+    }
+  } finally {
+    brokerChanging.value = false
+  }
+}
+
 async function signOut() {
   await logout()
   await router.replace({ name: 'login' })
@@ -312,7 +360,12 @@ onMounted(() => {
     :session-needs-attention="sessionNeedsAttention"
     :top-badges="topBadges"
     :user-label="userLabel"
+    :broker-options="brokerOptions"
+    :active-broker-id="session?.brokerId ?? null"
+    :broker-changing="brokerChanging"
+    :broker-error="brokerError"
     show-sign-out
+    @broker-change="changeBroker"
     @sign-out="signOut"
   >
     <div id="polizas-content" class="polizas-toolbar">
@@ -358,6 +411,10 @@ onMounted(() => {
       <span v-if="contextBlocked" class="warning" role="alert">
         <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
         {{ runtimeError ?? 'Broker requerido' }}
+      </span>
+      <span v-if="brokerError" class="warning" role="alert">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        {{ brokerError }}
       </span>
     </section>
 

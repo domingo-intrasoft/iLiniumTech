@@ -1,9 +1,15 @@
 import { computed, readonly, ref } from 'vue'
 import axios from 'axios'
 
+import { toPolizasUserError } from '@/services/apiErrors'
 import { apiClient } from '@/services/apiClient'
 import { getRuntimeConfig } from '@/services/runtimeConfig'
-import { clearSessionContext, getSessionContext, type SessionContext } from '@/services/session'
+import {
+  clearSessionContext,
+  getSessionContext,
+  switchSessionBroker,
+  type SessionContext,
+} from '@/services/session'
 
 export interface AuthUser {
   id: string
@@ -221,6 +227,10 @@ function isBackendUnauthenticated(error: unknown) {
   return axios.isAxiosError(error) && error.response?.status === 401
 }
 
+function isBrokerSwitchVerificationError(error: unknown) {
+  return error instanceof Error && error.name === 'BrokerSwitchVerificationError'
+}
+
 function syncStoredSessionWithBackendContext(context: SessionContext) {
   if (session.value === null) {
     return
@@ -316,6 +326,21 @@ export async function validateAuthSession(options: { requireBackendConfirmation?
     }
 
     return options.requireBackendConfirmation !== true
+  }
+}
+
+export async function switchAuthBroker(brokerId: number) {
+  try {
+    const context = await switchSessionBroker(brokerId)
+    syncStoredSessionWithBackendContext(context)
+    return context
+  } catch (error) {
+    const userError = toPolizasUserError(error, 'No se pudo cambiar el broker activo.')
+    if (userError.kind === 'unauthenticated' || isBrokerSwitchVerificationError(error)) {
+      clearAuthSession()
+    }
+
+    throw error
   }
 }
 

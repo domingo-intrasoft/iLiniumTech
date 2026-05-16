@@ -386,6 +386,34 @@ select:focus-visible {
   min-width: 0;
 }
 
+.broker-selector {
+  display: inline-flex;
+  min-width: 138px;
+  min-height: 30px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #b9cadd;
+  border-radius: 6px;
+  padding: 0 7px;
+  color: #344359;
+  background: #ffffff;
+}
+
+.broker-selector i {
+  color: #006ea9;
+  font-size: 0.9rem;
+}
+
+.broker-selector select {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  color: #17324a;
+  background: transparent;
+  font-weight: 800;
+  outline: 0;
+}
+
 .round-badge {
   display: inline-grid;
   width: 18px;

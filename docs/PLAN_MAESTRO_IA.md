@@ -480,7 +480,7 @@ DoD y evidencia:
 3. Mejorar menu lateral y shell con permisos y estados claros.
 4. Subir pantalla de polizas: filtros, query params, detalle, estados y pruebas.
 5. Abrir decision de auth productiva y matriz de permisos.
-6. Disenar cambio de broker activo validado por backend.
+6. Cambio de broker activo validado por backend entregado con evidencia en `docs/qa/active-broker-change-checklist.md`.
 7. Preparar prueba SQL real read-only con DBA y cuenta minima.
 8. Ejecutar UAT de polizas con muestras sanitizadas.
 9. Consolidar CI/preview dry-run y branch protection.

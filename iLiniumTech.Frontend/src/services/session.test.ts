@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 vi.mock('./apiClient', () => ({
   apiClient: {
     get: vi.fn(),
+    post: vi.fn(),
   },
 }))
 
@@ -259,5 +260,66 @@ describe('session service', () => {
     expect(currentSession.error.value).toContain('VITE_ILINIUMTECH_API_KEY')
     expect(currentSession.errorKind.value).toBe('runtime')
     expect(apiClient.get).not.toHaveBeenCalled()
+  })
+
+  it('switches broker through backend demo-session and revalidates /api/me', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    const { apiClient } = await import('./apiClient')
+    vi.mocked(apiClient.post).mockResolvedValueOnce({ data: {} })
+    vi.mocked(apiClient.get).mockResolvedValueOnce({
+      data: {
+        brokerId: 84,
+        entityMainId: 84,
+        userId: 7,
+        profileId: 11,
+        profileTypeId: 'admin',
+        isAdmin: false,
+        headerExecutionContextEnabled: false,
+        polizasExecutionContextRequired: true,
+        allowedBrokerIds: [42, 84],
+        permissions: ['polizas.catalogs', 'polizas.read'],
+        authMode: 'DemoSession',
+      },
+    })
+
+    const { switchSessionBroker, useSession } = await import('./session')
+    const currentSession = useSession()
+
+    await expect(switchSessionBroker(84)).resolves.toMatchObject({
+      brokerId: 84,
+      allowedBrokerIds: [42, 84],
+    })
+
+    expect(apiClient.post).toHaveBeenCalledWith('/api/auth/broker', { brokerId: 84 })
+    expect(apiClient.get).toHaveBeenCalledWith('/api/me')
+    expect(currentSession.session.value?.brokerId).toBe(84)
+  })
+
+  it('marks broker switch verification failures after the backend accepts the change', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    const { apiClient } = await import('./apiClient')
+    vi.mocked(apiClient.post).mockResolvedValueOnce({ data: {} })
+    vi.mocked(apiClient.get).mockRejectedValueOnce(
+      axiosError(401, {
+        error: {
+          message: 'Expired demo-session cookie.',
+          correlationId: 'broker-verify-401',
+        },
+      }),
+    )
+
+    const { BrokerSwitchVerificationError, switchSessionBroker, useSession } =
+      await import('./session')
+    const currentSession = useSession()
+
+    await expect(switchSessionBroker(84)).rejects.toBeInstanceOf(BrokerSwitchVerificationError)
+
+    expect(apiClient.post).toHaveBeenCalledWith('/api/auth/broker', { brokerId: 84 })
+    expect(apiClient.get).toHaveBeenCalledWith('/api/me')
+    expect(currentSession.session.value).toBeNull()
+    expect(currentSession.errorKind.value).toBe('unauthenticated')
+    expect(currentSession.error.value).toContain('Ref: broker-verify-401.')
   })
 })

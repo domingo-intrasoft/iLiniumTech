@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
-import { clearAuthSession, useAuthSession } from '@/features/auth/authSession'
+import { clearAuthSession, switchAuthBroker, useAuthSession } from '@/features/auth/authSession'
 import { toPolizasUserError } from '@/services/apiErrors'
 import { getBlockingRuntimeConfigMessage } from '@/services/runtimeConfig'
 import { type SessionContext, useSession } from '@/services/session'
@@ -17,10 +17,12 @@ import type { PolizaDetail } from './polizasTypes'
 const route = useRoute()
 const router = useRouter()
 const { userLabel, logout } = useAuthSession()
-const { error: sessionError, errorKind: sessionErrorKind, loadSession } = useSession()
+const { session, error: sessionError, errorKind: sessionErrorKind, loadSession } = useSession()
 const poliza = ref<PolizaDetail | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
+const brokerChanging = ref(false)
+const brokerError = ref<string | null>(null)
 const premiumField: PolizaDetailField = { key: 'primaAnual', label: 'Prima anual', type: 'money' }
 const isBackendMode = import.meta.env.VITE_USE_BACKEND === 'true'
 const dataOriginLabel = computed(() => (isBackendMode ? 'API polizas' : 'Fixture local'))
@@ -30,6 +32,19 @@ const polizasBackTarget = computed(() => ({ name: 'polizas', query: route.query 
 const POLIZAS_DETAIL_PERMISSION = 'polizas.detail'
 const POLIZAS_DETAIL_ACCESS_DENIED_MESSAGE =
   'La sesion actual no tiene permiso para consultar el detalle de polizas.'
+
+const brokerOptions = computed(() => {
+  if (!isBackendMode || session.value?.authMode !== 'DemoSession') {
+    return []
+  }
+
+  const brokerIds = session.value.allowedBrokerIds ?? []
+  const uniqueBrokerIds = Array.from(
+    new Set(brokerIds.filter((brokerId) => Number.isInteger(brokerId) && brokerId > 0)),
+  )
+
+  return uniqueBrokerIds.length > 1 ? uniqueBrokerIds : []
+})
 
 function currentPolizaId() {
   const id = route.params.id
@@ -125,6 +140,36 @@ async function signOut() {
   await router.replace({ name: 'login' })
 }
 
+async function changeBroker(brokerId: number) {
+  if (brokerChanging.value || brokerId === session.value?.brokerId) {
+    return
+  }
+
+  if (!brokerOptions.value.includes(brokerId)) {
+    brokerError.value = 'El broker seleccionado no esta disponible para la sesion actual.'
+    error.value = brokerError.value
+    return
+  }
+
+  brokerChanging.value = true
+  brokerError.value = null
+
+  try {
+    await switchAuthBroker(brokerId)
+    await router.replace({ name: 'polizas' })
+  } catch (exception) {
+    const userError = toPolizasUserError(exception, 'No se pudo cambiar el broker activo.')
+    brokerError.value = userError.message
+    error.value = brokerError.value
+    if (userError.kind === 'unauthenticated') {
+      clearAuthSession()
+      await router.replace({ name: 'login' })
+    }
+  } finally {
+    brokerChanging.value = false
+  }
+}
+
 watch(() => route.params.id, loadPoliza, { immediate: true })
 </script>
 
@@ -134,7 +179,12 @@ watch(() => route.params.id, loadPoliza, { immediate: true })
     section-title="Polizas"
     :session-label="shellStatusLabel"
     :user-label="userLabel"
+    :broker-options="brokerOptions"
+    :active-broker-id="session?.brokerId ?? null"
+    :broker-changing="brokerChanging"
+    :broker-error="brokerError"
     show-sign-out
+    @broker-change="changeBroker"
     @sign-out="signOut"
   >
     <div id="poliza-detail-content" class="poliza-detail-page">

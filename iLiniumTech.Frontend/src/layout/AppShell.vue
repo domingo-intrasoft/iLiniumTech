@@ -3,6 +3,7 @@ import AppSideMenu from './AppSideMenu.vue'
 
 const emit = defineEmits<{
   signOut: []
+  brokerChange: [brokerId: number]
 }>()
 
 withDefaults(
@@ -14,14 +15,29 @@ withDefaults(
     topBadges?: string[]
     userLabel?: string
     showSignOut?: boolean
+    brokerOptions?: number[]
+    activeBrokerId?: number | null
+    brokerChanging?: boolean
+    brokerError?: string | null
   }>(),
   {
     sessionNeedsAttention: false,
     topBadges: () => [],
     userLabel: 'MVP iLiniumTech',
     showSignOut: false,
+    brokerOptions: () => [],
+    activeBrokerId: null,
+    brokerChanging: false,
+    brokerError: null,
   },
 )
+
+function onBrokerSelection(event: Event) {
+  const selectedBrokerId = Number((event.target as HTMLSelectElement).value)
+  if (Number.isInteger(selectedBrokerId) && selectedBrokerId > 0) {
+    emit('brokerChange', selectedBrokerId)
+  }
+}
 </script>
 
 <template>
@@ -46,6 +62,21 @@ withDefaults(
         </span>
 
         <div class="top-actions" aria-label="Acciones de usuario">
+          <label v-if="brokerOptions.length > 0" class="broker-selector">
+            <span class="sr-only">Broker activo</span>
+            <i class="pi pi-building" aria-hidden="true"></i>
+            <select
+              :value="activeBrokerId ?? ''"
+              :disabled="brokerChanging"
+              :aria-invalid="brokerError ? 'true' : 'false'"
+              aria-label="Broker activo"
+              @change="onBrokerSelection"
+            >
+              <option v-for="brokerId in brokerOptions" :key="brokerId" :value="brokerId">
+                Broker {{ brokerId }}
+              </option>
+            </select>
+          </label>
           <span v-for="badge in topBadges" :key="badge" class="round-badge">{{ badge }}</span>
           <span class="user-name">{{ userLabel }}</span>
           <button class="icon-button ghost" type="button" aria-label="Notificaciones">

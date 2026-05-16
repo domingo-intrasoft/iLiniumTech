@@ -234,6 +234,7 @@ export function usePolizas() {
     filters,
     pagination,
     refresh,
+    loadCatalogs,
     setPage,
     setPageSize,
   }

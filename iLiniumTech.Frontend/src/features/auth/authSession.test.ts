@@ -10,6 +10,7 @@ import {
   loginDemo,
   logoutAuthSession,
   readStoredSession,
+  switchAuthBroker,
   validateAuthSession,
 } from './authSession'
 
@@ -222,5 +223,90 @@ describe('authSession MVP', () => {
     await expect(validateAuthSession({ requireBackendConfirmation: true })).resolves.toBe(false)
 
     expect(readStoredSession()).not.toBeNull()
+  })
+
+  it('updates stored backend session after a validated broker switch', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    loginDemo({ username: 'domingo', password: 'demo' })
+    vi.mocked(apiClient.post).mockResolvedValueOnce({ data: {} })
+    vi.mocked(apiClient.get).mockResolvedValueOnce({
+      data: {
+        brokerId: 84,
+        entityMainId: 84,
+        userId: 7,
+        profileId: 11,
+        profileTypeId: 'admin',
+        isAdmin: false,
+        headerExecutionContextEnabled: false,
+        polizasExecutionContextRequired: true,
+        user: {
+          id: 'demo:backend-user',
+          displayName: 'backend-user',
+        },
+        application: {
+          key: 'iliniumtech',
+          name: 'iLiniumTech',
+        },
+        allowedBrokerIds: [42, 84],
+        permissions: ['polizas.catalogs', 'polizas.read', 'polizas.detail'],
+        authMode: 'DemoSession',
+      },
+    })
+
+    await expect(switchAuthBroker(84)).resolves.toMatchObject({
+      brokerId: 84,
+      allowedBrokerIds: [42, 84],
+    })
+
+    expect(apiClient.post).toHaveBeenCalledWith('/api/auth/broker', { brokerId: 84 })
+    expect(apiClient.get).toHaveBeenCalledWith('/api/me')
+    expect(readStoredSession()).toMatchObject({
+      source: 'backend',
+      currentBrokerId: 84,
+      permissions: ['polizas.catalogs', 'polizas.read', 'polizas.detail'],
+    })
+  })
+
+  it('clears stored backend sessions when broker switch returns 401', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    loginDemo({ username: 'domingo', password: 'demo' })
+    vi.mocked(apiClient.post).mockRejectedValueOnce({
+      isAxiosError: true,
+      response: {
+        status: 401,
+        data: {
+          error: {
+            code: 'AUTH_SESSION_EXPIRED',
+            correlationId: 'broker-401',
+          },
+        },
+      },
+    })
+
+    await expect(switchAuthBroker(84)).rejects.toMatchObject({
+      response: {
+        status: 401,
+      },
+    })
+
+    expect(readStoredSession()).toBeNull()
+    expect(hasAuthSession()).toBe(false)
+  })
+
+  it('clears stored backend sessions when broker switch cannot confirm /api/me', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    loginDemo({ username: 'domingo', password: 'demo' })
+    vi.mocked(apiClient.post).mockResolvedValueOnce({ data: {} })
+    vi.mocked(apiClient.get).mockRejectedValueOnce(new Error('backend unavailable'))
+
+    await expect(switchAuthBroker(84)).rejects.toThrow(
+      'No se pudo confirmar el broker activo tras cambiarlo.',
+    )
+
+    expect(readStoredSession()).toBeNull()
+    expect(hasAuthSession()).toBe(false)
   })
 })

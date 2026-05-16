@@ -2,7 +2,7 @@ import { computed, readonly, ref } from 'vue'
 
 import { toPolizasUserError, type PolizasUserErrorKind } from './apiErrors'
 import { apiClient } from './apiClient'
-import { assertRuntimeConfigReady } from './runtimeConfig'
+import { assertRuntimeConfigReady, getRuntimeConfig, RuntimeConfigError } from './runtimeConfig'
 
 export interface SessionContext {
   brokerId: number | null
@@ -31,6 +31,16 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 const errorKind = ref<PolizasUserErrorKind | null>(null)
 let pendingRequest: Promise<SessionContext> | null = null
+
+export class BrokerSwitchVerificationError extends Error {
+  readonly cause: unknown
+
+  constructor(cause: unknown) {
+    super('No se pudo confirmar el broker activo tras cambiarlo.')
+    this.name = 'BrokerSwitchVerificationError'
+    this.cause = cause
+  }
+}
 
 function readPositiveInteger(value: string | undefined): number | null {
   if (!value) {
@@ -82,6 +92,44 @@ export async function getSessionContext(): Promise<SessionContext> {
   assertRuntimeConfigReady()
   const response = await apiClient.get<SessionContext>('/api/me')
   return normalizeSessionContext(response.data)
+}
+
+export async function switchSessionBroker(brokerId: number): Promise<SessionContext> {
+  if (!Number.isInteger(brokerId) || brokerId <= 0) {
+    throw new RuntimeConfigError('Selecciona un broker valido para continuar.')
+  }
+
+  const runtimeConfig = getRuntimeConfig()
+  if (!runtimeConfig.backendEnabled || runtimeConfig.authMode !== 'demo-session') {
+    throw new RuntimeConfigError(
+      'El cambio de broker requiere una sesion demo validada por backend.',
+    )
+  }
+
+  assertRuntimeConfigReady(runtimeConfig)
+  loading.value = true
+  error.value = null
+  errorKind.value = null
+  let brokerSwitchCommitted = false
+
+  try {
+    await apiClient.post('/api/auth/broker', { brokerId })
+    brokerSwitchCommitted = true
+    clearSessionContext()
+    const nextSession = await getSessionContext()
+    session.value = nextSession
+    return nextSession
+  } catch (exception) {
+    const userError = toPolizasUserError(exception, 'No se pudo cambiar el broker activo.')
+    error.value = userError.message
+    errorKind.value = userError.kind
+    if (brokerSwitchCommitted) {
+      throw new BrokerSwitchVerificationError(exception)
+    }
+    throw exception
+  } finally {
+    loading.value = false
+  }
 }
 
 export function useSession() {

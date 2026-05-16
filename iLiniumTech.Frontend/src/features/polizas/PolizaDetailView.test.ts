@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   sessionError: { value: null as string | null },
   sessionErrorKind: { value: null as 'unauthenticated' | null },
   loadSession: vi.fn(),
+  switchSessionBroker: vi.fn(),
   getPolizaById: vi.fn(),
 }))
 
@@ -42,6 +43,7 @@ vi.mock('@/services/session', () => ({
     errorKind: mocks.sessionErrorKind,
     loadSession: mocks.loadSession,
   }),
+  switchSessionBroker: mocks.switchSessionBroker,
 }))
 
 vi.mock('./polizasApi', () => ({
@@ -91,6 +93,7 @@ describe('PolizaDetailView', () => {
     mocks.sessionError.value = null
     mocks.sessionErrorKind.value = null
     mocks.loadSession.mockReset()
+    mocks.switchSessionBroker.mockReset()
     mocks.getPolizaById.mockReset()
     clearAuthSession()
   })
@@ -215,5 +218,33 @@ describe('PolizaDetailView', () => {
     expect(wrapper.find('[role="alert"]').text()).toContain(
       'La sesion actual no tiene permiso para consultar el detalle de polizas.',
     )
+  })
+
+  it('redirects to the polizas list after switching broker from detail', async () => {
+    enableBackendDemoSessionMode()
+    loginDemo({ username: 'domingo', password: 'demo' })
+    const initialSession = backendSession({
+      allowedBrokerIds: [42, 84],
+      authMode: 'DemoSession',
+    })
+    const switchedSession = backendSession({
+      brokerId: 84,
+      entityMainId: 84,
+      allowedBrokerIds: [42, 84],
+      authMode: 'DemoSession',
+    })
+    mocks.session.value = initialSession
+    mocks.loadSession.mockResolvedValue(initialSession)
+    mocks.switchSessionBroker.mockResolvedValueOnce(switchedSession)
+    mocks.getPolizaById.mockResolvedValueOnce(polizasDetailFixture[0])
+
+    const wrapper = mount(PolizaDetailView)
+    await flushPromises()
+
+    await wrapper.get('select[aria-label="Broker activo"]').setValue('84')
+    await flushPromises()
+
+    expect(mocks.switchSessionBroker).toHaveBeenCalledWith(84)
+    expect(mocks.router.replace).toHaveBeenCalledWith({ name: 'polizas' })
   })
 })

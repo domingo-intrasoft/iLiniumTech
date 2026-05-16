@@ -27,6 +27,14 @@ export interface PolizasUserError {
   status?: number
 }
 
+function unwrapKnownUserErrorCause(error: unknown) {
+  if (error instanceof Error && error.name === 'BrokerSwitchVerificationError') {
+    return (error as Error & { cause?: unknown }).cause ?? error
+  }
+
+  return error
+}
+
 const SAFE_BACKEND_MESSAGES = new Map<string, string>([
   ['POLIZAS_CONTEXT_REQUIRED', 'Configura un broker antes de consultar polizas.'],
   ['POLIZAS_CONTEXT_INVALID', 'El contexto de broker no es valido.'],
@@ -53,16 +61,18 @@ export function isPolizasAccessError(error: PolizasUserError) {
 }
 
 export function toPolizasUserError(error: unknown, fallback: string): PolizasUserError {
-  if (error instanceof RuntimeConfigError) {
-    return { kind: 'runtime', message: error.message }
+  const effectiveError = unwrapKnownUserErrorCause(error)
+
+  if (effectiveError instanceof RuntimeConfigError) {
+    return { kind: 'runtime', message: effectiveError.message }
   }
 
-  if (!axios.isAxiosError<BackendErrorResponse>(error)) {
+  if (!axios.isAxiosError<BackendErrorResponse>(effectiveError)) {
     return { kind: 'unknown', message: fallback }
   }
 
-  const status = error.response?.status
-  const backendError = error.response?.data?.error
+  const status = effectiveError.response?.status
+  const backendError = effectiveError.response?.data?.error
   const backendCode = backendError?.code
 
   if (backendCode && SAFE_BACKEND_MESSAGES.has(backendCode)) {
@@ -131,7 +141,7 @@ export function toPolizasUserError(error: unknown, fallback: string): PolizasUse
     }
   }
 
-  if (error.code === 'ECONNABORTED') {
+  if (effectiveError.code === 'ECONNABORTED') {
     return { kind: 'timeout', message: 'La API de polizas tardo demasiado en responder.' }
   }
 
