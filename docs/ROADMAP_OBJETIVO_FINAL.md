@@ -299,6 +299,7 @@ Proximo incremento preparado:
 - Implementar cambio de broker activo mediante endpoint validado por backend, no header libre.
 - Preparar decision de proveedor auth y matriz real de permisos.
 - Retirar gradualmente API key/headers MVP de entornos preview/produccion.
+- Usar [qa/login-session-hardening-checklist.md](qa/login-session-hardening-checklist.md) como evidencia corta del incremento, completando solo resultados reales.
 
 Pendiente de implementacion:
 

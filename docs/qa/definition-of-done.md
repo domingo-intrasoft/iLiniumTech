@@ -83,6 +83,27 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-Depend
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-CorsAudit.ps1 -FailOnFindings
 ```
 
+## Criterios especificos - login, sesion y auth-broker
+
+Aplican al incremento Fase 2 login/sesion robusto y a cualquier cambio que toque `/login`, `/api/auth/*`, `/api/me`, guards, permisos o broker activo.
+
+- `/login` queda fuera del shell protegido y no renderiza contenido privado.
+- En modo backend real (`VITE_USE_BACKEND=true`), la sesion backend validada tiene prioridad sobre cualquier sesion local.
+- `/api/me` es el contrato unico para identidad, modo de autenticacion, broker activo, brokers permitidos y permisos efectivos.
+- Refresh del navegador y entrada directa a rutas protegidas conservan sesion valida o redirigen/devuelven 401 seguro.
+- Logout limpia sesion/cookie demo y estado frontend reutilizable.
+- 401, 403 y 404 esperados muestran mensajes publicos sanitizados y `correlationId` cuando aplique.
+- Falta de sesion, broker ausente, broker no permitido y permiso ausente se distinguen en UI sin exponer datos ni detalles internos.
+- `currentBrokerId` debe pertenecer a `allowedBrokerIds` antes de catalogos, listado, detalle o SQL real.
+- Cualquier cambio de broker debe venir de endpoint/contrato backend validado; no de header libre como autoridad.
+- API key MVP, headers MVP y `DemoSession` quedan etiquetados como compatibilidad local/demo, no auth productiva.
+- No se loguean tokens, cookies, API keys, datos personales, SQL completo, connection strings ni broker ajeno.
+- No hay fallback silencioso a fixtures si el backend falla en modo backend real.
+
+Evidencia operativa:
+
+- [login-session-hardening-checklist.md](login-session-hardening-checklist.md)
+
 ## Gate recomendado antes de cerrar rama
 
 ```powershell

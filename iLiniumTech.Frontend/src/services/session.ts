@@ -116,10 +116,7 @@ export function useSession() {
   }
 
   function resetSession() {
-    session.value = null
-    error.value = null
-    errorKind.value = null
-    pendingRequest = null
+    clearSessionContext()
   }
 
   return {
@@ -132,4 +129,11 @@ export function useSession() {
     loadSession,
     resetSession,
   }
+}
+
+export function clearSessionContext() {
+  session.value = null
+  error.value = null
+  errorKind.value = null
+  pendingRequest = null
 }

@@ -6,6 +6,8 @@ Objetivo grande activo: consolidar el MVP actual con login, shell/menu lateral y
 
 Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea funcional debe estar respaldada por SDD, issue o decision documentada antes de implementarse.
 
+Estado de coordinacion 2026-05-16: el carril de paginas estaticas del menu ya tiene evidencias QA versionadas para las pantallas trabajadas. No debe relanzarse como paquete activo salvo regresion, ajuste de evidencia o nueva decision de producto. El incremento activo de gobierno es Fase 2 login/sesion robusto.
+
 ## Reglas de coordinacion
 
 - Un agente no debe tocar archivos fuera de su alcance.
@@ -36,8 +38,8 @@ Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea
 - **Archivos que puede tocar:** `iLiniumTech.Frontend/**`, `iLiniumTech.Backend/**` solo en auth/session, `docs/qa/**` si aporta evidencia.
 - **Archivos que NO debe tocar:** extractor, SQL real, `.github/**` salvo coordinacion.
 - **Dependencias:** contrato `/api/me` y decision pendiente de auth productiva.
-- **Criterios de aceptacion:** `/login` queda fuera del shell; rutas protegidas redirigen bien; logout limpia sesion; errores son sanitizados.
-- **Pruebas obligatorias:** tests backend auth; tests frontend auth/guard; smoke login -> polizas -> logout; secret scan si toca configuracion.
+- **Criterios de aceptacion:** `/login` queda fuera del shell; rutas protegidas redirigen bien; `/api/me` es fuente unica de identidad/broker/permisos; refresh y expiracion son consistentes; logout limpia sesion; 401/403/404 son sanitizados; no hay fallback silencioso a fixtures en modo backend real.
+- **Pruebas obligatorias:** tests backend auth/session/permisos; tests frontend auth/guard/composables; smoke login -> polizas -> detalle -> logout; secret scan si toca configuracion.
 - **Documentacion a actualizar:** evidencia QA y roadmap si cambia estado.
 - **Riesgo de conflicto:** medio con permisos y shell.
 
@@ -101,9 +103,9 @@ Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea
 - **Documentacion a actualizar:** DoD, roadmap, plan CI/CD, evidencias de cierre.
 - **Riesgo de conflicto:** medio con workflows y seguridad.
 
-## Paquete operativo - paginas estaticas del menu
+## Paquete operativo aparcado - paginas estaticas del menu
 
-Este paquete ordena el siguiente avance de paginas del menu a partir de `docs/appbuilder/pages/development-readiness.md`. No autoriza programar backend, crear APIs, tocar paquetes, cambiar router/navegacion ni activar datos reales. Sirve para repartir trabajo si producto decide enriquecer las paginas estaticas ya existentes.
+Este paquete queda aparcado como referencia porque las pantallas estaticas trabajadas ya tienen evidencias QA en `docs/qa/*-mvp-evidence.md`. No autoriza programar backend, crear APIs, tocar paquetes, cambiar router/navegacion ni activar datos reales. Solo debe retomarse para regresiones, ajustes documentales o si producto decide enriquecer nuevas paginas estaticas.
 
 ### Regla de carriles
 

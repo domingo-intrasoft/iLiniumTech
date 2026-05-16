@@ -72,11 +72,14 @@ export function usePolizas() {
     }
 
     if (!currentSession) {
+      const validationError =
+        sessionError.value ?? 'No se pudo validar la sesion antes de consultar polizas.'
+
       if (sessionErrorKind.value === 'unauthenticated') {
         clearAuthSession()
       }
 
-      error.value = sessionError.value ?? 'No se pudo validar la sesion antes de consultar polizas.'
+      error.value = validationError
       runtimeError.value = error.value
       contextBlocked.value = true
       items.value = []

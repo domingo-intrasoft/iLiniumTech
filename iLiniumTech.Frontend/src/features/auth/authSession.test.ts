@@ -10,10 +10,12 @@ import {
   loginDemo,
   logoutAuthSession,
   readStoredSession,
+  validateAuthSession,
 } from './authSession'
 
 vi.mock('@/services/apiClient', () => ({
   apiClient: {
+    get: vi.fn(),
     post: vi.fn(),
   },
 }))
@@ -23,6 +25,7 @@ describe('authSession MVP', () => {
     vi.stubEnv('VITE_USE_BACKEND', 'false')
     vi.stubEnv('VITE_AUTH_MODE', 'api-key')
     vi.stubEnv('VITE_BROKER_ID', '42')
+    vi.mocked(apiClient.get).mockReset()
     vi.mocked(apiClient.post).mockReset()
     clearAuthSession()
   })
@@ -145,5 +148,79 @@ describe('authSession MVP', () => {
 
     expect(apiClient.post).toHaveBeenCalledWith('/api/auth/logout')
     expect(hasAuthSession()).toBe(false)
+  })
+
+  it('validates backend demo sessions against /api/me before trusting storage', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    loginDemo({ username: 'domingo', password: 'demo' })
+    vi.mocked(apiClient.get).mockResolvedValueOnce({
+      data: {
+        brokerId: 42,
+        entityMainId: 42,
+        userId: 7,
+        profileId: 11,
+        profileTypeId: 'admin',
+        isAdmin: false,
+        headerExecutionContextEnabled: false,
+        polizasExecutionContextRequired: true,
+        user: {
+          id: 'demo:backend-user',
+          displayName: 'backend-user',
+        },
+        application: {
+          key: 'iliniumtech',
+          name: 'iLiniumTech',
+        },
+        permissions: ['polizas.catalogs', 'polizas.read'],
+      },
+    })
+
+    await expect(validateAuthSession()).resolves.toBe(true)
+
+    expect(apiClient.get).toHaveBeenCalledWith('/api/me')
+    expect(readStoredSession()).toMatchObject({
+      source: 'backend',
+      user: {
+        displayName: 'backend-user',
+      },
+      currentBrokerId: 42,
+      permissions: ['polizas.catalogs', 'polizas.read'],
+    })
+    expect(hasAuthSession()).toBe(true)
+  })
+
+  it('clears stored backend sessions when /api/me returns 401', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    loginDemo({ username: 'domingo', password: 'demo' })
+    vi.mocked(apiClient.get).mockRejectedValueOnce({
+      isAxiosError: true,
+      response: {
+        status: 401,
+        data: {
+          error: {
+            code: 'AUTH_SESSION_EXPIRED',
+            correlationId: 'auth-401',
+          },
+        },
+      },
+    })
+
+    await expect(validateAuthSession()).resolves.toBe(false)
+
+    expect(readStoredSession()).toBeNull()
+    expect(hasAuthSession()).toBe(false)
+  })
+
+  it('does not treat unconfirmed backend sessions as valid when confirmation is required', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    loginDemo({ username: 'domingo', password: 'demo' })
+    vi.mocked(apiClient.get).mockRejectedValueOnce(new Error('backend unavailable'))
+
+    await expect(validateAuthSession({ requireBackendConfirmation: true })).resolves.toBe(false)
+
+    expect(readStoredSession()).not.toBeNull()
   })
 })

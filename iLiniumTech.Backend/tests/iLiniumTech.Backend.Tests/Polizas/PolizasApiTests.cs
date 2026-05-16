@@ -287,6 +287,33 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Demo_login_rejects_non_positive_requested_broker_without_configuration_fallback()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:BrokerId"] = "84"
+        });
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "login-broker-validation");
+
+        var response = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            username = "demo",
+            password = "demo",
+            brokerId = 0
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.Headers.TryGetValues("Set-Cookie", out _).Should().BeFalse();
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("login-broker-validation");
+        body.Should().Contain("AUTH_BROKER_VALIDATION_ERROR");
+        body.Should().Contain("\"correlationId\":\"login-broker-validation\"");
+        body.Should().NotContain("84");
+        body.Should().NotContain("password");
+    }
+
+    [Fact]
     public async Task Demo_login_rejects_requested_broker_outside_allowed_brokers()
     {
         await using var factory = new TestApiFactory(new Dictionary<string, string?>

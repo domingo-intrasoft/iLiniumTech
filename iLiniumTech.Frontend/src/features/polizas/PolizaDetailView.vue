@@ -66,11 +66,14 @@ async function ensureBackendDetailContext() {
 
   const currentSession = await loadSession()
   if (!currentSession) {
+    const validationError =
+      sessionError.value ?? 'No se pudo validar la sesion antes de consultar polizas.'
+
     if (sessionErrorKind.value === 'unauthenticated') {
       clearAuthSession()
     }
 
-    error.value = sessionError.value ?? 'No se pudo validar la sesion antes de consultar polizas.'
+    error.value = validationError
     poliza.value = null
     return false
   }

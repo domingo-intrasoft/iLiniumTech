@@ -3,6 +3,7 @@ import axios from 'axios'
 
 import { apiClient } from '@/services/apiClient'
 import { getRuntimeConfig } from '@/services/runtimeConfig'
+import { clearSessionContext, getSessionContext, type SessionContext } from '@/services/session'
 
 export interface AuthUser {
   id: string
@@ -173,6 +174,7 @@ export function loginDemo(credentials: LoginCredentials): AuthMvpSession {
     permissions: DEMO_PERMISSIONS,
   }
 
+  clearSessionContext()
   storage()?.setItem(SESSION_STORAGE_KEY, JSON.stringify(nextSession))
   session.value = nextSession
   return nextSession
@@ -215,6 +217,30 @@ function toBackendLoginMessage(error: unknown) {
   return 'No se pudo iniciar sesion.'
 }
 
+function isBackendUnauthenticated(error: unknown) {
+  return axios.isAxiosError(error) && error.response?.status === 401
+}
+
+function syncStoredSessionWithBackendContext(context: SessionContext) {
+  if (session.value === null) {
+    return
+  }
+
+  const nextSession: AuthMvpSession = {
+    ...session.value,
+    source: 'backend',
+    user: context.user ?? session.value.user,
+    application: context.application ?? session.value.application,
+    currentBrokerId: context.brokerId,
+    permissions: Array.isArray(context.permissions)
+      ? context.permissions
+      : session.value.permissions,
+  }
+
+  storage()?.setItem(SESSION_STORAGE_KEY, JSON.stringify(nextSession))
+  session.value = nextSession
+}
+
 export async function loginWithBackendDemo(credentials: LoginCredentials): Promise<AuthMvpSession> {
   const username = credentials.username.trim()
   if (!username || !credentials.password) {
@@ -237,6 +263,7 @@ export async function loginWithBackendDemo(credentials: LoginCredentials): Promi
 
   const nextSession = toBackendSession(response.data)
 
+  clearSessionContext()
   storage()?.setItem(SESSION_STORAGE_KEY, JSON.stringify(nextSession))
   session.value = nextSession
   return nextSession
@@ -252,6 +279,7 @@ export async function loginAuthSession(credentials: LoginCredentials): Promise<A
 export function clearAuthSession() {
   storage()?.removeItem(SESSION_STORAGE_KEY)
   session.value = null
+  clearSessionContext()
 }
 
 export async function logoutAuthSession() {
@@ -264,6 +292,30 @@ export async function logoutAuthSession() {
     } catch {
       // Local logout must not keep the user trapped if the backend endpoint is unavailable.
     }
+  }
+}
+
+export async function validateAuthSession(options: { requireBackendConfirmation?: boolean } = {}) {
+  session.value = readStoredSession()
+  if (session.value === null) {
+    return false
+  }
+
+  const runtimeConfig = getRuntimeConfig()
+  if (!runtimeConfig.backendEnabled || runtimeConfig.authMode !== 'demo-session') {
+    return true
+  }
+
+  try {
+    syncStoredSessionWithBackendContext(await getSessionContext())
+    return true
+  } catch (error) {
+    if (isBackendUnauthenticated(error)) {
+      clearAuthSession()
+      return false
+    }
+
+    return options.requireBackendConfirmation !== true
   }
 }
 

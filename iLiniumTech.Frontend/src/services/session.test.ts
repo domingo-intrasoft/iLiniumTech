@@ -91,6 +91,75 @@ describe('session service', () => {
     expect(apiClient.get).toHaveBeenCalledTimes(1)
   })
 
+  it('clears shared context so logout and re-login cannot reuse stale /api/me data', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
+    const { apiClient } = await import('./apiClient')
+    vi.mocked(apiClient.get).mockResolvedValueOnce({
+      data: {
+        brokerId: 84,
+        entityMainId: 84,
+        userId: null,
+        profileId: null,
+        profileTypeId: null,
+        isAdmin: null,
+        headerExecutionContextEnabled: false,
+        polizasExecutionContextRequired: true,
+      },
+    })
+
+    const { clearSessionContext, useSession } = await import('./session')
+    const currentSession = useSession()
+
+    await currentSession.loadSession()
+    clearSessionContext()
+
+    expect(currentSession.session.value).toBeNull()
+    expect(currentSession.brokerId.value).toBeNull()
+    expect(currentSession.error.value).toBeNull()
+  })
+
+  it('forces a new /api/me request after clearing shared context', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
+    const { apiClient } = await import('./apiClient')
+    vi.mocked(apiClient.get)
+      .mockResolvedValueOnce({
+        data: {
+          brokerId: 84,
+          entityMainId: 84,
+          userId: null,
+          profileId: null,
+          profileTypeId: null,
+          isAdmin: null,
+          headerExecutionContextEnabled: false,
+          polizasExecutionContextRequired: true,
+        },
+      })
+      .mockResolvedValueOnce({
+        data: {
+          brokerId: 42,
+          entityMainId: 42,
+          userId: null,
+          profileId: null,
+          profileTypeId: null,
+          isAdmin: null,
+          headerExecutionContextEnabled: false,
+          polizasExecutionContextRequired: true,
+        },
+      })
+
+    const { clearSessionContext, useSession } = await import('./session')
+    const currentSession = useSession()
+
+    await currentSession.loadSession()
+    clearSessionContext()
+    await currentSession.loadSession()
+
+    expect(apiClient.get).toHaveBeenCalledTimes(2)
+    expect(currentSession.brokerId.value).toBe(42)
+  })
+
   it('keeps empty context available when /api/me has no broker yet', async () => {
     vi.stubEnv('VITE_USE_BACKEND', 'true')
     vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')

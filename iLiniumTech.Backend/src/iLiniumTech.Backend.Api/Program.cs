@@ -184,6 +184,15 @@ app.MapPost("/api/auth/login", async (
             "Username and password are required.");
     }
 
+    if (request.BrokerId is <= 0)
+    {
+        return ErrorResult(
+            httpContext,
+            StatusCodes.Status400BadRequest,
+            "AUTH_BROKER_VALIDATION_ERROR",
+            "A positive broker identifier is required.");
+    }
+
     var expectedPassword = configuration["Auth:Demo:Password"] ?? "demo";
     if (!string.Equals(request.Password, expectedPassword, StringComparison.Ordinal))
     {

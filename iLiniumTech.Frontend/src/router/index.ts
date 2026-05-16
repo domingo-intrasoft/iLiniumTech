@@ -28,7 +28,7 @@ import PropuestasView from '@/features/propuestas/PropuestasView.vue'
 import RecibosView from '@/features/recibos/RecibosView.vue'
 import SiniestrosView from '@/features/siniestros/SiniestrosView.vue'
 import SuplementosView from '@/features/suplementos/SuplementosView.vue'
-import { hasAuthSession } from '@/features/auth/authSession'
+import { validateAuthSession } from '@/features/auth/authSession'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -170,8 +170,10 @@ export const routes: RouteRecordRaw[] = [
 ]
 
 export function registerAuthGuard(router: Router) {
-  router.beforeEach((to) => {
-    const authenticated = hasAuthSession()
+  router.beforeEach(async (to) => {
+    const authenticated = await validateAuthSession({
+      requireBackendConfirmation: to.name === 'login',
+    })
 
     if (to.name === 'login' && authenticated) {
       const redirect = to.query.redirect

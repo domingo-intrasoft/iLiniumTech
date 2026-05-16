@@ -31,6 +31,11 @@ vi.mock('vue-router', () => ({
 }))
 
 vi.mock('@/services/session', () => ({
+  clearSessionContext: vi.fn(() => {
+    mocks.session.value = null
+    mocks.sessionError.value = null
+    mocks.sessionErrorKind.value = null
+  }),
   useSession: () => ({
     session: mocks.session,
     error: mocks.sessionError,
@@ -170,11 +175,11 @@ describe('PolizaDetailView', () => {
 
   it('does not call detail API when backend session cannot be validated', async () => {
     enableBackendDemoSessionMode()
+    loginDemo({ username: 'domingo', password: 'demo' })
     mocks.sessionError.value =
       'La sesion no esta autorizada para consultar polizas. Inicia sesion de nuevo si el problema continua.'
     mocks.sessionErrorKind.value = 'unauthenticated'
     mocks.loadSession.mockResolvedValueOnce(null)
-    loginDemo({ username: 'domingo', password: 'demo' })
 
     const wrapper = mount(PolizaDetailView)
     await flushPromises()
