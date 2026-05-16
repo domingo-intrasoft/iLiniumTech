@@ -117,7 +117,9 @@ export function getRuntimeConfig(): RuntimeConfig {
 
 export function getApiHeaders(config = getRuntimeConfig()) {
   return {
-    ...(config.apiKey ? { 'X-ILiniumTech-Api-Key': config.apiKey } : {}),
+    ...(config.authMode === 'api-key' && config.apiKey
+      ? { 'X-ILiniumTech-Api-Key': config.apiKey }
+      : {}),
     ...(config.brokerId ? { 'X-Broker-Id': config.brokerId } : {}),
   }
 }

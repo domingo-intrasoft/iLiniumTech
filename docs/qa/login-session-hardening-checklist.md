@@ -10,6 +10,8 @@ Estado: evidencia ejecutada del incremento Fase 2 login/sesion robusto.
 - Sesion backend `DemoSession` en modo local/demo mientras se decide auth productiva.
 - Contrato `/api/me` como fuente de identidad, broker activo, brokers permitidos, permisos y modo de autenticacion.
 - Guards frontend, estados de sesion, 401/403/404 seguros y broker autorizado.
+- Endurecimiento frontend para que, en modo backend demo-session, las rutas protegidas dependan de `/api/me` y no de storage local obsoleto.
+- Cliente API en `demo-session` sin cabecera `X-ILiniumTech-Api-Key`, para evitar credenciales mixtas y forzar validacion por cookie.
 
 Fuera de alcance:
 
@@ -23,6 +25,8 @@ Fuera de alcance:
 - [x] `/login` se muestra sin shell protegido, menu lateral ni datos privados.
 - [x] Ruta protegida sin sesion redirige a login o devuelve 401 seguro segun capa.
 - [x] En `VITE_USE_BACKEND=true`, la UI valida sesion backend antes de consumir Polizas.
+- [x] En modo backend demo-session, las rutas protegidas no confian en storage local ni cache frontend si `/api/me` no confirma una sesion backend valida.
+- [x] En modo backend demo-session, el cliente frontend usa cookie con `withCredentials` y no envia API key aunque exista una variable antigua configurada.
 - [x] Refresh con sesion valida conserva contexto desde `/api/me`.
 - [x] Refresh o entrada directa sin sesion no reutiliza estado local obsoleto.
 - [x] Logout limpia cookie/sesion demo, estado frontend y vuelve a `/login`.
@@ -73,6 +77,19 @@ Resultados:
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1`: OK, no leaks found.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-DependencyAudit.ps1 -ReportDir <temp> -FailOnFindings`: OK, total finding count 0.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-CorsAudit.ps1 -FailOnFindings`: OK.
+- `git diff --check`: OK, solo avisos CRLF del working copy.
+
+Actualizacion 2026-05-17:
+
+- Endurecimiento de guards: cualquier ruta protegida en `demo-session` exige confirmacion positiva de `/api/me`.
+- Endurecimiento de cliente API: en `demo-session`, el frontend usa cookie con `withCredentials` y no envia `X-ILiniumTech-Api-Key`.
+- Tests dirigidos `router`, `authSession`, `runtimeConfig` y `apiClient`: OK, 4 archivos / 32 tests.
+- `npm run format` equivalente con Node compatible: OK.
+- `npm run lint` equivalente con Node compatible: OK.
+- `npm run test:unit` equivalente con Node compatible: OK, 39 archivos / 183 tests.
+- `npm run build` equivalente con Node compatible: OK, `vue-tsc -b` y `vite build`.
+- `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release`: OK, 86 tests backend.
+- Baseline documental, secret scan, dependency audit y CORS audit: OK, 0 findings.
 - `git diff --check`: OK, solo avisos CRLF del working copy.
 
 Smoke recomendado:

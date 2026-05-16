@@ -171,8 +171,9 @@ export const routes: RouteRecordRaw[] = [
 
 export function registerAuthGuard(router: Router) {
   router.beforeEach(async (to) => {
+    const requiresAuth = to.matched.some((route) => route.meta.requiresAuth)
     const authenticated = await validateAuthSession({
-      requireBackendConfirmation: to.name === 'login',
+      requireBackendConfirmation: requiresAuth || to.name === 'login',
     })
 
     if (to.name === 'login' && authenticated) {
@@ -181,7 +182,7 @@ export function registerAuthGuard(router: Router) {
       return target?.startsWith('/') && !target.startsWith('//') ? target : { name: 'polizas' }
     }
 
-    if (to.meta.requiresAuth && !authenticated) {
+    if (requiresAuth && !authenticated) {
       return {
         name: 'login',
         query: { redirect: to.fullPath },

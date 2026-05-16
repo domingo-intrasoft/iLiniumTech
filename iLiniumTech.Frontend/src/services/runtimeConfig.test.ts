@@ -35,7 +35,7 @@ describe('runtime config contract', () => {
   it('allows backend demo-session mode without exposing an API key', async () => {
     vi.stubEnv('VITE_USE_BACKEND', 'true')
     vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
-    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', '')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'stale-mvp-api-key')
 
     const { getApiHeaders, getBlockingRuntimeConfigMessage, getRuntimeConfig } =
       await import('./runtimeConfig')
@@ -44,6 +44,7 @@ describe('runtime config contract', () => {
     expect(config.authMode).toBe('demo-session')
     expect(config.issues).toEqual([])
     expect(getBlockingRuntimeConfigMessage(config)).toBeNull()
+    expect(config.apiKey).toBe('stale-mvp-api-key')
     expect(getApiHeaders(config)['X-ILiniumTech-Api-Key']).toBeUndefined()
   })
 

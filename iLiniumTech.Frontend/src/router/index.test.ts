@@ -92,6 +92,21 @@ describe('router auth guard', () => {
     expect(router.currentRoute.value.query.redirect).toBe('/polizas')
   })
 
+  it('redirects protected backend demo routes to login when /api/me is unavailable despite stored local session', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    loginDemo({ username: 'demo', password: 'demo' })
+    vi.mocked(apiClient.get).mockRejectedValueOnce(new Error('backend unavailable'))
+    const router = createIliniumRouter(createMemoryHistory())
+
+    await router.push('/clientes')
+    await router.isReady()
+
+    expect(apiClient.get).toHaveBeenCalledWith('/api/me')
+    expect(router.currentRoute.value.name).toBe('login')
+    expect(router.currentRoute.value.query.redirect).toBe('/clientes')
+  })
+
   it('allows backend demo sessions only after /api/me validates the cookie session', async () => {
     vi.stubEnv('VITE_USE_BACKEND', 'true')
     vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
