@@ -1,71 +1,153 @@
-import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
+import { createMemoryHistory, createRouter } from 'vue-router'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { useSession } from '@/services/session'
 
 import PropuestasView from './PropuestasView.vue'
 
-const mvpPageShellStub = {
-  props: ['page'],
-  template: `
-    <section data-test="mvp-page-shell">
-      <h1>{{ page.title }}</h1>
-      <p>{{ page.status }}</p>
-      <p>{{ page.subtitle }}</p>
-      <p>{{ page.source }}</p>
+const runtimeMarkers =
+  /IAP_|QueryStatic|ComponentDataSource|connectionString|SELECT \*|Pantalla_|AppBuilder|appsettings|metadata/i
+const secretOrSensitiveMarkers =
+  /BEGIN (RSA|OPENSSH|PRIVATE) KEY|password=|pwd=|secret|token|iban|cuenta bancaria|direccion|telefono|email|@/i
 
-      <div>
-        <button v-for="action in page.actions" :key="action.label" type="button" disabled>
-          {{ action.label }}
-        </button>
-      </div>
+async function mountPropuestasView() {
+  const router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/login', name: 'login', component: { template: '<div />' } },
+      { path: '/agenda', component: { template: '<div />' } },
+      { path: '/clientes', component: { template: '<div />' } },
+      { path: '/propuestas', component: PropuestasView },
+      { path: '/polizas', component: { template: '<div />' } },
+      { path: '/autos-particulares', component: { template: '<div />' } },
+      { path: '/polizas/flotas', component: { template: '<div />' } },
+      { path: '/polizas/colectivas', component: { template: '<div />' } },
+      { path: '/recibos', component: { template: '<div />' } },
+      { path: '/suplementos', component: { template: '<div />' } },
+      { path: '/siniestros', component: { template: '<div />' } },
+      { path: '/liq-cia', component: { template: '<div />' } },
+      { path: '/liq-col', component: { template: '<div />' } },
+      { path: '/informes', component: { template: '<div />' } },
+      { path: '/controles', component: { template: '<div />' } },
+      { path: '/estadisticas', component: { template: '<div />' } },
+      { path: '/administracion', component: { template: '<div />' } },
+      { path: '/configuracion', component: { template: '<div />' } },
+      { path: '/conectividad', component: { template: '<div />' } },
+      { path: '/by-aunna', component: { template: '<div />' } },
+      { path: '/logs', component: { template: '<div />' } },
+    ],
+  })
+  await router.push('/propuestas')
+  await router.isReady()
 
-      <article v-for="metric in page.metrics" :key="metric.label">
-        {{ metric.label }} {{ metric.value }}
-      </article>
-
-      <section>
-        <h2>{{ page.scope.title }}</h2>
-        <ul>
-          <li v-for="item in page.scope.items" :key="item">{{ item }}</li>
-        </ul>
-      </section>
-
-      <section>
-        <h2>{{ page.nextSteps.title }}</h2>
-        <ul>
-          <li v-for="item in page.nextSteps.items" :key="item">{{ item }}</li>
-        </ul>
-      </section>
-
-      <section>
-        <h2>{{ page.risks.title }}</h2>
-        <ul>
-          <li v-for="item in page.risks.items" :key="item">{{ item }}</li>
-        </ul>
-      </section>
-    </section>
-  `,
+  return mount(PropuestasView, {
+    global: {
+      plugins: [router],
+    },
+  })
 }
 
-describe('PropuestasView', () => {
-  it('renders static MVP content with disabled actions and no runtime markers', () => {
-    const wrapper = mount(PropuestasView, {
-      global: {
-        stubs: {
-          MvpPageShell: mvpPageShellStub,
-        },
-      },
-    })
+async function settlePropuestasView() {
+  await flushPromises()
+  await flushPromises()
+}
 
-    expect(wrapper.get('h1').text()).toBe('Propuestas')
-    expect(wrapper.text()).toContain('sin metadata concreta')
-    expect(wrapper.text()).toContain('Propuestas sea Solicitudes')
-    expect(wrapper.text()).toContain('read-only futura')
-    expect(wrapper.text()).toContain('multi-tenant')
-    expect(wrapper.findAll('button[disabled]').map((button) => button.text())).toEqual([
-      'Listar propuestas',
-      'Crear propuesta',
-      'Convertir a poliza',
-    ])
-    expect(wrapper.html()).not.toMatch(/IAP_|QueryStatic|ComponentDataSource/)
+describe('PropuestasView smoke', () => {
+  beforeEach(() => {
+    vi.stubEnv('VITE_USE_BACKEND', 'false')
+    vi.stubEnv('VITE_BROKER_ID', '')
+    useSession().resetSession()
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    useSession().resetSession()
+  })
+
+  it('renders the read-only fixture shell with sanitized data and disabled actions', async () => {
+    const wrapper = await mountPropuestasView()
+    await settlePropuestasView()
+
+    expect(wrapper.text()).toContain('Propuestas')
+    expect(wrapper.text()).toContain('Solo lectura')
+    expect(wrapper.text()).toContain('Fixture local sin API')
+    expect(wrapper.text()).toContain('Datos minimizados y sanitizados')
+    expect(wrapper.text()).toContain('Sin emision ni conversion a poliza')
+    expect(wrapper.text()).toContain('Origen y SDD pendientes')
+    expect(wrapper.text()).toContain('Modo fixture')
+    expect(wrapper.get('.summary-header').text()).toContain('4 propuestas')
+    expect(wrapper.findAll('tbody tr')).toHaveLength(4)
+    expect(wrapper.text()).toContain('PROP-2026-0001')
+    expect(wrapper.text()).toContain('Solicitante anonimo 2')
+    expect(wrapper.text()).toContain('Importe demo D')
+
+    const disabledActions = wrapper.findAll('button[disabled]')
+    expect(disabledActions.length).toBeGreaterThanOrEqual(12)
+    expect(wrapper.findAll('button.table-icon-action[disabled]')).toHaveLength(4)
+    expect(wrapper.text()).toContain('Crear')
+    expect(wrapper.text()).toContain('Convertir')
+    expect(wrapper.text()).toContain('Documentos')
+    expect(wrapper.text()).toContain('Exportar')
+  })
+
+  it('filters locally by reference, state, branch/type, and date from', async () => {
+    const wrapper = await mountPropuestasView()
+    await settlePropuestasView()
+
+    await wrapper.get('#propuestas-filter-referencia').setValue('0002')
+    await wrapper.get('.search-action-buttons .primary-action').trigger('click')
+    await settlePropuestasView()
+
+    expect(wrapper.get('.summary-header').text()).toContain('1 propuesta')
+    expect(wrapper.findAll('tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).toContain('PROP-2026-0002')
+    expect(wrapper.text()).toContain('Hogar demo')
+    expect(wrapper.text()).not.toContain('PROP-2026-0001')
+
+    const clearButton = wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Limpiar Filtros'))
+    expect(clearButton).toBeDefined()
+    await clearButton!.trigger('click')
+    await settlePropuestasView()
+
+    await wrapper.get('#propuestas-filter-estado').setValue('Bloqueada demo')
+    await wrapper.get('#propuestas-filter-ramo').setValue('Salud demo')
+    await wrapper.get('#propuestas-filter-fecha').setValue('2026-04-01')
+    await wrapper.get('.search-action-buttons .primary-action').trigger('click')
+    await settlePropuestasView()
+
+    expect(wrapper.get('.summary-header').text()).toContain('1 propuesta')
+    expect(wrapper.findAll('tbody tr')).toHaveLength(1)
+    expect(wrapper.text()).toContain('PROP-2026-0004')
+    expect(wrapper.text()).toContain('Documentos no conectados')
+  })
+
+  it('shows the empty state for filters without fixture matches', async () => {
+    const wrapper = await mountPropuestasView()
+    await settlePropuestasView()
+
+    await wrapper.get('#propuestas-filter-estado').setValue('Caducada demo')
+    await wrapper.get('#propuestas-filter-fecha').setValue('2026-04-01')
+    await wrapper.get('.search-action-buttons .primary-action').trigger('click')
+    await settlePropuestasView()
+
+    expect(wrapper.get('.summary-header').text()).toContain('0 propuestas')
+    expect(wrapper.find('tbody tr').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Sin resultados')
+    expect(wrapper.text()).toContain('No hay propuestas fixture para los filtros actuales.')
+  })
+
+  it('does not expose runtime metadata, secrets, personal identifiers, or operative amounts', async () => {
+    const wrapper = await mountPropuestasView()
+    await settlePropuestasView()
+
+    const smokeDom = wrapper.html()
+    expect(smokeDom).not.toMatch(runtimeMarkers)
+    expect(smokeDom).not.toMatch(secretOrSensitiveMarkers)
+    expect(smokeDom).not.toMatch(/[A-Z]{2}\d{2}[A-Z0-9]{11,30}/)
+    expect(smokeDom).not.toMatch(/\b\d{8}[A-Z]\b/i)
+    expect(smokeDom).not.toMatch(/\b\d{1,3}(?:\.\d{3})*,\d{2}\s?EUR\b/i)
   })
 })
