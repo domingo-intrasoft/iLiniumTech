@@ -670,6 +670,30 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Demo_session_permission_denial_short_circuits_before_polizas_service()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["Auth:Demo:Permissions:0"] = PolizasPermissions.Catalogs
+            },
+            configureServices: services =>
+            {
+                services.RemoveAll<IPolizasService>();
+                services.AddScoped<IPolizasService, ThrowingUnexpectedPolizasService>();
+            });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        body.Should().Contain("POLIZAS_ACCESS_DENIED");
+        body.Should().NotContain(ThrowingUnexpectedPolizasService.FailureMessage);
+    }
+
+    [Fact]
     public async Task Demo_session_permissions_take_precedence_over_api_key_when_both_are_present()
     {
         await using var factory = new TestApiFactory(new Dictionary<string, string?>
@@ -831,6 +855,31 @@ public sealed class PolizasApiTests
         body.Should().Contain("\"correlationId\":\"api-key-no-polizas-permission\"");
         body.Should().NotContain("test-key-that-is-long-enough-for-production");
         body.Should().NotContain("POL-1001");
+    }
+
+    [Fact]
+    public async Task Api_key_production_denial_short_circuits_before_polizas_service()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["ApiSecurity:ApiKey"] = "test-key-that-is-long-enough-for-production"
+            },
+            configureServices: services =>
+            {
+                services.RemoveAll<IPolizasService>();
+                services.AddScoped<IPolizasService, ThrowingUnexpectedPolizasService>();
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key-that-is-long-enough-for-production");
+
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        body.Should().Contain("POLIZAS_ACCESS_DENIED");
+        body.Should().NotContain(ThrowingUnexpectedPolizasService.FailureMessage);
     }
 
     [Fact]
@@ -1419,5 +1468,24 @@ public sealed class PolizasApiTests
 
         public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
             throw new InvalidOperationException("ConnectionStrings:PolizasReadOnly is missing.");
+    }
+
+    private sealed class ThrowingUnexpectedPolizasService : IPolizasService
+    {
+        public const string FailureMessage = "Polizas service should not be invoked after authorization denial.";
+
+        public Task<PagedResult<PolizaListItem>> SearchAsync(
+            PolizasSearchRequest request,
+            CancellationToken cancellationToken) =>
+            throw new InvalidOperationException(FailureMessage);
+
+        public Task<PolizaDetail?> GetByIdAsync(
+            string id,
+            CancellationToken cancellationToken,
+            string? ramo = null) =>
+            throw new InvalidOperationException(FailureMessage);
+
+        public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
+            throw new InvalidOperationException(FailureMessage);
     }
 }
