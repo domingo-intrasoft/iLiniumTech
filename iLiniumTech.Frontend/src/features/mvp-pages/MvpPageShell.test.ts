@@ -42,6 +42,10 @@ describe('MvpPageShell', () => {
 
     expect(wrapper.get('h1').text()).toBe('Clientes')
     expect(wrapper.text()).toContain('MVP estatico')
+    expect(wrapper.get('section.mvp-module-page').attributes('aria-labelledby')).toBe(
+      'Clientes-title',
+    )
+    expect(wrapper.find('main.mvp-module-page').exists()).toBe(false)
     expect(wrapper.findAll('button[disabled]')).toHaveLength(1)
     expect(wrapper.text()).not.toMatch(/IAP_|QueryStatic|ComponentDataSource/)
   })

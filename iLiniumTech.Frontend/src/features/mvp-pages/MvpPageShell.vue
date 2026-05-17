@@ -25,7 +25,11 @@ function metricToneClass(metric: MvpPageMetric) {
     session-label="MVP estatico"
     session-needs-attention
   >
-    <main :id="contentId" class="mvp-module-page" :aria-labelledby="`${page.sectionTitle}-title`">
+    <section
+      :id="contentId"
+      class="mvp-module-page"
+      :aria-labelledby="`${page.sectionTitle}-title`"
+    >
       <header class="mvp-module-header">
         <div>
           <p class="section-kicker">{{ page.status }}</p>
@@ -77,6 +81,6 @@ function metricToneClass(metric: MvpPageMetric) {
       </section>
 
       <p class="mvp-module-source">{{ page.source }}</p>
-    </main>
+    </section>
   </AppShell>
 </template>
