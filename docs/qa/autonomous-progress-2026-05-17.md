@@ -48,6 +48,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `14120a6` | Frontend auth | Skip link del login mueve foco real al formulario y crea `tabindex=-1` si falta. |
 | `28e3b63` | Frontend Siniestros | Controles bloqueados de Siniestros comparten descripcion accesible y el smoke de fixtures cubre la ruta. |
 | `61fb488` | Backend seguridad | `DemoSession` solo emite permisos activos `polizas.*` conocidos y descarta permisos demo desconocidos. |
+| `729f4e6` | Backend seguridad | Regresiones fijan que claims de `DemoSession` prevalecen sobre headers MVP manipulables. |
 
 ## Validaciones ejecutadas
 
@@ -365,6 +366,13 @@ Validacion adicional tras allowlist de permisos demo:
 
 - `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter FullyQualifiedName~PolizasApiTests`: `64/64` tests OK.
 - `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release`: `100/100` tests OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras regresiones de prioridad sesion sobre headers MVP:
+
+- `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter FullyQualifiedName~PolizasApiTests`: `66/66` tests OK.
+- `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release`: `102/102` tests OK.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
 
