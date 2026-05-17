@@ -9,6 +9,8 @@ const emit = defineEmits<{
 }>()
 
 const sideMenuOpen = ref(true)
+const placeholderTopbarActionDescription =
+  'Acciones de cabecera no disponibles en el MVP hasta SDD y contrato funcional.'
 
 const props = withDefaults(
   defineProps<{
@@ -97,6 +99,9 @@ function focusMainContent(event: MouseEvent) {
         </span>
 
         <div class="top-actions" aria-label="Acciones de usuario">
+          <p id="app-shell-placeholder-actions" class="sr-only">
+            {{ placeholderTopbarActionDescription }}
+          </p>
           <label v-if="brokerOptions.length > 0" class="broker-selector">
             <span class="sr-only">Broker activo</span>
             <i class="pi pi-building" aria-hidden="true"></i>
@@ -123,6 +128,7 @@ function focusMainContent(event: MouseEvent) {
             type="button"
             aria-label="Notificaciones no disponibles en el MVP"
             title="Notificaciones pendientes de SDD"
+            aria-describedby="app-shell-placeholder-actions"
             disabled
           >
             <i class="pi pi-bell" aria-hidden="true"></i>
@@ -132,6 +138,7 @@ function focusMainContent(event: MouseEvent) {
             type="button"
             aria-label="Configuracion no disponible desde esta accion"
             title="Usa el menu lateral; la configuracion funcional sigue bloqueada por SDD"
+            aria-describedby="app-shell-placeholder-actions"
             disabled
           >
             <i class="pi pi-cog" aria-hidden="true"></i>
@@ -141,6 +148,7 @@ function focusMainContent(event: MouseEvent) {
             class="icon-button ghost"
             type="button"
             aria-label="Salir"
+            title="Cerrar sesion"
             @click="emit('signOut')"
           >
             <i class="pi pi-sign-out" aria-hidden="true"></i>

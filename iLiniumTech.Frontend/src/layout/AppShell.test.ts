@@ -113,10 +113,37 @@ describe('AppShell', () => {
       'button[aria-label="Configuracion no disponible desde esta accion"]',
     )
 
+    expect(wrapper.get('#app-shell-placeholder-actions').text()).toContain('no disponibles')
     expect(notifications.attributes('disabled')).toBeDefined()
     expect(notifications.attributes('title')).toContain('pendientes de SDD')
+    expect(notifications.attributes('aria-describedby')).toBe('app-shell-placeholder-actions')
     expect(configuration.attributes('disabled')).toBeDefined()
     expect(configuration.attributes('title')).toContain('bloqueada por SDD')
+    expect(configuration.attributes('aria-describedby')).toBe('app-shell-placeholder-actions')
+  })
+
+  it('labels the sign out icon button without changing the emitted action', async () => {
+    const wrapper = mount(AppShell, {
+      props: {
+        contentId: 'content',
+        sectionTitle: 'Polizas',
+        sessionLabel: 'Modo local',
+        showSignOut: true,
+      },
+      global: {
+        stubs: {
+          AppSideMenu: true,
+        },
+      },
+    })
+
+    const signOutButton = wrapper.get('button[aria-label="Salir"]')
+
+    expect(signOutButton.attributes('title')).toBe('Cerrar sesion')
+
+    await signOutButton.trigger('click')
+
+    expect(wrapper.emitted('signOut')).toEqual([[]])
   })
 
   it('toggles the static side menu from the topbar control', async () => {
