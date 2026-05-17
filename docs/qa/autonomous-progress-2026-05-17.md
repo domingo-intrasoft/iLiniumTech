@@ -40,6 +40,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `1259602` | Frontend Polizas | Acciones heredadas de filtros, campos fuera de contrato y busqueda bloqueada explican motivo accesible sin activar nuevas APIs. |
 | `2f507e4` | Frontend Polizas | Toolbar superior de Polizas mantiene acciones bloqueadas y describe motivo MVP read-only por SDD/API/permisos/UAT. |
 | `1f5f090` | Frontend Polizas | Accesos superiores a scopes Flotas/Colectivas/Externas describen que no cargan datos ni activan permisos sin SDD/API/UAT. |
+| `3694909` | Frontend shell | Breadcrumb del shell pasa a `nav` semantico, marca la seccion actual y elimina la barra final. |
 
 ## Validaciones ejecutadas
 
@@ -274,6 +275,17 @@ Validacion adicional tras descripcion accesible de scopes superiores de Polizas:
 - `npm run test:unit`: `192/192` tests OK.
 - `npm run build`: OK.
 - `npm run test:e2e -- polizas`: `1` smoke OK con `CI=1`.
+
+Validacion adicional tras breadcrumb semantico del shell:
+
+- `npx vitest run src/layout/AppShell.test.ts`: `7/7` tests OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run test:unit`: `193/193` tests OK.
+- `npm run build`: OK.
+- `npm run test:e2e -- responsive-shell`: `1` smoke OK con `CI=1`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
 
 ## Estado local visible
 
