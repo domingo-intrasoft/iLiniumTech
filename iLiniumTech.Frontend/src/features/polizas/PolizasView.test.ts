@@ -134,13 +134,20 @@ describe('PolizasView smoke', () => {
       'polizas-toolbar-blocked-actions',
     )
     expect(wrapper.get('button[aria-label="Validar"]').attributes('title')).toContain('UAT')
+    expect(wrapper.get('#polizas-scope-blocked-actions').text()).toContain('no carga datos')
     expect(wrapper.get('.context-buttons a[href="/polizas/flotas"]').text()).toContain(
       'Polizas de flota',
     )
+    expect(
+      wrapper.get('.context-buttons a[href="/polizas/flotas"]').attributes('aria-describedby'),
+    ).toBe('polizas-scope-blocked-actions')
     expect(wrapper.get('.context-buttons a[href="/polizas/colectivas"]').text()).toContain(
       'Polizas colectivas',
     )
     expect(wrapper.get('.context-buttons button[disabled]').text()).toContain('Polizas Externas')
+    expect(wrapper.get('.context-buttons button[disabled]').attributes('aria-describedby')).toBe(
+      'polizas-scope-blocked-actions',
+    )
     expect(wrapper.get('.summary-header').text()).toContain(`${polizasFixture.total} polizas`)
     expect(wrapper.findAll('tbody tr')).toHaveLength(polizasFixture.total)
     expect(wrapper.text()).toContain('POL-2026-0001')

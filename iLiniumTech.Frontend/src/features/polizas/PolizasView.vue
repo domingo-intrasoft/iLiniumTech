@@ -54,6 +54,8 @@ const isBackendMode = import.meta.env.VITE_USE_BACKEND === 'true'
 const dataOriginLabel = computed(() => (isBackendMode ? 'API polizas' : 'Fixture local'))
 const blockedToolbarActionDescription =
   'Accion bloqueada en el MVP read-only hasta SDD, contrato API, permisos y UAT.'
+const blockedScopeActionDescription =
+  'Scope de Polizas aparcado: no carga datos ni activa permisos hasta SDD, contrato API y UAT.'
 const POLIZAS_DETAIL_PERMISSION = 'polizas.detail'
 const brokerChanging = ref(false)
 const brokerError = ref<string | null>(null)
@@ -460,21 +462,27 @@ onMounted(() => {
       </div>
 
       <div class="context-buttons">
+        <p id="polizas-scope-blocked-actions" class="sr-only">
+          {{ blockedScopeActionDescription }}
+        </p>
         <RouterLink
           to="/polizas/flotas"
           title="Scope estatico bloqueado hasta SDD, regla funcional, permisos y UAT"
+          aria-describedby="polizas-scope-blocked-actions"
         >
           Polizas de flota
         </RouterLink>
         <RouterLink
           to="/polizas/colectivas"
           title="Scope estatico bloqueado hasta SDD, regla funcional, permisos y UAT"
+          aria-describedby="polizas-scope-blocked-actions"
         >
           Polizas colectivas
         </RouterLink>
         <button
           type="button"
           title="Pendiente de SDD, regla funcional, permisos y contrato API"
+          aria-describedby="polizas-scope-blocked-actions"
           disabled
         >
           Polizas Externas
