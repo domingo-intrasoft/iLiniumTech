@@ -90,6 +90,7 @@ describe('router auth guard', () => {
     expect(apiClient.get).toHaveBeenCalledWith('/api/me')
     expect(router.currentRoute.value.name).toBe('login')
     expect(router.currentRoute.value.query.redirect).toBe('/polizas')
+    expect(router.currentRoute.value.query.reason).toBe('session-check-failed')
   })
 
   it('redirects protected backend demo routes to login when /api/me is unavailable despite stored local session', async () => {
@@ -105,6 +106,7 @@ describe('router auth guard', () => {
     expect(apiClient.get).toHaveBeenCalledWith('/api/me')
     expect(router.currentRoute.value.name).toBe('login')
     expect(router.currentRoute.value.query.redirect).toBe('/clientes')
+    expect(router.currentRoute.value.query.reason).toBe('session-check-failed')
   })
 
   it('allows backend demo sessions only after /api/me validates the cookie session', async () => {

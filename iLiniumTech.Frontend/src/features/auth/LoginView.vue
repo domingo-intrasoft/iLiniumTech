@@ -14,6 +14,14 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 
 const canSubmit = computed(() => username.value.trim() !== '' && password.value !== '')
+const sessionNotice = computed(() => {
+  const reason = route.query.reason
+  const value = Array.isArray(reason) ? reason[0] : reason
+
+  return value === 'session-check-failed'
+    ? 'No hemos podido confirmar tu sesion. Inicia sesion de nuevo.'
+    : null
+})
 
 function targetAfterLogin() {
   const redirect = route.query.redirect
@@ -83,6 +91,10 @@ async function submitLogin() {
             required
           />
         </label>
+
+        <p v-if="sessionNotice && !error" class="login-error" role="status">
+          {{ sessionNotice }}
+        </p>
 
         <p v-if="error" class="login-error" role="alert">{{ error }}</p>
 

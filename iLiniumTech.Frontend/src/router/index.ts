@@ -28,7 +28,7 @@ import PropuestasView from '@/features/propuestas/PropuestasView.vue'
 import RecibosView from '@/features/recibos/RecibosView.vue'
 import SiniestrosView from '@/features/siniestros/SiniestrosView.vue'
 import SuplementosView from '@/features/suplementos/SuplementosView.vue'
-import { validateAuthSession } from '@/features/auth/authSession'
+import { hasAuthSession, validateAuthSession } from '@/features/auth/authSession'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -172,6 +172,7 @@ export const routes: RouteRecordRaw[] = [
 export function registerAuthGuard(router: Router) {
   router.beforeEach(async (to) => {
     const requiresAuth = to.matched.some((route) => route.meta.requiresAuth)
+    const hadSessionBeforeValidation = requiresAuth ? hasAuthSession() : false
     const authenticated = await validateAuthSession({
       requireBackendConfirmation: requiresAuth || to.name === 'login',
     })
@@ -185,7 +186,10 @@ export function registerAuthGuard(router: Router) {
     if (requiresAuth && !authenticated) {
       return {
         name: 'login',
-        query: { redirect: to.fullPath },
+        query: {
+          redirect: to.fullPath,
+          ...(hadSessionBeforeValidation ? { reason: 'session-check-failed' } : {}),
+        },
       }
     }
 

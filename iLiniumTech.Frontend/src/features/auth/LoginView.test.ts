@@ -15,9 +15,15 @@ function createTestRouter() {
   })
 }
 
-async function mountLoginView(redirect = '/polizas') {
+async function mountLoginView(redirect = '/polizas', reason?: string) {
   const router = createTestRouter()
-  await router.push({ name: 'login', query: { redirect } })
+  await router.push({
+    name: 'login',
+    query: {
+      redirect,
+      ...(reason ? { reason } : {}),
+    },
+  })
   await router.isReady()
 
   return {
@@ -56,5 +62,13 @@ describe('LoginView', () => {
 
     expect(wrapper.get('[role="alert"]').text()).toBe('Introduce usuario y contrasena.')
     expect(hasAuthSession()).toBe(false)
+  })
+
+  it('shows generic feedback when the backend session cannot be confirmed', async () => {
+    const { wrapper } = await mountLoginView('/polizas', 'session-check-failed')
+
+    expect(wrapper.get('[role="status"]').text()).toBe(
+      'No hemos podido confirmar tu sesion. Inicia sesion de nuevo.',
+    )
   })
 })
