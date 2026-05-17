@@ -47,6 +47,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `933e6c7` | Frontend Polizas | Enlace de vuelta del detalle describe que conserva filtros y paginacion de origen. |
 | `14120a6` | Frontend auth | Skip link del login mueve foco real al formulario y crea `tabindex=-1` si falta. |
 | `28e3b63` | Frontend Siniestros | Controles bloqueados de Siniestros comparten descripcion accesible y el smoke de fixtures cubre la ruta. |
+| `61fb488` | Backend seguridad | `DemoSession` solo emite permisos activos `polizas.*` conocidos y descarta permisos demo desconocidos. |
 
 ## Validaciones ejecutadas
 
@@ -357,6 +358,13 @@ Validacion adicional tras descripcion accesible de acciones bloqueadas en Sinies
 - `npm run test:unit`: `195/195` tests OK.
 - `npm run build`: OK.
 - `npm run test:e2e -- domain-fixtures`: `1` smoke OK con `CI=1`, incluyendo `/siniestros`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras allowlist de permisos demo:
+
+- `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter FullyQualifiedName~PolizasApiTests`: `64/64` tests OK.
+- `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release`: `100/100` tests OK.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
 
