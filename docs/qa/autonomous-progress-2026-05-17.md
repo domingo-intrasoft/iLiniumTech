@@ -49,6 +49,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `28e3b63` | Frontend Siniestros | Controles bloqueados de Siniestros comparten descripcion accesible y el smoke de fixtures cubre la ruta. |
 | `61fb488` | Backend seguridad | `DemoSession` solo emite permisos activos `polizas.*` conocidos y descarta permisos demo desconocidos. |
 | `729f4e6` | Backend seguridad | Regresiones fijan que claims de `DemoSession` prevalecen sobre headers MVP manipulables. |
+| `c88e275` | QA gobierno | Indice operativo `docs/qa/README.md` creado y protegido por baseline documental. |
 
 ## Validaciones ejecutadas
 
@@ -373,6 +374,12 @@ Validacion adicional tras regresiones de prioridad sesion sobre headers MVP:
 
 - `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter FullyQualifiedName~PolizasApiTests`: `66/66` tests OK.
 - `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release`: `102/102` tests OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras indice operativo QA:
+
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK, incluyendo `docs/qa/README.md` y evidencias QA clave.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
 
