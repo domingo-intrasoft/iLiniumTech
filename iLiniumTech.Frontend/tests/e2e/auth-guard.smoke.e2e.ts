@@ -15,6 +15,7 @@ test('protected MVP routes require demo login and logout clears access', async (
   await page.goto('/clientes')
 
   await expect(page.getByRole('heading', { name: 'Iniciar sesion' })).toBeVisible()
+  await expect(page.getByLabel('Usuario', { exact: true })).toBeFocused()
   await expectLoginRedirect(page.url(), '/clientes')
 
   await page.getByLabel('Usuario', { exact: true }).fill('e2e')
@@ -38,6 +39,7 @@ test('protected MVP routes require demo login and logout clears access', async (
   await page.goto('/polizas')
 
   await expect(page.getByRole('heading', { name: 'Iniciar sesion' })).toBeVisible()
+  await expect(page.getByLabel('Usuario', { exact: true })).toBeFocused()
   await expectLoginRedirect(page.url(), '/polizas')
   await expect(page.getByRole('heading', { name: 'Polizas' })).toHaveCount(0)
 

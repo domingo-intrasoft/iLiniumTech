@@ -29,6 +29,7 @@ async function mountLoginView(redirect = '/polizas', reason?: string) {
   return {
     router,
     wrapper: mount(LoginView, {
+      attachTo: document.body,
       global: {
         plugins: [router],
       },
@@ -39,6 +40,7 @@ async function mountLoginView(redirect = '/polizas', reason?: string) {
 describe('LoginView', () => {
   beforeEach(() => {
     vi.stubEnv('VITE_BROKER_ID', '')
+    document.body.innerHTML = ''
     clearAuthSession()
   })
 
@@ -56,11 +58,17 @@ describe('LoginView', () => {
 
   it('shows validation feedback when credentials are empty', async () => {
     const { wrapper } = await mountLoginView()
+    await flushPromises()
+
+    expect(document.activeElement).toBe(wrapper.get('#auth-username').element)
 
     await wrapper.get('form').trigger('submit')
     await flushPromises()
 
     expect(wrapper.get('[role="alert"]').text()).toBe('Introduce usuario y contrasena.')
+    expect(wrapper.get('form').attributes('aria-describedby')).toBe('login-error-message')
+    expect(wrapper.get('#auth-username').attributes('aria-invalid')).toBe('true')
+    expect(wrapper.get('#auth-password').attributes('aria-invalid')).toBe('true')
     expect(hasAuthSession()).toBe(false)
   })
 
@@ -68,7 +76,8 @@ describe('LoginView', () => {
     const { wrapper } = await mountLoginView('/polizas', 'session-check-failed')
 
     expect(wrapper.get('[role="status"]').text()).toBe(
-      'No hemos podido confirmar tu sesion. Inicia sesion de nuevo.',
+      'No hemos podido confirmar tu sesion. Vuelve a iniciar sesion para continuar con seguridad.',
     )
+    expect(wrapper.get('form').attributes('aria-describedby')).toBe('login-session-notice')
   })
 })

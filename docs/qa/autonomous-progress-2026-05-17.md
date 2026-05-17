@@ -31,6 +31,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `7916670` | Frontend Polizas | Listado explica de forma visible/accesible cuando `polizas.detail` no permite abrir detalle. |
 | `281e924` | Frontend Polizas | Detalle de poliza alinea badge superior con broker activo, broker requerido y permiso ausente. |
 | `856913a` | Frontend Polizas | Resumen visible de filtros activos sincronizado con URL, catalogos y retorno desde detalle. |
+| Bloque actual | Frontend auth | Login enfoca usuario, separa aviso de sesion de error y expone estado accesible durante validacion. |
 
 ## Validaciones ejecutadas
 
@@ -159,6 +160,17 @@ Validacion adicional tras resumen de filtros activos en Polizas:
 - `npm run lint`: OK.
 - `npm run build`: OK.
 - `npm run test:e2e -- polizas`: `1` smoke OK con `CI=1`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras pulido accesible de login:
+
+- `npx vitest run src/features/auth/LoginView.test.ts`: `3/3` tests OK.
+- `npm run test:e2e -- auth-guard`: `1` smoke OK con `CI=1`.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run build`: OK.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.

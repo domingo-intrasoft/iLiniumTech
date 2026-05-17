@@ -7,6 +7,7 @@ Fecha: 2026-05-15
 - Ruta `/login` visible sin menu lateral.
 - Acceso a `/polizas` redirige a login cuando no hay sesion MVP.
 - Login demo local crea sesion en `sessionStorage`.
+- Login enfoca el campo usuario al abrir, distingue aviso informativo de sesion no confirmada y marca errores de validacion con `aria-describedby`/`aria-invalid`.
 - Tras login se muestra la pantalla actual de polizas dentro de `AppShell`.
 - Boton de salida disponible en pantallas con shell.
 - La UI sigue sin consumir metadata AppBuilder para construir pantallas.
@@ -255,6 +256,7 @@ Resultado:
 Smoke navegador local:
 
 - `/polizas` sin sesion redirige a `/login?redirect=/polizas`.
+- `/login?reason=session-check-failed` muestra aviso seguro sin exponer backend ni credenciales.
 - Login demo local entra en `/polizas`.
 - Polizas muestra resultados en shell/menu.
 - No hay enlace activo a `/autos-particulares`; aparece como opcion aparcada/deshabilitada.

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useAuthSession } from './authSession'
@@ -12,6 +12,7 @@ const username = ref('')
 const password = ref('')
 const loading = ref(false)
 const error = ref<string | null>(null)
+const usernameInput = ref<HTMLInputElement | null>(null)
 
 const canSubmit = computed(() => username.value.trim() !== '' && password.value !== '')
 const sessionNotice = computed(() => {
@@ -19,8 +20,20 @@ const sessionNotice = computed(() => {
   const value = Array.isArray(reason) ? reason[0] : reason
 
   return value === 'session-check-failed'
-    ? 'No hemos podido confirmar tu sesion. Inicia sesion de nuevo.'
+    ? 'No hemos podido confirmar tu sesion. Vuelve a iniciar sesion para continuar con seguridad.'
     : null
+})
+const feedbackId = computed(() => {
+  if (error.value) {
+    return 'login-error-message'
+  }
+
+  return sessionNotice.value ? 'login-session-notice' : undefined
+})
+const credentialsMissing = computed(() => Boolean(error.value) && !canSubmit.value)
+
+onMounted(() => {
+  void nextTick(() => usernameInput.value?.focus())
 })
 
 function targetAfterLogin() {
@@ -67,15 +80,24 @@ async function submitLogin() {
         <h2 id="login-title">Iniciar sesion</h2>
       </div>
 
-      <form id="login-form" class="login-form" novalidate @submit.prevent="submitLogin">
+      <form
+        id="login-form"
+        class="login-form"
+        novalidate
+        :aria-busy="loading"
+        :aria-describedby="feedbackId"
+        @submit.prevent="submitLogin"
+      >
         <label class="login-field" for="auth-username">
           <span>Usuario</span>
           <input
             id="auth-username"
+            ref="usernameInput"
             v-model="username"
             name="username"
             type="text"
             autocomplete="username"
+            :aria-invalid="credentialsMissing ? 'true' : undefined"
             required
           />
         </label>
@@ -88,20 +110,29 @@ async function submitLogin() {
             name="password"
             type="password"
             autocomplete="current-password"
+            :aria-invalid="credentialsMissing ? 'true' : undefined"
             required
           />
         </label>
 
-        <p v-if="sessionNotice && !error" class="login-error" role="status">
+        <p
+          v-if="sessionNotice && !error"
+          id="login-session-notice"
+          class="login-notice"
+          role="status"
+        >
           {{ sessionNotice }}
         </p>
 
-        <p v-if="error" class="login-error" role="alert">{{ error }}</p>
+        <p v-if="error" id="login-error-message" class="login-error" role="alert">
+          {{ error }}
+        </p>
 
         <button class="login-submit" type="submit" :disabled="loading">
           <i class="pi pi-sign-in" aria-hidden="true"></i>
           <span>{{ loading ? 'Entrando...' : 'Entrar' }}</span>
         </button>
+        <span v-if="loading" class="sr-only" role="status">Validando acceso.</span>
       </form>
     </section>
   </main>
