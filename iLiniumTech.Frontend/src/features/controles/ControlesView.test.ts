@@ -76,6 +76,9 @@ describe('ControlesView smoke', () => {
     expect(wrapper.text()).toContain('SDD/UAT pendiente')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('4 controles candidatos')
+    expect(wrapper.get('caption').text()).toContain(
+      'Controles fixture read-only: 1-2 de 4 controles candidatos',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('CTRL-2026-0001')
     expect(wrapper.text()).toContain('CTRL-2026-0002')
@@ -104,6 +107,9 @@ describe('ControlesView smoke', () => {
     await settleControlesView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 control candidato')
+    expect(wrapper.get('caption').text()).toContain(
+      'Controles fixture read-only: 1-1 de 1 control candidato',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('CTRL-2026-0002')
     expect(wrapper.text()).toContain('Validacion de datos sanitizados')

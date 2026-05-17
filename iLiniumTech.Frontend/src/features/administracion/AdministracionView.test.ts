@@ -73,6 +73,9 @@ describe('AdministracionView smoke', () => {
     expect(wrapper.text()).toContain('Fixture local sin API')
     expect(wrapper.text()).toContain('Usuarios reales y permisos reales bloqueados')
     expect(wrapper.get('.summary-header').text()).toContain('4 registros')
+    expect(wrapper.get('caption').text()).toContain(
+      'Administracion fixture read-only: 1-2 de 4 registros',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('ADM-DEMO-ACCESOS')
     expect(wrapper.text()).toContain('ADM-DEMO-AUDITORIA')
@@ -94,6 +97,9 @@ describe('AdministracionView smoke', () => {
     await settleView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 registro')
+    expect(wrapper.get('caption').text()).toContain(
+      'Administracion fixture read-only: 1-1 de 1 registro',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('ADM-DEMO-AUDITORIA')
     expect(wrapper.text()).not.toContain('ADM-DEMO-ACCESOS')

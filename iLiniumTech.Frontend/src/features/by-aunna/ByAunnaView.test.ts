@@ -77,6 +77,9 @@ describe('ByAunnaView smoke', () => {
     expect(wrapper.text()).toContain('Publicacion y detalle deshabilitados')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('4 elementos candidatos')
+    expect(wrapper.get('caption').text()).toContain(
+      'By Aunna fixture read-only: 1-2 de 4 elementos candidatos',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('AUN-DEMO-001')
     expect(wrapper.text()).toContain('AUN-DEMO-002')
@@ -105,6 +108,9 @@ describe('ByAunnaView smoke', () => {
     await settleView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 elemento candidato')
+    expect(wrapper.get('caption').text()).toContain(
+      'By Aunna fixture read-only: 1-1 de 1 elemento candidato',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('AUN-DEMO-003')
     expect(wrapper.text()).toContain('Descarga y detalle no operativos')

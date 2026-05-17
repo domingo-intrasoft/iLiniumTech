@@ -76,6 +76,9 @@ describe('ConectividadView smoke', () => {
     expect(wrapper.text()).toContain('Pruebas externas deshabilitadas')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('4 entradas candidatas')
+    expect(wrapper.get('caption').text()).toContain(
+      'Conectividad fixture read-only: 1-2 de 4 entradas candidatas',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('CON-DEMO-001')
     expect(wrapper.text()).toContain('CON-DEMO-002')
@@ -104,6 +107,9 @@ describe('ConectividadView smoke', () => {
     await settleView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 entrada candidata')
+    expect(wrapper.get('caption').text()).toContain(
+      'Conectividad fixture read-only: 1-1 de 1 entrada candidata',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('CON-DEMO-004')
     expect(wrapper.text()).toContain('URL libre no permitida')

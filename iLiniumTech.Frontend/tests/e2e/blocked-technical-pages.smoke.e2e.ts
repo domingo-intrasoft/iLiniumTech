@@ -101,7 +101,9 @@ async function assertBlockedPage(page: Page, smokeCase: BlockedPageSmokeCase) {
   await page.goto(smokeCase.path)
   await expect(page).toHaveURL(new RegExp(`${smokeCase.path}$`))
   await expect(page.getByRole('heading', { name: smokeCase.heading })).toBeVisible()
-  await expect(page.getByText(smokeCase.safetyMarker ?? 'Solo lectura')).toBeVisible()
+  await expect(
+    page.getByText(smokeCase.safetyMarker ?? 'Solo lectura', { exact: true }),
+  ).toBeVisible()
   await expect(page.getByText('Fixture local sin API', { exact: true }).first()).toBeVisible()
   await expect(page.getByRole('table')).toBeVisible()
   await expect(page.getByText(smokeCase.initialMarker)).toBeVisible()
@@ -110,7 +112,7 @@ async function assertBlockedPage(page: Page, smokeCase: BlockedPageSmokeCase) {
   await textFilter.fill(smokeCase.searchText)
   await page.locator('.search-action-buttons .primary-action').click()
 
-  await expect(page.getByText(smokeCase.summaryAfterSearch)).toBeVisible()
+  await expect(page.getByText(smokeCase.summaryAfterSearch, { exact: true })).toBeVisible()
   await expect(page.getByText(smokeCase.expectedAfterSearch)).toBeVisible()
   await expect(page.getByText(smokeCase.initialMarker)).toHaveCount(0)
 

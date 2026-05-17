@@ -73,6 +73,9 @@ describe('ConfiguracionView smoke', () => {
     expect(wrapper.text()).toContain('Fixture local sin API')
     expect(wrapper.text()).toContain('Secretos y valores de entorno bloqueados')
     expect(wrapper.get('.summary-header').text()).toContain('4 registros')
+    expect(wrapper.get('caption').text()).toContain(
+      'Configuracion fixture read-only: 1-2 de 4 registros',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('CFG-DEMO-GENERAL')
     expect(wrapper.text()).toContain('CFG-DEMO-SEGURIDAD')
@@ -94,6 +97,9 @@ describe('ConfiguracionView smoke', () => {
     await settleView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 registro')
+    expect(wrapper.get('caption').text()).toContain(
+      'Configuracion fixture read-only: 1-1 de 1 registro',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('CFG-DEMO-INTEGRACIONES')
     expect(wrapper.text()).not.toContain('CFG-DEMO-GENERAL')

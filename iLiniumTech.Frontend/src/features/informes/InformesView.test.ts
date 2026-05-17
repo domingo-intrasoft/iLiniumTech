@@ -77,6 +77,9 @@ describe('InformesView smoke', () => {
     expect(wrapper.text()).toContain('Evidencia AppBuilder insuficiente')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('4 categorias candidatas')
+    expect(wrapper.get('caption').text()).toContain(
+      'Informes fixture read-only: 1-2 de 4 categorias candidatas',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('Polizas en vigor')
     expect(wrapper.text()).toContain('Recibos y remesas')
@@ -105,6 +108,9 @@ describe('InformesView smoke', () => {
     await settleInformesView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 categoria candidata')
+    expect(wrapper.get('caption').text()).toContain(
+      'Informes fixture read-only: 1-1 de 1 categoria candidata',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('Recibos y remesas')
     expect(wrapper.text()).toContain('No ejecutable en MVP')

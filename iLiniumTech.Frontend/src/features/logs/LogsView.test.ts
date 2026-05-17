@@ -77,6 +77,7 @@ describe('LogsView smoke', () => {
     expect(wrapper.text()).toContain('Detalle y exportacion deshabilitados')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('4 logs demo')
+    expect(wrapper.get('caption').text()).toContain('Logs fixture read-only: 1-2 de 4 logs demo')
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('LOG-DEMO-001')
     expect(wrapper.text()).toContain('LOG-DEMO-002')
@@ -105,6 +106,7 @@ describe('LogsView smoke', () => {
     await settleView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 log demo')
+    expect(wrapper.get('caption').text()).toContain('Logs fixture read-only: 1-1 de 1 log demo')
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('LOG-DEMO-003')
     expect(wrapper.text()).toContain('Request y response no expuestos')

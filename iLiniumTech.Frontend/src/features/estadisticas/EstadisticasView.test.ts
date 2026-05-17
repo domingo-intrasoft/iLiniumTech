@@ -77,6 +77,9 @@ describe('EstadisticasView smoke', () => {
     expect(wrapper.text()).toContain('SDD/UAT pendiente')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('4 KPIs candidatos')
+    expect(wrapper.get('caption').text()).toContain(
+      'Estadisticas fixture read-only: 1-2 de 4 KPIs candidatos',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('EST-2026-0001')
     expect(wrapper.text()).toContain('EST-2026-0002')
@@ -105,6 +108,9 @@ describe('EstadisticasView smoke', () => {
     await settleEstadisticasView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 KPI candidato')
+    expect(wrapper.get('caption').text()).toContain(
+      'Estadisticas fixture read-only: 1-1 de 1 KPI candidato',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('EST-2026-0002')
     expect(wrapper.text()).toContain('Distribucion candidata de recibos')
