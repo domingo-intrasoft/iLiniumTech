@@ -77,6 +77,65 @@ Nombres de permisos iniciales propuestos para el proximo incremento:
 
 Estos tres permisos de polizas son el contrato objetivo del incremento de permisos/broker autorizado. Pueden alimentarse temporalmente desde `demo-session` en entornos controlados, pero deben modelarse como politicas backend explicitas y no como metadata AppBuilder runtime. Los nombres definitivos para escrituras, exportaciones o administracion deben cerrarse con producto/UAT antes de implementarlos.
 
+### Matriz documental futura de permisos productivos
+
+Esta matriz es documental y prepara decisiones de producto/seguridad. No implementa codigo, no elige proveedor auth y no autoriza consumir permisos AppBuilder como runtime. Cada fila debe cerrarse con evidencia funcional, validacion DBA/UAT y pruebas antes de considerarse Done.
+
+Leyenda:
+
+- `Detectado`: existe como necesidad o contrato ya observable en el MVP/documentacion actual.
+- `Inferido`: regla razonable para producto, pendiente de confirmacion humana.
+- `Pendiente`: no debe implementarse ni concederse hasta que producto, DBA o UAT lo aprueben.
+
+| Dimension | Estado | Uso objetivo en iLiniumTech | Permisos iLiniumTech iniciales | Fuente/evidencia permitida | Pendiente de cierre |
+| --- | --- | --- | --- | --- | --- |
+| Broker | Detectado | Delimita tenant/cartera efectiva. `currentBrokerId` debe pertenecer a `allowedBrokerIds` antes de resolver conexion o leer datos. | `polizas.catalogs`, `polizas.read`, `polizas.detail` condicionados por broker valido. | `/api/me`, `allowedBrokerIds`, selector demo validado, analisis historico AppBuilder solo como comparativa. | Confirmar con DBA regla final de broker, claves `SESSION_CONTEXT` y comportamiento ante broker sin conexion autorizada. |
+| Perfil | Detectado | Agrupa capacidades funcionales y puede alimentar permisos efectivos; no sustituye autorizacion por permiso. | Mapeo inicial de perfil a `polizas.catalogs`, `polizas.read`, `polizas.detail`; `polizas.export` queda reservado. | `profileId`, `profileTypeId` en contexto normalizado; permisos historicos AppBuilder como evidencia no vinculante. | Validar con UAT que perfiles reales equivalen a permisos iLiniumTech y que no hay sobreconcesion. |
+| Oficina | Inferido | Restringe visibilidad dentro de un broker cuando la organizacion opere por sucursal/oficina. | No concede permisos nuevos por defecto; solo puede filtrar alcance de permisos ya concedidos. | Campos o vistas autorizadas por DBA; AppBuilder puede ayudar a localizar conceptos, no a aplicarlos en runtime. | Confirmar si oficina existe como dimension obligatoria, nombre de campo/vista y regla de usuarios multi-oficina. |
+| Gestor | Inferido | Restringe cartera o polizas asignadas a un gestor cuando aplique. | No concede permisos nuevos por defecto; limita `polizas.read` y `polizas.detail` si UAT lo aprueba. | Muestras sanitizadas de UAT y reglas DBA; trazabilidad AppBuilder solo para comparar resultados esperados. | Confirmar si gestor es propietario, responsable comercial, tramitador u otra figura, y como se resuelven sustituciones/equipos. |
+| Usuario | Detectado | Identidad minima auditada y origen de permisos efectivos. | Permisos efectivos normalizados en `permissions`; `isAdmin` no concede permisos por si solo. | `currentUserId`, sesion/claims futuros, `demo-session` solo como compatibilidad controlada. | Elegir proveedor auth y definir identificador interno estable sin exponer email/nombre en logs. |
+
+#### Permisos iLiniumTech iniciales
+
+Permisos productivos iniciales para Polizas:
+
+| Permiso | Estado | Alcance | Concesion por defecto |
+| --- | --- | --- | --- |
+| `polizas.catalogs` | Detectado | Consultar catalogos necesarios para filtros de Polizas. | Solo perfiles/usuarios autorizados y broker valido. |
+| `polizas.read` | Detectado | Consultar listado read-only de Polizas dentro del alcance permitido. | Solo perfiles/usuarios autorizados y broker valido. |
+| `polizas.detail` | Detectado | Consultar detalle read-only sin revelar polizas de otro broker/alcance. | Solo perfiles/usuarios autorizados y broker valido. |
+| `polizas.export` | Pendiente | Exportar datos de Polizas. | No concedido hasta SDD propia, clasificacion PII y UAT. |
+| `admin.security.view` | Pendiente | Diagnostico administrativo de seguridad/permisos. | No forma parte del MVP; requiere SDD y auditoria. |
+
+#### Decision sobre AppBuilder historico
+
+Los permisos, perfiles, menus o reglas historicas AppBuilder se pueden usar como:
+
+- evidencia para descubrir perfiles, pantallas y restricciones existentes;
+- material de comparacion en UAT con muestras sanitizadas;
+- trazabilidad para justificar mapeos hacia permisos iLiniumTech.
+
+No se pueden usar como:
+
+- fuente runtime de permisos productivos;
+- motor dinamico de menus, pantallas, queries o workflows;
+- autorizacion directa de broker, perfil, oficina, gestor o usuario;
+- razon para conceder `isAdmin` o permisos sin decision de producto/seguridad.
+
+Si hay discrepancia entre AppBuilder historico y la matriz iLiniumTech, prevalece la decision documentada de producto/seguridad y se registra la diferencia como riesgo o bloqueo UAT.
+
+#### Preguntas abiertas DBA/UAT
+
+- DBA: cual es la clave definitiva de broker/entidad principal para validar tenant antes de resolver conexion y para poblar `SESSION_CONTEXT`?
+- DBA: existen columnas, vistas o funciones autorizadas para oficina, gestor y cartera, o esas dimensiones deben resolverse fuera de SQL?
+- DBA: que claves exactas de `SESSION_CONTEXT` afectan a vistas, funciones, triggers o auditoria, y cuales son obligatorias por consulta?
+- DBA: hay riesgo de contaminacion por pooling si una conexion cambia de broker, usuario, perfil, oficina o gestor entre requests?
+- UAT: que perfiles funcionales reales pueden ver catalogos, listado y detalle de Polizas?
+- UAT: que usuarios pueden operar con multiples brokers, oficinas o gestores, y como seleccionan el alcance activo?
+- UAT: debe existir delegacion temporal, sustitucion de gestor o acceso por equipo?
+- UAT: que campos de Polizas deben quedar ocultos, vacios o enmascarados aunque exista `polizas.detail`?
+- UAT: como se validara la equivalencia entre comportamiento AppBuilder historico y permisos iLiniumTech sin copiarlo como runtime?
+
 ### Incremento permisos/broker autorizado
 
 El siguiente incremento tecnico debe aplicar estas reglas minimas:
@@ -178,6 +237,10 @@ Los valores anteriores son ejemplos sanitizados, no datos reales.
 - [ ] Logs de auth/autorizacion registran decision, politica, resultado y `correlationId` sin secretos ni datos personales innecesarios.
 - [ ] La UI no consume metadata AppBuilder para permisos runtime.
 - [ ] No se guardan secretos ni datos sensibles en Git.
+- [ ] La matriz de permisos productivos diferencia filas `Detectado`, `Inferido` y `Pendiente`, y ninguna fila inferida se implementa como autorizacion efectiva sin decision humana.
+- [ ] Broker, perfil, oficina, gestor y usuario tienen regla de alcance aprobada o bloqueo DBA/UAT documentado antes de Done productivo.
+- [ ] Los permisos AppBuilder historicos quedan registrados solo como evidencia/trazabilidad y no como fuente runtime.
+- [ ] `polizas.export` y permisos administrativos permanecen denegados por defecto hasta SDD propia.
 
 ## Impacto tecnico
 
@@ -260,6 +323,8 @@ Esta migracion no debe romper el contrato del frontend de polizas: los endpoints
   - usuario sin `polizas.detail` devuelve 403 en detalle;
   - usuario con `polizas.detail` no puede leer detalle de broker cruzado;
   - `SESSION_CONTEXT` usa valores autenticados y no headers manipulados.
+  - oficina o gestor inferidos no filtran ni conceden acceso hasta existir regla DBA/UAT aprobada;
+  - permisos pendientes como `polizas.export` y `admin.security.view` se deniegan por defecto.
 - E2E/smoke:
   - UI muestra estado de acceso denegado sin fixtures silenciosos;
   - cambio de broker autorizado refresca contexto y listado;
@@ -272,6 +337,8 @@ Esta migracion no debe romper el contrato del frontend de polizas: los endpoints
   - payloads de headers MVP manipulados no elevan permisos.
 - Manual/UAT:
   - matriz de permisos por broker, perfil, oficina, gestor y usuario validada con responsables funcionales.
+  - equivalencias AppBuilder historicas revisadas como evidencia, con diferencias documentadas sin incorporarlas como runtime.
+  - muestras UAT sanitizadas cubren al menos usuario sin permiso, broker autorizado, broker cruzado, perfil limitado y alcance por oficina/gestor si aplica.
 
 ## Riesgos
 

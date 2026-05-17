@@ -19,6 +19,9 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `e426838` | Backend seguridad | `DemoSession` fuera de Development exige opt-in y `Auth:Demo:Password` explicita no predeterminada. |
 | `45e5781` | Backend seguridad | API key MVP solo concede permisos funcionales `polizas.*` en Development. |
 | `f129f48` | Frontend UX/auth | Login muestra mensaje generico cuando una sesion backend no puede confirmarse y conserva redirect. |
+| `dfc30e9` | Backend QA | Regresiones que prueban que denegaciones de permisos/auth cortocircuitan antes de tocar servicio de Polizas. |
+| `b859b0d` | QA docs | DoD de fase 7 alineado con la cobertura E2E real. |
+| `d486a30` | QA/backend docs | Smoke de paridad menu/rutas, test de broker denegado y cierre operativo MVP login/menu/Polizas. |
 
 ## Validaciones ejecutadas
 
@@ -53,6 +56,17 @@ Validaciones adicionales del ultimo incremento frontend:
 - `npm run test:e2e`: `7` smokes OK.
 - `Test-DocumentationBaseline.ps1`: OK.
 - `Invoke-SecretScan.ps1 -NoReport`: OK.
+
+Validaciones adicionales del checkpoint `d486a30`:
+
+- `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter "FullyQualifiedName~PolizasApiTests"`: `62/62` tests OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run typecheck`: OK.
+- `npm run test:e2e`: `8` smokes OK con Node `v24.14.0` del runtime Codex.
+- `Test-DocumentationBaseline.ps1`: OK.
+- `Invoke-SecretScan.ps1 -NoReport`: OK.
+- `git diff --check`: OK.
 
 ## Estado local visible
 
