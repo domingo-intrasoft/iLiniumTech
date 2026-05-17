@@ -34,7 +34,8 @@ Cubre:
 - Menu principal visible en movil.
 - Boton de ocultar/mostrar menu con estado `aria-expanded`.
 - Breadcrumb del shell expuesto como `nav` de ruta actual, con seccion marcada por `aria-current` y sin separador final suelto.
-- Acciones placeholder del topbar marcadas como no disponibles hasta SDD, sin aparentar funcionalidad real.
+- Acciones placeholder del topbar marcadas como no disponibles hasta SDD, con descripcion accesible comun y sin aparentar funcionalidad real.
+- Logout del shell conserva evento `signOut` y expone `title` explicito para el icon button.
 - Tabla de polizas contenida en `.table-scroll`, con scroll horizontal interno y sin overflow global de pagina.
 - Navegacion desde menu a `/clientes`.
 - Filtros de pagina fixture visibles y dentro del viewport.
