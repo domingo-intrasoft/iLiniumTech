@@ -30,7 +30,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `a32a23a` | QA docs | Log autonomo alineado con commits cerrados. |
 | `7916670` | Frontend Polizas | Listado explica de forma visible/accesible cuando `polizas.detail` no permite abrir detalle. |
 | `281e924` | Frontend Polizas | Detalle de poliza alinea badge superior con broker activo, broker requerido y permiso ausente. |
-| Bloque actual | Frontend Polizas | Resumen visible de filtros activos sincronizado con URL, catalogos y retorno desde detalle. |
+| `856913a` | Frontend Polizas | Resumen visible de filtros activos sincronizado con URL, catalogos y retorno desde detalle. |
 
 ## Validaciones ejecutadas
 
