@@ -33,6 +33,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `856913a` | Frontend Polizas | Resumen visible de filtros activos sincronizado con URL, catalogos y retorno desde detalle. |
 | `0fc94fb` | Frontend auth | Login enfoca usuario, separa aviso de sesion de error y expone estado accesible durante validacion. |
 | `0fe67fd` | Frontend menu | Leyenda compacta del menu muestra rotulo visible `Estado` y conserva descripcion accesible. |
+| Bloque actual | QA gate | Gate local completo ejecutado tras los incrementos autonomos de login/menu/Polizas. |
 
 ## Validaciones ejecutadas
 
@@ -185,6 +186,24 @@ Validacion adicional tras rotulo de leyenda del menu:
 - `npm run build`: OK.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Gate completo tras incrementos autonomos:
+
+- Primer intento: backend restore/build/tests OK (`98/98`), bloqueado en `npm ci` por binario nativo de Rollup retenido por Vite local en `127.0.0.1:5174`.
+- Accion: se detuvo el proceso Vite de `5174` y se relanzo el gate.
+- `.\tools\quality\Invoke-MvpQualityGate.ps1 -RunFrontendE2E -NodeExe "C:\Users\DomingoCabezaGuerra\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"`: OK.
+- Backend restore/build: OK.
+- Backend tests: `98/98` OK.
+- Frontend `npm ci`, `npm run format`, `npm run lint`, `npm run test:unit:ci`, `npm run build`: OK.
+- Frontend unit tests: `189/189` OK.
+- Frontend E2E: `8/8` smokes OK.
+- Backend HTTP smoke y frontend smoke: OK.
+- Secret scan: sin leaks.
+- Dependency audit: `0` findings.
+- CORS audit: sin findings.
+- Polizas metadata extractor tests: OK.
+- Documentation baseline: OK.
 - `git diff --check`: OK.
 
 ## Estado local visible
