@@ -29,7 +29,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `3664c64` | QA docs | Gate local completo registrado tras los incrementos autonomos. |
 | `a32a23a` | QA docs | Log autonomo alineado con commits cerrados. |
 | `7916670` | Frontend Polizas | Listado explica de forma visible/accesible cuando `polizas.detail` no permite abrir detalle. |
-| `0ad395c` | Frontend Polizas | Detalle de poliza alinea badge superior con broker activo, broker requerido y permiso ausente. |
+| `281e924` | Frontend Polizas | Detalle de poliza alinea badge superior con broker activo, broker requerido y permiso ausente. |
 
 ## Validaciones ejecutadas
 
