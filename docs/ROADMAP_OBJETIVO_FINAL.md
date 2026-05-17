@@ -29,7 +29,7 @@ Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. L
 - CI GitHub: baseline disponible con `ci.yml`, `security.yml`, PR template e issue form SDD.
 - Gate local fase 7: disponible y actualizado en `tools/quality/Invoke-MvpQualityGate.ps1` con backend, frontend, smoke, auditorias, validacion documental y `git diff --check`.
 - Fase 7 plataforma: CI publica artefacto de calidad documental, seguridad tiene schedule, CodeQL esta definido y preview queda como dry-run manual sin secrets ni deploy real.
-- Smoke E2E frontend de `/polizas` disponible con Playwright Chromium contra preview local, `VITE_USE_BACKEND=false` y fixture anonimizadas; CI lo ejecuta tras instalar Chromium.
+- Smoke E2E frontend disponible con Playwright Chromium contra preview local, `VITE_USE_BACKEND=false` y fixtures anonimizadas. La cobertura actual esta resumida en [qa/e2e-smoke-coverage.md](qa/e2e-smoke-coverage.md) e incluye auth guard, logout, menu, Polizas, paginas fixture, paginas tecnicas bloqueadas y responsive shell.
 
 ## Principios de cierre
 
@@ -371,7 +371,7 @@ Avance 2026-05-14:
 - `codeql.yml` queda creado para C# y TypeScript sin secrets.
 - `preview-dry-run.yml` queda manual, bloqueado por `DEPLOY_PREVIEW_ENABLED=false` y publica solo un plan de preview.
 - `Invoke-MvpQualityGate.ps1` agrupa restore/build/test backend, formato/lint/test/build frontend, smoke backend/frontend, pruebas del extractor, auditorias, validacion documental y `git diff --check`.
-- `npm run test:e2e` cubre el smoke real de navegador de `/polizas`: modo solo lectura, origen `Fixture local`, busqueda por `0002`, limpieza de filtros y ausencia en DOM de `connectionString`, `SELECT *`, `AppBuilder`, `QueryStatic` y `Pantalla_Polizas`.
+- `npm run test:e2e` cubre 7 smokes reales de navegador: guardas de auth/logout, `/polizas` y detalle, menu lateral, paginas de dominio fixture, paginas tecnicas bloqueadas, `Autos Particulares` aparcado y responsive shell movil. La matriz viva esta en [qa/e2e-smoke-coverage.md](qa/e2e-smoke-coverage.md).
 
 Pendiente tecnico:
 
