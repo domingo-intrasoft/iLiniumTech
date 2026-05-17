@@ -214,7 +214,7 @@ select:focus-visible {
   top: 0;
   z-index: 5;
   display: grid;
-  grid-template-rows: 32px minmax(0, 1fr);
+  grid-template-rows: 32px minmax(0, 1fr) auto;
   height: 100vh;
   overflow: hidden;
   color: #ffffff;
@@ -327,6 +327,29 @@ select:focus-visible {
 
 .nav-status-dot.status-blockedSdd {
   background: #d96055;
+}
+
+.side-status-legend {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  place-items: center;
+  padding: 8px 7px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.side-status-legend .nav-status-dot {
+  position: static;
+  display: grid;
+  width: 24px;
+  height: 16px;
+  place-items: center;
+  color: #ffffff;
+  font-size: 0.48rem;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
 }
 
 .side-subnav {

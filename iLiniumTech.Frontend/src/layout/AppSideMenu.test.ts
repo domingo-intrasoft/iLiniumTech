@@ -70,6 +70,20 @@ describe('AppSideMenu', () => {
     expect(
       wrapper.get('.side-subnav a[href="/polizas/flotas"] .nav-status-dot').classes(),
     ).toContain('status-blockedSdd')
+    expect(wrapper.get('.side-status-legend').attributes('aria-label')).toBe(
+      'Leyenda de estados del menu',
+    )
+    expect(wrapper.findAll('.side-status-legend .nav-status-dot')).toHaveLength(4)
+    expect(wrapper.get('.side-status-legend .status-operational').attributes('title')).toContain(
+      'Operativo',
+    )
+    expect(wrapper.get('.side-status-legend .status-fixture').attributes('title')).toContain(
+      'Fixture',
+    )
+    expect(wrapper.get('.side-status-legend').text()).toContain('OK')
+    expect(wrapper.get('.side-status-legend').text()).toContain('FIC')
+    expect(wrapper.get('.side-status-legend').text()).toContain('PA')
+    expect(wrapper.get('.side-status-legend').text()).toContain('SDD')
     expect(wrapper.get('.side-nav [aria-current="page"]').text()).toContain('Polizas')
     expect(wrapper.text()).not.toMatch(/IAP_|QueryStatic|ComponentDataSource|metadata/i)
   })

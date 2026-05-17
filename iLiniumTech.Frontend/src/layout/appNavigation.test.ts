@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import {
   appNavigation,
+  appNavigationStatusLegend,
   getNavigationStatusDescription,
   getNavigationStatusLabel,
+  getNavigationStatusShortLabel,
   getNavigationUnavailableReason,
   hasNavigationPermission,
 } from './appNavigation'
@@ -69,6 +71,20 @@ describe('appNavigation static permission state', () => {
     expect(getNavigationStatusDescription(clientes)).toContain('fixture local sin API real')
     expect(getNavigationStatusLabel(logs)).toBe('Bloqueado SDD')
     expect(getNavigationStatusDescription(logs)).toContain('SDD')
+  })
+
+  it('keeps a stable status legend for the side menu', () => {
+    expect(appNavigationStatusLegend).toEqual(['operational', 'fixture', 'parked', 'blockedSdd'])
+
+    const labels = appNavigationStatusLegend.map((status) =>
+      getNavigationStatusLabel({ label: status, icon: '', status }),
+    )
+    const shortLabels = appNavigationStatusLegend.map((status) =>
+      getNavigationStatusShortLabel({ label: status, icon: '', status }),
+    )
+
+    expect(labels).toEqual(['Operativo', 'Fixture', 'Aparcado', 'Bloqueado SDD'])
+    expect(shortLabels).toEqual(['OK', 'FIC', 'PA', 'SDD'])
   })
 
   it('does not disable legacy API-key mode when /api/me cannot declare permissions yet', () => {

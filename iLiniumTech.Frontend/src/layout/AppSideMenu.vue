@@ -6,8 +6,10 @@ import { useSession } from '@/services/session'
 
 import {
   appNavigation,
+  appNavigationStatusLegend,
   getNavigationStatusDescription,
   getNavigationStatusLabel,
+  getNavigationStatusShortLabel,
   getNavigationUnavailableReason,
   isNavigationItemActive,
   type AppNavigationItem,
@@ -53,6 +55,15 @@ function childTitle(parent: AppNavigationItem, child: AppNavigationItem) {
   }
 
   return itemTitle(child)
+}
+
+function statusLegendItem(status: (typeof appNavigationStatusLegend)[number]): AppNavigationItem {
+  return { label: status, icon: '', status }
+}
+
+function statusLegendTitle(status: (typeof appNavigationStatusLegend)[number]) {
+  const item = statusLegendItem(status)
+  return `${getNavigationStatusLabel(item)}: ${getNavigationStatusDescription(item)}`
 }
 </script>
 
@@ -141,5 +152,21 @@ function childTitle(parent: AppNavigationItem, child: AppNavigationItem) {
         </li>
       </ul>
     </nav>
+
+    <div class="side-status-legend" aria-label="Leyenda de estados del menu">
+      <span
+        v-for="status in appNavigationStatusLegend"
+        :key="status"
+        class="nav-status-dot"
+        :class="`status-${status}`"
+        :title="statusLegendTitle(status)"
+        :aria-label="statusLegendTitle(status)"
+        role="img"
+      >
+        <span aria-hidden="true">{{
+          getNavigationStatusShortLabel(statusLegendItem(status))
+        }}</span>
+      </span>
+    </div>
   </aside>
 </template>

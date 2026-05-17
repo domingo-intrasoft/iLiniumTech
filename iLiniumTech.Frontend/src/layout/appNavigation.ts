@@ -22,12 +22,26 @@ const navigationStatusLabels: Record<AppNavigationStatus, string> = {
   blockedSdd: 'Bloqueado SDD',
 }
 
+const navigationStatusShortLabels: Record<AppNavigationStatus, string> = {
+  operational: 'OK',
+  fixture: 'FIC',
+  parked: 'PA',
+  blockedSdd: 'SDD',
+}
+
 const navigationStatusDescriptions: Record<AppNavigationStatus, string> = {
   operational: 'MVP read-only con contrato iLiniumTech explicito',
   fixture: 'MVP estatico con fixture local sin API real',
   parked: 'Aparcado por decision de producto',
   blockedSdd: 'Bloqueado hasta SDD, regla funcional, permisos y UAT',
 }
+
+export const appNavigationStatusLegend: AppNavigationStatus[] = [
+  'operational',
+  'fixture',
+  'parked',
+  'blockedSdd',
+]
 
 export const appNavigation: AppNavigationItem[] = [
   { label: 'Agenda', icon: 'pi pi-calendar', to: '/agenda', status: 'fixture' },
@@ -78,6 +92,10 @@ export const appNavigation: AppNavigationItem[] = [
 
 export function getNavigationStatusLabel(item: AppNavigationItem) {
   return navigationStatusLabels[item.status]
+}
+
+export function getNavigationStatusShortLabel(item: AppNavigationItem) {
+  return navigationStatusShortLabels[item.status]
 }
 
 export function getNavigationStatusDescription(item: AppNavigationItem) {
