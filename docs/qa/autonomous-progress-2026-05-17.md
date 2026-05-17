@@ -46,6 +46,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `ab8131e` | Frontend Polizas | Breadcrumb del detalle separa ruta y pagina actual de forma semantica y el smoke valida `aria-current`. |
 | `933e6c7` | Frontend Polizas | Enlace de vuelta del detalle describe que conserva filtros y paginacion de origen. |
 | `14120a6` | Frontend auth | Skip link del login mueve foco real al formulario y crea `tabindex=-1` si falta. |
+| `28e3b63` | Frontend Siniestros | Controles bloqueados de Siniestros comparten descripcion accesible y el smoke de fixtures cubre la ruta. |
 
 ## Validaciones ejecutadas
 
@@ -345,6 +346,17 @@ Validacion adicional tras foco real del skip link de login:
 - `npm run test:unit`: `195/195` tests OK.
 - `npm run build`: OK.
 - `npm run test:e2e -- auth-guard`: `1` smoke OK con `CI=1`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras descripcion accesible de acciones bloqueadas en Siniestros:
+
+- `npx vitest run src/features/siniestros/SiniestrosView.test.ts`: `2/2` tests OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run test:unit`: `195/195` tests OK.
+- `npm run build`: OK.
+- `npm run test:e2e -- domain-fixtures`: `1` smoke OK con `CI=1`, incluyendo `/siniestros`.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
 
