@@ -77,6 +77,9 @@ describe('ClientesView smoke', () => {
     expect(wrapper.text()).toContain('Tabs relacionadas pendientes')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('4 clientes demo')
+    expect(wrapper.get('caption').text()).toContain(
+      'Clientes fixture read-only: 1-2 de 4 clientes demo',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('CLI-2026-0001')
     expect(wrapper.text()).toContain('CLI-2026-0002')
@@ -105,6 +108,9 @@ describe('ClientesView smoke', () => {
     await settleClientesView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 cliente demo')
+    expect(wrapper.get('caption').text()).toContain(
+      'Clientes fixture read-only: 1-1 de 1 cliente demo',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('CLI-2026-0004')
     expect(wrapper.text()).toContain('Alias anonimo D')

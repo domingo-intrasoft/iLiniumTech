@@ -74,6 +74,9 @@ describe('SiniestrosView smoke', () => {
     expect(wrapper.text()).toContain('Detalle y exportacion pendientes')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('3 siniestros')
+    expect(wrapper.get('caption').text()).toContain(
+      'Siniestros fixture read-only: 1-3 de 3 siniestros',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(3)
     expect(wrapper.text()).toContain('SIN-2026-0001')
     expect(wrapper.text()).toContain('Cliente anonimo 2')
@@ -84,6 +87,9 @@ describe('SiniestrosView smoke', () => {
     await settleSiniestrosView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 siniestro')
+    expect(wrapper.get('caption').text()).toContain(
+      'Siniestros fixture read-only: 1-1 de 1 siniestro',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('SIN-2026-0002')
     expect(wrapper.text()).toContain('Cliente anonimo 2')

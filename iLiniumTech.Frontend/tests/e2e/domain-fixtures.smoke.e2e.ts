@@ -98,7 +98,7 @@ async function assertFixtureDomainPage(page: Page, smokeCase: DomainSmokeCase) {
   await textFilter.fill(smokeCase.searchText)
   await page.locator('.search-action-buttons .primary-action').click()
 
-  await expect(page.getByText(smokeCase.summaryAfterSearch)).toBeVisible()
+  await expect(page.getByText(smokeCase.summaryAfterSearch, { exact: true })).toBeVisible()
   await expect(page.getByText(smokeCase.expectedAfterSearch)).toBeVisible()
   await expect(page.getByText(smokeCase.initialMarker)).toHaveCount(0)
 
