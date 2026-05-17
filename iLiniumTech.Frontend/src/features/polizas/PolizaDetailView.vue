@@ -227,10 +227,15 @@ watch(() => route.params.id, loadPoliza, { immediate: true })
           class="detail-back"
           :to="polizasBackTarget"
           aria-label="Volver al listado de polizas"
+          aria-describedby="poliza-detail-back-context"
+          title="Volver al listado conservando filtros y paginacion"
         >
           <i class="pi pi-arrow-left" aria-hidden="true"></i>
           Volver a Polizas
         </RouterLink>
+        <span id="poliza-detail-back-context" class="sr-only">
+          Conserva los filtros y la paginacion de origen cuando existen en la URL.
+        </span>
         <nav class="detail-breadcrumb" aria-label="Ruta de poliza">
           <span>Polizas</span>
           <span aria-hidden="true">/</span>

@@ -135,6 +135,11 @@ describe('PolizaDetailView', () => {
     expect(backLink.attributes('data-query-page')).toBe('2')
     expect(backLink.attributes('data-query-page-size')).toBe('10')
     expect(backLink.attributes('aria-label')).toBe('Volver al listado de polizas')
+    expect(backLink.attributes('aria-describedby')).toBe('poliza-detail-back-context')
+    expect(backLink.attributes('title')).toContain('conservando filtros')
+    expect(wrapper.get('#poliza-detail-back-context').text()).toContain(
+      'Conserva los filtros y la paginacion de origen',
+    )
   })
 
   it('shows a loading state while the detail request is pending', () => {
