@@ -33,7 +33,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `856913a` | Frontend Polizas | Resumen visible de filtros activos sincronizado con URL, catalogos y retorno desde detalle. |
 | `0fc94fb` | Frontend auth | Login enfoca usuario, separa aviso de sesion de error y expone estado accesible durante validacion. |
 | `0fe67fd` | Frontend menu | Leyenda compacta del menu muestra rotulo visible `Estado` y conserva descripcion accesible. |
-| Bloque actual | QA gate | Gate local completo ejecutado tras los incrementos autonomos de login/menu/Polizas. |
+| `c9f8eda` | QA gate | Gate local completo ejecutado tras los incrementos autonomos de login/menu/Polizas. |
 
 ## Validaciones ejecutadas
 
