@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter, type LocationQuery, type LocationQueryRaw } from 'vue-router'
+import {
+  RouterLink,
+  useRoute,
+  useRouter,
+  type LocationQuery,
+  type LocationQueryRaw,
+} from 'vue-router'
 
 import { clearAuthSession, switchAuthBroker, useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
@@ -445,9 +451,25 @@ onMounted(() => {
       </div>
 
       <div class="context-buttons">
-        <button type="button" disabled>Polizas de flota</button>
-        <button type="button" disabled>Polizas colectivas</button>
-        <button type="button" disabled>Polizas Externas</button>
+        <RouterLink
+          to="/polizas/flotas"
+          title="Scope estatico bloqueado hasta SDD, regla funcional, permisos y UAT"
+        >
+          Polizas de flota
+        </RouterLink>
+        <RouterLink
+          to="/polizas/colectivas"
+          title="Scope estatico bloqueado hasta SDD, regla funcional, permisos y UAT"
+        >
+          Polizas colectivas
+        </RouterLink>
+        <button
+          type="button"
+          title="Pendiente de SDD, regla funcional, permisos y contrato API"
+          disabled
+        >
+          Polizas Externas
+        </button>
       </div>
     </div>
 

@@ -598,6 +598,7 @@ select:focus-visible {
   margin-left: auto;
 }
 
+.context-buttons a,
 .context-buttons button,
 .primary-action,
 .search-action-buttons button {
@@ -606,11 +607,19 @@ select:focus-visible {
   font-weight: 800;
 }
 
+.context-buttons a,
 .context-buttons button {
+  display: inline-flex;
+  align-items: center;
   border: 0;
   padding: 0 9px;
   color: #ffffff;
   background: #002f47;
+  text-decoration: none;
+}
+
+.context-buttons a:hover {
+  background: #0b5570;
 }
 
 .tab-strip {

@@ -22,6 +22,7 @@ Fuera de alcance:
 - `Autos Particulares` queda clasificada como `Aparcado` y sigue deshabilitada en el menu.
 - `Flotas` y `Colectivas` siguen navegables como scopes estaticos, pero bloqueadas para datos reales hasta SDD, regla funcional, permisos, DBA/UAT y API explicita.
 - La leyenda compacta del menu muestra un rotulo visible `Estado` y mantiene descripcion accesible/title para cada codigo.
+- Los accesos superiores de Polizas a `Flotas` y `Colectivas` reutilizan esas mismas rutas estaticas bloqueadas; `Polizas Externas` sigue sin accion por falta de SDD.
 - La documentacion del menu ya no afirma que solo `/polizas` y `/autos-particulares` tienen ruta real.
 
 ## Comandos ejecutados

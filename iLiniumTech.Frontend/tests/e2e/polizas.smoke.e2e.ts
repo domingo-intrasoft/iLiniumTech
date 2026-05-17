@@ -23,6 +23,15 @@ test('polizas smoke uses local fixture without leaking AppBuilder runtime detail
   await expect(
     page.getByRole('link', { name: 'Ver detalle de poliza POL-2026-0001', exact: true }),
   ).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Polizas de flota', exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Polizas colectivas', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Polizas Externas', exact: true })).toBeDisabled()
+
+  await page.getByRole('link', { name: 'Polizas de flota', exact: true }).click()
+  await expect(page).toHaveURL(/\/polizas\/flotas$/)
+  await expect(page.getByRole('heading', { name: 'Polizas Flotas' })).toBeVisible()
+  await expect(page.getByText('Scope aparcado hasta SDD')).toBeVisible()
+  await page.goto('/polizas')
 
   await page.getByRole('link', { name: 'Ver detalle de poliza POL-2026-0001', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'POL-2026-0001' })).toBeVisible()
