@@ -210,6 +210,7 @@ function statusLegendTitle(status: (typeof appNavigationStatusLegend)[number]) {
     </nav>
 
     <div class="side-status-legend" aria-label="Leyenda de estados del menu">
+      <span class="side-status-legend-title">Estado</span>
       <span
         v-for="status in appNavigationStatusLegend"
         :key="status"

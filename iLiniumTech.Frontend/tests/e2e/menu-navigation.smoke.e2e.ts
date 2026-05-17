@@ -15,6 +15,7 @@ test('side menu exposes maturity states and navigates MVP routes without backend
 
   const sideMenu = page.getByRole('complementary', { name: 'Menu principal' })
   await expect(sideMenu).toBeVisible()
+  await expect(sideMenu.locator('.side-status-legend-title')).toHaveText('Estado')
   await expect(sideMenu.locator('.side-status-legend .status-operational')).toHaveAttribute(
     'title',
     /Operativo/,

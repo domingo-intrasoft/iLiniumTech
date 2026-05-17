@@ -21,6 +21,7 @@ Fuera de alcance:
 - Entradas tecnicas o sin SDD quedan clasificadas como `Bloqueado SDD`.
 - `Autos Particulares` queda clasificada como `Aparcado` y sigue deshabilitada en el menu.
 - `Flotas` y `Colectivas` siguen navegables como scopes estaticos, pero bloqueadas para datos reales hasta SDD, regla funcional, permisos, DBA/UAT y API explicita.
+- La leyenda compacta del menu muestra un rotulo visible `Estado` y mantiene descripcion accesible/title para cada codigo.
 - La documentacion del menu ya no afirma que solo `/polizas` y `/autos-particulares` tienen ruta real.
 
 ## Comandos ejecutados

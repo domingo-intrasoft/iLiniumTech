@@ -73,6 +73,7 @@ describe('AppSideMenu', () => {
     expect(wrapper.get('.side-status-legend').attributes('aria-label')).toBe(
       'Leyenda de estados del menu',
     )
+    expect(wrapper.get('.side-status-legend-title').text()).toBe('Estado')
     expect(wrapper.findAll('.side-status-legend .nav-status-dot')).toHaveLength(4)
     expect(wrapper.get('.side-status-legend .status-operational').attributes('title')).toContain(
       'Operativo',

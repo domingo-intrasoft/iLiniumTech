@@ -32,6 +32,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `281e924` | Frontend Polizas | Detalle de poliza alinea badge superior con broker activo, broker requerido y permiso ausente. |
 | `856913a` | Frontend Polizas | Resumen visible de filtros activos sincronizado con URL, catalogos y retorno desde detalle. |
 | `0fc94fb` | Frontend auth | Login enfoca usuario, separa aviso de sesion de error y expone estado accesible durante validacion. |
+| Bloque actual | Frontend menu | Leyenda compacta del menu muestra rotulo visible `Estado` y conserva descripcion accesible. |
 
 ## Validaciones ejecutadas
 
@@ -168,6 +169,17 @@ Validacion adicional tras pulido accesible de login:
 
 - `npx vitest run src/features/auth/LoginView.test.ts`: `3/3` tests OK.
 - `npm run test:e2e -- auth-guard`: `1` smoke OK con `CI=1`.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run build`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras rotulo de leyenda del menu:
+
+- `npx vitest run src/layout/AppSideMenu.test.ts`: `4/4` tests OK.
+- `npm run test:e2e -- menu-navigation`: `1` smoke OK con `CI=1`.
 - `npm run format`: OK.
 - `npm run lint`: OK.
 - `npm run build`: OK.

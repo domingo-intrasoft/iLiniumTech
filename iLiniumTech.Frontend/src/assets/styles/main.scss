@@ -348,11 +348,20 @@ select:focus-visible {
 .side-status-legend {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
+  gap: 5px;
   place-items: center;
-  padding: 8px 7px;
+  padding: 7px;
   border-top: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(0, 0, 0, 0.12);
+}
+
+.side-status-legend-title {
+  grid-column: 1 / -1;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.48rem;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .side-status-legend .nav-status-dot {
