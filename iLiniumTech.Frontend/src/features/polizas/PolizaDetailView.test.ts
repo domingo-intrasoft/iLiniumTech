@@ -113,8 +113,9 @@ describe('PolizaDetailView', () => {
 
     expect(wrapper.get('h1').text()).toBe('POL-2026-0001')
     expect(wrapper.text()).toContain('Inicio')
-    expect(wrapper.text()).toContain('Detalle / POL-2026-0001')
     expect(wrapper.get('.detail-breadcrumb').attributes('aria-label')).toBe('Ruta de poliza')
+    expect(wrapper.get('.detail-breadcrumb').text()).toBe('Polizas/Detalle/POL-2026-0001')
+    expect(wrapper.findAll('.detail-breadcrumb [aria-hidden="true"]')).toHaveLength(2)
     expect(wrapper.get('.detail-breadcrumb [aria-current="page"]').text()).toBe('POL-2026-0001')
     expect(wrapper.text()).toContain('Solo lectura')
     expect(wrapper.text()).toContain('Fixture local')

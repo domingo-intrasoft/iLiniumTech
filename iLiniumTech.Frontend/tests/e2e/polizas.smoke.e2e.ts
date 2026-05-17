@@ -35,7 +35,10 @@ test('polizas smoke uses local fixture without leaking AppBuilder runtime detail
 
   await page.getByRole('link', { name: 'Ver detalle de poliza POL-2026-0001', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'POL-2026-0001' })).toBeVisible()
-  await expect(page.getByText('Detalle / POL-2026-0001')).toBeVisible()
+  const detailBreadcrumb = page.locator('.detail-breadcrumb')
+  await expect(detailBreadcrumb).toContainText('Polizas')
+  await expect(detailBreadcrumb).toContainText('Detalle')
+  await expect(detailBreadcrumb.locator('[aria-current="page"]')).toHaveText('POL-2026-0001')
   await page.goto('/polizas')
 
   const polizaFilter = page.getByRole('searchbox', { name: 'Poliza', exact: true })

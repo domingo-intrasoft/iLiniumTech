@@ -232,7 +232,10 @@ watch(() => route.params.id, loadPoliza, { immediate: true })
           Volver a Polizas
         </RouterLink>
         <nav class="detail-breadcrumb" aria-label="Ruta de poliza">
-          <span>Polizas / Detalle / </span>
+          <span>Polizas</span>
+          <span aria-hidden="true">/</span>
+          <span>Detalle</span>
+          <span aria-hidden="true">/</span>
           <span aria-current="page">{{ detailTitle }}</span>
         </nav>
       </header>

@@ -1289,6 +1289,9 @@ tbody tr:hover {
 }
 
 .detail-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: #5c7188;
   font-size: 0.85rem;
   font-weight: 800;
