@@ -23,7 +23,8 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `b859b0d` | QA docs | DoD de fase 7 alineado con la cobertura E2E real. |
 | `d486a30` | QA/backend docs | Smoke de paridad menu/rutas, test de broker denegado y cierre operativo MVP login/menu/Polizas. |
 | `91da188` | Auth docs | Matriz documental de permisos productivos para broker, perfil, oficina, gestor y usuario. |
-| Bloque actual | Frontend accesibilidad | Menu lateral colapsado sale del arbol de foco con `inert` y mantiene `aria-hidden`. |
+| `e659589` | Frontend accesibilidad | Menu lateral colapsado sale del arbol de foco con `inert` y mantiene `aria-hidden`. |
+| Bloque actual | Frontend accesibilidad | Estados del menu expuestos por `aria-describedby` sin alterar nombres de enlace; `sr-only` no genera overflow movil. |
 
 ## Validaciones ejecutadas
 
@@ -82,6 +83,19 @@ Validaciones adicionales tras matriz de permisos y accesibilidad shell:
 - `npm run lint`: OK.
 - `npm run typecheck`: OK.
 - `npm run build`: OK.
+
+Validaciones adicionales tras descripcion accesible del menu:
+
+- `npx vitest run src/layout/AppSideMenu.test.ts`: `4/4` tests OK.
+- `npm run test:e2e -- responsive-shell menu-navigation menu-route-parity`: `3` smokes OK con `CI=1` para reconstruir preview.
+- `npm run test:e2e`: `8` smokes OK con `CI=1`.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run test:unit`: `187/187` tests OK.
+- `npm run build`: OK.
+- `Test-DocumentationBaseline.ps1`: OK.
+- `Invoke-SecretScan.ps1 -NoReport`: OK.
+- `git diff --check`: OK.
 
 ## Estado local visible
 

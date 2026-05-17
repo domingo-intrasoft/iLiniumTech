@@ -57,6 +57,52 @@ function childTitle(parent: AppNavigationItem, child: AppNavigationItem) {
   return itemTitle(child)
 }
 
+function accessibleStatusDescription(item: AppNavigationItem) {
+  return getNavigationStatusDescription(item).replace(
+    'fixture local',
+    'datos de demostracion local',
+  )
+}
+
+function itemAccessibleDescription(item: AppNavigationItem) {
+  const unavailableReason = getNavigationUnavailableReason(item, session.value)
+
+  if (unavailableReason === 'disabled') {
+    return `${item.label} no disponible en el MVP. ${accessibleStatusDescription(item)}`
+  }
+
+  if (unavailableReason === 'permission') {
+    return `${item.label} no disponible para la sesion actual. ${accessibleStatusDescription(item)}`
+  }
+
+  return `${item.label}. ${accessibleStatusDescription(item)}`
+}
+
+function childAccessibleDescription(parent: AppNavigationItem, child: AppNavigationItem) {
+  const parentReason = getNavigationUnavailableReason(parent, session.value)
+
+  if (parentReason === 'disabled') {
+    return `${child.label} no disponible en el MVP`
+  }
+
+  if (parentReason === 'permission') {
+    return `${child.label} no disponible para la sesion actual`
+  }
+
+  return itemAccessibleDescription(child)
+}
+
+function navigationDescriptionId(item: AppNavigationItem, parent?: AppNavigationItem) {
+  const key = [parent?.label, item.label]
+    .filter(Boolean)
+    .join('-')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+
+  return `nav-description-${key}`
+}
+
 function statusLegendItem(status: (typeof appNavigationStatusLegend)[number]): AppNavigationItem {
   return { label: status, icon: '', status }
 }
@@ -84,11 +130,15 @@ function statusLegendTitle(status: (typeof appNavigationStatusLegend)[number]) {
             active: isNavigationItemActive(item, activePath),
           }"
         >
+          <span :id="navigationDescriptionId(item)" hidden>{{
+            itemAccessibleDescription(item)
+          }}</span>
           <RouterLink
             v-if="item.to && !itemUnavailable(item)"
             :to="item.to"
             :title="itemTitle(item)"
             :aria-current="item.to === activePath ? 'page' : undefined"
+            :aria-describedby="navigationDescriptionId(item)"
           >
             <i :class="item.icon" aria-hidden="true"></i>
             <span class="side-nav-label">{{ item.label }}</span>
@@ -104,6 +154,7 @@ function statusLegendTitle(status: (typeof appNavigationStatusLegend)[number]) {
             class="side-nav-disabled"
             :title="itemTitle(item)"
             :aria-disabled="itemUnavailable(item) ? 'true' : undefined"
+            :aria-describedby="navigationDescriptionId(item)"
           >
             <i :class="item.icon" aria-hidden="true"></i>
             <span class="side-nav-label">{{ item.label }}</span>
@@ -117,11 +168,15 @@ function statusLegendTitle(status: (typeof appNavigationStatusLegend)[number]) {
 
           <ul v-if="item.children?.length" class="side-subnav">
             <li v-for="child in item.children" :key="child.label">
+              <span :id="navigationDescriptionId(child, item)" hidden>{{
+                childAccessibleDescription(item, child)
+              }}</span>
               <RouterLink
                 v-if="child.to && !childUnavailable(item, child)"
                 :to="child.to"
                 :title="childTitle(item, child)"
                 :aria-current="child.to === activePath ? 'page' : undefined"
+                :aria-describedby="navigationDescriptionId(child, item)"
               >
                 <i :class="child.icon" aria-hidden="true"></i>
                 <span class="side-nav-label">{{ child.label }}</span>
@@ -137,6 +192,7 @@ function statusLegendTitle(status: (typeof appNavigationStatusLegend)[number]) {
                 class="side-nav-disabled"
                 :title="childTitle(item, child)"
                 :aria-disabled="childUnavailable(item, child) ? 'true' : undefined"
+                :aria-describedby="navigationDescriptionId(child, item)"
               >
                 <i :class="child.icon" aria-hidden="true"></i>
                 <span class="side-nav-label">{{ child.label }}</span>

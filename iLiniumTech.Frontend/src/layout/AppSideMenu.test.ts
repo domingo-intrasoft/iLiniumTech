@@ -85,6 +85,12 @@ describe('AppSideMenu', () => {
     expect(wrapper.get('.side-status-legend').text()).toContain('PA')
     expect(wrapper.get('.side-status-legend').text()).toContain('SDD')
     expect(wrapper.get('.side-nav [aria-current="page"]').text()).toContain('Polizas')
+    expect(wrapper.get('.side-nav a[href="/clientes"]').attributes('aria-describedby')).toBe(
+      'nav-description-clientes',
+    )
+    expect(wrapper.get('#nav-description-clientes').text()).toContain(
+      'MVP estatico con datos de demostracion local sin API real',
+    )
     expect(wrapper.text()).not.toMatch(/IAP_|QueryStatic|ComponentDataSource|metadata/i)
   })
 
@@ -94,6 +100,12 @@ describe('AppSideMenu', () => {
     expect(wrapper.find('[aria-current="page"]').exists()).toBe(false)
     expect(wrapper.get('.side-subnav .side-nav-disabled').text()).toContain('Autos Particulares')
     expect(wrapper.get('.side-subnav .side-nav-disabled').attributes('title')).toContain(
+      'Aparcado por decision de producto',
+    )
+    expect(wrapper.get('.side-subnav .side-nav-disabled').attributes('aria-describedby')).toBe(
+      'nav-description-polizas-autos-particulares',
+    )
+    expect(wrapper.get('#nav-description-polizas-autos-particulares').text()).toContain(
       'Aparcado por decision de producto',
     )
     expect(wrapper.get('.side-subnav .side-nav-disabled .nav-status-dot').classes()).toContain(
