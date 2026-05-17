@@ -783,7 +783,7 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
-    public async Task Me_can_use_header_context_outside_development_with_explicit_override()
+    public async Task Me_ignores_header_context_outside_development_without_demo_opt_in_even_with_override()
     {
         await using var factory = new TestApiFactory(
             new Dictionary<string, string?>
@@ -791,6 +791,31 @@ public sealed class PolizasApiTests
                 ["ApiSecurity:ApiKey"] = "test-key-that-is-long-enough-for-production",
                 ["Polizas:AllowHeaderExecutionContext"] = "true",
                 ["Polizas:AllowHeaderExecutionContextOutsideDevelopment"] = "true",
+                ["Polizas:BrokerId"] = "84"
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key-that-is-long-enough-for-production");
+        client.DefaultRequestHeaders.Add("X-Broker-Id", "42");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"brokerId\":84");
+        body.Should().Contain("\"headerExecutionContextEnabled\":false");
+    }
+
+    [Fact]
+    public async Task Me_can_use_header_context_outside_development_with_explicit_demo_opt_in()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["ApiSecurity:ApiKey"] = "test-key-that-is-long-enough-for-production",
+                ["Polizas:AllowHeaderExecutionContext"] = "true",
+                ["Polizas:AllowHeaderExecutionContextOutsideDevelopment"] = "true",
+                [HeaderExecutionContextPolicy.DemoOptInKey] = HeaderExecutionContextPolicy.DemoOptInRequiredValue,
                 ["Polizas:BrokerId"] = "84"
             },
             environmentName: "Production");

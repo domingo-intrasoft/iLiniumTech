@@ -148,7 +148,7 @@ public sealed class HeaderPolizasExecutionContextAccessorTests
     }
 
     [Fact]
-    public void Current_can_enable_header_context_outside_development_with_explicit_override()
+    public void Current_ignores_header_context_outside_development_without_demo_opt_in_even_with_override()
     {
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Headers[HeaderPolizasExecutionContextAccessor.BrokerIdHeaderName] = "42";
@@ -157,6 +157,31 @@ public sealed class HeaderPolizasExecutionContextAccessorTests
             {
                 ["Polizas:AllowHeaderExecutionContext"] = "true",
                 ["Polizas:AllowHeaderExecutionContextOutsideDevelopment"] = "true",
+                ["Polizas:BrokerId"] = "84"
+            })
+            .Build();
+        var accessor = new HeaderPolizasExecutionContextAccessor(
+            new HttpContextAccessor { HttpContext = httpContext },
+            configuration,
+            ProductionEnvironment());
+
+        var current = accessor.Current;
+
+        current.Should().NotBeNull();
+        current!.BrokerId.Should().Be(84);
+    }
+
+    [Fact]
+    public void Current_can_enable_header_context_outside_development_with_explicit_demo_opt_in()
+    {
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Headers[HeaderPolizasExecutionContextAccessor.BrokerIdHeaderName] = "42";
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Polizas:AllowHeaderExecutionContext"] = "true",
+                ["Polizas:AllowHeaderExecutionContextOutsideDevelopment"] = "true",
+                [HeaderExecutionContextPolicy.DemoOptInKey] = HeaderExecutionContextPolicy.DemoOptInRequiredValue,
                 ["Polizas:BrokerId"] = "84"
             })
             .Build();

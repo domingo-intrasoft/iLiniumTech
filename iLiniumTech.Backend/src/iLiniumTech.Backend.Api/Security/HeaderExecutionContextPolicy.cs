@@ -23,8 +23,13 @@ public static class HeaderExecutionContextPolicy
             return false;
         }
 
-        return environment.IsDevelopment() ||
-            ReadBoolean(configuration, AllowOutsideDevelopmentKey, AllowOutsideDevelopmentEnvironmentKey);
+        if (environment.IsDevelopment())
+        {
+            return true;
+        }
+
+        return ReadBoolean(configuration, AllowOutsideDevelopmentKey, AllowOutsideDevelopmentEnvironmentKey) &&
+            HasDemoOptIn(configuration);
     }
 
     public static bool RequiresDemoOptInForReadiness(IConfiguration configuration, IHostEnvironment environment) =>

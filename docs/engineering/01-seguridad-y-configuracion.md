@@ -64,7 +64,7 @@ La SDD canonica para Fase 5 es [SDD-2026-005 Auth y permisos de producto](../sdd
 Reglas minimas hasta cerrar proveedor:
 
 - `X-ILiniumTech-Api-Key` y los headers MVP de broker/usuario/perfil son bootstrap de desarrollo/demo, no identidad de produccion.
-- `Polizas:AllowHeaderExecutionContextOutsideDevelopment=true` es excepcional: fuera de Development, `/ready` debe fallar salvo opt-in demo exacto `Polizas:AllowHeaderExecutionContextDemoOptIn=DEMO_ONLY_NOT_FOR_REAL_DATA` o `ILINIUMTECH__ALLOW_HEADER_EXECUTION_CONTEXT_DEMO_OPT_IN=DEMO_ONLY_NOT_FOR_REAL_DATA`.
+- `Polizas:AllowHeaderExecutionContextOutsideDevelopment=true` es excepcional: fuera de Development, el runtime debe ignorar headers MVP y `/ready` debe fallar salvo opt-in demo exacto `Polizas:AllowHeaderExecutionContextDemoOptIn=DEMO_ONLY_NOT_FOR_REAL_DATA` o `ILINIUMTECH__ALLOW_HEADER_EXECUTION_CONTEXT_DEMO_OPT_IN=DEMO_ONLY_NOT_FOR_REAL_DATA`.
 - En produccion, `currentUserId`, `currentBrokerId`, perfil, roles y permisos deben salir de claims o sesion backend validada.
 - Si coexisten headers MVP y auth real, los claims/sesion tienen prioridad y cualquier broker solicitado se valida contra los brokers permitidos del usuario.
 - 401 significa ausencia o invalidez de credenciales; 403 significa usuario autenticado sin broker, permiso o alcance suficiente.
