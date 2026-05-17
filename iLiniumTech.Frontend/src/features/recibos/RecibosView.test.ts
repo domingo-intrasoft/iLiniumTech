@@ -77,6 +77,7 @@ describe('RecibosView smoke', () => {
     expect(wrapper.text()).toContain('Importes demo anonimizados')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('3 recibos')
+    expect(wrapper.get('caption').text()).toContain('Recibos fixture read-only: 1-3 de 3 recibos')
     expect(wrapper.findAll('tbody tr')).toHaveLength(3)
     expect(wrapper.text()).toContain('REC-2026-0001')
     expect(wrapper.text()).toContain('Cliente anonimo 2')
@@ -87,6 +88,7 @@ describe('RecibosView smoke', () => {
     await settleRecibosView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 recibo')
+    expect(wrapper.get('caption').text()).toContain('Recibos fixture read-only: 1-1 de 1 recibo')
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('REC-2026-0002')
     expect(wrapper.text()).toContain('Cliente anonimo 2')

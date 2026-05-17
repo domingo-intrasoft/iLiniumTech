@@ -78,6 +78,9 @@ describe('LiquidacionesColaboradorView smoke', () => {
     expect(wrapper.text()).toContain('Comisiones y liquidos bloqueados')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('4 liquidaciones')
+    expect(wrapper.get('caption').text()).toContain(
+      'Liquidaciones de colaborador fixture read-only: 1-2 de 4 liquidaciones',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('LC-2026-0001')
     expect(wrapper.text()).toContain('Colaborador anonimo B')
@@ -110,6 +113,9 @@ describe('LiquidacionesColaboradorView smoke', () => {
     await settleLiquidacionesColaboradorView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 liquidacion')
+    expect(wrapper.get('caption').text()).toContain(
+      'Liquidaciones de colaborador fixture read-only: 1-1 de 1 liquidacion',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('LC-2026-0003')
     expect(wrapper.text()).toContain('Colaborador anonimo C')

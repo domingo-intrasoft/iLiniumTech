@@ -143,6 +143,10 @@ const firstVisible = computed(() =>
 )
 const lastVisible = computed(() => Math.min(pagination.page * pagination.pageSize, total.value))
 const resultLabel = computed(() => (total.value === 1 ? 'suplemento' : 'suplementos'))
+const tableCaption = computed(
+  () =>
+    `Suplementos fixture read-only: ${firstVisible.value}-${lastVisible.value} de ${total.value} ${resultLabel.value}. Datos sanitizados sin workflows ni API backend.`,
+)
 const canGoPrevious = computed(() => pagination.page > 1)
 const canGoNext = computed(() => pagination.page < totalPages.value)
 
@@ -407,6 +411,7 @@ async function signOut() {
 
       <div v-else class="table-scroll">
         <table>
+          <caption class="sr-only" v-text="tableCaption"></caption>
           <thead>
             <tr>
               <th scope="col">Acciones</th>

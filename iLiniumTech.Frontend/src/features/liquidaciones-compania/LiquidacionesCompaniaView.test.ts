@@ -79,6 +79,9 @@ describe('LiquidacionesCompaniaView smoke', () => {
     expect(wrapper.text()).toContain('Sin importes reales')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('4 liquidaciones')
+    expect(wrapper.get('caption').text()).toContain(
+      'Liquidaciones de compania fixture read-only: 1-2 de 4 liquidaciones',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.text()).toContain('LCIA-2026-0001')
     expect(wrapper.text()).toContain('LCIA-2026-0002')
@@ -112,6 +115,9 @@ describe('LiquidacionesCompaniaView smoke', () => {
     await settleLiquidacionesCompaniaView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 liquidacion')
+    expect(wrapper.get('caption').text()).toContain(
+      'Liquidaciones de compania fixture read-only: 1-1 de 1 liquidacion',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('LCIA-2026-0002')
     expect(wrapper.text()).toContain('Compania demo sur')

@@ -77,6 +77,9 @@ describe('PropuestasView smoke', () => {
     expect(wrapper.text()).toContain('Origen y SDD pendientes')
     expect(wrapper.text()).toContain('Modo fixture')
     expect(wrapper.get('.summary-header').text()).toContain('4 propuestas')
+    expect(wrapper.get('caption').text()).toContain(
+      'Propuestas fixture read-only: 1-4 de 4 propuestas',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(4)
     expect(wrapper.text()).toContain('PROP-2026-0001')
     expect(wrapper.text()).toContain('Solicitante anonimo 2')
@@ -100,6 +103,9 @@ describe('PropuestasView smoke', () => {
     await settlePropuestasView()
 
     expect(wrapper.get('.summary-header').text()).toContain('1 propuesta')
+    expect(wrapper.get('caption').text()).toContain(
+      'Propuestas fixture read-only: 1-1 de 1 propuesta',
+    )
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('PROP-2026-0002')
     expect(wrapper.text()).toContain('Hogar demo')
