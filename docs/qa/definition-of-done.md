@@ -2,7 +2,7 @@
 
 Este documento define la evidencia minima para considerar Done un cambio en iLiniumTech.
 
-Para cierres de fase o PRs con varias areas, usar tambien la plantilla operativa [phase-closure-checklist.md](phase-closure-checklist.md).
+Para localizar evidencia vigente, gates y bloqueos, empezar por [README.md](README.md). Para cierres de fase o PRs con varias areas, usar tambien la plantilla operativa [phase-closure-checklist.md](phase-closure-checklist.md).
 
 ## Done general
 

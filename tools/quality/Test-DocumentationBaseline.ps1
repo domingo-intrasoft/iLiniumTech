@@ -36,6 +36,12 @@ try {
         "docs/DECISION_PRODUCTO_ARQUITECTURA.md",
         "docs/engineering/README.md",
         "docs/engineering/08-quality-phase-7-dod.md",
+        "docs/qa/README.md",
+        "docs/qa/definition-of-done.md",
+        "docs/qa/e2e-smoke-coverage.md",
+        "docs/qa/phase-closure-checklist.md",
+        "docs/qa/mvp-login-menu-polizas-closure-2026-05-17.md",
+        "docs/qa/autonomous-progress-2026-05-17.md",
         "docs/sdd/templates/spec-template.md",
         "docs/sdd/templates/security-review-template.md",
         ".github/workflows/ci.yml",
@@ -75,6 +81,15 @@ try {
     Test-ContentPattern -Path "docs/ROADMAP_OBJETIVO_FINAL.md" -Pattern "iLiniumTech no es un runtime dinamico tipo AppBuilder" -Description "architecture decision"
     Test-ContentPattern -Path "docs/ROADMAP_OBJETIVO_FINAL.md" -Pattern "Jefe calidad, CI y documentacion" -Description "quality owner section"
     Test-ContentPattern -Path "docs/ROADMAP_OBJETIVO_FINAL.md" -Pattern "Bloqueos actuales" -Description "real environment blockers"
+    Test-ContentPattern -Path "docs/qa/README.md" -Pattern "Invoke-MvpQualityGate\.ps1 -RunFrontendE2E" -Description "strict QA closure gate"
+    Test-ContentPattern -Path "docs/qa/README.md" -Pattern "Autos Particulares.*aparcado" -Description "parked Autos Particulares warning"
+    Test-ContentPattern -Path "docs/qa/README.md" -Pattern "Bloqueado externo" -Description "external blocker classification"
+    Test-ContentPattern -Path "docs/qa/e2e-smoke-coverage.md" -Pattern "VITE_USE_BACKEND=false" -Description "fixture E2E mode"
+    Test-ContentPattern -Path "docs/qa/e2e-smoke-coverage.md" -Pattern "Riesgos residuales" -Description "E2E residual risks"
+    Test-ContentPattern -Path "docs/qa/phase-closure-checklist.md" -Pattern "Completado con evidencia" -Description "phase closure status taxonomy"
+    Test-ContentPattern -Path "docs/qa/phase-closure-checklist.md" -Pattern "Pendiente tecnico" -Description "phase closure status taxonomy"
+    Test-ContentPattern -Path "docs/qa/phase-closure-checklist.md" -Pattern "Bloqueado externo" -Description "phase closure status taxonomy"
+    Test-ContentPattern -Path "docs/qa/mvp-login-menu-polizas-closure-2026-05-17.md" -Pattern "DemoSession" -Description "MVP auth compatibility evidence"
     Test-ContentPattern -Path ".github/workflows/ci.yml" -Pattern "dotnet build" -Description "backend build in CI"
     Test-ContentPattern -Path ".github/workflows/ci.yml" -Pattern "npm run format" -Description "frontend format in CI"
     Test-ContentPattern -Path ".github/workflows/ci.yml" -Pattern "npm run lint" -Description "frontend lint in CI"
