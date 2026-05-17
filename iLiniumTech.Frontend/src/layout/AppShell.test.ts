@@ -83,4 +83,36 @@ describe('AppShell', () => {
     expect(sideMenu.attributes('inert')).toBeUndefined()
     expect(menuButton.attributes('aria-expanded')).toBe('true')
   })
+
+  it('moves focus to the target content when the skip link is activated', async () => {
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+
+    const wrapper = mount(AppShell, {
+      attachTo: host,
+      props: {
+        contentId: 'content',
+        sectionTitle: 'Polizas',
+        sessionLabel: 'Modo local',
+      },
+      slots: {
+        default: '<section id="content">Contenido principal</section>',
+      },
+      global: {
+        stubs: {
+          AppSideMenu: true,
+        },
+      },
+    })
+
+    await wrapper.get('.skip-link').trigger('click')
+
+    const content = host.querySelector<HTMLElement>('#content')
+    expect(content).not.toBeNull()
+    expect(content?.getAttribute('tabindex')).toBe('-1')
+    expect(document.activeElement).toBe(content)
+
+    wrapper.unmount()
+    host.remove()
+  })
 })

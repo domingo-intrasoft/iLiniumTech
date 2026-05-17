@@ -10,7 +10,7 @@ const emit = defineEmits<{
 
 const sideMenuOpen = ref(true)
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     contentId: string
     sectionTitle: string
@@ -46,11 +46,27 @@ function onBrokerSelection(event: Event) {
 function toggleSideMenu() {
   sideMenuOpen.value = !sideMenuOpen.value
 }
+
+function focusMainContent(event: MouseEvent) {
+  const content = document.getElementById(props.contentId)
+
+  if (!content) {
+    return
+  }
+
+  event.preventDefault()
+
+  if (!content.hasAttribute('tabindex')) {
+    content.setAttribute('tabindex', '-1')
+  }
+
+  content.focus({ preventScroll: false })
+}
 </script>
 
 <template>
   <main class="ilinium-shell" :class="{ 'menu-collapsed': !sideMenuOpen }">
-    <a class="skip-link" :href="`#${contentId}`">Saltar al contenido</a>
+    <a class="skip-link" :href="`#${contentId}`" @click="focusMainContent">Saltar al contenido</a>
     <AppSideMenu
       id="app-side-menu"
       :aria-hidden="!sideMenuOpen"
