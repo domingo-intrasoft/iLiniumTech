@@ -52,6 +52,8 @@ const router = useRouter()
 const { userLabel, logout } = useAuthSession()
 const isBackendMode = import.meta.env.VITE_USE_BACKEND === 'true'
 const dataOriginLabel = computed(() => (isBackendMode ? 'API polizas' : 'Fixture local'))
+const blockedToolbarActionDescription =
+  'Accion bloqueada en el MVP read-only hasta SDD, contrato API, permisos y UAT.'
 const POLIZAS_DETAIL_PERMISSION = 'polizas.detail'
 const brokerChanging = ref(false)
 const brokerError = ref<string | null>(null)
@@ -422,6 +424,9 @@ onMounted(() => {
   >
     <div id="polizas-content" class="polizas-toolbar">
       <h1 class="sr-only">Polizas</h1>
+      <p id="polizas-toolbar-blocked-actions" class="sr-only">
+        {{ blockedToolbarActionDescription }}
+      </p>
       <div class="toolbar-groups">
         <div class="action-group">
           <button
@@ -431,6 +436,8 @@ onMounted(() => {
             :class="{ active: action.active }"
             type="button"
             :aria-label="action.label"
+            :title="blockedToolbarActionDescription"
+            aria-describedby="polizas-toolbar-blocked-actions"
             disabled
           >
             <i :class="action.icon" aria-hidden="true"></i>
@@ -443,6 +450,8 @@ onMounted(() => {
             class="square-action dark"
             type="button"
             :aria-label="action.label"
+            :title="blockedToolbarActionDescription"
+            aria-describedby="polizas-toolbar-blocked-actions"
             disabled
           >
             <i :class="action.icon" aria-hidden="true"></i>

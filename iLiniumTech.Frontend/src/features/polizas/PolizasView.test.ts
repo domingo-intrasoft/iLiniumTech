@@ -129,6 +129,11 @@ describe('PolizasView smoke', () => {
     expect(wrapper.text()).toContain('Solo lectura')
     expect(wrapper.text()).toContain('Fixture local')
     expect(wrapper.text()).toContain('Modo local')
+    expect(wrapper.get('#polizas-toolbar-blocked-actions').text()).toContain('MVP read-only')
+    expect(wrapper.get('button[aria-label="Autos"]').attributes('aria-describedby')).toBe(
+      'polizas-toolbar-blocked-actions',
+    )
+    expect(wrapper.get('button[aria-label="Validar"]').attributes('title')).toContain('UAT')
     expect(wrapper.get('.context-buttons a[href="/polizas/flotas"]').text()).toContain(
       'Polizas de flota',
     )
