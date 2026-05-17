@@ -9,6 +9,7 @@ Indice vivo para localizar evidencias, gates y bloqueos del MVP. Este documento 
 - [e2e-smoke-coverage.md](e2e-smoke-coverage.md): matriz de smokes Playwright y reglas para ampliarlos.
 - [mvp-login-menu-polizas-closure-2026-05-17.md](mvp-login-menu-polizas-closure-2026-05-17.md): cierre operativo vigente de login, menu y Polizas.
 - [autonomous-progress-2026-05-17.md](autonomous-progress-2026-05-17.md): log de incrementos autonomos y comandos ejecutados.
+- [autonomous-progress-2026-05-18.md](autonomous-progress-2026-05-18.md): continuacion autonoma con evidencias tras el cambio de dia local.
 
 ## Evidencia por area
 
@@ -21,7 +22,7 @@ Indice vivo para localizar evidencias, gates y bloqueos del MVP. Este documento 
 | Paginas fixture de dominio | [domain-fixtures-smoke-evidence.md](domain-fixtures-smoke-evidence.md), [clientes-mvp-evidence.md](clientes-mvp-evidence.md), [siniestros-mvp-evidence.md](siniestros-mvp-evidence.md), [agenda-mvp-evidence.md](agenda-mvp-evidence.md), [propuestas-mvp-evidence.md](propuestas-mvp-evidence.md), [recibos-suplementos-mvp-evidence.md](recibos-suplementos-mvp-evidence.md), [liquidaciones-compania-mvp-evidence.md](liquidaciones-compania-mvp-evidence.md), [liquidaciones-colaborador-mvp-evidence.md](liquidaciones-colaborador-mvp-evidence.md) | Validar rutas protegidas read-only, fixtures locales, filtros locales y ausencia de llamadas backend. |
 | Superficies bloqueadas | [blocked-technical-pages-smoke-evidence.md](blocked-technical-pages-smoke-evidence.md), [administracion-configuracion-mvp-evidence.md](administracion-configuracion-mvp-evidence.md), [conectividad-logs-byaunna-mvp-evidence.md](conectividad-logs-byaunna-mvp-evidence.md), [controles-estadisticas-mvp-evidence.md](controles-estadisticas-mvp-evidence.md), [informes-mvp-evidence.md](informes-mvp-evidence.md) | Validar que paginas sensibles siguen bloqueadas hasta SDD/API/permisos/UAT. |
 | Autos Particulares | [autos-particulares-mvp-evidence.md](autos-particulares-mvp-evidence.md) | Mantener trazabilidad del incremento tecnico aparcado; no reactivarlo sin decision de producto, SDD, DBA/UAT y permisos. |
-| Gobierno y cierre | [mvp-documentation-governance-review-2026-05-17.md](mvp-documentation-governance-review-2026-05-17.md), [autonomous-progress-2026-05-17.md](autonomous-progress-2026-05-17.md) | Revisar convenciones de evidencia, riesgos residuales y siguientes pasos. |
+| Gobierno y cierre | [mvp-documentation-governance-review-2026-05-17.md](mvp-documentation-governance-review-2026-05-17.md), [autonomous-progress-2026-05-17.md](autonomous-progress-2026-05-17.md), [autonomous-progress-2026-05-18.md](autonomous-progress-2026-05-18.md) | Revisar convenciones de evidencia, riesgos residuales y siguientes pasos. |
 
 ## Comandos recomendados
 
