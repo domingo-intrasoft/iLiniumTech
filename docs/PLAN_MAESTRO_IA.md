@@ -20,8 +20,9 @@ Si una tarea pide algo que no encaja con este principio o no tiene sentido dentr
 Base entregada:
 
 - Gobierno inicial: `AGENTS.md`, `PLANS.md`, DoD, workflow IA, roadmap, SDD y gates locales.
-- Frontend: Vue 3 + Vite + TypeScript con `/login`, shell estatico, menu lateral, `/polizas`, detalle de poliza y ruta tecnica `/autos-particulares`.
+- Frontend: Vue 3 + Vite + TypeScript con `/login`, shell estatico, menu lateral, `/polizas`, detalle de poliza y paginas protegidas estaticas del menu. `Autos Particulares` existe como ruta tecnica aparcada/deshabilitada.
 - Backend: API .NET con `/health`, `/ready`, `/api/auth/login`, `/api/auth/logout`, `/api/me`, `/api/polizas/catalogs`, `/api/polizas`, `/api/polizas/{id}` y politicas iniciales `polizas.catalogs`, `polizas.read`, `polizas.detail`.
+- Broker activo: selector frontend y `POST /api/auth/broker` entregados para `DemoSession`, validando contra `allowedBrokerIds`, releyendo `/api/me` y refrescando Polizas.
 - Datos: repositorio `InMemory` por defecto, repositorio SQL read-only activable por configuracion, resolver `AppBuilderMaster`, whitelists, parametros y `SESSION_CONTEXT` parametrizado.
 - Seguridad MVP: API key temporal, `DemoSession` y headers MVP clasificados como compatibilidad local/demo, no como auth productiva.
 - QA/CI: gate local, validacion documental, auditorias de secretos/dependencias/CORS, CI baseline, CodeQL y preview dry-run.
@@ -30,6 +31,7 @@ Base entregada:
 Puntos aparcados o no cerrados:
 
 - `Autos Particulares` existe como incremento tecnico anterior, pero no es el objetivo MVP actual. No debe ampliarse ni presentarse como objetivo principal sin nueva confirmacion funcional, SDD y UAT.
+- Las paginas estaticas del menu son visibles para orientar navegacion y pruebas, pero estan bloqueadas para datos reales, filtros funcionales, escrituras, exportaciones, permisos finos o APIs propias hasta SDD/API/UAT.
 - La autenticacion productiva no esta decidida.
 - Falta matriz real de permisos por broker, perfil, oficina, gestor y usuario.
 - Falta validar SQL contra BBDD autorizada y confirmar claves de `SESSION_CONTEXT` con DBA.

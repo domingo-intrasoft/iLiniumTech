@@ -30,11 +30,9 @@ builder.Services.AddAuthentication(options =>
     .AddPolicyScheme(AuthenticationSchemes.ApiKeyOrDemoSession, "API key or demo session", options =>
     {
         options.ForwardDefaultSelector = context =>
-            context.Request.Headers.ContainsKey(ApiKeyAuthenticationHandler.HeaderName)
-                ? ApiKeyAuthenticationHandler.SchemeName
-                : context.Request.Cookies.ContainsKey(AuthenticationSchemes.DemoSessionCookieName)
-                    ? AuthenticationSchemes.DemoSession
-                    : ApiKeyAuthenticationHandler.SchemeName;
+            context.Request.Cookies.ContainsKey(AuthenticationSchemes.DemoSessionCookieName)
+                ? AuthenticationSchemes.DemoSession
+                : ApiKeyAuthenticationHandler.SchemeName;
     })
     .AddCookie(AuthenticationSchemes.DemoSession, options =>
     {

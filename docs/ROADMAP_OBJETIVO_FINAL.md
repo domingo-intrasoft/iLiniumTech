@@ -20,10 +20,12 @@ Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. L
 
 - Fase documental y decision de arquitectura: completada.
 - MVP read-only de polizas: implementado con frontend Vue, backend API, fixtures anonimizados, API key temporal y pruebas base.
+- Menu lateral y paginas estaticas protegidas: rutas Vue bajo `src/features/*` para las entradas principales del menu, con contenido read-only/fixture local o superficies bloqueadas. No equivalen a datos reales, APIs nuevas ni paridad AppBuilder.
 - Autos Particulares existe como incremento tecnico anterior documentado en `SDD-2026-006`, pero queda aparcado y no es el objetivo MVP vigente. No debe ampliarse ni presentarse como objetivo principal sin nueva confirmacion funcional, SDD actualizada y UAT.
 - Repositorio SQL read-only: implementado como backend configurable, parametrizado y con whitelist; pendiente de validar contra entorno real autorizado y auth real.
 - Extractor offline de metadata: implementado en `tools/extractor/polizas-metadata` con modos `Fixture`, `DryRun` y `Live`; pendiente de validar modo `Live` contra entorno autorizado y politica final de artefactos.
 - Frontend polizas: protegido por configuracion runtime y contexto `/api/me`; no consulta backend si falta API key temporal, sesion demo o contexto de broker requerido.
+- Broker activo MVP: `POST /api/auth/broker` y selector frontend entregados para `DemoSession`, con validacion contra `allowedBrokerIds`, relectura de `/api/me` e invalidacion/refresco de Polizas.
 - CI GitHub: baseline disponible con `ci.yml`, `security.yml`, PR template e issue form SDD.
 - Gate local fase 7: disponible y actualizado en `tools/quality/Invoke-MvpQualityGate.ps1` con backend, frontend, smoke, auditorias, validacion documental y `git diff --check`.
 - Fase 7 plataforma: CI publica artefacto de calidad documental, seguridad tiene schedule, CodeQL esta definido y preview queda como dry-run manual sin secrets ni deploy real.

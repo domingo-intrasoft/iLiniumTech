@@ -199,6 +199,16 @@ select:focus-visible {
   background: #edf3f8;
 }
 
+.ilinium-shell.menu-collapsed {
+  grid-template-columns: 0 minmax(0, 1fr);
+}
+
+.ilinium-shell.menu-collapsed .il-sidebar {
+  width: 0;
+  min-width: 0;
+  visibility: hidden;
+}
+
 .il-sidebar {
   position: sticky;
   top: 0;
@@ -1328,6 +1338,10 @@ tbody tr:hover {
 
   .ilinium-shell {
     grid-template-columns: 1fr;
+  }
+
+  .ilinium-shell.menu-collapsed .il-sidebar {
+    display: none;
   }
 
   .il-sidebar {

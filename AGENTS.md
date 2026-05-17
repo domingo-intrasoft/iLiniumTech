@@ -40,7 +40,9 @@ Backend:
 Frontend:
 
 - Proyecto en `iLiniumTech.Frontend`.
-- Feature principal actual: `src/features/polizas`.
+- Feature funcional principal actual: `src/features/polizas`.
+- Paginas estaticas protegidas del menu en `src/features/*`; son superficies MVP read-only y no autorizan datos reales, APIs nuevas ni acciones sin SDD.
+- `src/features/autos-particulares` existe como incremento tecnico aparcado; no ampliarlo sin decision de producto, SDD actualizada y UAT/DBA.
 - Servicios compartidos en `src/services`.
 - La UI de pantallas es Vue/TypeScript mantenido como codigo fuente, no metadata runtime.
 - Node requerido: `>=20.19.0`.

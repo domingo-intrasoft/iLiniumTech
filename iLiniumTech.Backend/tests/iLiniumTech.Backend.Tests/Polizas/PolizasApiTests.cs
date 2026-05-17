@@ -564,6 +564,28 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Demo_session_permissions_take_precedence_over_api_key_when_both_are_present()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Catalogs
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "permission-denied-with-api-key");
+
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        body.Should().Contain("POLIZAS_ACCESS_DENIED");
+        body.Should().Contain("\"correlationId\":\"permission-denied-with-api-key\"");
+        body.Should().NotContain(PolizasPermissions.Read);
+        body.Should().NotContain("test-key");
+    }
+
+    [Fact]
     public async Task Demo_session_with_catalogs_permission_can_read_catalogs()
     {
         await using var factory = new TestApiFactory(new Dictionary<string, string?>
@@ -637,6 +659,34 @@ public sealed class PolizasApiTests
         body.Should().NotContain("42");
         body.Should().NotContain("84");
         body.Should().NotContain(PolizasPermissions.Read);
+    }
+
+    [Fact]
+    public async Task Demo_session_broker_validation_takes_precedence_over_api_key_when_both_are_present()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        var cookie = CreateDemoSessionCookie(
+            factory,
+            currentBrokerId: 42,
+            allowedBrokerIds: [84],
+            permissions: [PolizasPermissions.Catalogs, PolizasPermissions.Read, PolizasPermissions.Detail]);
+        client.DefaultRequestHeaders.Add(
+            "Cookie",
+            $"{ApiAuthenticationSchemes.DemoSessionCookieName}={cookie}");
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "broker-not-allowed-with-api-key");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("broker-not-allowed-with-api-key");
+        body.Should().Contain("POLIZAS_BROKER_FORBIDDEN");
+        body.Should().Contain("\"correlationId\":\"broker-not-allowed-with-api-key\"");
+        body.Should().NotContain("42");
+        body.Should().NotContain("84");
+        body.Should().NotContain("test-key");
     }
 
     [Fact]

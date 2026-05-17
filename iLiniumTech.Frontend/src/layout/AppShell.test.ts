@@ -44,4 +44,36 @@ describe('AppShell', () => {
 
     expect(wrapper.find('select[aria-label="Broker activo"]').exists()).toBe(false)
   })
+
+  it('toggles the static side menu from the topbar control', async () => {
+    const wrapper = mount(AppShell, {
+      props: {
+        contentId: 'content',
+        sectionTitle: 'Polizas',
+        sessionLabel: 'Modo local',
+      },
+      global: {
+        stubs: {
+          AppSideMenu: true,
+        },
+      },
+    })
+
+    const menuButton = wrapper.get('button[aria-controls="app-side-menu"]')
+
+    expect(wrapper.get('main').classes()).not.toContain('menu-collapsed')
+    expect(menuButton.attributes('aria-expanded')).toBe('true')
+    expect(menuButton.attributes('aria-label')).toBe('Ocultar menu')
+
+    await menuButton.trigger('click')
+
+    expect(wrapper.get('main').classes()).toContain('menu-collapsed')
+    expect(menuButton.attributes('aria-expanded')).toBe('false')
+    expect(menuButton.attributes('aria-label')).toBe('Mostrar menu')
+
+    await menuButton.trigger('click')
+
+    expect(wrapper.get('main').classes()).not.toContain('menu-collapsed')
+    expect(menuButton.attributes('aria-expanded')).toBe('true')
+  })
 })

@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
 import AppSideMenu from './AppSideMenu.vue'
 
 const emit = defineEmits<{
   signOut: []
   brokerChange: [brokerId: number]
 }>()
+
+const sideMenuOpen = ref(true)
 
 withDefaults(
   defineProps<{
@@ -38,17 +42,29 @@ function onBrokerSelection(event: Event) {
     emit('brokerChange', selectedBrokerId)
   }
 }
+
+function toggleSideMenu() {
+  sideMenuOpen.value = !sideMenuOpen.value
+}
 </script>
 
 <template>
-  <main class="ilinium-shell">
+  <main class="ilinium-shell" :class="{ 'menu-collapsed': !sideMenuOpen }">
     <a class="skip-link" :href="`#${contentId}`">Saltar al contenido</a>
-    <AppSideMenu />
+    <AppSideMenu id="app-side-menu" :aria-hidden="!sideMenuOpen" />
 
     <section class="workspace">
       <header class="workspace-topbar">
         <div class="breadcrumb-line">
-          <button class="icon-button" type="button" aria-label="Menu">
+          <button
+            class="icon-button"
+            type="button"
+            :aria-label="sideMenuOpen ? 'Ocultar menu' : 'Mostrar menu'"
+            aria-controls="app-side-menu"
+            :aria-expanded="sideMenuOpen"
+            :title="sideMenuOpen ? 'Ocultar menu' : 'Mostrar menu'"
+            @click="toggleSideMenu"
+          >
             <i class="pi pi-bars" aria-hidden="true"></i>
           </button>
           <strong>Inicio</strong>

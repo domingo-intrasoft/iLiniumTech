@@ -46,6 +46,18 @@ dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Relea
 - No se consume metadata AppBuilder como contrato runtime.
 - Si cambia UI visible, hay smoke manual o automatizado.
 
+### Paginas estaticas del menu
+
+Aplican a rutas del menu que todavia no tienen contrato backend funcional.
+
+- La ruta existe como Vue/TypeScript explicito y protegido por guard de sesion.
+- La pagina declara de forma honesta que es MVP estatico, fixture local, read-only o superficie bloqueada.
+- No crea servicios API, DTOs operativos, filtros reales, exportaciones, escrituras, permisos nuevos ni llamadas a backend sin SDD.
+- Acciones, botones sensibles o flujos futuros estan deshabilitados o marcados como no operativos.
+- No expone datos personales reales, importes reales, secretos, endpoints internos, SQL, connection strings ni payloads sensibles.
+- Si se toca la pagina, hay test de vista/ruta y smoke visual cuando cambie el layout o la navegacion.
+- La evidencia QA referencia el bloqueo para datos reales y el documento de readiness de la pagina.
+
 Comandos:
 
 ```powershell
