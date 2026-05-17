@@ -46,7 +46,7 @@ Fuera de alcance confirmado:
 | Acciones heredadas de filtros | Completado con evidencia | `PolizasFilters` mantiene bloqueadas acciones sin contrato (`Guardar busqueda`, modos avanzado/simple, agregar filtros, opciones por campo) y expone motivo accesible por SDD/API/permisos/UAT. | No habilitar acciones, busquedas guardadas ni filtros avanzados sin SDD, contrato API y UAT. | Frontend / UX |
 | Toolbar superior Polizas | Completado con evidencia | Acciones superiores heredadas (`Autos`, `Gestion`, `Favoritos`, `Servicios`, `Riesgos`, `Validar`, `Pausar`, `Cerrar`) siguen deshabilitadas y describen bloqueo MVP read-only. | No activar workflows, validaciones ni cambios de estado sin SDD, permisos, API y UAT. | Frontend / UX |
 | Accesos scopes Polizas | Completado con evidencia | Los accesos superiores a Flotas y Colectivas navegan a paginas estaticas bloqueadas por SDD; Polizas Externas permanece deshabilitado. Todos describen que no cargan datos ni activan permisos sin SDD/API/UAT. | No activar datos, filtros ni permisos de scopes sin SDD/API/UAT. | Frontend / UX |
-| Detalle prevalidado | Completado con evidencia | La UI valida sesion, broker requerido y `polizas.detail` antes de consultar detalle en modo backend; si falta permiso, el listado muestra motivo visible y acciones deshabilitadas con descripcion accesible. El detalle conserva breadcrumb semantico con pagina actual marcada. | Completar UAT con matriz real de permisos cuando exista. | Frontend / Backend |
+| Detalle prevalidado | Completado con evidencia | La UI valida sesion, broker requerido y `polizas.detail` antes de consultar detalle en modo backend; si falta permiso, el listado muestra motivo visible y acciones deshabilitadas con descripcion accesible. El detalle conserva breadcrumb semantico con pagina actual marcada y vuelta con filtros/paginacion de origen. | Completar UAT con matriz real de permisos cuando exista. | Frontend / Backend |
 | Cambio broker demo | Completado MVP | `POST /api/auth/broker` exige `demo-session`, valida `allowedBrokerIds`, reemite cookie y no acepta API key sola. | Retirar o reemplazar en auth productiva. | Backend / Datos |
 | Seguridad / privacidad | Completado con gate local | Gate completo, secret scan, dependencia, CORS, build, tests, E2E y smoke sin findings bloqueantes. | Repetir en PR/CI. | QA / Seguridad |
 | UAT | Bloqueado externo | Requiere entorno autorizado y responsable funcional si se valida contra datos reales. | Registrar UAT o bloqueo DBA/funcional. | Producto / DBA |
@@ -83,6 +83,7 @@ Fuera de alcance confirmado:
 - Una poliza inexistente, no autorizada o de broker cruzado no debe revelar si existe.
 - 401/403/404 esperados deben incluir mensaje publico sanitizado y `correlationId` cuando aplique.
 - El boton/enlace de vuelta desde detalle debe conservar filtros y paginacion de origen cuando la navegacion venga desde `/polizas`.
+- El enlace de vuelta debe explicar de forma accesible que conserva filtros y paginacion cuando existen en la URL.
 - En modo backend real/demo, un fallo de API o configuracion no debe caer silenciosamente a fixtures.
 
 ### Cambio de broker demo, si backend lo entrega
@@ -158,7 +159,7 @@ Resultado del gate:
 | Frontend filtros bloqueados | Unit tests de acciones heredadas bloqueadas, campos fuera de contrato y busqueda sin contexto. | Botones y campos deshabilitados explican motivo por `aria-describedby`/`title`; no emiten busqueda si falta contexto. |
 | Frontend toolbar bloqueada | Unit test de acciones superiores heredadas. | Botones de toolbar deshabilitados describen bloqueo MVP read-only sin activar workflows. |
 | Frontend scopes Polizas | Unit test de shortcuts y smoke E2E de navegacion a Flotas. | Flotas/Colectivas solo abren paginas estaticas bloqueadas; Externas sigue sin accion; todos explican que no cargan datos ni permisos. |
-| Frontend detalle | Tests de entrada directa, sin sesion, sin `polizas.detail`, breadcrumb y vuelta conservando filtros. | No se consulta detalle si falta sesion/contexto/permiso; error visible seguro; ruta actual marcada con `aria-current`. |
+| Frontend detalle | Tests de entrada directa, sin sesion, sin `polizas.detail`, breadcrumb y vuelta conservando filtros. | No se consulta detalle si falta sesion/contexto/permiso; error visible seguro; ruta actual marcada con `aria-current`; vuelta describe filtros/paginacion conservados. |
 | Frontend contexto detalle | Test de detalle con broker valido, broker ausente y permiso ausente. | Badge superior refleja broker activo o estado de atencion sin ocultar el error principal. |
 | Frontend listado sin detalle | Tests de tabla/listado con `polizas.read` sin `polizas.detail`. | Acciones de detalle deshabilitadas, sin enlaces navegables y con motivo visible/accesible. |
 | Backend permisos | Tests de `polizas.catalogs`, `polizas.read`, `polizas.detail`, broker ausente y broker cruzado. | 401/403 sanitizados con `correlationId`; sin lectura de repositorio si falla autorizacion. |
