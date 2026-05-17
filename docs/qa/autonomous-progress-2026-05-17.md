@@ -52,6 +52,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `c88e275` | QA gobierno | Indice operativo `docs/qa/README.md` creado y protegido por baseline documental. |
 | `377e20e` | Frontend accesibilidad | `MvpPageShell` evita `<main>` anidado en scopes estaticos y conserva destino del skip link. |
 | `b9444eb` | Frontend accesibilidad | Tablas fixture de Clientes y Siniestros incorporan captions accesibles con rango, total y alcance read-only. |
+| `2eb5b17` | Frontend accesibilidad | Tablas fixture restantes del smoke de dominio incorporan captions accesibles coherentes con rango, total y alcance read-only. |
 
 ## Validaciones ejecutadas
 
@@ -406,6 +407,18 @@ Validacion adicional tras captions accesibles en tablas fixture:
 - `npm run build`: OK.
 - Primer `npm run test:e2e -- domain-fixtures`: fallo por selector amplio que encontraba tambien el `caption` accesible de Siniestros; se ajusto el smoke a texto exacto visible.
 - `npm run test:e2e -- domain-fixtures`: `1` smoke OK con `CI=1`, incluyendo `/clientes` y `/siniestros`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras captions accesibles en tablas fixture restantes del smoke de dominio:
+
+- `npx vitest run src/features/agenda/AgendaView.test.ts src/features/propuestas/PropuestasView.test.ts src/features/recibos/RecibosView.test.ts src/features/suplementos/SuplementosView.test.ts src/features/liquidaciones-compania/LiquidacionesCompaniaView.test.ts src/features/liquidaciones-colaborador/LiquidacionesColaboradorView.test.ts`: `22/22` tests OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run test:unit`: `195/195` tests OK.
+- `npm run build`: OK.
+- `npm run test:e2e -- domain-fixtures`: `1` smoke OK con `CI=1`, incluyendo Agenda, Propuestas, Recibos, Suplementos y Liquidaciones.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
