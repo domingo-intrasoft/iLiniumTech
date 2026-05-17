@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { loginDemo } from './auth'
+import { blockBackendRequests, expectNoBackendRequests } from './networkGuards'
 
 const forbiddenRuntimeLeaks =
   /connectionString|SELECT \*|QueryStatic|ComponentDataSource|IAP_|Pantalla_|appsettings/i
@@ -125,20 +126,7 @@ async function assertBlockedPage(page: Page, smokeCase: BlockedPageSmokeCase) {
 test('blocked technical MVP pages remain read-only and do not expose secrets or backend calls', async ({
   page,
 }) => {
-  const backendRequests: string[] = []
-
-  await page.route('**/api/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
-  await page.route('http://localhost:5146/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
-  await page.route('http://127.0.0.1:5146/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
+  const backendRequests = await blockBackendRequests(page)
 
   await loginDemo(page, blockedPageSmokeCases[0]!.path)
 
@@ -146,5 +134,5 @@ test('blocked technical MVP pages remain read-only and do not expose secrets or 
     await assertBlockedPage(page, smokeCase)
   }
 
-  expect(backendRequests).toEqual([])
+  expectNoBackendRequests(backendRequests)
 })

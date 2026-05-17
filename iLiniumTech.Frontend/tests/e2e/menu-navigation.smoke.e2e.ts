@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 import { loginDemo } from './auth'
+import { blockBackendRequests, expectNoBackendRequests } from './networkGuards'
 
 const forbiddenRuntimeLeaks =
   /connectionString|SELECT \*|AppBuilder|QueryStatic|ComponentDataSource|IAP_|Pantalla_|metadata/i
@@ -8,20 +9,7 @@ const forbiddenRuntimeLeaks =
 test('side menu exposes maturity states and navigates MVP routes without backend calls', async ({
   page,
 }) => {
-  const backendRequests: string[] = []
-
-  await page.route('**/api/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
-  await page.route('http://localhost:5146/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
-  await page.route('http://127.0.0.1:5146/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
+  const backendRequests = await blockBackendRequests(page)
 
   await loginDemo(page, '/polizas')
 
@@ -75,5 +63,5 @@ test('side menu exposes maturity states and navigates MVP routes without backend
   await expect(page.getByText('Scope aparcado hasta SDD')).toBeVisible()
 
   await expect(page.locator('body')).not.toContainText(forbiddenRuntimeLeaks)
-  expect(backendRequests).toEqual([])
+  expectNoBackendRequests(backendRequests)
 })

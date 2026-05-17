@@ -1,26 +1,14 @@
 import { expect, test } from '@playwright/test'
 
 import { loginDemo } from './auth'
+import { blockBackendRequests, expectNoBackendRequests } from './networkGuards'
 
 const forbiddenRuntimeLeaks = /connectionString|SELECT \*|AppBuilder|QueryStatic|Pantalla_Polizas/i
 
 test('polizas smoke uses local fixture without leaking AppBuilder runtime details', async ({
   page,
 }) => {
-  const backendRequests: string[] = []
-
-  await page.route('**/api/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
-  await page.route('http://localhost:5146/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
-  await page.route('http://127.0.0.1:5146/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
+  const backendRequests = await blockBackendRequests(page)
 
   await loginDemo(page, '/polizas')
 
@@ -65,5 +53,5 @@ test('polizas smoke uses local fixture without leaking AppBuilder runtime detail
   await expect(page.getByRole('link', { name: 'POL-2026-0001', exact: true })).toBeVisible()
   await expect(page.getByRole('link', { name: 'POL-2026-0002', exact: true })).toBeVisible()
   await expect(page.locator('body')).not.toContainText(forbiddenRuntimeLeaks)
-  expect(backendRequests).toEqual([])
+  expectNoBackendRequests(backendRequests)
 })

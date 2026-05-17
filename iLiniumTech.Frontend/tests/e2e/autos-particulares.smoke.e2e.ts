@@ -1,26 +1,14 @@
 import { expect, test } from '@playwright/test'
 
 import { loginDemo } from './auth'
+import { blockBackendRequests, expectNoBackendRequests } from './networkGuards'
 
 const forbiddenRuntimeLeaks =
   /connectionString|SELECT \*|AppBuilder|QueryStatic|Pantalla_Polizas|metadata/i
 const forbiddenVehicleLeaks = /\b\d{4}\s?[A-Z]{3}\b/
 
 test('autos particulares smoke uses local fixture and blocks backend calls', async ({ page }) => {
-  const backendRequests: string[] = []
-
-  await page.route('**/api/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
-  await page.route('http://localhost:5146/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
-  await page.route('http://127.0.0.1:5146/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
+  const backendRequests = await blockBackendRequests(page)
 
   await loginDemo(page, '/autos-particulares')
 
@@ -49,5 +37,5 @@ test('autos particulares smoke uses local fixture and blocks backend calls', asy
   await expect(page.getByText('AUTO-2026-0002')).toBeVisible()
   await expect(page.locator('body')).not.toContainText(forbiddenRuntimeLeaks)
   await expect(page.locator('body')).not.toContainText(forbiddenVehicleLeaks)
-  expect(backendRequests).toEqual([])
+  expectNoBackendRequests(backendRequests)
 })

@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { loginDemo } from './auth'
+import { blockBackendRequests, expectNoBackendRequests } from './networkGuards'
 
 const forbiddenRuntimeLeaks =
   /connectionString|SELECT \*|QueryStatic|ComponentDataSource|IAP_|Pantalla_|metadata|appsettings/i
@@ -104,20 +105,7 @@ async function assertFixtureDomainPage(page: Page, smokeCase: DomainSmokeCase) {
 test('domain fixture MVP pages stay read-only, filter locally, and avoid backend calls', async ({
   page,
 }) => {
-  const backendRequests: string[] = []
-
-  await page.route('**/api/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
-  await page.route('http://localhost:5146/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
-  await page.route('http://127.0.0.1:5146/**', async (route) => {
-    backendRequests.push(route.request().url())
-    await route.abort()
-  })
+  const backendRequests = await blockBackendRequests(page)
 
   await loginDemo(page, domainSmokeCases[0]!.path)
 
@@ -125,5 +113,5 @@ test('domain fixture MVP pages stay read-only, filter locally, and avoid backend
     await assertFixtureDomainPage(page, smokeCase)
   }
 
-  expect(backendRequests).toEqual([])
+  expectNoBackendRequests(backendRequests)
 })
