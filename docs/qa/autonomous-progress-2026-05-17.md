@@ -28,7 +28,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `75d55a4` | Frontend accesibilidad | Skip link del shell mueve foco real al contenido principal y crea `tabindex=-1` si falta. |
 | `3664c64` | QA docs | Gate local completo registrado tras los incrementos autonomos. |
 | `a32a23a` | QA docs | Log autonomo alineado con commits cerrados. |
-| Bloque actual | Frontend Polizas | Listado explica de forma visible/accesible cuando `polizas.detail` no permite abrir detalle. |
+| `7916670` | Frontend Polizas | Listado explica de forma visible/accesible cuando `polizas.detail` no permite abrir detalle. |
 
 ## Validaciones ejecutadas
 
