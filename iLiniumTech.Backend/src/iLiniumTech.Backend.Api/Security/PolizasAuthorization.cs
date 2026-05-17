@@ -9,6 +9,15 @@ public static class PolizasPermissions
     public const string Catalogs = "polizas.catalogs";
     public const string Read = "polizas.read";
     public const string Detail = "polizas.detail";
+
+    private static readonly HashSet<string> ActivePermissions = new(StringComparer.Ordinal)
+    {
+        Catalogs,
+        Read,
+        Detail
+    };
+
+    public static bool IsActive(string permission) => ActivePermissions.Contains(permission);
 }
 
 public static class PolizasAuthorizationPolicies

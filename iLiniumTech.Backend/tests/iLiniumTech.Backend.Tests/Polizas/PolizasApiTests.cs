@@ -733,6 +733,60 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Demo_session_ignores_unknown_configured_permissions()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Catalogs,
+            ["Auth:Demo:Permissions:1"] = "polizas.export",
+            ["Auth:Demo:Permissions:2"] = "admin.security.view"
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain(PolizasPermissions.Catalogs);
+        body.Should().NotContain("polizas.export");
+        body.Should().NotContain("admin.security.view");
+    }
+
+    [Fact]
+    public async Task Demo_session_with_only_unknown_permissions_denies_polizas_before_service()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["Auth:Demo:Permissions:0"] = "polizas.export",
+                ["Auth:Demo:Permissions:1"] = "admin.security.view"
+            },
+            configureServices: services =>
+            {
+                services.RemoveAll<IPolizasService>();
+                services.AddScoped<IPolizasService, ThrowingUnexpectedPolizasService>();
+            });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var me = await client.GetAsync("/api/me");
+        var meBody = await me.Content.ReadAsStringAsync();
+        var response = await client.GetAsync("/api/polizas");
+        var body = await response.Content.ReadAsStringAsync();
+
+        me.StatusCode.Should().Be(HttpStatusCode.OK);
+        meBody.Should().Contain("\"permissions\":[]");
+        meBody.Should().NotContain("polizas.export");
+        meBody.Should().NotContain("admin.security.view");
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        body.Should().Contain("POLIZAS_ACCESS_DENIED");
+        body.Should().NotContain("polizas.export");
+        body.Should().NotContain("admin.security.view");
+        body.Should().NotContain(ThrowingUnexpectedPolizasService.FailureMessage);
+    }
+
+    [Fact]
     public async Task Demo_session_permissions_take_precedence_over_api_key_when_both_are_present()
     {
         await using var factory = new TestApiFactory(new Dictionary<string, string?>

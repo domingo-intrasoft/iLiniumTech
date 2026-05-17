@@ -818,6 +818,7 @@ static IReadOnlyList<string> ReadDemoPermissions(IConfiguration configuration)
         return configuredPermissions.Get<string[]>()?
             .Where(permission => !string.IsNullOrWhiteSpace(permission))
             .Select(permission => permission.Trim())
+            .Where(PolizasPermissions.IsActive)
             .Distinct(StringComparer.Ordinal)
             .ToArray() ?? [];
     }
