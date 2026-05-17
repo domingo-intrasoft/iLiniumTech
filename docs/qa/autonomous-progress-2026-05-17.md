@@ -1,0 +1,72 @@
+# Avance autonomo IA - 2026-05-17
+
+Rama: `codex/static-polizas-data-api`
+Ventana: trabajo autonomo solicitado para avanzar sin supervision humana durante el dia.
+
+## Objetivo operativo
+
+Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBuilder, manteniendo `Autos Particulares` aparcado y dejando evidencias para futuras IA.
+
+## Incrementos cerrados
+
+| Commit | Area | Resultado |
+| --- | --- | --- |
+| `ea06fe3` | Frontend QA | Smoke responsive de login, shell, menu, Polizas y Clientes en viewport movil. |
+| `6ee60c4` | Frontend QA | Smoke de guardas: rutas protegidas, login demo local, logout y limpieza de sesion. |
+| `5db2022` | QA docs | Matriz viva de cobertura Playwright E2E en `docs/qa/e2e-smoke-coverage.md`. |
+| `07685bd` | Quality gate | Gate local prueba `DemoSession`: login, `/api/me`, cambio de broker y logout. |
+| `4e90cee` | Backend seguridad | Headers MVP fuera de Development requieren opt-in demo tambien en runtime, no solo en `/ready`. |
+| `e426838` | Backend seguridad | `DemoSession` fuera de Development exige opt-in y `Auth:Demo:Password` explicita no predeterminada. |
+| `45e5781` | Backend seguridad | API key MVP solo concede permisos funcionales `polizas.*` en Development. |
+| `f129f48` | Frontend UX/auth | Login muestra mensaje generico cuando una sesion backend no puede confirmarse y conserva redirect. |
+
+## Validaciones ejecutadas
+
+Checkpoint completo tras los cambios de backend/QA:
+
+```powershell
+.\tools\quality\Invoke-MvpQualityGate.ps1 -RunFrontendE2E -NodeExe "C:\Users\DomingoCabezaGuerra\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
+```
+
+Resultado:
+
+- Backend restore/build OK.
+- Backend tests OK: `95` tests.
+- Frontend `npm ci`, format, lint, unit tests y build OK.
+- Frontend unit tests OK: `186` tests en el checkpoint; despues del feedback de login quedan `187`.
+- Playwright E2E OK: `7` smokes.
+- Backend HTTP smoke OK, incluyendo API key local y `DemoSession`.
+- Gitleaks OK: `no leaks found`.
+- Dependency audit OK: `0` findings.
+- CORS audit OK.
+- Extractor Polizas metadata tests OK.
+- Documentation baseline OK.
+- `git diff --check` OK.
+
+Validaciones adicionales del ultimo incremento frontend:
+
+- `npx vitest run src/router/index.test.ts src/features/auth/LoginView.test.ts`: `12` tests OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run test:unit`: `187` tests OK.
+- `npm run build`: OK.
+- `npm run test:e2e`: `7` smokes OK.
+- `Test-DocumentationBaseline.ps1`: OK.
+- `Invoke-SecretScan.ps1 -NoReport`: OK.
+
+## Estado local visible
+
+El servidor frontend de desarrollo queda levantado en:
+
+```text
+http://127.0.0.1:5174/
+```
+
+Nota operativa: el gate local ejecuta `npm ci`, por lo que conviene parar cualquier Vite/esbuild activo del workspace antes de correrlo para evitar bloqueo de `node_modules/@esbuild/.../esbuild.exe` en Windows.
+
+## Riesgos residuales
+
+- `DemoSession`, API key MVP y headers MVP siguen siendo compatibilidad local/demo, no autenticacion productiva.
+- Datos reales SQL, DBA/UAT, permisos finales y proveedor auth siguen bloqueados externamente.
+- Las paginas de menu distintas de Polizas siguen siendo fixture/read-only o superficies bloqueadas; no autorizan API, PII, escrituras ni exportaciones.
+- `Autos Particulares` sigue aparcado por decision de producto.
