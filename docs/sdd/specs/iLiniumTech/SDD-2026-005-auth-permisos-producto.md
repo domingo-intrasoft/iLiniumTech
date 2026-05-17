@@ -106,7 +106,7 @@ Reglas obligatorias:
 - si coexisten con autenticacion real, los claims/sesion tienen prioridad;
 - cualquier valor de header debe validarse contra el contexto autenticado antes de influir en datos;
 - `X-Is-Admin` nunca concede permisos por si solo;
-- API key MVP solo demuestra conocimiento de una clave tecnica de entorno, no usuario final, broker autorizado ni permiso funcional;
+- API key MVP solo demuestra conocimiento de una clave tecnica de entorno, no usuario final, broker autorizado ni permiso funcional; fuera de Development no satisface politicas `polizas.*`;
 - `demo-session` debe quedar claramente etiquetada como demo y reemplazable por el proveedor auth aprobado;
 - fuera de Development, `demo-session` requiere opt-in demo explicito y una `Auth:Demo:Password` no predeterminada gestionada fuera de Git;
 - los logs pueden registrar que se uso modo MVP, pero no valores personales o sensibles.

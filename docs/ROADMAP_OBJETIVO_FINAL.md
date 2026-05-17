@@ -292,6 +292,7 @@ Entregado:
 - Politicas backend explicitas entregadas para `polizas.catalogs`, `polizas.read` y `polizas.detail`.
 - Validacion basica de broker autorizado antes de resolver conexion o leer polizas cuando existe sesion autenticada.
 - Compatibilidad temporal: API key MVP y `demo-session` pueden seguir existiendo solo para desarrollo/demo y no equivalen a auth productiva real.
+- API key MVP no concede permisos funcionales `polizas.*` fuera de Development; las demos fuera de Development deben usar `demo-session` con opt-in y contrasena explicita hasta que exista auth productiva.
 - Fuera de Development, `demo-session` requiere opt-in demo explicito y `Auth:Demo:Password` no predeterminada; `/ready` falla si se deja la contrasena por defecto `demo` o un placeholder.
 - `/api/me` debe seguir siendo el contrato del frontend para permisos efectivos, broker activo, brokers permitidos y modo de autenticacion.
 - La metadata AppBuilder sigue siendo evidencia de migracion, nunca contrato runtime para permisos, pantallas o queries.

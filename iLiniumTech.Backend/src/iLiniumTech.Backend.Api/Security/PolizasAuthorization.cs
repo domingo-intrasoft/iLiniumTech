@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Hosting;
 using System.Security.Claims;
 
 namespace iLiniumTech.Backend.Api.Security;
@@ -19,7 +20,7 @@ public static class PolizasAuthorizationPolicies
 
 public sealed record PolizasPermissionRequirement(string Permission) : IAuthorizationRequirement;
 
-public sealed class PolizasPermissionAuthorizationHandler
+public sealed class PolizasPermissionAuthorizationHandler(IHostEnvironment environment)
     : AuthorizationHandler<PolizasPermissionRequirement>
 {
     protected override Task HandleRequirementAsync(
@@ -31,7 +32,8 @@ public sealed class PolizasPermissionAuthorizationHandler
             return Task.CompletedTask;
         }
 
-        if (HasPermission(context.User, requirement.Permission) || IsLegacyApiKeyCompatibility(context.User))
+        if (HasPermission(context.User, requirement.Permission) ||
+            IsLegacyApiKeyCompatibility(context.User, environment))
         {
             context.Succeed(requirement);
         }
@@ -43,7 +45,8 @@ public sealed class PolizasPermissionAuthorizationHandler
         user.FindAll(PolizasContextClaimTypes.Permission)
             .Any(claim => string.Equals(claim.Value, permission, StringComparison.Ordinal));
 
-    private static bool IsLegacyApiKeyCompatibility(ClaimsPrincipal user) =>
+    private static bool IsLegacyApiKeyCompatibility(ClaimsPrincipal user, IHostEnvironment environment) =>
+        environment.IsDevelopment() &&
         string.Equals(
             user.Identity?.AuthenticationType,
             ApiKeyAuthenticationHandler.SchemeName,

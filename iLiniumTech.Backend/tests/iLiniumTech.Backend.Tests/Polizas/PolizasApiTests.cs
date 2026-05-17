@@ -796,7 +796,7 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
-    public async Task Api_key_mvp_remains_legacy_compatibility_for_policy_protected_polizas()
+    public async Task Api_key_mvp_remains_development_compatibility_for_policy_protected_polizas()
     {
         await using var factory = new TestApiFactory();
         using var client = factory.CreateClient();
@@ -807,6 +807,30 @@ public sealed class PolizasApiTests
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         body.Should().Contain("POL-2026-0001");
+    }
+
+    [Fact]
+    public async Task Api_key_mvp_does_not_grant_polizas_permissions_outside_development()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["ApiSecurity:ApiKey"] = "test-key-that-is-long-enough-for-production"
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key-that-is-long-enough-for-production");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "api-key-no-polizas-permission");
+
+        var response = await client.GetAsync("/api/polizas/POL-1001");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("api-key-no-polizas-permission");
+        body.Should().Contain("POLIZAS_ACCESS_DENIED");
+        body.Should().Contain("\"correlationId\":\"api-key-no-polizas-permission\"");
+        body.Should().NotContain("test-key-that-is-long-enough-for-production");
+        body.Should().NotContain("POL-1001");
     }
 
     [Fact]
