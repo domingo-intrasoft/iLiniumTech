@@ -20,7 +20,7 @@ El gate ejecuta:
 - `npm ci`, `npm run format`, `npm run lint`, `npm run test:unit:ci` y `npm run build`;
 - smoke HTTP de backend con repositorio `InMemory`: `/health`, `/api/me`, `/api/polizas/catalogs`, `/api/polizas`, login demo `POST /api/auth/login`, cambio de broker `POST /api/auth/broker` y logout `POST /api/auth/logout`;
 - smoke frontend sobre `dist/index.html` o sobre `-FrontendSmokeUrl` si se quiere validar un Vite/preview ya levantado;
-- smoke E2E de `/polizas` con Playwright Chromium cuando se invoca `-RunFrontendE2E`; usa `VITE_USE_BACKEND=false`, fixture local anonimizadas y no genera screenshots, videos ni traces;
+- smoke E2E Playwright Chromium cuando se invoca `-RunFrontendE2E`; cubre guardas de auth/logout, Polizas, menu lateral, paginas fixture, paginas tecnicas bloqueadas, `Autos Particulares` aparcado y responsive shell. Usa `VITE_USE_BACKEND=false`, fixtures locales anonimizadas y no genera screenshots, videos ni traces;
 - Gitleaks, auditoria npm/NuGet y auditoria CORS;
 - validacion documental de roadmap, SDDs, CI y plantillas;
 - `git diff --check`.
@@ -50,6 +50,8 @@ El smoke Playwright se puede ejecutar localmente desde `iLiniumTech.Frontend` co
 npx playwright install chromium
 npm run test:e2e
 ```
+
+La matriz viva de rutas cubiertas esta en [`../qa/e2e-smoke-coverage.md`](../qa/e2e-smoke-coverage.md).
 
 El gate local no lo ejecuta por defecto para evitar que la instalacion de navegadores bloquee entornos ligeros. Para incluirlo en cierre de rama:
 
