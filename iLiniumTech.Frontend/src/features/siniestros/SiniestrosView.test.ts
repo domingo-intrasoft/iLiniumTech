@@ -102,6 +102,16 @@ describe('SiniestrosView smoke', () => {
     const disabledActions = wrapper.findAll('button[disabled]')
     expect(disabledActions.length).toBeGreaterThanOrEqual(7)
     expect(wrapper.findAll('button.table-icon-action[disabled]')).toHaveLength(3)
+    expect(wrapper.get('#siniestros-blocked-actions').text()).toContain('contrato API')
+    expect(
+      wrapper.get('button[aria-label="Ver detalle pendiente"]').attributes('aria-describedby'),
+    ).toBe('siniestros-blocked-actions')
+    expect(
+      wrapper.get('button[aria-label="Opciones de estado"]').attributes('aria-describedby'),
+    ).toBe('siniestros-blocked-actions')
+    expect(wrapper.get('button.table-icon-action').attributes('aria-describedby')).toBe(
+      'siniestros-blocked-actions',
+    )
 
     const smokeDom = wrapper.html()
     expect(smokeDom).not.toMatch(runtimeMarkers)

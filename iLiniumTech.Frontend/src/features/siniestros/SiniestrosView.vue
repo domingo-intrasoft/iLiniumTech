@@ -79,6 +79,8 @@ const moduleActions = [
   { label: 'Ver detalle pendiente', icon: 'pi pi-eye' },
   { label: 'Exportacion pendiente', icon: 'pi pi-download' },
 ]
+const blockedActionsDescription =
+  'Acciones de siniestros bloqueadas en el MVP read-only hasta SDD, contrato API, permisos y UAT.'
 
 const filters = reactive<SiniestrosFilters>({
   referencia: '',
@@ -209,6 +211,10 @@ async function signOut() {
         <h1>Siniestros</h1>
       </div>
 
+      <p id="siniestros-blocked-actions" class="sr-only">
+        {{ blockedActionsDescription }}
+      </p>
+
       <div class="toolbar-groups">
         <div class="action-group">
           <button
@@ -218,6 +224,7 @@ async function signOut() {
             :class="{ active: action.active }"
             type="button"
             :aria-label="action.label"
+            aria-describedby="siniestros-blocked-actions"
             disabled
           >
             <i :class="action.icon" aria-hidden="true"></i>
@@ -254,11 +261,11 @@ async function signOut() {
             <i class="pi pi-trash" aria-hidden="true"></i>
             Limpiar Filtros
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="siniestros-blocked-actions" disabled>
             <i class="pi pi-save" aria-hidden="true"></i>
             Guardar busqueda
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="siniestros-blocked-actions" disabled>
             <i class="pi pi-download" aria-hidden="true"></i>
             Exportar
           </button>
@@ -287,7 +294,12 @@ async function signOut() {
                   type="search"
                   aria-label="Referencia o cliente"
                 />
-                <button type="button" aria-label="Opciones de referencia" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de referencia"
+                  aria-describedby="siniestros-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -302,7 +314,12 @@ async function signOut() {
                   type="search"
                   aria-label="Poliza"
                 />
-                <button type="button" aria-label="Opciones de poliza" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de poliza"
+                  aria-describedby="siniestros-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -321,7 +338,12 @@ async function signOut() {
                   <option>Abierto</option>
                   <option>Cerrado</option>
                 </select>
-                <button type="button" aria-label="Opciones de estado" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de estado"
+                  aria-describedby="siniestros-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -346,7 +368,12 @@ async function signOut() {
                   <option>Media</option>
                   <option>Baja</option>
                 </select>
-                <button type="button" aria-label="Opciones de prioridad" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de prioridad"
+                  aria-describedby="siniestros-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -361,7 +388,12 @@ async function signOut() {
                   type="date"
                   aria-label="Fecha siniestro desde"
                 />
-                <button type="button" aria-label="Opciones de fecha" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de fecha"
+                  aria-describedby="siniestros-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -379,8 +411,14 @@ async function signOut() {
                   value="Fuera del MVP read-only"
                   disabled
                   aria-label="Campos sensibles bloqueados"
+                  aria-describedby="siniestros-blocked-actions"
                 />
-                <button type="button" aria-label="Campos sensibles bloqueados" disabled>
+                <button
+                  type="button"
+                  aria-label="Campos sensibles bloqueados"
+                  aria-describedby="siniestros-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-lock" aria-hidden="true"></i>
                 </button>
               </span>
@@ -431,6 +469,7 @@ async function signOut() {
                   class="table-icon-action"
                   type="button"
                   :aria-label="`Detalle pendiente para siniestro ${item.referencia}`"
+                  aria-describedby="siniestros-blocked-actions"
                   title="Detalle pendiente de SDD/API"
                   disabled
                 >

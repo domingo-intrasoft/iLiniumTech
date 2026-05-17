@@ -57,6 +57,15 @@ const domainSmokeCases: DomainSmokeCase[] = [
     summaryAfterSearch: '1 suplemento',
   },
   {
+    path: '/siniestros',
+    heading: 'Siniestros',
+    filterSelector: '#siniestros-filter-referencia',
+    searchText: '0002',
+    expectedAfterSearch: 'SIN-2026-0002',
+    initialMarker: 'SIN-2026-0001',
+    summaryAfterSearch: '1 siniestro',
+  },
+  {
     path: '/liq-cia',
     heading: 'Liquidaciones de compania',
     filterSelector: '#liq-cia-filter-texto',
