@@ -36,6 +36,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `c9f8eda` | QA gate | Gate local completo ejecutado tras los incrementos autonomos de login/menu/Polizas. |
 | `54467f0` | Frontend Polizas | Accesos superiores a Flotas/Colectivas enlazan a scopes estaticos bloqueados por SDD; Externas sigue deshabilitado. |
 | `125c5f6` | Frontend shell | Acciones placeholder de Notificaciones/Configuracion quedan deshabilitadas y etiquetadas como pendientes de SDD. |
+| Bloque actual | Frontend shell | Selector de broker enlaza `aria-invalid` con descripcion accesible del error. |
 
 ## Validaciones ejecutadas
 
@@ -223,6 +224,16 @@ Validacion adicional tras placeholder actions del shell:
 
 - `npx vitest run src/layout/AppShell.test.ts`: `5/5` tests OK.
 - `npm run test:e2e -- responsive-shell`: `1` smoke OK con `CI=1`.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run build`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras descripcion accesible del error de broker:
+
+- `npx vitest run src/layout/AppShell.test.ts`: `6/6` tests OK.
 - `npm run format`: OK.
 - `npm run lint`: OK.
 - `npm run build`: OK.

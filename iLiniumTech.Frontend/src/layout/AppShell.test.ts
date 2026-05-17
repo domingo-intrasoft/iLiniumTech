@@ -28,6 +28,32 @@ describe('AppShell', () => {
     expect(wrapper.emitted('brokerChange')).toEqual([[84]])
   })
 
+  it('describes broker selector errors without adding visible shell noise', () => {
+    const wrapper = mount(AppShell, {
+      props: {
+        contentId: 'content',
+        sectionTitle: 'Polizas',
+        sessionLabel: 'Broker 42',
+        brokerOptions: [42, 84],
+        activeBrokerId: 42,
+        brokerError: 'El broker seleccionado no esta disponible.',
+      },
+      global: {
+        stubs: {
+          AppSideMenu: true,
+        },
+      },
+    })
+
+    const selector = wrapper.get('select[aria-label="Broker activo"]')
+
+    expect(selector.attributes('aria-invalid')).toBe('true')
+    expect(selector.attributes('aria-describedby')).toBe('app-shell-broker-error')
+    expect(wrapper.get('#app-shell-broker-error').text()).toBe(
+      'El broker seleccionado no esta disponible.',
+    )
+  })
+
   it('keeps broker selector hidden when there are no useful allowed brokers', () => {
     const wrapper = mount(AppShell, {
       props: {

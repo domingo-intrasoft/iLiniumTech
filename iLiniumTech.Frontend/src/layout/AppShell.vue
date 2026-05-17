@@ -105,6 +105,7 @@ function focusMainContent(event: MouseEvent) {
               :value="activeBrokerId ?? ''"
               :disabled="brokerChanging"
               :aria-invalid="brokerError ? 'true' : 'false'"
+              :aria-describedby="brokerError ? 'app-shell-broker-error' : undefined"
               aria-label="Broker activo"
               @change="onBrokerSelection"
             >
@@ -112,6 +113,9 @@ function focusMainContent(event: MouseEvent) {
                 Broker {{ brokerId }}
               </option>
             </select>
+            <span v-if="brokerError" id="app-shell-broker-error" class="sr-only">
+              {{ brokerError }}
+            </span>
           </label>
           <span v-for="badge in topBadges" :key="badge" class="round-badge">{{ badge }}</span>
           <span class="user-name">{{ userLabel }}</span>

@@ -31,6 +31,7 @@ Marcar solo cuando exista evidencia real del incremento.
 - [x] Tras cambiar broker, el frontend vuelve a consultar `/api/me` y refleja el `currentBrokerId` actualizado.
 - [x] Tras cambiar broker, catalogos/listado/detalle de Polizas se refrescan o invalidan cache para evitar datos del broker anterior.
 - [x] Catalogos, listado y detalle no se consultan si el contexto queda sin broker activo valido.
+- [x] Si el selector de broker muestra error, el control expone `aria-invalid` y descripcion accesible del motivo.
 - [x] Error 400 por payload invalido o broker ausente se muestra con mensaje publico sanitizado.
 - [x] Error 401 por sesion ausente o expirada fuerza reautenticacion sin conservar datos sensibles.
 - [x] Error 403 por broker no permitido se muestra sanitizado y no revela brokers ajenos ni existencia de polizas.
