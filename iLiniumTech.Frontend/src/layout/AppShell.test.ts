@@ -71,6 +71,27 @@ describe('AppShell', () => {
     expect(wrapper.find('select[aria-label="Broker activo"]').exists()).toBe(false)
   })
 
+  it('exposes the current section through a semantic breadcrumb', () => {
+    const wrapper = mount(AppShell, {
+      props: {
+        contentId: 'content',
+        sectionTitle: 'Polizas',
+        sessionLabel: 'Modo local',
+      },
+      global: {
+        stubs: {
+          AppSideMenu: true,
+        },
+      },
+    })
+
+    const breadcrumb = wrapper.get('nav[aria-label="Ruta actual"]')
+
+    expect(breadcrumb.text()).toBe('Inicio/Polizas')
+    expect(breadcrumb.text()).not.toMatch(/\/$/)
+    expect(breadcrumb.get('[aria-current="page"]').text()).toBe('Polizas')
+  })
+
   it('marks placeholder topbar actions as unavailable in the MVP', () => {
     const wrapper = mount(AppShell, {
       props: {

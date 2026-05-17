@@ -75,7 +75,7 @@ function focusMainContent(event: MouseEvent) {
 
     <section class="workspace">
       <header class="workspace-topbar">
-        <div class="breadcrumb-line">
+        <nav class="breadcrumb-line" aria-label="Ruta actual">
           <button
             class="icon-button"
             type="button"
@@ -89,9 +89,8 @@ function focusMainContent(event: MouseEvent) {
           </button>
           <strong>Inicio</strong>
           <span>/</span>
-          <strong>{{ sectionTitle }}</strong>
-          <span>/</span>
-        </div>
+          <strong aria-current="page">{{ sectionTitle }}</strong>
+        </nav>
 
         <span class="environment-badge" :class="{ warning: sessionNeedsAttention }">
           {{ sessionLabel }}
