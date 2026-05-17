@@ -35,7 +35,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `0fe67fd` | Frontend menu | Leyenda compacta del menu muestra rotulo visible `Estado` y conserva descripcion accesible. |
 | `c9f8eda` | QA gate | Gate local completo ejecutado tras los incrementos autonomos de login/menu/Polizas. |
 | `54467f0` | Frontend Polizas | Accesos superiores a Flotas/Colectivas enlazan a scopes estaticos bloqueados por SDD; Externas sigue deshabilitado. |
-| Bloque actual | Frontend shell | Acciones placeholder de Notificaciones/Configuracion quedan deshabilitadas y etiquetadas como pendientes de SDD. |
+| `125c5f6` | Frontend shell | Acciones placeholder de Notificaciones/Configuracion quedan deshabilitadas y etiquetadas como pendientes de SDD. |
 
 ## Validaciones ejecutadas
 
