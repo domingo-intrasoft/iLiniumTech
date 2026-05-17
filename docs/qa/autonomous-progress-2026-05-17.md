@@ -25,7 +25,8 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `91da188` | Auth docs | Matriz documental de permisos productivos para broker, perfil, oficina, gestor y usuario. |
 | `e659589` | Frontend accesibilidad | Menu lateral colapsado sale del arbol de foco con `inert` y mantiene `aria-hidden`. |
 | `f0728db` | Frontend accesibilidad | Estados del menu expuestos por `aria-describedby` sin alterar nombres de enlace; `sr-only` no genera overflow movil. |
-| Bloque actual | Frontend accesibilidad | Skip link del shell mueve foco real al contenido principal y crea `tabindex=-1` si falta. |
+| `75d55a4` | Frontend accesibilidad | Skip link del shell mueve foco real al contenido principal y crea `tabindex=-1` si falta. |
+| `3664c64` | QA docs | Gate local completo registrado tras los incrementos autonomos. |
 
 ## Validaciones ejecutadas
 
