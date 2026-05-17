@@ -44,7 +44,7 @@ Fuera de alcance confirmado:
 | Resumen filtros activos | Completado con evidencia | El listado muestra chips de filtros activos derivados del estado Vue/query params y traduce valores de catalogo visibles. | Mantenerlo como resumen estatico; acciones adicionales requieren nueva cobertura. | Frontend / UX |
 | Acciones heredadas de filtros | Completado con evidencia | `PolizasFilters` mantiene bloqueadas acciones sin contrato (`Guardar busqueda`, modos avanzado/simple, agregar filtros, opciones por campo) y expone motivo accesible por SDD/API/permisos/UAT. | No habilitar acciones, busquedas guardadas ni filtros avanzados sin SDD, contrato API y UAT. | Frontend / UX |
 | Toolbar superior Polizas | Completado con evidencia | Acciones superiores heredadas (`Autos`, `Gestion`, `Favoritos`, `Servicios`, `Riesgos`, `Validar`, `Pausar`, `Cerrar`) siguen deshabilitadas y describen bloqueo MVP read-only. | No activar workflows, validaciones ni cambios de estado sin SDD, permisos, API y UAT. | Frontend / UX |
-| Accesos scopes Polizas | Completado con evidencia | Los accesos superiores a Flotas y Colectivas navegan a paginas estaticas bloqueadas por SDD; Polizas Externas permanece deshabilitado. | No activar datos, filtros ni permisos de scopes sin SDD/API/UAT. | Frontend / UX |
+| Accesos scopes Polizas | Completado con evidencia | Los accesos superiores a Flotas y Colectivas navegan a paginas estaticas bloqueadas por SDD; Polizas Externas permanece deshabilitado. Todos describen que no cargan datos ni activan permisos sin SDD/API/UAT. | No activar datos, filtros ni permisos de scopes sin SDD/API/UAT. | Frontend / UX |
 | Detalle prevalidado | Completado con evidencia | La UI valida sesion, broker requerido y `polizas.detail` antes de consultar detalle en modo backend; si falta permiso, el listado muestra motivo visible y acciones deshabilitadas con descripcion accesible. | Completar UAT con matriz real de permisos cuando exista. | Frontend / Backend |
 | Cambio broker demo | Completado MVP | `POST /api/auth/broker` exige `demo-session`, valida `allowedBrokerIds`, reemite cookie y no acepta API key sola. | Retirar o reemplazar en auth productiva. | Backend / Datos |
 | Seguridad / privacidad | Completado con gate local | Gate completo, secret scan, dependencia, CORS, build, tests, E2E y smoke sin findings bloqueantes. | Repetir en PR/CI. | QA / Seguridad |
@@ -60,6 +60,7 @@ Fuera de alcance confirmado:
 - Campos heredados fuera de contrato deben quedar deshabilitados y describir de forma accesible que dependen de contrato API revisado.
 - Acciones heredadas de filtros sin contrato (`Guardar busqueda`, modos avanzado/simple, agregar filtro y opciones por campo) deben permanecer bloqueadas con motivo accesible.
 - Acciones superiores heredadas de Polizas deben permanecer bloqueadas con motivo accesible mientras no exista SDD/API/permisos/UAT.
+- Scopes superiores de Polizas (`Flotas`, `Colectivas`, `Externas`) deben explicar que son superficies aparcadas y no cargan datos reales ni activan permisos hasta SDD/API/UAT.
 - Valores vacios deben eliminarse de la URL o normalizarse sin dejar ruido.
 - Fechas invalidas, paginas menores que 1, page sizes no permitidos o sort fuera de whitelist deben normalizarse o bloquearse con error seguro.
 - Cambiar filtros debe resetear `page` a 1 salvo decision UX documentada.
@@ -152,7 +153,7 @@ Resultado del gate:
 | Frontend filtros activos | Test de listado con busqueda, limpieza, query params y valores de catalogo. | Chips visibles reflejan filtros activos sin invocar metadata ni nuevas APIs. |
 | Frontend filtros bloqueados | Unit tests de acciones heredadas bloqueadas, campos fuera de contrato y busqueda sin contexto. | Botones y campos deshabilitados explican motivo por `aria-describedby`/`title`; no emiten busqueda si falta contexto. |
 | Frontend toolbar bloqueada | Unit test de acciones superiores heredadas. | Botones de toolbar deshabilitados describen bloqueo MVP read-only sin activar workflows. |
-| Frontend scopes Polizas | Unit test de shortcuts y smoke E2E de navegacion a Flotas. | Flotas/Colectivas solo abren paginas estaticas bloqueadas; Externas sigue sin accion. |
+| Frontend scopes Polizas | Unit test de shortcuts y smoke E2E de navegacion a Flotas. | Flotas/Colectivas solo abren paginas estaticas bloqueadas; Externas sigue sin accion; todos explican que no cargan datos ni permisos. |
 | Frontend detalle | Tests de entrada directa, sin sesion, sin `polizas.detail` y vuelta conservando filtros. | No se consulta detalle si falta sesion/contexto/permiso; error visible seguro. |
 | Frontend contexto detalle | Test de detalle con broker valido, broker ausente y permiso ausente. | Badge superior refleja broker activo o estado de atencion sin ocultar el error principal. |
 | Frontend listado sin detalle | Tests de tabla/listado con `polizas.read` sin `polizas.detail`. | Acciones de detalle deshabilitadas, sin enlaces navegables y con motivo visible/accesible. |

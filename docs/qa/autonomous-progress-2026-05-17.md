@@ -39,6 +39,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `5fbb3c2` | Frontend shell | Selector de broker enlaza `aria-invalid` con descripcion accesible del error. |
 | `1259602` | Frontend Polizas | Acciones heredadas de filtros, campos fuera de contrato y busqueda bloqueada explican motivo accesible sin activar nuevas APIs. |
 | `2f507e4` | Frontend Polizas | Toolbar superior de Polizas mantiene acciones bloqueadas y describe motivo MVP read-only por SDD/API/permisos/UAT. |
+| `1f5f090` | Frontend Polizas | Accesos superiores a scopes Flotas/Colectivas/Externas describen que no cargan datos ni activan permisos sin SDD/API/UAT. |
 
 ## Validaciones ejecutadas
 
@@ -264,6 +265,15 @@ Validacion adicional tras descripcion accesible de acciones superiores de Poliza
 - `npm run test:e2e -- polizas`: `1` smoke OK con `CI=1`.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
+
+Validacion adicional tras descripcion accesible de scopes superiores de Polizas:
+
+- `npx vitest run src/features/polizas/PolizasView.test.ts`: `8/8` tests OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run test:unit`: `192/192` tests OK.
+- `npm run build`: OK.
+- `npm run test:e2e -- polizas`: `1` smoke OK con `CI=1`.
 
 ## Estado local visible
 
