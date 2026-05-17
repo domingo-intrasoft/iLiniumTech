@@ -16,7 +16,7 @@ cd .\iLiniumTech.Frontend
 npm run test:e2e
 ```
 
-Resultado local ultimo: `7 passed`.
+Resultado local ultimo: `8 passed`.
 
 ## Matriz actual
 
@@ -25,6 +25,7 @@ Resultado local ultimo: `7 passed`.
 | `tests/e2e/auth-guard.smoke.e2e.ts` | `/clientes`, `/login`, `/polizas` | Guardas de rutas protegidas, redirect, login demo, logout y limpieza de `sessionStorage`. |
 | `tests/e2e/polizas.smoke.e2e.ts` | `/polizas`, `/polizas/:id` | Listado, detalle, filtros, limpieza, retorno y ausencia de leaks AppBuilder/runtime. |
 | `tests/e2e/menu-navigation.smoke.e2e.ts` | `/polizas`, `/clientes`, `/siniestros`, `/polizas/flotas`, `/polizas/colectivas` | Menu lateral, estados de madurez, submenus visibles/bloqueados y navegacion MVP. |
+| `tests/e2e/menu-route-parity.smoke.e2e.ts` | rutas navegables de `appNavigation` | Paridad entre menu estatico y rutas protegidas visibles, estados de madurez por ruta, `Autos Particulares` aparcado y ausencia de llamadas backend. |
 | `tests/e2e/domain-fixtures.smoke.e2e.ts` | `/agenda`, `/propuestas`, `/recibos`, `/suplementos`, `/liq-cia`, `/liq-col` | Paginas de dominio fixture read-only, filtro local, limpieza y ausencia de backend/leaks. |
 | `tests/e2e/blocked-technical-pages.smoke.e2e.ts` | `/administracion`, `/configuracion`, `/conectividad`, `/logs`, `/by-aunna`, `/controles`, `/estadisticas`, `/informes` | Superficies tecnicas bloqueadas/read-only, mensajes de seguridad, filtros locales y ausencia de secretos. |
 | `tests/e2e/autos-particulares.smoke.e2e.ts` | `/autos-particulares` | Incremento tecnico aparcado sigue en fixture local y no llama backend. No reactivar producto sin SDD/UAT. |

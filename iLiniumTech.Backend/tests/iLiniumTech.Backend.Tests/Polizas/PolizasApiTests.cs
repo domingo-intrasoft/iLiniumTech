@@ -596,6 +596,45 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Demo_session_rejected_broker_switch_keeps_effective_session_context()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:AllowedBrokerIds:0"] = "42"
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client, brokerId: 42);
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "broker-forbidden-keeps-session");
+
+        var broker = await client.PostAsJsonAsync("/api/auth/broker", new
+        {
+            brokerId = 84
+        });
+        var brokerBody = await broker.Content.ReadAsStringAsync();
+
+        broker.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        broker.Headers.TryGetValues("Set-Cookie", out _).Should().BeFalse();
+        broker.Headers.GetValues("X-Correlation-Id").Should().Contain("broker-forbidden-keeps-session");
+        brokerBody.Should().Contain("AUTH_BROKER_FORBIDDEN");
+        brokerBody.Should().Contain("\"correlationId\":\"broker-forbidden-keeps-session\"");
+        brokerBody.Should().NotContain("42");
+        brokerBody.Should().NotContain("84");
+        brokerBody.Should().NotContain(PolizasPermissions.Read);
+        brokerBody.Should().NotContain("test-key");
+
+        var me = await client.GetAsync("/api/me");
+        var meBody = await me.Content.ReadAsStringAsync();
+
+        me.StatusCode.Should().Be(HttpStatusCode.OK);
+        meBody.Should().Contain("\"brokerId\":42");
+        meBody.Should().Contain("\"entityMainId\":42");
+        meBody.Should().Contain("\"allowedBrokerIds\":[42]");
+        meBody.Should().Contain("\"authMode\":\"DemoSession\"");
+        meBody.Should().NotContain("\"brokerId\":84");
+        meBody.Should().NotContain("\"entityMainId\":84");
+    }
+
+    [Fact]
     public async Task Demo_session_rejects_broker_switch_when_allowed_brokers_are_missing()
     {
         await using var factory = new TestApiFactory();
