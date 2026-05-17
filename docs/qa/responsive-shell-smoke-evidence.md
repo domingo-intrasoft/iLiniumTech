@@ -33,6 +33,7 @@ Cubre:
 - Login demo y navegacion a `/polizas`.
 - Menu principal visible en movil.
 - Boton de ocultar/mostrar menu con estado `aria-expanded`.
+- Acciones placeholder del topbar marcadas como no disponibles hasta SDD, sin aparentar funcionalidad real.
 - Tabla de polizas contenida en `.table-scroll`, con scroll horizontal interno y sin overflow global de pagina.
 - Navegacion desde menu a `/clientes`.
 - Filtros de pagina fixture visibles y dentro del viewport.

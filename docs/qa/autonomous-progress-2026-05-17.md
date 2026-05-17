@@ -35,6 +35,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `0fe67fd` | Frontend menu | Leyenda compacta del menu muestra rotulo visible `Estado` y conserva descripcion accesible. |
 | `c9f8eda` | QA gate | Gate local completo ejecutado tras los incrementos autonomos de login/menu/Polizas. |
 | `54467f0` | Frontend Polizas | Accesos superiores a Flotas/Colectivas enlazan a scopes estaticos bloqueados por SDD; Externas sigue deshabilitado. |
+| Bloque actual | Frontend shell | Acciones placeholder de Notificaciones/Configuracion quedan deshabilitadas y etiquetadas como pendientes de SDD. |
 
 ## Validaciones ejecutadas
 
@@ -211,6 +212,17 @@ Validacion adicional tras accesos superiores a scopes de Polizas:
 
 - `npx vitest run src/features/polizas/PolizasView.test.ts`: `8/8` tests OK.
 - `npm run test:e2e -- polizas`: `1` smoke OK con `CI=1`.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run build`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras placeholder actions del shell:
+
+- `npx vitest run src/layout/AppShell.test.ts`: `5/5` tests OK.
+- `npm run test:e2e -- responsive-shell`: `1` smoke OK con `CI=1`.
 - `npm run format`: OK.
 - `npm run lint`: OK.
 - `npm run build`: OK.

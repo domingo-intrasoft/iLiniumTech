@@ -45,6 +45,33 @@ describe('AppShell', () => {
     expect(wrapper.find('select[aria-label="Broker activo"]').exists()).toBe(false)
   })
 
+  it('marks placeholder topbar actions as unavailable in the MVP', () => {
+    const wrapper = mount(AppShell, {
+      props: {
+        contentId: 'content',
+        sectionTitle: 'Polizas',
+        sessionLabel: 'Modo local',
+      },
+      global: {
+        stubs: {
+          AppSideMenu: true,
+        },
+      },
+    })
+
+    const notifications = wrapper.get(
+      'button[aria-label="Notificaciones no disponibles en el MVP"]',
+    )
+    const configuration = wrapper.get(
+      'button[aria-label="Configuracion no disponible desde esta accion"]',
+    )
+
+    expect(notifications.attributes('disabled')).toBeDefined()
+    expect(notifications.attributes('title')).toContain('pendientes de SDD')
+    expect(configuration.attributes('disabled')).toBeDefined()
+    expect(configuration.attributes('title')).toContain('bloqueada por SDD')
+  })
+
   it('toggles the static side menu from the topbar control', async () => {
     const wrapper = mount(AppShell, {
       props: {

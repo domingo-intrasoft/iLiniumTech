@@ -115,10 +115,22 @@ function focusMainContent(event: MouseEvent) {
           </label>
           <span v-for="badge in topBadges" :key="badge" class="round-badge">{{ badge }}</span>
           <span class="user-name">{{ userLabel }}</span>
-          <button class="icon-button ghost" type="button" aria-label="Notificaciones">
+          <button
+            class="icon-button ghost"
+            type="button"
+            aria-label="Notificaciones no disponibles en el MVP"
+            title="Notificaciones pendientes de SDD"
+            disabled
+          >
             <i class="pi pi-bell" aria-hidden="true"></i>
           </button>
-          <button class="icon-button ghost" type="button" aria-label="Configuracion">
+          <button
+            class="icon-button ghost"
+            type="button"
+            aria-label="Configuracion no disponible desde esta accion"
+            title="Usa el menu lateral; la configuracion funcional sigue bloqueada por SDD"
+            disabled
+          >
             <i class="pi pi-cog" aria-hidden="true"></i>
           </button>
           <button
