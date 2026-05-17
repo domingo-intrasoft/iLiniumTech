@@ -18,7 +18,7 @@ El gate ejecuta:
 
 - `dotnet restore`, `dotnet build --configuration Release` y `dotnet test --configuration Release --no-build`;
 - `npm ci`, `npm run format`, `npm run lint`, `npm run test:unit:ci` y `npm run build`;
-- smoke HTTP de backend con repositorio `InMemory`;
+- smoke HTTP de backend con repositorio `InMemory`: `/health`, `/api/me`, `/api/polizas/catalogs`, `/api/polizas`, login demo `POST /api/auth/login`, cambio de broker `POST /api/auth/broker` y logout `POST /api/auth/logout`;
 - smoke frontend sobre `dist/index.html` o sobre `-FrontendSmokeUrl` si se quiere validar un Vite/preview ya levantado;
 - smoke E2E de `/polizas` con Playwright Chromium cuando se invoca `-RunFrontendE2E`; usa `VITE_USE_BACKEND=false`, fixture local anonimizadas y no genera screenshots, videos ni traces;
 - Gitleaks, auditoria npm/NuGet y auditoria CORS;

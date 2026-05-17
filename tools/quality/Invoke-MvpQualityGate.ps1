@@ -6,7 +6,8 @@ param(
     [string]$NodeExe = "",
     [string]$FrontendSmokeUrl = "",
     [string]$BackendSmokeUrl = "http://127.0.0.1:5146",
-    [string]$BackendSmokeApiKey = "local-quality-gate-key"
+    [string]$BackendSmokeApiKey = "local-quality-gate-key",
+    [string]$BackendSmokeDemoPassword = "local-quality-gate-demo"
 )
 
 $ErrorActionPreference = "Stop"
@@ -83,11 +84,21 @@ function Invoke-Npm {
 function Invoke-BackendSmoke {
     $logPath = Join-Path $reportsRoot "backend-smoke.log"
     $errorPath = Join-Path $reportsRoot "backend-smoke.err.log"
+    $previousEnvironment = $env:ASPNETCORE_ENVIRONMENT
     $previousApiKey = $env:ApiSecurity__ApiKey
     $previousRepository = $env:Polizas__Repository
+    $previousDemoEnabled = $env:Auth__Demo__Enabled
+    $previousDemoPassword = $env:Auth__Demo__Password
+    $previousDemoAllowedBroker0 = $env:Auth__Demo__AllowedBrokerIds__0
+    $previousDemoAllowedBroker1 = $env:Auth__Demo__AllowedBrokerIds__1
 
+    $env:ASPNETCORE_ENVIRONMENT = "Development"
     $env:ApiSecurity__ApiKey = $BackendSmokeApiKey
     $env:Polizas__Repository = "InMemory"
+    $env:Auth__Demo__Enabled = "true"
+    $env:Auth__Demo__Password = $BackendSmokeDemoPassword
+    $env:Auth__Demo__AllowedBrokerIds__0 = "42"
+    $env:Auth__Demo__AllowedBrokerIds__1 = "84"
 
     $process = Start-Process -FilePath dotnet `
         -ArgumentList @("run", "--no-build", "--configuration", "Release", "--project", $backendApiProject, "--urls", $BackendSmokeUrl) `
@@ -121,6 +132,54 @@ function Invoke-BackendSmoke {
         if ($null -eq $polizas.items) {
             throw "Backend smoke did not return a polizas items collection."
         }
+
+        $loginBody = @{
+            username = "quality-gate"
+            password = $BackendSmokeDemoPassword
+            brokerId = 42
+        } | ConvertTo-Json
+        $login = Invoke-RestMethod -Uri "$BackendSmokeUrl/api/auth/login" `
+            -Method Post `
+            -ContentType "application/json" `
+            -Body $loginBody `
+            -SessionVariable demoSession `
+            -TimeoutSec 5
+        if ($login.currentBrokerId -ne 42) {
+            throw "Backend auth smoke did not establish the requested demo broker."
+        }
+        if (-not ($login.permissions -contains "polizas.read")) {
+            throw "Backend auth smoke did not return expected demo permissions."
+        }
+
+        $me = Invoke-RestMethod -Uri "$BackendSmokeUrl/api/me" -WebSession $demoSession -TimeoutSec 5
+        if ($me.brokerId -ne 42 -or $me.authMode -ne "DemoSession") {
+            throw "Backend auth smoke /api/me did not reflect the demo session."
+        }
+
+        $brokerBody = @{ brokerId = 84 } | ConvertTo-Json
+        $broker = Invoke-RestMethod -Uri "$BackendSmokeUrl/api/auth/broker" `
+            -Method Post `
+            -ContentType "application/json" `
+            -Body $brokerBody `
+            -WebSession $demoSession `
+            -TimeoutSec 5
+        if ($broker.currentBrokerId -ne 84) {
+            throw "Backend auth smoke did not switch to the allowed broker."
+        }
+
+        $meAfterBrokerSwitch = Invoke-RestMethod -Uri "$BackendSmokeUrl/api/me" -WebSession $demoSession -TimeoutSec 5
+        if ($meAfterBrokerSwitch.brokerId -ne 84) {
+            throw "Backend auth smoke /api/me did not reflect the switched broker."
+        }
+
+        $logout = Invoke-WebRequest -Uri "$BackendSmokeUrl/api/auth/logout" `
+            -Method Post `
+            -WebSession $demoSession `
+            -UseBasicParsing `
+            -TimeoutSec 5
+        if ($logout.StatusCode -ne 204) {
+            throw "Backend auth smoke logout returned HTTP $($logout.StatusCode)."
+        }
     }
     finally {
         if ($process -and -not $process.HasExited) {
@@ -128,8 +187,13 @@ function Invoke-BackendSmoke {
             $process.WaitForExit(5000) | Out-Null
         }
 
+        $env:ASPNETCORE_ENVIRONMENT = $previousEnvironment
         $env:ApiSecurity__ApiKey = $previousApiKey
         $env:Polizas__Repository = $previousRepository
+        $env:Auth__Demo__Enabled = $previousDemoEnabled
+        $env:Auth__Demo__Password = $previousDemoPassword
+        $env:Auth__Demo__AllowedBrokerIds__0 = $previousDemoAllowedBroker0
+        $env:Auth__Demo__AllowedBrokerIds__1 = $previousDemoAllowedBroker1
     }
 }
 
