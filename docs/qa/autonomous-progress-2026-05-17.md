@@ -103,6 +103,28 @@ Validaciones adicionales tras foco real del skip link:
 - `npx vitest run src/layout/AppShell.test.ts`: `4/4` tests OK.
 - `npm run test:e2e -- responsive-shell`: `1` smoke OK con `CI=1`.
 
+Checkpoint completo tras los incrementos autonomos de QA, auth docs y accesibilidad:
+
+```powershell
+.\tools\quality\Invoke-MvpQualityGate.ps1 -RunFrontendE2E -NodeExe "C:\Users\DomingoCabezaGuerra\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
+```
+
+Resultado:
+
+- Backend restore/build OK.
+- Backend tests OK: `98` tests.
+- Frontend `npm ci`, format, lint, unit tests y build OK.
+- Frontend unit tests OK: `188` tests.
+- Playwright E2E OK: `8` smokes.
+- Backend HTTP smoke OK.
+- Frontend smoke OK.
+- Gitleaks OK: `no leaks found`.
+- Dependency audit OK: `0` findings.
+- CORS audit OK.
+- Extractor Polizas metadata tests OK.
+- Documentation baseline OK.
+- `git diff --check` OK.
+
 ## Estado local visible
 
 El servidor frontend de desarrollo queda levantado en:
