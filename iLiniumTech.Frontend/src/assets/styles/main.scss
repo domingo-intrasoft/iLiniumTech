@@ -850,6 +850,42 @@ select:focus-visible {
   font-weight: 700;
 }
 
+.active-filter-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 8px 0;
+  border: 1px solid #cddae8;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #31435c;
+  background: #f7fbff;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.active-filter-summary-title {
+  margin-right: 2px;
+  color: #51677f;
+  text-transform: uppercase;
+}
+
+.active-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  border: 1px solid #b8cadc;
+  border-radius: 999px;
+  padding: 0 9px;
+  background: #ffffff;
+}
+
+.active-filter-chip strong {
+  color: #17324a;
+}
+
 .criteria-select {
   padding: 0 0 7px;
 }

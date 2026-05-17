@@ -41,6 +41,7 @@ Fuera de alcance confirmado:
 | --- | --- | --- | --- | --- |
 | Producto / SDD | Completado con evidencia | MVP vigente confirmado: login/sesion, shell/menu y Polizas read-only. Autos aparcado. | Mantener SDD-2026-001/003/005/007 como base del cierre. | Producto / Arquitectura |
 | Filtros en URL | Completado con evidencia | `PolizasView` sincroniza filtros soportados, paginacion y query params; normaliza paginas/page sizes/fechas invalidas. | Mantener cobertura unitaria y E2E al ampliar filtros. | Frontend / UX |
+| Resumen filtros activos | Completado con evidencia | El listado muestra chips de filtros activos derivados del estado Vue/query params y traduce valores de catalogo visibles. | Mantenerlo como resumen estatico; acciones adicionales requieren nueva cobertura. | Frontend / UX |
 | Detalle prevalidado | Completado con evidencia | La UI valida sesion, broker requerido y `polizas.detail` antes de consultar detalle en modo backend; si falta permiso, el listado muestra motivo visible y acciones deshabilitadas con descripcion accesible. | Completar UAT con matriz real de permisos cuando exista. | Frontend / Backend |
 | Cambio broker demo | Completado MVP | `POST /api/auth/broker` exige `demo-session`, valida `allowedBrokerIds`, reemite cookie y no acepta API key sola. | Retirar o reemplazar en auth productiva. | Backend / Datos |
 | Seguridad / privacidad | Completado con gate local | Gate completo, secret scan, dependencia, CORS, build, tests, E2E y smoke sin findings bloqueantes. | Repetir en PR/CI. | QA / Seguridad |
@@ -142,6 +143,7 @@ Resultado del gate:
 | Area | Prueba / evidencia requerida | Resultado esperado |
 | --- | --- | --- |
 | Frontend filtros URL | Unit tests de parseo/serializacion y E2E con reload/back-forward. | Query params permitidos reconstruyen listado; valores invalidos se normalizan o bloquean. |
+| Frontend filtros activos | Test de listado con busqueda, limpieza, query params y valores de catalogo. | Chips visibles reflejan filtros activos sin invocar metadata ni nuevas APIs. |
 | Frontend detalle | Tests de entrada directa, sin sesion, sin `polizas.detail` y vuelta conservando filtros. | No se consulta detalle si falta sesion/contexto/permiso; error visible seguro. |
 | Frontend contexto detalle | Test de detalle con broker valido, broker ausente y permiso ausente. | Badge superior refleja broker activo o estado de atencion sin ocultar el error principal. |
 | Frontend listado sin detalle | Tests de tabla/listado con `polizas.read` sin `polizas.detail`. | Acciones de detalle deshabilitadas, sin enlaces navegables y con motivo visible/accesible. |

@@ -12,6 +12,7 @@ import {
   moduleActions,
   statusActions,
   topBadges,
+  type PolizasCatalogKey,
   type PolizasSearchCriteria,
 } from './polizasConstants'
 import { usePolizas } from './usePolizas'
@@ -54,6 +55,22 @@ interface PolizasRouteState {
   page: number
   pageSize: number
 }
+
+interface ActivePolizasFilterDefinition {
+  key: keyof PolizasQueryFilters
+  label: string
+  catalogKey?: PolizasCatalogKey
+}
+
+const activeFilterDefinitions: ActivePolizasFilterDefinition[] = [
+  { key: 'numero', label: 'Poliza' },
+  { key: 'cliente', label: 'Cliente' },
+  { key: 'estado', label: 'Tipo poliza', catalogKey: 'tipoPoliza' },
+  { key: 'compania', label: 'Compania', catalogKey: 'compania' },
+  { key: 'ramo', label: 'Ramo', catalogKey: 'ramo' },
+  { key: 'fechaEfectoDesde', label: 'Efecto desde' },
+  { key: 'fechaEfectoHasta', label: 'Efecto hasta' },
+]
 
 function firstQueryValue(value: LocationQuery[string] | undefined) {
   const item = Array.isArray(value) ? value[0] : value
@@ -235,6 +252,30 @@ const filterCriteria = computed<PolizasSearchCriteria>(() => ({
   fechaEfectoDesde: filters.fechaEfectoDesde,
   fechaEfectoHasta: filters.fechaEfectoHasta,
 }))
+
+function catalogValueLabel(catalogKey: PolizasCatalogKey, value: string) {
+  return catalogs.value[catalogKey].find((option) => option.value === value)?.label ?? value
+}
+
+const activeFilterChips = computed(() =>
+  activeFilterDefinitions.flatMap((definition) => {
+    const rawValue = filters[definition.key].trim()
+
+    if (!rawValue) {
+      return []
+    }
+
+    return [
+      {
+        key: definition.key,
+        label: definition.label,
+        value: definition.catalogKey
+          ? catalogValueLabel(definition.catalogKey, rawValue)
+          : rawValue,
+      },
+    ]
+  }),
+)
 
 const detailQuery = computed(() => buildPolizasRouteQuery(filters, pagination))
 const canOpenPolizaDetail = computed(() => {
@@ -443,6 +484,17 @@ onMounted(() => {
       @search="executeSearch"
       @clear="clearFilters"
     />
+    <section
+      v-if="activeFilterChips.length > 0"
+      class="active-filter-summary"
+      aria-label="Filtros activos de polizas"
+    >
+      <span class="active-filter-summary-title">Filtros activos</span>
+      <span v-for="filter in activeFilterChips" :key="filter.key" class="active-filter-chip">
+        <strong>{{ filter.label }}</strong>
+        {{ filter.value }}
+      </span>
+    </section>
     <PolizasTable
       :items="items"
       :total="total"

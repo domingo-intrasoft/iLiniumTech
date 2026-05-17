@@ -139,6 +139,9 @@ describe('PolizasView smoke', () => {
       pageSize: '25',
       numero: '0002',
     })
+    expect(wrapper.get('.active-filter-summary').text()).toContain('Filtros activos')
+    expect(wrapper.get('.active-filter-summary').text()).toContain('Poliza')
+    expect(wrapper.get('.active-filter-summary').text()).toContain('0002')
     expect(wrapper.get('.summary-header').text()).toContain('1 poliza')
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
     expect(wrapper.text()).toContain('POL-2026-0002')
@@ -156,6 +159,7 @@ describe('PolizasView smoke', () => {
       page: '1',
       pageSize: '25',
     })
+    expect(wrapper.find('.active-filter-summary').exists()).toBe(false)
     expect(wrapper.get('.summary-header').text()).toContain(`${polizasFixture.total} polizas`)
     expect(wrapper.findAll('tbody tr')).toHaveLength(polizasFixture.total)
     expect(wrapper.text()).toContain('POL-2026-0001')
@@ -173,6 +177,8 @@ describe('PolizasView smoke', () => {
     await settlePolizasView()
 
     expect((wrapper.get('#polizas-filter-poliza').element as HTMLInputElement).value).toBe('0002')
+    expect(wrapper.get('.active-filter-summary').text()).toContain('Poliza')
+    expect(wrapper.get('.active-filter-summary').text()).toContain('0002')
     expect(wrapper.get('.summary-header').text()).toContain('1 poliza')
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
 
@@ -188,6 +194,8 @@ describe('PolizasView smoke', () => {
     expect((wrapper.get('#polizas-filter-nombreCompleto').element as HTMLInputElement).value).toBe(
       'Cliente anonimo 1',
     )
+    expect(wrapper.get('.active-filter-summary').text()).toContain('Cliente')
+    expect(wrapper.get('.active-filter-summary').text()).toContain('Cliente anonimo 1')
     expect(wrapper.get('.summary-header').text()).toContain('1 poliza')
     expect(wrapper.text()).toContain('POL-2026-0001')
     expect(wrapper.text()).not.toContain('POL-2026-0002')
@@ -351,7 +359,7 @@ describe('PolizasView smoke', () => {
 
   it('normalizes unsupported page sizes, invalid pages, invalid dates, and unknown query keys', async () => {
     const { router, wrapper } = await mountPolizasView(
-      '/polizas?numero=0001&page=0&pageSize=99&fechaEfectoDesde=nope&fechaEfectoHasta=2026-02-31&metadata=IAP',
+      '/polizas?numero=0001&estado=Vigor&page=0&pageSize=99&fechaEfectoDesde=nope&fechaEfectoHasta=2026-02-31&metadata=IAP',
     )
     await settlePolizasView()
 
@@ -364,7 +372,10 @@ describe('PolizasView smoke', () => {
       page: '1',
       pageSize: '25',
       numero: '0001',
+      estado: 'Vigor',
     })
+    expect(wrapper.get('.active-filter-summary').text()).toContain('0001')
+    expect(wrapper.get('.active-filter-summary').text()).toContain('En vigor')
     expect(wrapper.get('.summary-header').text()).toContain('1 poliza')
   })
 })
