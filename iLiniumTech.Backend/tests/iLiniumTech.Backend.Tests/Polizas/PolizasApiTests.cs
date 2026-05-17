@@ -1032,6 +1032,74 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Me_prefers_demo_session_claims_over_mvp_headers_when_both_are_present()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:AllowHeaderExecutionContext"] = "true",
+            ["Auth:Demo:UserId"] = "10",
+            ["Auth:Demo:ProfileId"] = "11",
+            ["Auth:Demo:ProfileTypeId"] = "session-profile",
+            ["Auth:Demo:IsAdmin"] = "false"
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client, brokerId: 42);
+        client.DefaultRequestHeaders.Add("X-Broker-Id", "84");
+        client.DefaultRequestHeaders.Add("X-User-Id", "777");
+        client.DefaultRequestHeaders.Add("X-Profile-Id", "888");
+        client.DefaultRequestHeaders.Add("X-Profile-Type-Id", "header-profile");
+        client.DefaultRequestHeaders.Add("X-Is-Admin", "true");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"brokerId\":42");
+        body.Should().Contain("\"entityMainId\":42");
+        body.Should().Contain("\"userId\":10");
+        body.Should().Contain("\"profileId\":11");
+        body.Should().Contain("\"profileTypeId\":\"session-profile\"");
+        body.Should().Contain("\"isAdmin\":false");
+        body.Should().Contain("\"authMode\":\"DemoSession\"");
+        body.Should().Contain("\"headerExecutionContextEnabled\":true");
+        body.Should().NotContain("\"brokerId\":84");
+        body.Should().NotContain("\"userId\":777");
+        body.Should().NotContain("\"profileId\":888");
+        body.Should().NotContain("header-profile");
+    }
+
+    [Fact]
+    public async Task Me_validates_demo_session_broker_before_mvp_headers_when_claims_are_not_allowed()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Polizas:AllowHeaderExecutionContext"] = "true"
+        });
+        using var client = factory.CreateClient();
+        var cookie = CreateDemoSessionCookie(
+            factory,
+            currentBrokerId: 42,
+            allowedBrokerIds: [84],
+            permissions: [PolizasPermissions.Catalogs, PolizasPermissions.Read, PolizasPermissions.Detail]);
+        client.DefaultRequestHeaders.Add(
+            "Cookie",
+            $"{ApiAuthenticationSchemes.DemoSessionCookieName}={cookie}");
+        client.DefaultRequestHeaders.Add("X-Broker-Id", "84");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "session-before-headers");
+
+        var response = await client.GetAsync("/api/me");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("session-before-headers");
+        body.Should().Contain("POLIZAS_BROKER_FORBIDDEN");
+        body.Should().Contain("\"correlationId\":\"session-before-headers\"");
+        body.Should().NotContain("42");
+        body.Should().NotContain("84");
+        body.Should().NotContain(PolizasPermissions.Read);
+    }
+
+    [Fact]
     public async Task Me_ignores_header_context_outside_development_without_explicit_override()
     {
         await using var factory = new TestApiFactory(
