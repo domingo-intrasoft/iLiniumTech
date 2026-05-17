@@ -253,6 +253,11 @@ const canOpenPolizaDetail = computed(() => {
     currentSession.permissions.includes(POLIZAS_DETAIL_PERMISSION)
   )
 })
+const detailUnavailableMessage = computed(() =>
+  canOpenPolizaDetail.value
+    ? null
+    : 'La sesion actual no tiene permiso para abrir el detalle de polizas.',
+)
 
 async function executeSearch(criteria: PolizasSearchCriteria) {
   filters.numero = criteria.numero
@@ -447,6 +452,7 @@ onMounted(() => {
       :page-size="pagination.pageSize"
       :detail-query="detailQuery"
       :can-open-detail="canOpenPolizaDetail"
+      :detail-unavailable-message="detailUnavailableMessage"
       @page-change="changePage"
       @page-size-change="changePageSize"
       @retry="refresh"

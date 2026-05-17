@@ -336,9 +336,15 @@ describe('PolizasView smoke', () => {
 
     const disabledDetailActions = wrapper.findAll('button.table-icon-action')
 
+    expect(wrapper.text()).toContain(
+      'La sesion actual no tiene permiso para abrir el detalle de polizas.',
+    )
     expect(disabledDetailActions).toHaveLength(polizasFixture.items.length)
     expect(disabledDetailActions[0].attributes('disabled')).toBeDefined()
     expect(disabledDetailActions[0].attributes('aria-label')).toContain('Detalle no disponible')
+    expect(disabledDetailActions[0].attributes('aria-describedby')).toBe(
+      'polizas-detail-unavailable-message',
+    )
     expect(wrapper.find('a.table-icon-action').exists()).toBe(false)
     expect(wrapper.find('a.table-link').exists()).toBe(false)
   })

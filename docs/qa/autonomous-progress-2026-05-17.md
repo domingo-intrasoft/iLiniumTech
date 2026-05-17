@@ -27,6 +27,8 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `f0728db` | Frontend accesibilidad | Estados del menu expuestos por `aria-describedby` sin alterar nombres de enlace; `sr-only` no genera overflow movil. |
 | `75d55a4` | Frontend accesibilidad | Skip link del shell mueve foco real al contenido principal y crea `tabindex=-1` si falta. |
 | `3664c64` | QA docs | Gate local completo registrado tras los incrementos autonomos. |
+| `a32a23a` | QA docs | Log autonomo alineado con commits cerrados. |
+| Bloque actual | Frontend Polizas | Listado explica de forma visible/accesible cuando `polizas.detail` no permite abrir detalle. |
 
 ## Validaciones ejecutadas
 
@@ -125,6 +127,18 @@ Resultado:
 - Extractor Polizas metadata tests OK.
 - Documentation baseline OK.
 - `git diff --check` OK.
+
+Validaciones adicionales tras aviso de permiso de detalle en Polizas:
+
+- `npx vitest run src/features/polizas/PolizasTable.test.ts src/features/polizas/PolizasView.test.ts`: `14/14` tests OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run test:unit`: `188/188` tests OK.
+- `npm run build`: OK.
+- `npm run test:e2e -- polizas`: `1` smoke OK con `CI=1`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
 
 ## Estado local visible
 

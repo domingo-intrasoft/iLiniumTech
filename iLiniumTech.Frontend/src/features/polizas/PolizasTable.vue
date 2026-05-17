@@ -16,10 +16,12 @@ const props = withDefaults(
     pageSize: number
     detailQuery?: LocationQueryRaw
     canOpenDetail?: boolean
+    detailUnavailableMessage?: string | null
   }>(),
   {
     detailQuery: undefined,
     canOpenDetail: true,
+    detailUnavailableMessage: null,
   },
 )
 
@@ -38,6 +40,10 @@ const canGoPrevious = computed(() => props.page > 1 && !props.loading)
 const canGoNext = computed(() => props.page < totalPages.value && !props.loading)
 const resultLabel = computed(() => (props.total === 1 ? 'poliza' : 'polizas'))
 const canOpenDetail = computed(() => props.canOpenDetail ?? true)
+const detailUnavailableMessageId = 'polizas-detail-unavailable-message'
+const detailUnavailableMessage = computed(() =>
+  canOpenDetail.value ? null : props.detailUnavailableMessage,
+)
 
 function tableCellValue(item: PolizaListItem, column: PolizaTableColumn) {
   return item[column.key]
@@ -82,6 +88,16 @@ function detailRoute(item: PolizaListItem) {
       </span>
       <span>{{ firstVisible }}-{{ lastVisible }} visibles</span>
     </div>
+
+    <p
+      v-if="detailUnavailableMessage"
+      :id="detailUnavailableMessageId"
+      class="results-permission-warning"
+      role="status"
+    >
+      <i class="pi pi-lock" aria-hidden="true"></i>
+      {{ detailUnavailableMessage }}
+    </p>
 
     <div v-if="loading" class="table-scroll" role="status" aria-label="Cargando polizas">
       <span class="sr-only">Cargando polizas.</span>
@@ -154,6 +170,9 @@ function detailRoute(item: PolizaListItem) {
                 class="table-icon-action"
                 type="button"
                 :aria-label="`Detalle no disponible para poliza ${item.numero}`"
+                :aria-describedby="
+                  detailUnavailableMessage ? detailUnavailableMessageId : undefined
+                "
                 title="Detalle no disponible"
                 disabled
               >

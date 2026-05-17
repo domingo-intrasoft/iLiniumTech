@@ -41,7 +41,7 @@ Fuera de alcance confirmado:
 | --- | --- | --- | --- | --- |
 | Producto / SDD | Completado con evidencia | MVP vigente confirmado: login/sesion, shell/menu y Polizas read-only. Autos aparcado. | Mantener SDD-2026-001/003/005/007 como base del cierre. | Producto / Arquitectura |
 | Filtros en URL | Completado con evidencia | `PolizasView` sincroniza filtros soportados, paginacion y query params; normaliza paginas/page sizes/fechas invalidas. | Mantener cobertura unitaria y E2E al ampliar filtros. | Frontend / UX |
-| Detalle prevalidado | Completado con evidencia | La UI valida sesion, broker requerido y `polizas.detail` antes de consultar detalle en modo backend. | Completar UAT con matriz real de permisos cuando exista. | Frontend / Backend |
+| Detalle prevalidado | Completado con evidencia | La UI valida sesion, broker requerido y `polizas.detail` antes de consultar detalle en modo backend; si falta permiso, el listado muestra motivo visible y acciones deshabilitadas con descripcion accesible. | Completar UAT con matriz real de permisos cuando exista. | Frontend / Backend |
 | Cambio broker demo | Completado MVP | `POST /api/auth/broker` exige `demo-session`, valida `allowedBrokerIds`, reemite cookie y no acepta API key sola. | Retirar o reemplazar en auth productiva. | Backend / Datos |
 | Seguridad / privacidad | Completado con gate local | Gate completo, secret scan, dependencia, CORS, build, tests, E2E y smoke sin findings bloqueantes. | Repetir en PR/CI. | QA / Seguridad |
 | UAT | Bloqueado externo | Requiere entorno autorizado y responsable funcional si se valida contra datos reales. | Registrar UAT o bloqueo DBA/funcional. | Producto / DBA |
@@ -66,6 +66,7 @@ Fuera de alcance confirmado:
 - Con `VITE_USE_BACKEND=true`, el frontend debe validar `/api/me` o contexto equivalente antes de consultar detalle.
 - Si falta broker requerido o `currentBrokerId` no pertenece a `allowedBrokerIds`, no debe consultarse el detalle.
 - Si falta permiso `polizas.detail`, la UI debe mostrar acceso denegado sin revelar datos de la poliza.
+- Si el listado ya esta visible pero la sesion no concede `polizas.detail`, los enlaces de detalle deben quedar deshabilitados y explicar el motivo sin consultar el detalle.
 - Backend debe exigir `polizas.detail` y broker autorizado antes de leer repositorio o resolver SQL.
 - Una poliza inexistente, no autorizada o de broker cruzado no debe revelar si existe.
 - 401/403/404 esperados deben incluir mensaje publico sanitizado y `correlationId` cuando aplique.
@@ -141,6 +142,7 @@ Resultado del gate:
 | --- | --- | --- |
 | Frontend filtros URL | Unit tests de parseo/serializacion y E2E con reload/back-forward. | Query params permitidos reconstruyen listado; valores invalidos se normalizan o bloquean. |
 | Frontend detalle | Tests de entrada directa, sin sesion, sin `polizas.detail` y vuelta conservando filtros. | No se consulta detalle si falta sesion/contexto/permiso; error visible seguro. |
+| Frontend listado sin detalle | Tests de tabla/listado con `polizas.read` sin `polizas.detail`. | Acciones de detalle deshabilitadas, sin enlaces navegables y con motivo visible/accesible. |
 | Backend permisos | Tests de `polizas.catalogs`, `polizas.read`, `polizas.detail`, broker ausente y broker cruzado. | 401/403 sanitizados con `correlationId`; sin lectura de repositorio si falla autorizacion. |
 | Broker demo | Tests de broker permitido, broker no permitido y sesion ausente. | Backend valida `allowedBrokerIds`; no se usa header libre como autoridad. |
 | Seguridad | Secret scan, CORS si toca API/config, errores sanitizados y capturas redaccionadas. | Sin leaks, sin SQL/trazas/secrets/PII en respuestas o evidencia. |

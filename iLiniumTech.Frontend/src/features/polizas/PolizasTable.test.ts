@@ -53,14 +53,23 @@ describe('PolizasTable', () => {
     expect(detailActions[0].attributes('aria-label')).toContain('Ver detalle de poliza')
   })
 
-  it('renders disabled detail actions without navigable links when detail permission is denied', () => {
-    const wrapper = mountTable({ canOpenDetail: false })
+  it('renders disabled detail actions with the access reason when detail permission is denied', () => {
+    const wrapper = mountTable({
+      canOpenDetail: false,
+      detailUnavailableMessage: 'La sesion actual no tiene permiso para abrir el detalle.',
+    })
 
     const disabledActions = wrapper.findAll('button.table-icon-action')
 
+    expect(wrapper.get('#polizas-detail-unavailable-message').text()).toContain(
+      'La sesion actual no tiene permiso para abrir el detalle.',
+    )
     expect(disabledActions).toHaveLength(polizasFixture.items.length)
     expect(disabledActions[0].attributes('disabled')).toBeDefined()
     expect(disabledActions[0].attributes('aria-label')).toContain('Detalle no disponible')
+    expect(disabledActions[0].attributes('aria-describedby')).toBe(
+      'polizas-detail-unavailable-message',
+    )
     expect(wrapper.find('a.table-icon-action').exists()).toBe(false)
     expect(wrapper.find('a.table-link').exists()).toBe(false)
   })
