@@ -31,7 +31,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `7916670` | Frontend Polizas | Listado explica de forma visible/accesible cuando `polizas.detail` no permite abrir detalle. |
 | `281e924` | Frontend Polizas | Detalle de poliza alinea badge superior con broker activo, broker requerido y permiso ausente. |
 | `856913a` | Frontend Polizas | Resumen visible de filtros activos sincronizado con URL, catalogos y retorno desde detalle. |
-| Bloque actual | Frontend auth | Login enfoca usuario, separa aviso de sesion de error y expone estado accesible durante validacion. |
+| `0fc94fb` | Frontend auth | Login enfoca usuario, separa aviso de sesion de error y expone estado accesible durante validacion. |
 
 ## Validaciones ejecutadas
 
