@@ -156,6 +156,55 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Ready_rejects_demo_auth_outside_development_without_explicit_password()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["ApiSecurity:ApiKey"] = "test-key-that-is-long-enough-for-production",
+                ["Auth:Demo:Enabled"] = "true",
+                ["Auth:Demo:OptIn"] = HeaderExecutionContextPolicy.DemoOptInRequiredValue
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/ready");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
+        body.Should().Contain("\"status\":\"not_ready\"");
+        body.Should().Contain("\"name\":\"demoAuthentication\"");
+        body.Should().Contain("requires an explicit non-default password");
+        body.Should().Contain("\"requiresExplicitPassword\":true");
+        body.Should().NotContain(HeaderExecutionContextPolicy.DemoOptInRequiredValue);
+        body.Should().NotContain("demo-password");
+    }
+
+    [Fact]
+    public async Task Ready_allows_demo_auth_outside_development_with_explicit_non_default_password()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["ApiSecurity:ApiKey"] = "test-key-that-is-long-enough-for-production",
+                ["Auth:Demo:Enabled"] = "true",
+                ["Auth:Demo:OptIn"] = HeaderExecutionContextPolicy.DemoOptInRequiredValue,
+                ["Auth:Demo:Password"] = "configured-demo-password"
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/ready");
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        body.Should().Contain("\"status\":\"ready\"");
+        body.Should().Contain("\"name\":\"demoAuthentication\"");
+        body.Should().Contain("Demo authentication is explicitly configured");
+        body.Should().NotContain("configured-demo-password");
+    }
+
+    [Fact]
     public async Task Responses_include_baseline_security_headers()
     {
         await using var factory = new TestApiFactory();
@@ -359,6 +408,63 @@ public sealed class PolizasApiTests
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         body.Should().Contain("AUTH_DEMO_DISABLED");
         response.Headers.TryGetValues("Set-Cookie", out _).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Demo_login_requires_explicit_non_default_password_outside_development()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["Auth:Demo:Enabled"] = "true",
+                ["Auth:Demo:OptIn"] = HeaderExecutionContextPolicy.DemoOptInRequiredValue
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "demo-password-required");
+
+        var response = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            username = "demo",
+            password = "demo",
+            brokerId = 42
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.Headers.TryGetValues("Set-Cookie", out _).Should().BeFalse();
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("demo-password-required");
+        body.Should().Contain("AUTH_DEMO_PASSWORD_REQUIRED");
+        body.Should().Contain("\"correlationId\":\"demo-password-required\"");
+        body.Should().NotContain("DEMO_ONLY_NOT_FOR_REAL_DATA");
+    }
+
+    [Fact]
+    public async Task Demo_login_allows_explicit_non_default_password_outside_development_with_opt_in()
+    {
+        await using var factory = new TestApiFactory(
+            new Dictionary<string, string?>
+            {
+                ["Auth:Demo:Enabled"] = "true",
+                ["Auth:Demo:OptIn"] = HeaderExecutionContextPolicy.DemoOptInRequiredValue,
+                ["Auth:Demo:Password"] = "configured-demo-password"
+            },
+            environmentName: "Production");
+        using var client = factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            username = "demo",
+            password = "configured-demo-password",
+            brokerId = 42
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Headers.GetValues("Set-Cookie")
+            .Should().Contain(cookie => cookie.Contains(ApiAuthenticationSchemes.DemoSessionCookieName));
+        body.Should().Contain("\"currentBrokerId\":42");
+        body.Should().NotContain("configured-demo-password");
     }
 
     [Fact]

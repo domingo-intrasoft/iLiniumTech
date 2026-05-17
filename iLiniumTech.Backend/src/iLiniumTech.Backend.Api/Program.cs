@@ -191,7 +191,16 @@ app.MapPost("/api/auth/login", async (
             "A positive broker identifier is required.");
     }
 
-    var expectedPassword = configuration["Auth:Demo:Password"] ?? "demo";
+    var expectedPassword = ReadDemoPassword(configuration, environment);
+    if (expectedPassword is null)
+    {
+        return ErrorResult(
+            httpContext,
+            StatusCodes.Status403Forbidden,
+            "AUTH_DEMO_PASSWORD_REQUIRED",
+            "Demo authentication requires explicit non-default credentials in this environment.");
+    }
+
     if (!string.Equals(request.Password, expectedPassword, StringComparison.Ordinal))
     {
         return ErrorResult(
@@ -643,6 +652,21 @@ static bool IsDemoAuthEnabled(IConfiguration configuration, IHostEnvironment env
             configuration["Auth:Demo:OptIn"],
             HeaderExecutionContextPolicy.DemoOptInRequiredValue,
             StringComparison.Ordinal);
+}
+
+static string? ReadDemoPassword(IConfiguration configuration, IHostEnvironment environment)
+{
+    var configuredPassword = configuration["Auth:Demo:Password"];
+    if (environment.IsDevelopment())
+    {
+        return configuredPassword ?? "demo";
+    }
+
+    return string.IsNullOrWhiteSpace(configuredPassword) ||
+        string.Equals(configuredPassword, "demo", StringComparison.Ordinal) ||
+        string.Equals(configuredPassword, "__SET_IN_ENVIRONMENT__", StringComparison.Ordinal)
+            ? null
+            : configuredPassword;
 }
 
 static LoginResponse CreateDemoSession(string username, int? requestedBrokerId, IConfiguration configuration)

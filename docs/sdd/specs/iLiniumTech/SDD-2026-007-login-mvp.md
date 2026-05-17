@@ -82,7 +82,7 @@ El segundo incremento mantiene un contrato propio de iLiniumTech y no reutiliza 
 - `POST /api/auth/logout`
 - `GET /api/me`
 
-`POST /api/auth/login` acepta credenciales demo solo para facilitar el MVP revisable. En Development queda disponible por defecto salvo `Auth:Demo:Enabled=false`; fuera de Development requiere `Auth:Demo:Enabled=true` y opt-in explicito `Auth:Demo:OptIn` con el valor demo aprobado por las politicas de contexto. Este contrato no sustituye la decision pendiente de proveedor productivo.
+`POST /api/auth/login` acepta credenciales demo solo para facilitar el MVP revisable. En Development queda disponible por defecto salvo `Auth:Demo:Enabled=false`; fuera de Development requiere `Auth:Demo:Enabled=true`, opt-in explicito `Auth:Demo:OptIn` con el valor demo aprobado por las politicas de contexto y `Auth:Demo:Password` configurado con un valor no predeterminado. Este contrato no sustituye la decision pendiente de proveedor productivo.
 
 `GET /api/me` devuelve, como minimo:
 

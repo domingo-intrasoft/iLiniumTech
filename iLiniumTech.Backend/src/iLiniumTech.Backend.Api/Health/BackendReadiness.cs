@@ -15,6 +15,7 @@ public static class BackendReadiness
             CheckApiKey(configuration, environment),
             CheckCors(configuration),
             CheckPolizasRepository(configuration),
+            CheckDemoAuthentication(configuration, environment),
             CheckHeaderExecutionContext(configuration, environment)
         };
 
@@ -220,6 +221,62 @@ public static class BackendReadiness
                 ["environment"] = environment.EnvironmentName,
                 ["demoOptIn"] = hasDemoOptIn && requiresDemoOptIn
             });
+    }
+
+    private static ReadinessCheck CheckDemoAuthentication(
+        IConfiguration configuration,
+        IHostEnvironment environment)
+    {
+        var configured = bool.TryParse(configuration["Auth:Demo:Enabled"], out var enabled) && enabled;
+        if (environment.IsDevelopment())
+        {
+            return ReadinessCheck.Ok(
+                "demoAuthentication",
+                configured
+                    ? "Demo authentication is explicitly enabled for Development."
+                    : "Demo authentication is available by default in Development.");
+        }
+
+        if (!configured)
+        {
+            return ReadinessCheck.Ok(
+                "demoAuthentication",
+                "Demo authentication is disabled outside Development.");
+        }
+
+        var hasDemoOptIn = string.Equals(
+            configuration["Auth:Demo:OptIn"],
+            HeaderExecutionContextPolicy.DemoOptInRequiredValue,
+            StringComparison.Ordinal);
+        if (!hasDemoOptIn)
+        {
+            return ReadinessCheck.Fail(
+                "demoAuthentication",
+                "Demo authentication cannot be enabled outside Development without explicit demo opt-in.",
+                new Dictionary<string, object?>
+                {
+                    ["environment"] = environment.EnvironmentName,
+                    ["requiresDemoOptIn"] = true
+                });
+        }
+
+        var demoPassword = configuration["Auth:Demo:Password"];
+        if (IsMissingOrPlaceholder(demoPassword) ||
+            string.Equals(demoPassword, "demo", StringComparison.Ordinal))
+        {
+            return ReadinessCheck.Fail(
+                "demoAuthentication",
+                "Demo authentication outside Development requires an explicit non-default password.",
+                new Dictionary<string, object?>
+                {
+                    ["environment"] = environment.EnvironmentName,
+                    ["requiresExplicitPassword"] = true
+                });
+        }
+
+        return ReadinessCheck.Ok(
+            "demoAuthentication",
+            "Demo authentication is explicitly configured for a non-production environment.");
     }
 
     private static bool IsMissingOrPlaceholder(string? value) =>
