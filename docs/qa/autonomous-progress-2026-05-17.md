@@ -29,6 +29,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `3664c64` | QA docs | Gate local completo registrado tras los incrementos autonomos. |
 | `a32a23a` | QA docs | Log autonomo alineado con commits cerrados. |
 | `7916670` | Frontend Polizas | Listado explica de forma visible/accesible cuando `polizas.detail` no permite abrir detalle. |
+| `0ad395c` | Frontend Polizas | Detalle de poliza alinea badge superior con broker activo, broker requerido y permiso ausente. |
 
 ## Validaciones ejecutadas
 
@@ -136,6 +137,16 @@ Validaciones adicionales tras aviso de permiso de detalle en Polizas:
 - `npm run test:unit`: `188/188` tests OK.
 - `npm run build`: OK.
 - `npm run test:e2e -- polizas`: `1` smoke OK con `CI=1`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras paridad de contexto en detalle de Polizas:
+
+- `npx vitest run src/features/polizas/PolizaDetailView.test.ts`: `10/10` tests OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run build`: OK.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.

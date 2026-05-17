@@ -67,6 +67,7 @@ Fuera de alcance confirmado:
 - Si falta broker requerido o `currentBrokerId` no pertenece a `allowedBrokerIds`, no debe consultarse el detalle.
 - Si falta permiso `polizas.detail`, la UI debe mostrar acceso denegado sin revelar datos de la poliza.
 - Si el listado ya esta visible pero la sesion no concede `polizas.detail`, los enlaces de detalle deben quedar deshabilitados y explicar el motivo sin consultar el detalle.
+- El detalle debe mostrar el contexto superior coherente con el listado: broker activo, broker requerido o aviso por sesion/permiso cuando aplique.
 - Backend debe exigir `polizas.detail` y broker autorizado antes de leer repositorio o resolver SQL.
 - Una poliza inexistente, no autorizada o de broker cruzado no debe revelar si existe.
 - 401/403/404 esperados deben incluir mensaje publico sanitizado y `correlationId` cuando aplique.
@@ -142,6 +143,7 @@ Resultado del gate:
 | --- | --- | --- |
 | Frontend filtros URL | Unit tests de parseo/serializacion y E2E con reload/back-forward. | Query params permitidos reconstruyen listado; valores invalidos se normalizan o bloquean. |
 | Frontend detalle | Tests de entrada directa, sin sesion, sin `polizas.detail` y vuelta conservando filtros. | No se consulta detalle si falta sesion/contexto/permiso; error visible seguro. |
+| Frontend contexto detalle | Test de detalle con broker valido, broker ausente y permiso ausente. | Badge superior refleja broker activo o estado de atencion sin ocultar el error principal. |
 | Frontend listado sin detalle | Tests de tabla/listado con `polizas.read` sin `polizas.detail`. | Acciones de detalle deshabilitadas, sin enlaces navegables y con motivo visible/accesible. |
 | Backend permisos | Tests de `polizas.catalogs`, `polizas.read`, `polizas.detail`, broker ausente y broker cruzado. | 401/403 sanitizados con `correlationId`; sin lectura de repositorio si falla autorizacion. |
 | Broker demo | Tests de broker permitido, broker no permitido y sesion ausente. | Backend valida `allowedBrokerIds`; no se usa header libre como autoridad. |

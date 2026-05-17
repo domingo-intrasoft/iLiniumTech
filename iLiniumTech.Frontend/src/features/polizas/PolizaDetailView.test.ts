@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
   },
   router: { replace: vi.fn() },
   session: { value: null as SessionContext | null },
+  sessionLoading: { value: false },
   sessionError: { value: null as string | null },
   sessionErrorKind: { value: null as 'unauthenticated' | null },
   loadSession: vi.fn(),
@@ -39,6 +40,7 @@ vi.mock('@/services/session', () => ({
   }),
   useSession: () => ({
     session: mocks.session,
+    loading: mocks.sessionLoading,
     error: mocks.sessionError,
     errorKind: mocks.sessionErrorKind,
     loadSession: mocks.loadSession,
@@ -90,6 +92,7 @@ describe('PolizaDetailView', () => {
     mocks.route.query = {}
     mocks.router.replace.mockReset()
     mocks.session.value = null
+    mocks.sessionLoading.value = false
     mocks.sessionError.value = null
     mocks.sessionErrorKind.value = null
     mocks.loadSession.mockReset()
@@ -196,12 +199,15 @@ describe('PolizaDetailView', () => {
 
   it('does not call detail API when backend session is missing broker context', async () => {
     enableBackendDemoSessionMode()
-    mocks.loadSession.mockResolvedValueOnce(backendSession({ brokerId: null, entityMainId: null }))
+    mocks.session.value = backendSession({ brokerId: null, entityMainId: null })
+    mocks.loadSession.mockResolvedValueOnce(mocks.session.value)
 
     const wrapper = mount(PolizaDetailView)
     await flushPromises()
 
     expect(mocks.getPolizaById).not.toHaveBeenCalled()
+    expect(wrapper.get('.environment-badge').text()).toBe('Broker requerido')
+    expect(wrapper.get('.environment-badge').classes()).toContain('warning')
     expect(wrapper.find('[role="alert"]').text()).toContain(
       'Configura un broker para consultar polizas.',
     )
@@ -209,15 +215,31 @@ describe('PolizaDetailView', () => {
 
   it('does not call detail API when backend session lacks polizas.detail permission', async () => {
     enableBackendDemoSessionMode()
-    mocks.loadSession.mockResolvedValueOnce(backendSession({ permissions: ['polizas.read'] }))
+    mocks.session.value = backendSession({ permissions: ['polizas.read'] })
+    mocks.loadSession.mockResolvedValueOnce(mocks.session.value)
 
     const wrapper = mount(PolizaDetailView)
     await flushPromises()
 
     expect(mocks.getPolizaById).not.toHaveBeenCalled()
+    expect(wrapper.get('.environment-badge').text()).toBe('Broker 42')
+    expect(wrapper.get('.environment-badge').classes()).toContain('warning')
     expect(wrapper.find('[role="alert"]').text()).toContain(
       'La sesion actual no tiene permiso para consultar el detalle de polizas.',
     )
+  })
+
+  it('shows the active backend broker in the detail shell when the session is valid', async () => {
+    enableBackendDemoSessionMode()
+    mocks.session.value = backendSession({ brokerId: 84, entityMainId: 84 })
+    mocks.loadSession.mockResolvedValueOnce(mocks.session.value)
+    mocks.getPolizaById.mockResolvedValueOnce(polizasDetailFixture[0])
+
+    const wrapper = mount(PolizaDetailView)
+    await flushPromises()
+
+    expect(wrapper.get('.environment-badge').text()).toBe('Broker 84')
+    expect(wrapper.get('.environment-badge').classes()).not.toContain('warning')
   })
 
   it('redirects to the polizas list after switching broker from detail', async () => {

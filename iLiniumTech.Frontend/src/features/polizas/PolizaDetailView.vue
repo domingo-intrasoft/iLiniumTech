@@ -17,7 +17,13 @@ import type { PolizaDetail } from './polizasTypes'
 const route = useRoute()
 const router = useRouter()
 const { userLabel, logout } = useAuthSession()
-const { session, error: sessionError, errorKind: sessionErrorKind, loadSession } = useSession()
+const {
+  session,
+  loading: sessionLoading,
+  error: sessionError,
+  errorKind: sessionErrorKind,
+  loadSession,
+} = useSession()
 const poliza = ref<PolizaDetail | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -26,12 +32,39 @@ const brokerError = ref<string | null>(null)
 const premiumField: PolizaDetailField = { key: 'primaAnual', label: 'Prima anual', type: 'money' }
 const isBackendMode = import.meta.env.VITE_USE_BACKEND === 'true'
 const dataOriginLabel = computed(() => (isBackendMode ? 'API polizas' : 'Fixture local'))
-const shellStatusLabel = computed(() => (isBackendMode ? 'API polizas' : 'Modo local'))
 const detailTitle = computed(() => poliza.value?.numero ?? 'Detalle de poliza')
 const polizasBackTarget = computed(() => ({ name: 'polizas', query: route.query }))
 const POLIZAS_DETAIL_PERMISSION = 'polizas.detail'
 const POLIZAS_DETAIL_ACCESS_DENIED_MESSAGE =
   'La sesion actual no tiene permiso para consultar el detalle de polizas.'
+
+const sessionLabel = computed(() => {
+  if (!isBackendMode) {
+    return 'Modo local'
+  }
+
+  if (sessionLoading.value) {
+    return 'Contexto...'
+  }
+
+  if (sessionError.value) {
+    return 'Sesion no disponible'
+  }
+
+  if (session.value?.brokerId) {
+    return `Broker ${session.value.brokerId}`
+  }
+
+  return session.value?.polizasExecutionContextRequired ? 'Broker requerido' : 'API polizas'
+})
+
+const sessionNeedsAttention = computed(
+  () =>
+    Boolean(sessionError.value) ||
+    Boolean(brokerError.value) ||
+    Boolean(session.value?.polizasExecutionContextRequired && !session.value.brokerId) ||
+    error.value === POLIZAS_DETAIL_ACCESS_DENIED_MESSAGE,
+)
 
 const brokerOptions = computed(() => {
   if (!isBackendMode || session.value?.authMode !== 'DemoSession') {
@@ -177,7 +210,8 @@ watch(() => route.params.id, loadPoliza, { immediate: true })
   <AppShell
     content-id="poliza-detail-content"
     section-title="Polizas"
-    :session-label="shellStatusLabel"
+    :session-label="sessionLabel"
+    :session-needs-attention="sessionNeedsAttention"
     :user-label="userLabel"
     :broker-options="brokerOptions"
     :active-broker-id="session?.brokerId ?? null"
