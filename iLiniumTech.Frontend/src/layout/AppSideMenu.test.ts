@@ -61,6 +61,15 @@ describe('AppSideMenu', () => {
     expect(wrapper.get('.side-nav a[href="/clientes"]').text()).toContain('Clientes')
     expect(wrapper.get('.side-nav a[href="/recibos"]').text()).toContain('Recibos')
     expect(wrapper.get('.side-subnav a[href="/polizas/flotas"]').text()).toContain('Flotas')
+    expect(wrapper.get('.side-nav a[href="/polizas"] .nav-status-dot').classes()).toContain(
+      'status-operational',
+    )
+    expect(wrapper.get('.side-nav a[href="/clientes"] .nav-status-dot').classes()).toContain(
+      'status-fixture',
+    )
+    expect(
+      wrapper.get('.side-subnav a[href="/polizas/flotas"] .nav-status-dot').classes(),
+    ).toContain('status-blockedSdd')
     expect(wrapper.get('.side-nav [aria-current="page"]').text()).toContain('Polizas')
     expect(wrapper.text()).not.toMatch(/IAP_|QueryStatic|ComponentDataSource|metadata/i)
   })
@@ -70,6 +79,12 @@ describe('AppSideMenu', () => {
 
     expect(wrapper.find('[aria-current="page"]').exists()).toBe(false)
     expect(wrapper.get('.side-subnav .side-nav-disabled').text()).toContain('Autos Particulares')
+    expect(wrapper.get('.side-subnav .side-nav-disabled').attributes('title')).toContain(
+      'Aparcado por decision de producto',
+    )
+    expect(wrapper.get('.side-subnav .side-nav-disabled .nav-status-dot').classes()).toContain(
+      'status-parked',
+    )
     expect(wrapper.get('.has-children').classes()).toContain('active')
   })
 

@@ -267,6 +267,7 @@ select:focus-visible {
 
 .side-nav a,
 .side-nav-disabled {
+  position: relative;
   display: grid;
   min-height: 39px;
   place-items: center;
@@ -291,8 +292,8 @@ select:focus-visible {
   font-size: 1rem;
 }
 
-.side-nav a span,
-.side-nav-disabled span {
+.side-nav a .side-nav-label,
+.side-nav-disabled .side-nav-label {
   max-width: 64px;
   overflow: hidden;
   font-size: 0.53rem;
@@ -300,6 +301,32 @@ select:focus-visible {
   line-height: 1.05;
   text-align: center;
   text-overflow: ellipsis;
+}
+
+.nav-status-dot {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+}
+
+.nav-status-dot.status-operational {
+  background: #33b879;
+}
+
+.nav-status-dot.status-fixture {
+  background: #8fc8ff;
+}
+
+.nav-status-dot.status-parked {
+  background: #d6a33e;
+}
+
+.nav-status-dot.status-blockedSdd {
+  background: #d96055;
 }
 
 .side-subnav {

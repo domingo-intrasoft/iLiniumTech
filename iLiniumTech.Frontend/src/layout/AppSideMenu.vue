@@ -6,6 +6,8 @@ import { useSession } from '@/services/session'
 
 import {
   appNavigation,
+  getNavigationStatusDescription,
+  getNavigationStatusLabel,
   getNavigationUnavailableReason,
   isNavigationItemActive,
   type AppNavigationItem,
@@ -26,16 +28,17 @@ function childUnavailable(parent: AppNavigationItem, child: AppNavigationItem) {
 
 function itemTitle(item: AppNavigationItem) {
   const unavailableReason = getNavigationUnavailableReason(item, session.value)
+  const statusDescription = getNavigationStatusDescription(item)
 
   if (unavailableReason === 'disabled') {
-    return `${item.label} no disponible en el MVP`
+    return `${item.label} no disponible en el MVP. ${statusDescription}`
   }
 
   if (unavailableReason === 'permission') {
-    return `${item.label} no disponible para la sesion actual`
+    return `${item.label} no disponible para la sesion actual. ${statusDescription}`
   }
 
-  return item.label
+  return `${item.label}. ${statusDescription}`
 }
 
 function childTitle(parent: AppNavigationItem, child: AppNavigationItem) {
@@ -77,7 +80,13 @@ function childTitle(parent: AppNavigationItem, child: AppNavigationItem) {
             :aria-current="item.to === activePath ? 'page' : undefined"
           >
             <i :class="item.icon" aria-hidden="true"></i>
-            <span>{{ item.label }}</span>
+            <span class="side-nav-label">{{ item.label }}</span>
+            <span
+              class="nav-status-dot"
+              :class="`status-${item.status}`"
+              :title="getNavigationStatusLabel(item)"
+              aria-hidden="true"
+            ></span>
           </RouterLink>
           <span
             v-else
@@ -86,7 +95,13 @@ function childTitle(parent: AppNavigationItem, child: AppNavigationItem) {
             :aria-disabled="itemUnavailable(item) ? 'true' : undefined"
           >
             <i :class="item.icon" aria-hidden="true"></i>
-            <span>{{ item.label }}</span>
+            <span class="side-nav-label">{{ item.label }}</span>
+            <span
+              class="nav-status-dot"
+              :class="`status-${item.status}`"
+              :title="getNavigationStatusLabel(item)"
+              aria-hidden="true"
+            ></span>
           </span>
 
           <ul v-if="item.children?.length" class="side-subnav">
@@ -98,7 +113,13 @@ function childTitle(parent: AppNavigationItem, child: AppNavigationItem) {
                 :aria-current="child.to === activePath ? 'page' : undefined"
               >
                 <i :class="child.icon" aria-hidden="true"></i>
-                <span>{{ child.label }}</span>
+                <span class="side-nav-label">{{ child.label }}</span>
+                <span
+                  class="nav-status-dot"
+                  :class="`status-${child.status}`"
+                  :title="getNavigationStatusLabel(child)"
+                  aria-hidden="true"
+                ></span>
               </RouterLink>
               <span
                 v-else
@@ -107,7 +128,13 @@ function childTitle(parent: AppNavigationItem, child: AppNavigationItem) {
                 :aria-disabled="childUnavailable(item, child) ? 'true' : undefined"
               >
                 <i :class="child.icon" aria-hidden="true"></i>
-                <span>{{ child.label }}</span>
+                <span class="side-nav-label">{{ child.label }}</span>
+                <span
+                  class="nav-status-dot"
+                  :class="`status-${child.status}`"
+                  :title="getNavigationStatusLabel(child)"
+                  aria-hidden="true"
+                ></span>
               </span>
             </li>
           </ul>

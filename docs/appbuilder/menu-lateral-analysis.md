@@ -28,11 +28,13 @@ Fecha: 2026-05-15
 ## Decisiones de replica en iLiniumTech
 
 - El menu lateral de iLiniumTech queda declarado como codigo fuente en `src/layout/appNavigation.ts`.
-- La navegacion visible mantiene la estructura funcional observada: modulos principales compactos, iconos PrimeIcons, Polizas como area activa y Autos Particulares como pantalla hija disponible.
-- Solo las pantallas existentes tienen enlace real: `/polizas` y `/autos-particulares`. El resto de opciones quedan visibles como alcance futuro no interactivo del MVP.
+- La navegacion visible mantiene la estructura funcional observada: modulos principales compactos, iconos PrimeIcons y Polizas como area activa.
+- Detectado en el frontend actual: casi todas las entradas principales del menu tienen rutas Vue protegidas y pantallas MVP estaticas. Estas rutas no equivalen a datos reales, paridad AppBuilder, API nueva ni permisos productivos.
+- Detectado en `src/layout/appNavigation.ts`: `Autos Particulares` conserva ruta tecnica `/autos-particulares`, pero sigue marcado como `disabled: true`. Se mantiene aparcada y no reactivada.
+- Detectado en `src/layout/appNavigation.ts`: `Flotas` y `Colectivas` tienen rutas explicitas `/polizas/flotas` y `/polizas/colectivas` bajo Polizas. Se tratan como scopes estaticos visibles, no como modulos funcionales conectados.
 - `AppSideMenu.vue` usa `RouterLink`, `useRoute` y una funcion local `isNavigationItemActive`; no consulta metadata, GraphQL, store heredado ni endpoints nuevos.
 - `AppShell.vue` centraliza sidebar y topbar para evitar duplicacion entre Polizas y Autos Particulares.
-- Polizas y Autos conservan sus contratos read-only y sus servicios actuales.
+- Polizas conserva su contrato read-only actual. Autos Particulares queda como incremento tecnico previo aparcado; su existencia de codigo/ruta no autoriza ampliarlo.
 
 ## Diferencias conscientes
 
@@ -40,11 +42,12 @@ Fecha: 2026-05-15
 - No se consume `Menu_GET_BY_APPLICATION_ID`, tablas `IAP_*`, localizaciones heredadas ni `urlComponentStatic` en runtime.
 - No hay apertura por hover/anclaje global ni keep-alive dirigido por metadata; se deja un menu compacto y estable para el MVP.
 - El logo de broker se representa como marca textual controlada por iLiniumTech, no como URL cargada desde sesion heredada.
-- Las entradas sin pantalla implementada no navegan para evitar rutas rotas y falsas capacidades.
+- Las rutas MVP estaticas orientan navegacion y pruebas, pero mantienen bloqueadas las capacidades con datos reales, acciones, filtros funcionales, workflows, permisos finos y APIs nuevas hasta SDD, permisos, DBA/UAT y contrato backend explicito.
 
 ## Riesgos
 
 - La taxonomia final de modulos podria diferir de la configuracion real por broker/perfil y requerira validacion funcional.
 - Los permisos reales aun no estan implementados; cuando exista auth de producto, el menu debera filtrar por permisos iLiniumTech, no por permisos AppBuilder.
-- La jerarquia de Autos Particulares bajo Polizas es una decision MVP razonable, pendiente de UAT de producto.
+- `Autos Particulares` no debe reactivarse por la sola existencia de ruta tecnica; requiere decision de producto, SDD actualizada, regla funcional, DBA/UAT y permisos.
+- `Flotas` y `Colectivas` pueden parecer navegables por existir como scopes estaticos, pero siguen bloqueadas para datos reales hasta validar regla funcional, permisos, contrato API y UAT/DBA.
 - La version actual prioriza mantenibilidad y trazabilidad sobre paridad visual total con los modos avanzados de Apollo.

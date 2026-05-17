@@ -26,8 +26,10 @@ Detalle operativo para futuras IA: [`development-readiness.md`](development-read
 Resumen ejecutivo:
 
 - `Polizas` queda como pagina funcional inicial con busqueda/listado/detalle.
-- El resto de entradas principales del menu quedan desbloqueadas como `MVP estatico visible`: ruta Vue protegida, contenido especifico de modulo, acciones deshabilitadas y sin consumo runtime de metadata.
+- Detectado en el frontend actual: casi todo el menu ya tiene rutas Vue protegidas y pantallas MVP estaticas con contenido de modulo, acciones bloqueadas o no operativas y sin consumo runtime de metadata.
 - `MVP estatico visible` no significa datos reales ni paridad AppBuilder. Para conectar API, filtros, acciones, PII, importes o workflows siguen haciendo falta SDD, permisos, DBA/UAT y contrato backend explicito.
+- `Flotas` y `Colectivas` existen como scopes estaticos bajo Polizas. Son visibles y navegables en el MVP, pero quedan bloqueadas para datos reales hasta SDD, permisos, regla funcional, DBA/UAT y API explicita.
+- `Autos Particulares` conserva ruta tecnica, pero esta aparcada y no reactivada.
 - Las entradas administrativas, tecnicas o genericas (`Administracion`, `Configuracion`, `Conectividad`, `Controles`, `Logs`, `By Aunna`, etc.) son especialmente sensibles: se muestran como superficies bloqueadas para orientar al usuario, pero no replican Builder ni habilitan configuracion real.
 
 | Entrada de menu actual | Estado de readiness | Documento |
@@ -36,9 +38,9 @@ Resumen ejecutivo:
 | Clientes | MVP estatico visible; datos/API/PII pendientes | [`clientes/README.md`](clientes/README.md) |
 | Propuestas | MVP estatico visible; datos/API pendientes | [`propuestas/README.md`](propuestas/README.md) |
 | Polizas | Lista para desarrollo inicial | [`polizas/README.md`](polizas/README.md) |
-| Polizas / Autos Particulares | Aparcada; no es readiness AppBuilder confirmada | Sin documento de pagina en esta carpeta; ver [`SDD-2026-006`](../../sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md) |
-| Polizas / Flotas | MVP estatico visible; reglas/API pendientes | Pendiente |
-| Polizas / Colectivas | MVP estatico visible; reglas/API pendientes | Pendiente |
+| Polizas / Autos Particulares | Aparcada; ruta tecnica deshabilitada, no reactivada | Sin documento de pagina en esta carpeta; ver [`SDD-2026-006`](../../sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md) |
+| Polizas / Flotas | MVP estatico visible; scope bajo Polizas; datos/API pendientes | [`polizas-flotas/README.md`](polizas-flotas/README.md) |
+| Polizas / Colectivas | MVP estatico visible; scope bajo Polizas; datos/API pendientes | [`polizas-colectivas/README.md`](polizas-colectivas/README.md) |
 | Recibos | MVP estatico visible; datos/API/importes pendientes | [`recibos/README.md`](recibos/README.md) |
 | Suplementos | MVP estatico visible; datos/API pendientes | [`suplementos/README.md`](suplementos/README.md) |
 | Siniestros | MVP estatico visible; datos/API/PII pendientes | [`siniestros/README.md`](siniestros/README.md) |
@@ -62,6 +64,11 @@ Polizas tiene documentacion por componentes y por eso es la unica pagina lista p
 - [`polizas/components/detalle-navegacion.md`](polizas/components/detalle-navegacion.md)
 - [`polizas/components/toolbar-acciones-contextuales.md`](polizas/components/toolbar-acciones-contextuales.md)
 - [`polizas/components/submenus-polizas.md`](polizas/components/submenus-polizas.md)
+
+Scopes estaticos bajo Polizas:
+
+- [`polizas-flotas/README.md`](polizas-flotas/README.md)
+- [`polizas-colectivas/README.md`](polizas-colectivas/README.md)
 
 Clientes tiene subdocumentos utiles para futura SDD, pero siguen bloqueados para desarrollo porque falta confirmar metadata real de pagina:
 

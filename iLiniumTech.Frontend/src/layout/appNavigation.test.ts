@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   appNavigation,
+  getNavigationStatusDescription,
+  getNavigationStatusLabel,
   getNavigationUnavailableReason,
   hasNavigationPermission,
 } from './appNavigation'
@@ -11,11 +13,16 @@ describe('appNavigation static permission state', () => {
     const polizas = appNavigation.find((item) => item.label === 'Polizas')
 
     expect(polizas?.to).toBe('/polizas')
+    expect(polizas && getNavigationStatusLabel(polizas)).toBe('Operativo')
     expect(polizas?.requiredPermission).toBe('polizas.read')
     expect(polizas?.children?.find((item) => item.label === 'Autos Particulares')?.disabled).toBe(
       true,
     )
+    expect(polizas?.children?.find((item) => item.label === 'Autos Particulares')?.status).toBe(
+      'parked',
+    )
     expect(polizas?.children?.find((item) => item.label === 'Flotas')?.to).toBe('/polizas/flotas')
+    expect(polizas?.children?.find((item) => item.label === 'Flotas')?.status).toBe('blockedSdd')
     expect(polizas?.children?.find((item) => item.label === 'Colectivas')?.to).toBe(
       '/polizas/colectivas',
     )
@@ -52,6 +59,16 @@ describe('appNavigation static permission state', () => {
     }
 
     expect(appNavigation.filter((item) => item.disabled)).toHaveLength(0)
+  })
+
+  it('classifies visible routes by MVP maturity without activating backend features', () => {
+    const clientes = appNavigation.find((item) => item.label === 'Clientes')!
+    const logs = appNavigation.find((item) => item.label === 'Logs')!
+
+    expect(getNavigationStatusLabel(clientes)).toBe('Fixture')
+    expect(getNavigationStatusDescription(clientes)).toContain('fixture local sin API real')
+    expect(getNavigationStatusLabel(logs)).toBe('Bloqueado SDD')
+    expect(getNavigationStatusDescription(logs)).toContain('SDD')
   })
 
   it('does not disable legacy API-key mode when /api/me cannot declare permissions yet', () => {
