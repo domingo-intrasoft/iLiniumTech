@@ -36,7 +36,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `c9f8eda` | QA gate | Gate local completo ejecutado tras los incrementos autonomos de login/menu/Polizas. |
 | `54467f0` | Frontend Polizas | Accesos superiores a Flotas/Colectivas enlazan a scopes estaticos bloqueados por SDD; Externas sigue deshabilitado. |
 | `125c5f6` | Frontend shell | Acciones placeholder de Notificaciones/Configuracion quedan deshabilitadas y etiquetadas como pendientes de SDD. |
-| Bloque actual | Frontend shell | Selector de broker enlaza `aria-invalid` con descripcion accesible del error. |
+| `5fbb3c2` | Frontend shell | Selector de broker enlaza `aria-invalid` con descripcion accesible del error. |
 
 ## Validaciones ejecutadas
 
