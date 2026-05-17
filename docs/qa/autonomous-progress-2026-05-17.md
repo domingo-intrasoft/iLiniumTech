@@ -37,6 +37,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `54467f0` | Frontend Polizas | Accesos superiores a Flotas/Colectivas enlazan a scopes estaticos bloqueados por SDD; Externas sigue deshabilitado. |
 | `125c5f6` | Frontend shell | Acciones placeholder de Notificaciones/Configuracion quedan deshabilitadas y etiquetadas como pendientes de SDD. |
 | `5fbb3c2` | Frontend shell | Selector de broker enlaza `aria-invalid` con descripcion accesible del error. |
+| `1259602` | Frontend Polizas | Acciones heredadas de filtros, campos fuera de contrato y busqueda bloqueada explican motivo accesible sin activar nuevas APIs. |
 
 ## Validaciones ejecutadas
 
@@ -238,6 +239,17 @@ Validacion adicional tras descripcion accesible del error de broker:
 - `npm run lint`: OK.
 - `npm run build`: OK.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras descripcion accesible de filtros bloqueados en Polizas:
+
+- `npx vitest run src/features/polizas/PolizasFilters.test.ts`: `6/6` tests OK.
+- `npm run format`: OK tras aplicar Prettier al alcance tocado.
+- `npm run lint`: OK.
+- `npm run test:unit`: `192/192` tests OK.
+- `npm run build`: OK.
+- `npm run test:e2e -- polizas`: `1` smoke OK con `CI=1`.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
 
