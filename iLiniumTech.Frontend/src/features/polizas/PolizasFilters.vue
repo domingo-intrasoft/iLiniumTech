@@ -33,6 +33,12 @@ const emit = defineEmits<{
   clear: []
 }>()
 
+const blockedFilterActionsDescription =
+  'Las acciones heredadas de filtros permanecen bloqueadas hasta tener SDD, contrato API, permisos y UAT.'
+const filterOptionActionDescription =
+  'Opciones avanzadas de filtro pendientes de SDD y contrato API de polizas.'
+const unsupportedFilterDescription = 'Pendiente de contrato API de polizas.'
+
 const searchValues = reactive(createEmptyPolizasFilterForm())
 const canSearch = computed(() => !props.loading && !props.searchDisabled)
 
@@ -91,7 +97,23 @@ function fieldTitle(field: PolizasSearchField) {
     return props.blockedMessage
   }
 
-  return fieldIsSupported(field) ? undefined : 'Pendiente de contrato API de polizas'
+  return fieldIsSupported(field) ? undefined : unsupportedFilterDescription
+}
+
+function fieldDescriptionIds(field: PolizasSearchField) {
+  const ids = [
+    props.error && field.control === 'select' ? 'polizas-catalog-error' : undefined,
+    props.searchDisabled && props.blockedMessage ? 'polizas-search-blocked' : undefined,
+    !fieldIsSupported(field) ? 'polizas-filter-unsupported' : undefined,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return ids || undefined
+}
+
+function searchDescriptionId() {
+  return props.searchDisabled && props.blockedMessage ? 'polizas-search-blocked' : undefined
 }
 
 function executeSearch() {
@@ -127,8 +149,28 @@ watch(() => props.criteria, applyCriteria, { immediate: true, deep: true })
     :aria-busy="props.loading"
   >
     <header class="search-actions">
+      <p id="polizas-filter-blocked-actions" class="sr-only">
+        {{ blockedFilterActionsDescription }}
+      </p>
+      <p
+        v-if="props.searchDisabled && props.blockedMessage"
+        id="polizas-search-blocked"
+        class="sr-only"
+      >
+        {{ props.blockedMessage }}
+      </p>
+      <p id="polizas-filter-unsupported" class="sr-only">
+        {{ unsupportedFilterDescription }}
+      </p>
       <div class="search-action-buttons">
-        <button type="button" class="primary-action" :disabled="!canSearch" @click="executeSearch">
+        <button
+          type="button"
+          class="primary-action"
+          :disabled="!canSearch"
+          :title="props.searchDisabled ? (props.blockedMessage ?? undefined) : undefined"
+          :aria-describedby="searchDescriptionId()"
+          @click="executeSearch"
+        >
           <i class="pi pi-search" aria-hidden="true"></i>
           Buscar
         </button>
@@ -136,20 +178,48 @@ watch(() => props.criteria, applyCriteria, { immediate: true, deep: true })
           <i class="pi pi-trash" aria-hidden="true"></i>
           Limpiar Filtros
         </button>
-        <button type="button" disabled>
+        <button
+          type="button"
+          :title="blockedFilterActionsDescription"
+          aria-describedby="polizas-filter-blocked-actions"
+          disabled
+        >
           <i class="pi pi-times" aria-hidden="true"></i>Cerrar Pestanas
         </button>
-        <button type="button" disabled>
+        <button
+          type="button"
+          :title="blockedFilterActionsDescription"
+          aria-describedby="polizas-filter-blocked-actions"
+          disabled
+        >
           <i class="pi pi-save" aria-hidden="true"></i>Guardar busqueda
         </button>
-        <button type="button" disabled>
+        <button
+          type="button"
+          :title="blockedFilterActionsDescription"
+          aria-describedby="polizas-filter-blocked-actions"
+          disabled
+        >
           <i class="pi pi-arrow-up" aria-hidden="true"></i>Avanzada
         </button>
-        <button type="button" class="primary-action compact-action" disabled>
+        <button
+          type="button"
+          class="primary-action compact-action"
+          :title="blockedFilterActionsDescription"
+          aria-describedby="polizas-filter-blocked-actions"
+          disabled
+        >
           <i class="pi pi-search" aria-hidden="true"></i>
           Simple
         </button>
-        <button type="button" class="primary-action icon-only" aria-label="Agregar filtro" disabled>
+        <button
+          type="button"
+          class="primary-action icon-only"
+          aria-label="Agregar filtro no disponible en el MVP"
+          :title="blockedFilterActionsDescription"
+          aria-describedby="polizas-filter-blocked-actions"
+          disabled
+        >
           <i class="pi pi-plus" aria-hidden="true"></i>
         </button>
       </div>
@@ -166,7 +236,12 @@ watch(() => props.criteria, applyCriteria, { immediate: true, deep: true })
 
     <div class="criteria-card">
       <div class="criteria-select">
-        <button type="button" disabled>
+        <button
+          type="button"
+          :title="blockedFilterActionsDescription"
+          aria-describedby="polizas-filter-blocked-actions"
+          disabled
+        >
           Seleccione... <i class="pi pi-chevron-down" aria-hidden="true"></i>
         </button>
       </div>
@@ -194,7 +269,7 @@ watch(() => props.criteria, applyCriteria, { immediate: true, deep: true })
                 :id="fieldControlId(field)"
                 v-model="searchValues[field.key]"
                 :aria-label="field.label"
-                :aria-describedby="props.error ? 'polizas-catalog-error' : undefined"
+                :aria-describedby="fieldDescriptionIds(field)"
                 :disabled="fieldDisabled(field)"
               >
                 <option value=""></option>
@@ -212,9 +287,16 @@ watch(() => props.criteria, applyCriteria, { immediate: true, deep: true })
                 v-model="searchValues[field.key]"
                 :type="field.control === 'date' ? 'date' : 'search'"
                 :aria-label="field.label"
+                :aria-describedby="fieldDescriptionIds(field)"
                 :disabled="fieldDisabled(field)"
               />
-              <button type="button" :aria-label="`Opciones de filtro para ${field.label}`" disabled>
+              <button
+                type="button"
+                :aria-label="`Opciones de filtro para ${field.label} no disponibles en el MVP`"
+                :title="filterOptionActionDescription"
+                aria-describedby="polizas-filter-blocked-actions"
+                disabled
+              >
                 <i class="pi pi-filter" aria-hidden="true"></i>
               </button>
             </span>

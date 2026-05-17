@@ -63,9 +63,35 @@ describe('PolizasFilters', () => {
 
     expect(wrapper.get('#polizas-filter-poliza').attributes('disabled')).toBeUndefined()
     expect(wrapper.get('#polizas-filter-riesgo').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('#polizas-filter-riesgo').attributes('aria-describedby')).toBe(
+      'polizas-filter-unsupported',
+    )
+    expect(wrapper.get('#polizas-filter-unsupported').text()).toContain('contrato API')
     expect(wrapper.get('label[for="polizas-filter-riesgo"]').attributes('title')).toContain(
       'Pendiente de contrato API',
     )
+  })
+
+  it('explains inherited blocked filter actions', () => {
+    const wrapper = mountFilters()
+    const buttons = wrapper.findAll('button')
+    const saveSearchButton = buttons.find((button) => button.text().includes('Guardar busqueda'))
+    const advancedButton = buttons.find((button) => button.text().includes('Avanzada'))
+
+    expect(wrapper.get('#polizas-filter-blocked-actions').text()).toContain('SDD')
+    expect(saveSearchButton?.attributes('title')).toContain('contrato API')
+    expect(saveSearchButton?.attributes('aria-describedby')).toBe('polizas-filter-blocked-actions')
+    expect(advancedButton?.attributes('title')).toContain('UAT')
+    expect(
+      wrapper
+        .get('button[aria-label="Agregar filtro no disponible en el MVP"]')
+        .attributes('title'),
+    ).toContain('permisos')
+    expect(
+      wrapper
+        .get('button[aria-label="Opciones de filtro para Poliza no disponibles en el MVP"]')
+        .attributes('title'),
+    ).toContain('Opciones avanzadas')
   })
 
   it('blocks search actions when the execution context is not ready', async () => {
@@ -76,6 +102,10 @@ describe('PolizasFilters', () => {
 
     expect(wrapper.get('#polizas-filter-poliza').attributes('disabled')).toBeDefined()
     expect(wrapper.get('.primary-action').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('.primary-action').attributes('aria-describedby')).toBe(
+      'polizas-search-blocked',
+    )
+    expect(wrapper.get('#polizas-search-blocked').text()).toContain('Configura un broker')
 
     await wrapper.get('.primary-action').trigger('click')
 
