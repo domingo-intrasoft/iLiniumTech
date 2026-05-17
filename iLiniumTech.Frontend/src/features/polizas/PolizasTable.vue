@@ -44,6 +44,10 @@ const detailUnavailableMessageId = 'polizas-detail-unavailable-message'
 const detailUnavailableMessage = computed(() =>
   canOpenDetail.value ? null : props.detailUnavailableMessage,
 )
+const tableCaption = computed(
+  () =>
+    `Listado de polizas. Mostrando ${firstVisible.value}-${lastVisible.value} de ${props.total}.`,
+)
 
 function tableCellValue(item: PolizaListItem, column: PolizaTableColumn) {
   return item[column.key]
@@ -102,6 +106,9 @@ function detailRoute(item: PolizaListItem) {
     <div v-if="loading" class="table-scroll" role="status" aria-label="Cargando polizas">
       <span class="sr-only">Cargando polizas.</span>
       <table>
+        <caption class="sr-only">
+          Cargando listado de polizas.
+        </caption>
         <thead>
           <tr>
             <th scope="col">Acciones</th>
@@ -145,6 +152,7 @@ function detailRoute(item: PolizaListItem) {
 
     <div v-else class="table-scroll">
       <table>
+        <caption class="sr-only" v-text="tableCaption"></caption>
         <thead>
           <tr>
             <th scope="col">Acciones</th>

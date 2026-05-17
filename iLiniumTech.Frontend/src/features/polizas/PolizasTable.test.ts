@@ -32,6 +32,7 @@ describe('PolizasTable', () => {
 
     expect(wrapper.find('#polizas-results-title').text()).toBe('Resultado')
     expect(wrapper.text()).toContain('2 polizas')
+    expect(wrapper.get('caption').text()).toBe('Listado de polizas. Mostrando 1-2 de 2.')
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
   })
 
@@ -40,6 +41,7 @@ describe('PolizasTable', () => {
 
     expect(wrapper.attributes('aria-busy')).toBe('true')
     expect(wrapper.find('[role="status"]').exists()).toBe(true)
+    expect(wrapper.get('caption').text()).toBe('Cargando listado de polizas.')
     expect(wrapper.findAll('thead th')).toHaveLength(10)
     expect(wrapper.findAll('tbody tr')).toHaveLength(5)
   })
