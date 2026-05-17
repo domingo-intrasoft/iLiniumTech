@@ -42,6 +42,7 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `1f5f090` | Frontend Polizas | Accesos superiores a scopes Flotas/Colectivas/Externas describen que no cargan datos ni activan permisos sin SDD/API/UAT. |
 | `3694909` | Frontend shell | Breadcrumb del shell pasa a `nav` semantico, marca la seccion actual y elimina la barra final. |
 | `bc22b98` | Frontend shell | Icon buttons del topbar exponen motivo accesible comun para placeholders y logout conserva titulo explicito. |
+| `5c0cd77` | Frontend Polizas | Tabla de resultados incorpora `caption` accesible para listado cargando y filas visibles. |
 
 ## Validaciones ejecutadas
 
@@ -296,6 +297,17 @@ Validacion adicional tras aclaracion de icon buttons del shell:
 - `npm run test:unit`: `194/194` tests OK.
 - `npm run build`: OK.
 - `npm run test:e2e -- responsive-shell`: `1` smoke OK con `CI=1`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
+Validacion adicional tras `caption` accesible de tabla de Polizas:
+
+- `npx vitest run src/features/polizas/PolizasTable.test.ts`: `6/6` tests OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run test:unit`: `194/194` tests OK.
+- `npm run build`: OK.
+- `npm run test:e2e -- polizas`: `1` smoke OK con `CI=1`.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
 

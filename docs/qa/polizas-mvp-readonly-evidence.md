@@ -42,6 +42,7 @@ Fuera de alcance confirmado:
 | Producto / SDD | Completado con evidencia | MVP vigente confirmado: login/sesion, shell/menu y Polizas read-only. Autos aparcado. | Mantener SDD-2026-001/003/005/007 como base del cierre. | Producto / Arquitectura |
 | Filtros en URL | Completado con evidencia | `PolizasView` sincroniza filtros soportados, paginacion y query params; normaliza paginas/page sizes/fechas invalidas. | Mantener cobertura unitaria y E2E al ampliar filtros. | Frontend / UX |
 | Resumen filtros activos | Completado con evidencia | El listado muestra chips de filtros activos derivados del estado Vue/query params y traduce valores de catalogo visibles. | Mantenerlo como resumen estatico; acciones adicionales requieren nueva cobertura. | Frontend / UX |
+| Tabla de resultados | Completado con evidencia | `PolizasTable` expone `caption` accesible para estado de carga y rango visible del listado. | Mantener caption actualizado si cambian paginacion, columnas o estados de tabla. | Frontend / UX |
 | Acciones heredadas de filtros | Completado con evidencia | `PolizasFilters` mantiene bloqueadas acciones sin contrato (`Guardar busqueda`, modos avanzado/simple, agregar filtros, opciones por campo) y expone motivo accesible por SDD/API/permisos/UAT. | No habilitar acciones, busquedas guardadas ni filtros avanzados sin SDD, contrato API y UAT. | Frontend / UX |
 | Toolbar superior Polizas | Completado con evidencia | Acciones superiores heredadas (`Autos`, `Gestion`, `Favoritos`, `Servicios`, `Riesgos`, `Validar`, `Pausar`, `Cerrar`) siguen deshabilitadas y describen bloqueo MVP read-only. | No activar workflows, validaciones ni cambios de estado sin SDD, permisos, API y UAT. | Frontend / UX |
 | Accesos scopes Polizas | Completado con evidencia | Los accesos superiores a Flotas y Colectivas navegan a paginas estaticas bloqueadas por SDD; Polizas Externas permanece deshabilitado. Todos describen que no cargan datos ni activan permisos sin SDD/API/UAT. | No activar datos, filtros ni permisos de scopes sin SDD/API/UAT. | Frontend / UX |
@@ -65,6 +66,7 @@ Fuera de alcance confirmado:
 - Fechas invalidas, paginas menores que 1, page sizes no permitidos o sort fuera de whitelist deben normalizarse o bloquearse con error seguro.
 - Cambiar filtros debe resetear `page` a 1 salvo decision UX documentada.
 - Paginacion y page size deben reflejarse en URL.
+- La tabla de resultados debe incluir contexto accesible del listado y del estado de carga mediante `caption` o equivalente.
 - Recargar navegador, abrir enlace compartido o usar atras/adelante debe conservar un estado coherente del listado.
 - La URL no debe contener datos personales reales, tokens, cookies, API keys, connection strings ni valores de headers MVP.
 
@@ -151,6 +153,7 @@ Resultado del gate:
 | --- | --- | --- |
 | Frontend filtros URL | Unit tests de parseo/serializacion y E2E con reload/back-forward. | Query params permitidos reconstruyen listado; valores invalidos se normalizan o bloquean. |
 | Frontend filtros activos | Test de listado con busqueda, limpieza, query params y valores de catalogo. | Chips visibles reflejan filtros activos sin invocar metadata ni nuevas APIs. |
+| Frontend tabla resultados | Unit test de `PolizasTable` en carga y listado con filas. | Caption accesible describe carga y rango visible sin alterar columnas ni datos. |
 | Frontend filtros bloqueados | Unit tests de acciones heredadas bloqueadas, campos fuera de contrato y busqueda sin contexto. | Botones y campos deshabilitados explican motivo por `aria-describedby`/`title`; no emiten busqueda si falta contexto. |
 | Frontend toolbar bloqueada | Unit test de acciones superiores heredadas. | Botones de toolbar deshabilitados describen bloqueo MVP read-only sin activar workflows. |
 | Frontend scopes Polizas | Unit test de shortcuts y smoke E2E de navegacion a Flotas. | Flotas/Colectivas solo abren paginas estaticas bloqueadas; Externas sigue sin accion; todos explican que no cargan datos ni permisos. |
