@@ -145,13 +145,27 @@ describe('ClientesView smoke', () => {
       .findAll('button')
       .find((button) => button.text().includes('Desglose'))
 
+    expect(wrapper.get('#clientes-blocked-actions').text()).toContain(
+      'Acciones de clientes bloqueadas en el MVP read-only',
+    )
     expect(openButton?.attributes('disabled')).toBeDefined()
+    expect(openButton?.attributes('aria-describedby')).toBe('clientes-blocked-actions')
     expect(exportButton?.attributes('disabled')).toBeDefined()
+    expect(exportButton?.attributes('aria-describedby')).toBe('clientes-blocked-actions')
     expect(breakdownButton?.attributes('disabled')).toBeDefined()
-    expect(wrapper.findAll('button.table-icon-action[disabled]')).toHaveLength(2)
+    expect(breakdownButton?.attributes('aria-describedby')).toBe('clientes-blocked-actions')
+    expect(
+      wrapper.get('button[aria-label="Opciones de referencia"]').attributes('aria-describedby'),
+    ).toBe('clientes-blocked-actions')
+    const tableActions = wrapper.findAll('button.table-icon-action[disabled]')
+    expect(tableActions).toHaveLength(2)
+    expect(tableActions[0]?.attributes('aria-describedby')).toBe('clientes-blocked-actions')
     expect(
       (wrapper.get('input[aria-label="Campos PII bloqueados"]').element as HTMLInputElement).value,
     ).toBe('Bloqueado: no se captura ni muestra PII en este MVP')
+    expect(
+      wrapper.get('input[aria-label="Campos PII bloqueados"]').attributes('aria-describedby'),
+    ).toBe('clientes-blocked-actions')
 
     const smokeDom = wrapper.html()
     expect(smokeDom).not.toMatch(runtimeMarkers)

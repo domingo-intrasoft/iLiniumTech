@@ -82,6 +82,8 @@ const moduleActions = [
   { label: 'Exportar bloqueado', icon: 'pi pi-download' },
   { label: 'Desglose bloqueado', icon: 'pi pi-sitemap' },
 ]
+const blockedActionsDescription =
+  'Acciones de clientes bloqueadas en el MVP read-only hasta SDD, contrato API, permisos, UAT y decision de minimizacion PII.'
 
 const filters = reactive<ClientesFilters>({
   texto: '',
@@ -204,6 +206,8 @@ async function signOut() {
     show-sign-out
     @sign-out="signOut"
   >
+    <p id="clientes-blocked-actions" class="sr-only" v-text="blockedActionsDescription"></p>
+
     <div id="clientes-content" class="polizas-toolbar">
       <div>
         <p class="section-kicker">MVP read-only</p>
@@ -219,6 +223,7 @@ async function signOut() {
             :class="{ active: action.active }"
             type="button"
             :aria-label="action.label"
+            aria-describedby="clientes-blocked-actions"
             disabled
           >
             <i :class="action.icon" aria-hidden="true"></i>
@@ -256,15 +261,15 @@ async function signOut() {
             <i class="pi pi-trash" aria-hidden="true"></i>
             Limpiar Filtros
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="clientes-blocked-actions" disabled>
             <i class="pi pi-id-card" aria-hidden="true"></i>
             Abrir ficha
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="clientes-blocked-actions" disabled>
             <i class="pi pi-download" aria-hidden="true"></i>
             Exportar
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="clientes-blocked-actions" disabled>
             <i class="pi pi-sitemap" aria-hidden="true"></i>
             Desglose
           </button>
@@ -289,7 +294,12 @@ async function signOut() {
                   type="search"
                   aria-label="Referencia o alias anonimo"
                 />
-                <button type="button" aria-label="Opciones de referencia" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de referencia"
+                  aria-describedby="clientes-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -308,7 +318,12 @@ async function signOut() {
                   <option>En revision</option>
                   <option>Bloqueado PII</option>
                 </select>
-                <button type="button" aria-label="Opciones de estado" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de estado"
+                  aria-describedby="clientes-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -327,7 +342,12 @@ async function signOut() {
                   <option>Empresa demo</option>
                   <option>Colectivo demo</option>
                 </select>
-                <button type="button" aria-label="Opciones de segmento" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de segmento"
+                  aria-describedby="clientes-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -342,7 +362,12 @@ async function signOut() {
                   type="date"
                   aria-label="Fecha alta desde"
                 />
-                <button type="button" aria-label="Opciones de fecha alta" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de fecha alta"
+                  aria-describedby="clientes-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -362,8 +387,14 @@ async function signOut() {
                   value="Bloqueado: no se captura ni muestra PII en este MVP"
                   disabled
                   aria-label="Campos PII bloqueados"
+                  aria-describedby="clientes-blocked-actions"
                 />
-                <button type="button" aria-label="Campos PII bloqueados" disabled>
+                <button
+                  type="button"
+                  aria-label="Campos PII bloqueados"
+                  aria-describedby="clientes-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-lock" aria-hidden="true"></i>
                 </button>
               </span>
@@ -413,6 +444,7 @@ async function signOut() {
                   class="table-icon-action"
                   type="button"
                   :aria-label="`Ficha, exportacion y desglose bloqueados para ${item.referencia}`"
+                  aria-describedby="clientes-blocked-actions"
                   title="Sin API, sin permisos efectivos y sin SDD de ficha"
                   disabled
                 >
