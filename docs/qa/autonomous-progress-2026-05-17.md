@@ -22,6 +22,8 @@ Avanzar el MVP sin activar datos reales, sin reintroducir runtime dinamico AppBu
 | `dfc30e9` | Backend QA | Regresiones que prueban que denegaciones de permisos/auth cortocircuitan antes de tocar servicio de Polizas. |
 | `b859b0d` | QA docs | DoD de fase 7 alineado con la cobertura E2E real. |
 | `d486a30` | QA/backend docs | Smoke de paridad menu/rutas, test de broker denegado y cierre operativo MVP login/menu/Polizas. |
+| `91da188` | Auth docs | Matriz documental de permisos productivos para broker, perfil, oficina, gestor y usuario. |
+| Bloque actual | Frontend accesibilidad | Menu lateral colapsado sale del arbol de foco con `inert` y mantiene `aria-hidden`. |
 
 ## Validaciones ejecutadas
 
@@ -67,6 +69,19 @@ Validaciones adicionales del checkpoint `d486a30`:
 - `Test-DocumentationBaseline.ps1`: OK.
 - `Invoke-SecretScan.ps1 -NoReport`: OK.
 - `git diff --check`: OK.
+
+Validaciones adicionales tras matriz de permisos y accesibilidad shell:
+
+- `Test-DocumentationBaseline.ps1`: OK.
+- `Invoke-SecretScan.ps1 -NoReport`: OK.
+- `npx vitest run src/layout/AppShell.test.ts`: `3/3` tests OK.
+- `npm run test:e2e -- responsive-shell`: `1` smoke OK.
+- `npm run test:unit`: `187/187` tests OK.
+- `npm run test:e2e`: `8` smokes OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run typecheck`: OK.
+- `npm run build`: OK.
 
 ## Estado local visible
 

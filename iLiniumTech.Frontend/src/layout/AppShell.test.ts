@@ -60,20 +60,27 @@ describe('AppShell', () => {
     })
 
     const menuButton = wrapper.get('button[aria-controls="app-side-menu"]')
+    const sideMenu = wrapper.get('#app-side-menu')
 
     expect(wrapper.get('main').classes()).not.toContain('menu-collapsed')
+    expect(sideMenu.attributes('aria-hidden')).toBe('false')
+    expect(sideMenu.attributes('inert')).toBeUndefined()
     expect(menuButton.attributes('aria-expanded')).toBe('true')
     expect(menuButton.attributes('aria-label')).toBe('Ocultar menu')
 
     await menuButton.trigger('click')
 
     expect(wrapper.get('main').classes()).toContain('menu-collapsed')
+    expect(sideMenu.attributes('aria-hidden')).toBe('true')
+    expect(sideMenu.attributes('inert')).toBeDefined()
     expect(menuButton.attributes('aria-expanded')).toBe('false')
     expect(menuButton.attributes('aria-label')).toBe('Mostrar menu')
 
     await menuButton.trigger('click')
 
     expect(wrapper.get('main').classes()).not.toContain('menu-collapsed')
+    expect(sideMenu.attributes('aria-hidden')).toBe('false')
+    expect(sideMenu.attributes('inert')).toBeUndefined()
     expect(menuButton.attributes('aria-expanded')).toBe('true')
   })
 })

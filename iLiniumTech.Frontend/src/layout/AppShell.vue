@@ -51,7 +51,11 @@ function toggleSideMenu() {
 <template>
   <main class="ilinium-shell" :class="{ 'menu-collapsed': !sideMenuOpen }">
     <a class="skip-link" :href="`#${contentId}`">Saltar al contenido</a>
-    <AppSideMenu id="app-side-menu" :aria-hidden="!sideMenuOpen" />
+    <AppSideMenu
+      id="app-side-menu"
+      :aria-hidden="!sideMenuOpen"
+      :inert="sideMenuOpen ? undefined : true"
+    />
 
     <section class="workspace">
       <header class="workspace-topbar">

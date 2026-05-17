@@ -49,6 +49,7 @@ test('login, side menu, and fixture pages remain usable on mobile viewport', asy
     'aria-expanded',
     'true',
   )
+  await expect(page.locator('#app-side-menu')).not.toHaveAttribute('inert', /.*/)
   await expectNoGlobalHorizontalOverflow(page)
 
   const polizasTableScroll = page.locator('.table-scroll').first()
@@ -69,9 +70,11 @@ test('login, side menu, and fixture pages remain usable on mobile viewport', asy
     'false',
   )
   await expect(page.locator('#app-side-menu')).toHaveAttribute('aria-hidden', 'true')
+  await expect(page.locator('#app-side-menu')).toHaveAttribute('inert', /.*/)
   await expectNoGlobalHorizontalOverflow(page)
 
   await page.getByRole('button', { name: 'Mostrar menu' }).click()
+  await expect(page.locator('#app-side-menu')).not.toHaveAttribute('inert', /.*/)
   await page.getByRole('link', { name: 'Clientes', exact: true }).click()
 
   await expect(page).toHaveURL(/\/clientes$/)
