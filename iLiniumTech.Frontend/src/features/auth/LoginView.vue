@@ -13,6 +13,7 @@ const password = ref('')
 const loading = ref(false)
 const error = ref<string | null>(null)
 const usernameInput = ref<HTMLInputElement | null>(null)
+const loginForm = ref<HTMLFormElement | null>(null)
 
 const canSubmit = computed(() => username.value.trim() !== '' && password.value !== '')
 const sessionNotice = computed(() => {
@@ -60,11 +61,25 @@ async function submitLogin() {
     loading.value = false
   }
 }
+
+function focusLoginForm(event: MouseEvent) {
+  if (!loginForm.value) {
+    return
+  }
+
+  event.preventDefault()
+
+  if (!loginForm.value.hasAttribute('tabindex')) {
+    loginForm.value.setAttribute('tabindex', '-1')
+  }
+
+  loginForm.value.focus({ preventScroll: false })
+}
 </script>
 
 <template>
   <main class="login-page">
-    <a class="skip-link" href="#login-form">Saltar al formulario</a>
+    <a class="skip-link" href="#login-form" @click="focusLoginForm">Saltar al formulario</a>
 
     <section class="login-brand" aria-label="iLiniumTech">
       <div class="login-mark" aria-hidden="true">
@@ -82,6 +97,7 @@ async function submitLogin() {
 
       <form
         id="login-form"
+        ref="loginForm"
         class="login-form"
         novalidate
         :aria-busy="loading"

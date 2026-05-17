@@ -80,4 +80,15 @@ describe('LoginView', () => {
     )
     expect(wrapper.get('form').attributes('aria-describedby')).toBe('login-session-notice')
   })
+
+  it('moves focus to the login form when the skip link is activated', async () => {
+    const { wrapper } = await mountLoginView()
+    await flushPromises()
+
+    await wrapper.get('.skip-link').trigger('click')
+
+    const form = wrapper.get('form')
+    expect(form.attributes('tabindex')).toBe('-1')
+    expect(document.activeElement).toBe(form.element)
+  })
 })
