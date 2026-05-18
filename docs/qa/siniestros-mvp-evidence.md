@@ -123,3 +123,24 @@ Riesgos residuales:
 - `Siniestros` sigue siendo fixture local read-only.
 - No existe API real ni contrato SQL autorizado.
 - El paso a datos reales sigue bloqueado por UAT, DBA, permisos y revision de seguridad segun `SDD-2026-008`.
+
+## Actualizacion T-110-SINIESTROS-BE-READONLY-CONTRACT - 2026-05-18
+
+Alcance de esta actualizacion:
+
+- Se anade backend explicito in-memory para `Siniestros`.
+- Endpoints disponibles: `GET /api/siniestros/catalogs` y `GET /api/siniestros`.
+- Permisos propios: `siniestros.catalogs` y `siniestros.read`.
+- API key legacy no concede permisos de Siniestros; se exige sesion/permisos explicitos.
+- No se activa SQL real, detalle, exportacion, importes, intervinientes, EIAC, observaciones ni escrituras.
+
+Evidencia de validacion:
+
+| Comando | Resultado |
+| --- | --- |
+| `dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "SiniestrosApiTests"` | OK, 5 tests |
+
+Riesgos residuales:
+
+- El backend de `Siniestros` es todavia in-memory/read-only.
+- La conexion a SQL real sigue bloqueada por UAT, DBA, permisos, minimizacion PII y revision de seguridad.

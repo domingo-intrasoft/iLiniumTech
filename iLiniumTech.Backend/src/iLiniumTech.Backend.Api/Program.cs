@@ -1,7 +1,19 @@
 using iLiniumTech.Backend.Api.Health;
 using iLiniumTech.Backend.Api.Security;
+using iLiniumTech.Backend.Application.Agenda;
+using iLiniumTech.Backend.Application.Clientes;
 using iLiniumTech.Backend.Application.Polizas;
+using iLiniumTech.Backend.Application.Propuestas;
+using iLiniumTech.Backend.Application.Recibos;
+using iLiniumTech.Backend.Application.Siniestros;
+using iLiniumTech.Backend.Application.Suplementos;
+using iLiniumTech.Backend.Domain.Agenda;
+using iLiniumTech.Backend.Domain.Clientes;
 using iLiniumTech.Backend.Domain.Polizas;
+using iLiniumTech.Backend.Domain.Propuestas;
+using iLiniumTech.Backend.Domain.Recibos;
+using iLiniumTech.Backend.Domain.Siniestros;
+using iLiniumTech.Backend.Domain.Suplementos;
 using iLiniumTech.Backend.Infrastructure;
 using iLiniumTech.Backend.Infrastructure.Polizas.Connections;
 using Microsoft.AspNetCore.Authentication;
@@ -73,6 +85,30 @@ builder.Services.AddAuthorization(options =>
         policy.Requirements.Add(new PolizasPermissionRequirement(PolizasPermissions.Update)));
     options.AddPolicy(PolizasAuthorizationPolicies.Delete, policy =>
         policy.Requirements.Add(new PolizasPermissionRequirement(PolizasPermissions.Delete)));
+    options.AddPolicy(SiniestrosAuthorizationPolicies.Catalogs, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(SiniestrosPermissions.Catalogs)));
+    options.AddPolicy(SiniestrosAuthorizationPolicies.Read, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(SiniestrosPermissions.Read)));
+    options.AddPolicy(RecibosAuthorizationPolicies.Catalogs, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(RecibosPermissions.Catalogs)));
+    options.AddPolicy(RecibosAuthorizationPolicies.Read, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(RecibosPermissions.Read)));
+    options.AddPolicy(ClientesAuthorizationPolicies.Catalogs, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(ClientesPermissions.Catalogs)));
+    options.AddPolicy(ClientesAuthorizationPolicies.Read, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(ClientesPermissions.Read)));
+    options.AddPolicy(AgendaAuthorizationPolicies.Catalogs, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(AgendaPermissions.Catalogs)));
+    options.AddPolicy(AgendaAuthorizationPolicies.Read, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(AgendaPermissions.Read)));
+    options.AddPolicy(PropuestasAuthorizationPolicies.Catalogs, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(PropuestasPermissions.Catalogs)));
+    options.AddPolicy(PropuestasAuthorizationPolicies.Read, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(PropuestasPermissions.Read)));
+    options.AddPolicy(SuplementosAuthorizationPolicies.Catalogs, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(SuplementosPermissions.Catalogs)));
+    options.AddPolicy(SuplementosAuthorizationPolicies.Read, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(SuplementosPermissions.Read)));
 });
 builder.Services.AddSingleton<IAuthorizationHandler, PolizasPermissionAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, SanitizedAuthorizationMiddlewareResultHandler>();
@@ -90,6 +126,12 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddScoped<IPolizasService, PolizasService>();
+builder.Services.AddScoped<ISiniestrosService, SiniestrosService>();
+builder.Services.AddScoped<IRecibosService, RecibosService>();
+builder.Services.AddScoped<IClientesService, ClientesService>();
+builder.Services.AddScoped<IAgendaService, AgendaService>();
+builder.Services.AddScoped<IPropuestasService, PropuestasService>();
+builder.Services.AddScoped<ISuplementosService, SuplementosService>();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
@@ -346,6 +388,24 @@ var polizas = app.MapGroup("/api/polizas")
 var autosParticulares = app.MapGroup("/api/autos-particulares")
     .RequireAuthorization();
 
+var siniestros = app.MapGroup("/api/siniestros")
+    .RequireAuthorization();
+
+var recibos = app.MapGroup("/api/recibos")
+    .RequireAuthorization();
+
+var clientes = app.MapGroup("/api/clientes")
+    .RequireAuthorization();
+
+var agenda = app.MapGroup("/api/agenda")
+    .RequireAuthorization();
+
+var propuestas = app.MapGroup("/api/propuestas")
+    .RequireAuthorization();
+
+var suplementos = app.MapGroup("/api/suplementos")
+    .RequireAuthorization();
+
 polizas.MapGet("/metadata", (HttpContext httpContext) => Results.Json(
         new ErrorResponse(new ErrorBody(
             Code: "POLIZAS_METADATA_DEPRECATED",
@@ -580,6 +640,326 @@ autosParticulares.MapGet("/polizas/{id}", async (
 .WithName("GetAutosParticularesPolizaById")
 .RequireAuthorization(PolizasAuthorizationPolicies.Detail)
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
+
+siniestros.MapGet("/catalogs", async (
+    [FromServices] ISiniestrosService service,
+    CancellationToken cancellationToken) =>
+        Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
+    .WithName("GetSiniestrosCatalogs")
+    .RequireAuthorization(SiniestrosAuthorizationPolicies.Catalogs);
+
+siniestros.MapGet("/", async (
+    HttpContext httpContext,
+    [FromServices] ISiniestrosService service,
+    [FromQuery] int? page,
+    [FromQuery] int? pageSize,
+    [FromQuery] string? sort,
+    [FromQuery] string? referencia,
+    [FromQuery] string? poliza,
+    [FromQuery] string? estado,
+    [FromQuery] string? prioridad,
+    [FromQuery] DateOnly? fechaSiniestroDesde,
+    [FromQuery] DateOnly? fechaSiniestroHasta,
+    CancellationToken cancellationToken) =>
+{
+    var request = new SiniestrosSearchRequest(
+        Page: page is null or 0 ? 1 : page.Value,
+        PageSize: pageSize is null or 0 ? 25 : pageSize.Value,
+        Sort: sort,
+        Referencia: referencia,
+        Poliza: poliza,
+        Estado: estado,
+        Prioridad: prioridad,
+        FechaSiniestroDesde: fechaSiniestroDesde,
+        FechaSiniestroHasta: fechaSiniestroHasta);
+
+    try
+    {
+        return Results.Ok(await service.SearchAsync(request, cancellationToken));
+    }
+    catch (SiniestrosValidationException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "SINIESTROS_VALIDATION_ERROR",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(httpContext))));
+    }
+})
+.WithName("SearchSiniestros")
+.RequireAuthorization(SiniestrosAuthorizationPolicies.Read);
+
+recibos.MapGet("/catalogs", async (
+    [FromServices] IRecibosService service,
+    CancellationToken cancellationToken) =>
+        Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
+    .WithName("GetRecibosCatalogs")
+    .RequireAuthorization(RecibosAuthorizationPolicies.Catalogs);
+
+recibos.MapGet("/", async (
+    HttpContext httpContext,
+    [FromServices] IRecibosService service,
+    [FromQuery] int? page,
+    [FromQuery] int? pageSize,
+    [FromQuery] string? sort,
+    [FromQuery] string? recibo,
+    [FromQuery] string? poliza,
+    [FromQuery] string? situacion,
+    [FromQuery] string? tipo,
+    [FromQuery] DateOnly? fechaVencimientoDesde,
+    [FromQuery] DateOnly? fechaVencimientoHasta,
+    CancellationToken cancellationToken) =>
+{
+    var request = new RecibosSearchRequest(
+        Page: page is null or 0 ? 1 : page.Value,
+        PageSize: pageSize is null or 0 ? 25 : pageSize.Value,
+        Sort: sort,
+        Recibo: recibo,
+        Poliza: poliza,
+        Situacion: situacion,
+        Tipo: tipo,
+        FechaVencimientoDesde: fechaVencimientoDesde,
+        FechaVencimientoHasta: fechaVencimientoHasta);
+
+    try
+    {
+        return Results.Ok(await service.SearchAsync(request, cancellationToken));
+    }
+    catch (RecibosValidationException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "RECIBOS_VALIDATION_ERROR",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(httpContext))));
+    }
+})
+.WithName("SearchRecibos")
+.RequireAuthorization(RecibosAuthorizationPolicies.Read);
+
+clientes.MapGet("/catalogs", async (
+    [FromServices] IClientesService service,
+    CancellationToken cancellationToken) =>
+        Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
+    .WithName("GetClientesCatalogs")
+    .RequireAuthorization(ClientesAuthorizationPolicies.Catalogs);
+
+clientes.MapGet("/", async (
+    HttpContext httpContext,
+    [FromServices] IClientesService service,
+    [FromQuery] int? page,
+    [FromQuery] int? pageSize,
+    [FromQuery] string? sort,
+    [FromQuery] string? texto,
+    [FromQuery] string? estado,
+    [FromQuery] string? segmento,
+    [FromQuery] DateOnly? fechaAltaDesde,
+    [FromQuery] DateOnly? fechaAltaHasta,
+    CancellationToken cancellationToken) =>
+{
+    var request = new ClientesSearchRequest(
+        Page: page is null or 0 ? 1 : page.Value,
+        PageSize: pageSize is null or 0 ? 25 : pageSize.Value,
+        Sort: sort,
+        Texto: texto,
+        Estado: estado,
+        Segmento: segmento,
+        FechaAltaDesde: fechaAltaDesde,
+        FechaAltaHasta: fechaAltaHasta);
+
+    try
+    {
+        return Results.Ok(await service.SearchAsync(request, cancellationToken));
+    }
+    catch (ClientesValidationException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "CLIENTES_VALIDATION_ERROR",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(httpContext))));
+    }
+})
+.WithName("SearchClientes")
+.RequireAuthorization(ClientesAuthorizationPolicies.Read);
+
+agenda.MapGet("/catalogs", async (
+    [FromServices] IAgendaService service,
+    CancellationToken cancellationToken) =>
+        Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
+    .WithName("GetAgendaCatalogs")
+    .RequireAuthorization(AgendaAuthorizationPolicies.Catalogs);
+
+agenda.MapGet("/events", async (
+    HttpContext httpContext,
+    [FromServices] IAgendaService service,
+    [FromQuery] int? page,
+    [FromQuery] int? pageSize,
+    [FromQuery] string? sort,
+    [FromQuery] string? texto,
+    [FromQuery] string? estado,
+    [FromQuery] string? prioridad,
+    [FromQuery] string? origen,
+    [FromQuery] DateOnly? fechaDesde,
+    [FromQuery] DateOnly? fechaHasta,
+    CancellationToken cancellationToken) =>
+{
+    var request = new AgendaSearchRequest(
+        Page: page is null or 0 ? 1 : page.Value,
+        PageSize: pageSize is null or 0 ? 25 : pageSize.Value,
+        Sort: sort,
+        Texto: texto,
+        Estado: estado,
+        Prioridad: prioridad,
+        Origen: origen,
+        FechaDesde: fechaDesde,
+        FechaHasta: fechaHasta);
+
+    try
+    {
+        return Results.Ok(await service.SearchAsync(request, cancellationToken));
+    }
+    catch (AgendaValidationException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "AGENDA_VALIDATION_ERROR",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(httpContext))));
+    }
+})
+.WithName("SearchAgendaEvents")
+.RequireAuthorization(AgendaAuthorizationPolicies.Read);
+
+agenda.MapGet("/", async (
+    HttpContext httpContext,
+    [FromServices] IAgendaService service,
+    [FromQuery] int? page,
+    [FromQuery] int? pageSize,
+    [FromQuery] string? sort,
+    [FromQuery] string? texto,
+    [FromQuery] string? estado,
+    [FromQuery] string? prioridad,
+    [FromQuery] string? origen,
+    [FromQuery] DateOnly? fechaDesde,
+    [FromQuery] DateOnly? fechaHasta,
+    CancellationToken cancellationToken) =>
+{
+    var request = new AgendaSearchRequest(
+        Page: page is null or 0 ? 1 : page.Value,
+        PageSize: pageSize is null or 0 ? 25 : pageSize.Value,
+        Sort: sort,
+        Texto: texto,
+        Estado: estado,
+        Prioridad: prioridad,
+        Origen: origen,
+        FechaDesde: fechaDesde,
+        FechaHasta: fechaHasta);
+
+    try
+    {
+        return Results.Ok(await service.SearchAsync(request, cancellationToken));
+    }
+    catch (AgendaValidationException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "AGENDA_VALIDATION_ERROR",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(httpContext))));
+    }
+})
+.WithName("SearchAgenda")
+.RequireAuthorization(AgendaAuthorizationPolicies.Read);
+
+propuestas.MapGet("/catalogs", async (
+    [FromServices] IPropuestasService service,
+    CancellationToken cancellationToken) =>
+        Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
+    .WithName("GetPropuestasCatalogs")
+    .RequireAuthorization(PropuestasAuthorizationPolicies.Catalogs);
+
+propuestas.MapGet("/", async (
+    HttpContext httpContext,
+    [FromServices] IPropuestasService service,
+    [FromQuery] int? page,
+    [FromQuery] int? pageSize,
+    [FromQuery] string? sort,
+    [FromQuery] string? referencia,
+    [FromQuery] string? estado,
+    [FromQuery] string? ramo,
+    [FromQuery] string? canal,
+    [FromQuery] DateOnly? fechaAltaDesde,
+    [FromQuery] DateOnly? fechaAltaHasta,
+    CancellationToken cancellationToken) =>
+{
+    var request = new PropuestasSearchRequest(
+        Page: page is null or 0 ? 1 : page.Value,
+        PageSize: pageSize is null or 0 ? 25 : pageSize.Value,
+        Sort: sort,
+        Referencia: referencia,
+        Estado: estado,
+        Ramo: ramo,
+        Canal: canal,
+        FechaAltaDesde: fechaAltaDesde,
+        FechaAltaHasta: fechaAltaHasta);
+
+    try
+    {
+        return Results.Ok(await service.SearchAsync(request, cancellationToken));
+    }
+    catch (PropuestasValidationException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "PROPUESTAS_VALIDATION_ERROR",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(httpContext))));
+    }
+})
+.WithName("SearchPropuestas")
+.RequireAuthorization(PropuestasAuthorizationPolicies.Read);
+
+suplementos.MapGet("/catalogs", async (
+    [FromServices] ISuplementosService service,
+    CancellationToken cancellationToken) =>
+        Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
+    .WithName("GetSuplementosCatalogs")
+    .RequireAuthorization(SuplementosAuthorizationPolicies.Catalogs);
+
+suplementos.MapGet("/", async (
+    HttpContext httpContext,
+    [FromServices] ISuplementosService service,
+    [FromQuery] int? page,
+    [FromQuery] int? pageSize,
+    [FromQuery] string? sort,
+    [FromQuery] string? referencia,
+    [FromQuery] string? poliza,
+    [FromQuery] string? tipo,
+    [FromQuery] string? situacion,
+    [FromQuery] DateOnly? fechaEfectoDesde,
+    [FromQuery] DateOnly? fechaEfectoHasta,
+    CancellationToken cancellationToken) =>
+{
+    var request = new SuplementosSearchRequest(
+        Page: page is null or 0 ? 1 : page.Value,
+        PageSize: pageSize is null or 0 ? 25 : pageSize.Value,
+        Sort: sort,
+        Referencia: referencia,
+        Poliza: poliza,
+        Tipo: tipo,
+        Situacion: situacion,
+        FechaEfectoDesde: fechaEfectoDesde,
+        FechaEfectoHasta: fechaEfectoHasta);
+
+    try
+    {
+        return Results.Ok(await service.SearchAsync(request, cancellationToken));
+    }
+    catch (SuplementosValidationException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "SUPLEMENTOS_VALIDATION_ERROR",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(httpContext))));
+    }
+})
+.WithName("SearchSuplementos")
+.RequireAuthorization(SuplementosAuthorizationPolicies.Read);
 
 app.Run();
 
@@ -956,7 +1336,7 @@ static IReadOnlyList<string> ReadDemoPermissions(IConfiguration configuration)
         return configuredPermissions.Get<string[]>()?
             .Where(permission => !string.IsNullOrWhiteSpace(permission))
             .Select(permission => permission.Trim())
-            .Where(PolizasPermissions.IsActive)
+            .Where(IlnPermissions.IsActive)
             .Distinct(StringComparer.Ordinal)
             .ToArray() ?? [];
     }

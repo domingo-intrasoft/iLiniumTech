@@ -24,43 +24,52 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 - `Autos Particulares` queda aparcado; no ampliarlo.
 - Paridad visual de `/polizas` con AppBuilder publicado refinada en segundo corte: chrome demo, menu lateral compacto, buscador iconificado, grid plano y menor ruido visual.
 - Paridad de datos del grid de `Polizas` cerrada como MVP local/demo: `N. Documento`, cliente descriptivo, `Ramo` y `Riesgo/Matric.` salen del contrato API real y la logica AppBuilder queda documentada para el resto de paginas.
-- Paginas del menu distintas de Polizas siguen en carril fixture/read-only o bloqueadas; el siguiente bloque vuelve a la cola pequena salvo nueva prioridad humana.
+- Nueva prioridad humana 2026-05-18: evolucionar el resto de paginas hacia CRUD. La regla operativa queda en `docs/PLAN_CRUD_RESTO_PAGINAS.md`: no hay CRUD generico ni escrituras reales sin SDD propia, origen SQL/UAT/DBA, permisos, transacciones y smoke. La primera fase prepara contratos frontend/API pagina por pagina.
+- Paginas del menu distintas de Polizas siguen en carril fixture/read-only o bloqueadas hasta superar sus precondiciones de SDD/API/UAT/DBA.
+- `Recibos`, `Clientes`, `Agenda`, `Propuestas` y `Suplementos` ya tienen contrato frontend fixture separado en tipos/fixture/composable.
+- `Siniestros` ya tiene primer backend read-only explicito in-memory: `GET /api/siniestros/catalogs` y `GET /api/siniestros`, con permisos propios y sin SQL real.
+- `Recibos` ya tiene primer backend read-only explicito in-memory: `GET /api/recibos/catalogs` y `GET /api/recibos`, con permisos propios, sin importes reales ni banco.
+- `Clientes`, `Agenda`, `Propuestas` y `Suplementos` ya tienen backend read-only explicito in-memory con permisos propios, contratos minimizados y tests dirigidos.
 - Ronda documental por pagina completada en `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`.
 - SDD drafts existentes para `Siniestros`, `Recibos`, `Clientes`, `Agenda`, `Propuestas` y `Suplementos`.
 - No activar datos reales, APIs nuevas, escrituras, exportaciones ni permisos nuevos para paginas fixture sin SDD aprobada, contrato API, UAT/DBA y seguridad.
 
 ## Siguiente tarea activa
 
-ID: `T-002-REC-FE-CONTRACT-FIXTURE`
+ID: `T-130-LIQCIA-SDD-READONLY`
 
 Estado: `READY`
 
-Nombre: separar contrato fixture de Recibos sin importes reales ni banco.
+Nombre: preparar SDD/readiness de `Liq.Cia` antes de cualquier API o dato real.
 
 Objetivo:
 
-- Separar tipos, fixture y logica local de `Recibos` para que la pagina quede preparada para API futura.
-- Mantener la pagina como read-only/fixture: no datos reales, no banco, no importes reales, no escrituras, no exportaciones.
-- No tocar backend, router, servicios compartidos ni layout global.
-- Documentar evidencia QA de Recibos como siguiente superficie tras cerrar Polizas MVP local.
+- Documentar el alcance read-only seguro de `Liq.Cia` como siguiente superficie financiera del menu.
+- Identificar campos financieros/personales prohibidos, permisos candidatos, bloqueos UAT/DBA/security y pruebas necesarias.
+- No crear backend, frontend, SQL, exportaciones, importes reales ni escrituras.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
 
 - `AGENTS.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md`
+- `docs/PLAN_CRUD_RESTO_PAGINAS.md`
+- `docs/ROADMAP_OBJETIVO_FINAL.md`
+- `docs/PLAN_MAESTRO_IA.md`
 - `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`
-- `iLiniumTech.Frontend/src/features/recibos/**`
+- `docs/appbuilder/pages/**/README.md`
 
 Archivos que puede tocar:
 
-- `iLiniumTech.Frontend/src/features/recibos/**`
-- `docs/qa/recibos-mvp-evidence.md`
+- `docs/sdd/specs/iLiniumTech/**`
+- `docs/appbuilder/pages/**`
+- `docs/qa/**`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
+- `docs/PLAN_CRUD_RESTO_PAGINAS.md`
 
 Archivos que NO debe tocar:
 
 - `iLiniumTech.Backend/**`
+- `iLiniumTech.Frontend/**`
 - `iLiniumTech.Frontend/src/services/**`
 - `iLiniumTech.Frontend/src/router/**`
 - `iLiniumTech.Frontend/src/layout/**`
@@ -72,24 +81,15 @@ Archivos que NO debe tocar:
 
 Pasos de implementacion:
 
-1. Inventariar la estructura actual de `src/features/recibos`.
-2. Extraer tipos y fixture a archivos propios si aun estan incrustados en la vista.
-3. Crear composable/ayuda local solo si reduce complejidad y mantiene fixture read-only.
-4. Mantener textos y UI sanitizados: sin importes reales, banco, cuenta, remesas reales ni PII.
-5. Actualizar o crear tests unitarios de Recibos.
-6. Actualizar `docs/qa/recibos-mvp-evidence.md`.
-7. Ejecutar validacion frontend completa, baseline documental, secret scan y `git diff --check`.
-8. Si todo pasa, marcar esta tarea `DONE` y promover `T-003-CLI-FE-CONTRACT-FIXTURE`.
+1. Localizar la evidencia existente de `Liq.Cia` en docs/menu/readiness sin abrir secretos ni datos reales.
+2. Crear o actualizar SDD read-only financiera con campos permitidos/prohibidos y bloqueos.
+3. Documentar QA/readiness de la superficie como bloqueada para API hasta UAT/DBA/security.
+4. Actualizar este cursor con la siguiente tarea tecnica segura.
+5. Ejecutar baseline documental, secret scan y `git diff --check`.
 
 Pruebas obligatorias:
 
 ```powershell
-cd .\iLiniumTech.Frontend
-npm run format
-npm run lint
-npm run test:unit
-npm run build
-cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
@@ -97,11 +97,10 @@ git diff --check
 
 Criterios de aceptacion:
 
-- Recibos mantiene comportamiento read-only fixture.
-- No aparecen importes reales, banco, cuenta bancaria ni datos personales reales.
-- La estructura queda lista para un adaptador API futuro sin activar backend.
-- Tests frontend pasan.
-- Evidencia QA queda actualizada.
+- `Liq.Cia` queda documentada como financiera/read-only pendiente de UAT/DBA/security.
+- No se activan APIs, SQL, importes reales, exportaciones ni escrituras.
+- La siguiente IA puede continuar sin reanalizar todo el repositorio.
+- Validaciones documentales pasan.
 
 Riesgo de conflicto: bajo si se respetan los archivos permitidos.
 
@@ -121,11 +120,11 @@ Objetivo: que cada pagina fixture tenga estructura mantenible y lista para API f
 | ID | Estado | Tarea | Archivos permitidos | No tocar | Pruebas |
 | --- | --- | --- | --- | --- | --- |
 | `T-001-SIN-FE-CONTRACT-FIXTURE` | `DONE` | Separar contrato fixture de Siniestros. | `src/features/siniestros/**`, `docs/qa/siniestros-mvp-evidence.md` | backend, services, router, layout | frontend completo |
-| `T-002-REC-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Recibos sin importes reales ni banco. | `src/features/recibos/**`, `docs/qa/recibos-mvp-evidence.md` | backend, services, router, layout | frontend completo |
-| `T-003-CLI-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Clientes con PII bloqueada. | `src/features/clientes/**`, `docs/qa/clientes-mvp-evidence.md` | backend, services, router, layout | frontend completo |
-| `T-004-AGE-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Agenda con rango/listado, sin calendario interactivo. | `src/features/agenda/**`, `docs/qa/agenda-mvp-evidence.md` | backend, services, router, layout | frontend completo |
-| `T-005-PRO-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Propuestas sin conversion, documentos ni importes reales. | `src/features/propuestas/**`, `docs/qa/propuestas-mvp-evidence.md` | backend, services, router, layout | frontend completo |
-| `T-006-SUP-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Suplementos sin detalle, workflows ni adjuntos. | `src/features/suplementos/**`, `docs/qa/suplementos-mvp-evidence.md` | backend, services, router, layout | frontend completo |
+| `T-002-REC-FE-CONTRACT-FIXTURE` | `SUPERSEDED` | Sustituida por `T-100-RECIBOS-FE-CONTRACT-FIXTURE` dentro del plan CRUD resto de paginas. | `src/features/recibos/**`, `docs/qa/recibos-mvp-evidence.md` | backend, services, router, layout | frontend completo |
+| `T-003-CLI-FE-CONTRACT-FIXTURE` | `SUPERSEDED` | Sustituida por `T-101-CLIENTES-FE-CONTRACT-FIXTURE`. | `src/features/clientes/**`, `docs/qa/clientes-mvp-evidence.md` | backend, services, router, layout | frontend completo |
+| `T-004-AGE-FE-CONTRACT-FIXTURE` | `SUPERSEDED` | Sustituida por `T-102-AGENDA-FE-CONTRACT-FIXTURE`. | `src/features/agenda/**`, `docs/qa/agenda-mvp-evidence.md` | backend, services, router, layout | frontend completo |
+| `T-005-PRO-FE-CONTRACT-FIXTURE` | `SUPERSEDED` | Sustituida por `T-103-PROPUESTAS-FE-CONTRACT-FIXTURE`. | `src/features/propuestas/**`, `docs/qa/propuestas-mvp-evidence.md` | backend, services, router, layout | frontend completo |
+| `T-006-SUP-FE-CONTRACT-FIXTURE` | `SUPERSEDED` | Sustituida por `T-104-SUPLEMENTOS-FE-CONTRACT-FIXTURE`. | `src/features/suplementos/**`, `docs/qa/suplementos-mvp-evidence.md` | backend, services, router, layout | frontend completo |
 
 ### Fase 2 - Preparar contratos read-only API sin datos reales
 
@@ -133,10 +132,29 @@ Objetivo: disenar contratos y pruebas de dominio antes de SQL real. No conectar 
 
 | ID | Estado | Tarea | Archivos permitidos | Bloqueo |
 | --- | --- | --- | --- | --- |
-| `T-010-SIN-BE-CONTRACT-DESIGN` | `TODO` | Crear modelos/validadores backend de Siniestros read-only con repositorio fixture/in-memory, sin SQL. | backend Siniestros nuevo, tests backend, docs QA | no SQL real |
+| `T-010-SIN-BE-CONTRACT-DESIGN` | `SUPERSEDED` | Sustituida por `T-110-SINIESTROS-BE-READONLY-CONTRACT`. | backend Siniestros nuevo, tests backend, docs QA | no SQL real |
 | `T-011-SIN-FE-API-ADAPTER-BLOCKED` | `TODO` | Preparar adaptador frontend Siniestros con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/siniestros/**` | requiere `T-010` |
-| `T-012-REC-BE-CONTRACT-DESIGN` | `TODO` | Modelos/validadores backend Recibos read-only sin importes reales. | backend Recibos nuevo, tests backend | no SQL real |
-| `T-013-CLI-BE-CONTRACT-DESIGN` | `TODO` | Modelos/validadores backend Clientes read-only minimizado sin PII ampliada. | backend Clientes nuevo, tests backend | no SQL real |
+| `T-012-REC-BE-CONTRACT-DESIGN` | `SUPERSEDED` | Sustituida por `T-120-RECIBOS-BE-READONLY-CONTRACT`. | backend Recibos nuevo, tests backend | no SQL real |
+| `T-013-CLI-BE-CONTRACT-DESIGN` | `SUPERSEDED` | Sustituida por `T-121-CLIENTES-BE-READONLY-CONTRACT`. | backend Clientes nuevo, tests backend | no SQL real |
+
+### Fase 1B - Preparar CRUD resto de paginas sin escrituras prematuras
+
+Objetivo: convertir la peticion de CRUD al resto de paginas en verticales explicitas, pequenas y seguras. Primero se separan contratos frontend y despues se abren APIs read-only; las escrituras se desbloquean pagina a pagina con SDD/UAT/DBA/security review.
+
+| ID | Estado | Tarea | Archivos permitidos | No tocar | Pruebas |
+| --- | --- | --- | --- | --- | --- |
+| `T-100-RECIBOS-FE-CONTRACT-FIXTURE` | `DONE` | Preparar Recibos para API/CRUD futura separando tipos, fixture y composable, sin importes reales ni banco. | `src/features/recibos/**`, `docs/qa/recibos-mvp-evidence.md`, planes | backend, services, router, layout | frontend completo |
+| `T-101-CLIENTES-FE-CONTRACT-FIXTURE` | `DONE` | Preparar Clientes para API futura separando tipos/fixture/composable con PII bloqueada. | `src/features/clientes/**`, `docs/qa/clientes-mvp-evidence.md`, planes | backend, services, router, layout | frontend completo |
+| `T-102-AGENDA-FE-CONTRACT-FIXTURE` | `DONE` | Preparar Agenda para API futura por rango sin calendario mutante. | `src/features/agenda/**`, `docs/qa/agenda-mvp-evidence.md`, planes | backend, services, router, layout | frontend completo |
+| `T-103-PROPUESTAS-FE-CONTRACT-FIXTURE` | `DONE` | Preparar Propuestas sin asumir Solicitudes ni activar emision/conversion. | `src/features/propuestas/**`, `docs/qa/propuestas-mvp-evidence.md`, planes | backend, services, router, layout | frontend completo |
+| `T-104-SUPLEMENTOS-FE-CONTRACT-FIXTURE` | `DONE` | Preparar Suplementos sin workflows, adjuntos, banco ni escrituras. | `src/features/suplementos/**`, `docs/qa/suplementos-mvp-evidence.md`, planes | backend, services, router, layout | frontend completo |
+| `T-110-SINIESTROS-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Siniestros con permisos propios y sin SQL real. | backend Siniestros, API, tests, docs QA | SQL real, frontend services | backend dirigido |
+| `T-120-RECIBOS-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Recibos sin importes reales ni banco. | backend Recibos, API, tests, docs QA | SQL real, frontend services | backend dirigido |
+| `T-121-CLIENTES-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Clientes con PII bloqueada. | backend Clientes, API, tests, docs QA | SQL real, frontend services | backend dirigido |
+| `T-122-AGENDA-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Agenda sin calendario mutante ni PII. | backend Agenda, API, tests, docs QA | SQL real, frontend services | backend dirigido |
+| `T-123-PROPUESTAS-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Propuestas sin solicitante real, importes, documentos ni conversion. | backend Propuestas, API, tests, docs QA | SQL real, frontend services | backend dirigido |
+| `T-124-SUPLEMENTOS-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Suplementos sin workflows, banco, adjuntos, importes ni escrituras. | backend Suplementos, API, tests, docs QA | SQL real, frontend services | backend dirigido |
+| `T-130-LIQCIA-SDD-READONLY` | `READY` | Preparar SDD/readiness de Liq.Cia antes de API por riesgo financiero. | docs SDD, appbuilder pages, QA, planes | backend, frontend, SQL real | docs |
 
 ### Fase 3 - Datos reales read-only por pagina
 
@@ -148,6 +166,8 @@ Objetivo: activar lectura SQL minimizada solo cuando haya SDD, UAT/DBA, permisos
 | `T-021-REC-SQL-READONLY` | `BLOCKED_EXTERNAL` | Implementar SQL read-only Recibos. | UAT/DBA, minimizacion financiera, permisos |
 | `T-022-CLI-SQL-READONLY` | `BLOCKED_EXTERNAL` | Implementar SQL read-only Clientes. | UAT/DBA, PII, permisos |
 | `T-023-AGE-SQL-READONLY` | `BLOCKED_EXTERNAL` | Implementar SQL read-only Agenda por rango. | UAT/DBA, PII en asunto/descripcion |
+| `T-024-PRO-SQL-READONLY` | `BLOCKED_EXTERNAL` | Implementar SQL read-only Propuestas. | UAT/DBA, origen funcional, minimizacion PII/importes/documentos |
+| `T-025-SUP-SQL-READONLY` | `BLOCKED_EXTERNAL` | Implementar SQL read-only Suplementos. | UAT/DBA, PII, banco, importes, documentos, workflows |
 
 ### Fase 4 - Auth, permisos y multi-tenant productivo
 
@@ -244,3 +264,7 @@ Gate completo:
 - 2026-05-18: `T-041-POL-AUDIT-WRITES` cerrada. Se creo `docs/engineering/polizas-write-audit-design.md` y se enlazo desde la evidencia CRUD. El diseno define eventos candidatos, campos permitidos, campos prohibidos, minimizacion, retencion y preguntas UAT/DBA sin implementar runtime ni guardar PII. El cursor queda en `T-042-POL-CRUD-REGRESSION-SMOKE`.
 - 2026-05-18: `T-042-POL-CRUD-REGRESSION-SMOKE` cerrada. Se reejecuto el smoke temporal API/UI CRUD real contra BBDD local de pruebas con resultados sanitizados: create 201, detail 200, search 1, update 204, delete 204, detail post-delete 404, limpieza exacta API/UI y residuales `0`. Evidencia actualizada en `docs/qa/polizas-crud-bbdd-evidence.md`. El cursor queda en `T-002-REC-FE-CONTRACT-FIXTURE`.
 - 2026-05-18: `T-047-POL-APPBUILDER-DATA-PARITY` cerrada. Se documento la logica AppBuilder de campos directos/lookups, se cambio lectura enriquecida de Polizas a `vw_ClientePolizas`, se incorporaron `documento` y `riesgo` al listado, `clienteNombre` ya no cae al codigo cliente, `Autos Particulares` sanitiza campos sensibles, smoke API/UI real OK contra BBDD local y validacion completa OK. El cursor vuelve a `T-002-REC-FE-CONTRACT-FIXTURE`.
+- 2026-05-18: el usuario cambia prioridad a "CRUD al resto de paginas". Se crea `docs/PLAN_CRUD_RESTO_PAGINAS.md` y se sustituye `T-002` por `T-100-RECIBOS-FE-CONTRACT-FIXTURE` como primer paso seguro. Escrituras reales quedan bloqueadas por pagina hasta SDD/UAT/DBA/permisos/transacciones/smoke.
+- 2026-05-18: `T-100`, `T-101`, `T-102`, `T-103` y `T-104` cerradas por agentes frontend con write scopes disjuntos. Recibos, Clientes, Agenda, Propuestas y Suplementos quedan separados en tipos, fixtures y composables locales; tests dirigidos OK. Se creo tambien `T-110-SINIESTROS-BE-READONLY-CONTRACT` y queda cerrado con API in-memory minimizada y tests `SiniestrosApiTests` OK. Cursor pasa a `T-120-RECIBOS-BE-READONLY-CONTRACT`.
+- 2026-05-18: `T-120-RECIBOS-BE-READONLY-CONTRACT` cerrada. Se creo API in-memory read-only de Recibos con permisos `recibos.catalogs` y `recibos.read`, sin importes reales ni banco; tests `RecibosApiTests` OK. Cursor pasa a `T-121-CLIENTES-BE-READONLY-CONTRACT`.
+- 2026-05-18: `T-121`, `T-122`, `T-123` y `T-124` cerradas. Se crearon APIs in-memory read-only de Clientes, Agenda, Propuestas y Suplementos con permisos propios y contratos minimizados; tests dirigidos `Clientes|Agenda|Propuestas|Suplementos` OK, 21 tests. Cursor pasa a `T-130-LIQCIA-SDD-READONLY`.

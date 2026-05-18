@@ -210,6 +210,14 @@ Manual/UAT:
 - Crear tarea DBA para confirmar origen de lectura, parseo de fechas y campos prohibidos.
 - Crear tarea seguridad para clasificacion de asuntos/textos libres y threat review del modulo.
 
+## Actualizacion de implementacion 2026-05-18
+
+- Implementado primer corte backend in-memory read-only: `GET /api/agenda/catalogs`, `GET /api/agenda` y alias `GET /api/agenda/events`.
+- Permisos implementados: `agenda.catalogs` y `agenda.read`.
+- La implementacion no consulta SQL real, no devuelve descripcion larga, participantes, `IdentidadId`, contacto ni PII ampliada, y no habilita calendario mutante, detalle, exportacion ni escritura.
+- Este corte no desbloquea datos reales; SQL, calendario operativo y CRUD siguen bloqueados hasta UAT/DBA/security review y SDD de escritura si aplica.
+- Tests dirigidos `AgendaApiTests`: OK.
+
 ## Definicion de hecho
 
 - [ ] SDD revisada por producto, backend/datos, frontend y seguridad.

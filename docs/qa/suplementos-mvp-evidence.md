@@ -30,6 +30,21 @@ Fecha: 2026-05-18
 - Payloads maliciosos y sort/filtros fuera de whitelist cubiertos por tests.
 - Secret scan, dependency audit y CORS audit si se toca API/configuracion.
 
+## Actualizacion contrato fixture 2026-05-18
+
+- `SuplementosView.vue` queda consumiendo `types.ts`, `fixtures.ts` y `useSuplementosFixture.ts`.
+- Se mantiene `/suplementos` como fixture/read-only sin API ni datos reales.
+- No se activan workflows, adjuntos, banco, importes reales ni escrituras.
+- Prueba dirigida ejecutada: `npm run test:unit -- SuplementosView.test.ts` OK, 4 tests.
+
+## Actualizacion backend read-only 2026-05-18
+
+- Se crea API in-memory read-only: `GET /api/suplementos/catalogs` y `GET /api/suplementos`.
+- Permisos propios: `suplementos.catalogs` y `suplementos.read`; la API key legacy no concede acceso.
+- Contrato minimizado sin tomador, beneficiario, documento, contacto, direccion, IBAN, cuenta, importes, documentos, adjuntos, workflows ni escrituras.
+- No hay SQL real, detalle, exportacion ni acciones operativas.
+- Prueba dirigida ejecutada: `dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "Suplementos"` OK, 5 tests.
+
 ## Pruebas de esta ronda
 
 Ronda documental. Se ejecuto validacion documental ligera desde raiz:

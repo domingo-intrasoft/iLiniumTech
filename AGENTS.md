@@ -41,8 +41,10 @@ Frontend:
 
 - Proyecto en `iLiniumTech.Frontend`.
 - Feature funcional principal actual: `src/features/polizas`.
-- Objetivo MVP activo desde 2026-05-18: `Polizas CRUD BBDD`, documentado en `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`.
-- Antes de avanzar en otras paginas del menu, prioriza cerrar `Polizas` con CRUD contra BBDD local autorizada o documentar bloqueo tecnico explicito.
+- `Polizas CRUD BBDD` queda como vertical MVP local de referencia, documentado en `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`.
+- Objetivo activo posterior desde 2026-05-18: evolucionar el resto de paginas del menu hacia API explicita y CRUD por fases segun `docs/PLAN_CRUD_RESTO_PAGINAS.md`.
+- `Siniestros`, `Recibos`, `Clientes`, `Agenda`, `Propuestas` y `Suplementos` tienen primer backend read-only in-memory con permisos propios y contratos minimizados. No se consideran CRUD real ni datos reales.
+- No activar CRUD real en paginas distintas de `Polizas` sin SDD propia de escritura, origen SQL/UAT/DBA confirmado, permisos, transacciones, auditoria y smoke local. La primera fase prepara contratos frontend/API read-only pagina por pagina.
 - Para CRUD de `Polizas`, no uses `Pantalla_Polizas.Poliza` como identificador de escritura; la BBDD local muestra duplicados. El recurso SQL debe evolucionar a `dbo.Poliza.Id` y `Poliza` queda como numero visible.
 - Las escrituras de `Polizas` requieren permisos explicitos (`polizas.create`, `polizas.update`, `polizas.delete`), `Polizas:WritesEnabled`, transacciones, SQL parametrizado y evidencia local sin secretos.
 - Paginas estaticas protegidas del menu en `src/features/*`; son superficies MVP read-only y no autorizan datos reales, APIs nuevas ni acciones sin SDD.

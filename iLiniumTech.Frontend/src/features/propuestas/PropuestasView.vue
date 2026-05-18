@@ -1,124 +1,45 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
 
-type PropuestaEstado = 'Borrador demo' | 'En revision demo' | 'Caducada demo' | 'Bloqueada demo'
-type PropuestaRamo = 'Autos demo' | 'Hogar demo' | 'Comercio demo' | 'Salud demo'
-
-interface PropuestaListItem {
-  id: string
-  referencia: string
-  estado: PropuestaEstado
-  ramo: PropuestaRamo
-  fechaAlta: string
-  vigencia: string
-  solicitante: string
-  canal: string
-  resultado: string
-  importeDemo: string
-}
-
-interface PropuestasFilters {
-  referencia: string
-  estado: '' | PropuestaEstado
-  ramo: '' | PropuestaRamo
-  fechaDesde: string
-}
-
-const propuestasFixture: PropuestaListItem[] = [
-  {
-    id: 'PROP-MVP-1001',
-    referencia: 'PROP-2026-0001',
-    estado: 'Borrador demo',
-    ramo: 'Autos demo',
-    fechaAlta: '2026-01-12',
-    vigencia: 'Pendiente de SDD',
-    solicitante: 'Solicitante anonimo 1',
-    canal: 'Canal demo mediador',
-    resultado: 'Sin tarificacion operativa',
-    importeDemo: 'Importe demo A',
-  },
-  {
-    id: 'PROP-MVP-1002',
-    referencia: 'PROP-2026-0002',
-    estado: 'En revision demo',
-    ramo: 'Hogar demo',
-    fechaAlta: '2026-02-20',
-    vigencia: 'Pendiente de origen',
-    solicitante: 'Solicitante anonimo 2',
-    canal: 'Canal demo oficina',
-    resultado: 'Revision funcional pendiente',
-    importeDemo: 'Importe demo B',
-  },
-  {
-    id: 'PROP-MVP-1003',
-    referencia: 'PROP-2026-0003',
-    estado: 'Caducada demo',
-    ramo: 'Comercio demo',
-    fechaAlta: '2026-03-18',
-    vigencia: 'No operativa',
-    solicitante: 'Solicitante anonimo 3',
-    canal: 'Canal demo interno',
-    resultado: 'Conversion bloqueada',
-    importeDemo: 'Importe demo C',
-  },
-  {
-    id: 'PROP-MVP-1004',
-    referencia: 'PROP-2026-0004',
-    estado: 'Bloqueada demo',
-    ramo: 'Salud demo',
-    fechaAlta: '2026-04-05',
-    vigencia: 'Pendiente de API',
-    solicitante: 'Solicitante anonimo 4',
-    canal: 'Canal demo compania',
-    resultado: 'Documentos no conectados',
-    importeDemo: 'Importe demo D',
-  },
-]
-
-const estados: PropuestaEstado[] = [
-  'Borrador demo',
-  'En revision demo',
-  'Caducada demo',
-  'Bloqueada demo',
-]
-const ramos: PropuestaRamo[] = ['Autos demo', 'Hogar demo', 'Comercio demo', 'Salud demo']
-const pageSizeOptions = [10, 25, 50]
-const topBadges = ['Read-only', 'Fixture']
-const moduleActions = [
-  { label: 'Buscar propuestas', icon: 'pi pi-search', active: true },
-  { label: 'Crear propuesta pendiente', icon: 'pi pi-plus' },
-  { label: 'Convertir a poliza pendiente', icon: 'pi pi-send' },
-  { label: 'Documentos pendientes', icon: 'pi pi-folder' },
-  { label: 'Exportacion pendiente', icon: 'pi pi-download' },
-]
-const blockedActionsDescription =
-  'Acciones de propuestas bloqueadas en el MVP read-only hasta SDD, contrato API, permisos, UAT y decision de emision/conversion/documentos.'
-
-const filters = reactive<PropuestasFilters>({
-  referencia: '',
-  estado: '',
-  ramo: '',
-  fechaDesde: '',
-})
-
-const draftFilters = reactive<PropuestasFilters>({
-  referencia: '',
-  estado: '',
-  ramo: '',
-  fechaDesde: '',
-})
-
-const pagination = reactive({
-  page: 1,
-  pageSize: 25,
-})
+import {
+  propuestasBlockedActionsDescription,
+  propuestasEstados,
+  propuestasModuleActions,
+  propuestasRamos,
+  propuestasTopBadges,
+} from './fixtures'
+import { formatPropuestaDate, usePropuestasFixture } from './usePropuestasFixture'
 
 const router = useRouter()
 const { session, userLabel, logout } = useAuthSession()
+const {
+  canGoNext,
+  canGoPrevious,
+  changePage,
+  changePageSize: changeFixturePageSize,
+  clearFilters,
+  draftFilters,
+  firstVisible,
+  lastVisible,
+  pageSizeOptions,
+  pagedItems,
+  pagination,
+  resultLabel,
+  searchPropuestas,
+  tableCaption,
+  total,
+  totalPages,
+} = usePropuestasFixture()
+
+const estados = propuestasEstados
+const ramos = propuestasRamos
+const topBadges = propuestasTopBadges
+const moduleActions = propuestasModuleActions
+const blockedActionsDescription = propuestasBlockedActionsDescription
 
 const sessionLabel = computed(() => {
   return session.value?.currentBrokerId ? `Broker ${session.value.currentBrokerId}` : 'Modo fixture'
@@ -126,80 +47,12 @@ const sessionLabel = computed(() => {
 
 const sessionNeedsAttention = computed(() => false)
 
-const filteredItems = computed(() => {
-  const referencia = normalizeText(filters.referencia)
-
-  return propuestasFixture.filter((item) => {
-    const matchesReferencia =
-      !referencia ||
-      normalizeText(item.referencia).includes(referencia) ||
-      normalizeText(item.solicitante).includes(referencia)
-    const matchesEstado = !filters.estado || item.estado === filters.estado
-    const matchesRamo = !filters.ramo || item.ramo === filters.ramo
-    const matchesFecha = !filters.fechaDesde || item.fechaAlta >= filters.fechaDesde
-
-    return matchesReferencia && matchesEstado && matchesRamo && matchesFecha
-  })
-})
-
-const total = computed(() => filteredItems.value.length)
-const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pagination.pageSize)))
-const pagedItems = computed(() => {
-  const start = (pagination.page - 1) * pagination.pageSize
-  return filteredItems.value.slice(start, start + pagination.pageSize)
-})
-const firstVisible = computed(() =>
-  total.value === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1,
-)
-const lastVisible = computed(() => Math.min(pagination.page * pagination.pageSize, total.value))
-const resultLabel = computed(() => (total.value === 1 ? 'propuesta' : 'propuestas'))
-const tableCaption = computed(
-  () =>
-    `Propuestas fixture read-only: ${firstVisible.value}-${lastVisible.value} de ${total.value} ${resultLabel.value}. Datos minimizados sin emision, conversion ni API backend.`,
-)
-const canGoPrevious = computed(() => pagination.page > 1)
-const canGoNext = computed(() => pagination.page < totalPages.value)
-
-function normalizeText(value: string) {
-  return value.trim().toLocaleLowerCase('es-ES')
-}
-
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat('es-ES').format(new Date(`${value}T00:00:00`))
-}
-
-function copyFilters(target: PropuestasFilters, source: PropuestasFilters) {
-  target.referencia = source.referencia
-  target.estado = source.estado
-  target.ramo = source.ramo
-  target.fechaDesde = source.fechaDesde
-}
-
-function searchPropuestas() {
-  copyFilters(filters, draftFilters)
-  pagination.page = 1
-}
-
-function clearFilters() {
-  copyFilters(draftFilters, {
-    referencia: '',
-    estado: '',
-    ramo: '',
-    fechaDesde: '',
-  })
-  copyFilters(filters, draftFilters)
-  pagination.page = 1
-}
-
-function changePage(page: number) {
-  if (page >= 1 && page <= totalPages.value) {
-    pagination.page = page
-  }
+  return formatPropuestaDate(value)
 }
 
 function changePageSize(event: Event) {
-  pagination.pageSize = Number((event.target as HTMLSelectElement).value)
-  pagination.page = 1
+  changeFixturePageSize(Number((event.target as HTMLSelectElement).value))
 }
 
 async function signOut() {

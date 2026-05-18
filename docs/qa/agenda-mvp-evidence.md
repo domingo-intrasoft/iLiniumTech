@@ -61,3 +61,18 @@ Fecha: 2026-05-16
 - Readiness operativo documentado en `docs/appbuilder/pages/agenda/operational-readiness.md`.
 - La SDD draft `SDD-2026-011` limita el primer corte futuro a listado read-only por rango.
 - Calendario visual, detalle, descripcion larga, participantes, drag/drop, reprogramacion, exportacion y escrituras siguen bloqueados hasta SDD posterior.
+
+## Actualizacion contrato fixture 2026-05-18
+
+- `AgendaView.vue` queda consumiendo `types.ts`, `fixtures.ts` y `useAgendaFixture.ts`.
+- Se mantiene `/agenda` como fixture/read-only sin API ni datos reales.
+- PII real, asunto sensible, participantes, descripcion larga y acciones mutantes de calendario siguen bloqueados.
+- Prueba dirigida ejecutada: `npm run test:unit -- AgendaView.test.ts` OK, 4 tests.
+
+## Actualizacion backend read-only 2026-05-18
+
+- Se crea API in-memory read-only: `GET /api/agenda/catalogs`, `GET /api/agenda` y alias `GET /api/agenda/events`.
+- Permisos propios: `agenda.catalogs` y `agenda.read`; la API key legacy no concede acceso.
+- Contrato minimizado sin descripcion larga, participantes, `IdentidadId`, calendario mutante, drag/drop ni escrituras.
+- Se valida rango maximo defensivo de fechas y sort por whitelist.
+- Prueba dirigida ejecutada: `dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "Agenda"` OK, 6 tests.

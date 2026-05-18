@@ -1,193 +1,46 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
 
-type ClienteEstado = 'Activo demo' | 'En revision' | 'Bloqueado PII'
-type ClienteSegmento = 'Particular demo' | 'Empresa demo' | 'Colectivo demo'
-
-interface ClienteListItem {
-  id: string
-  referencia: string
-  alias: string
-  estado: ClienteEstado
-  segmento: ClienteSegmento
-  fechaAlta: string
-  resultado: string
-  datos: string
-  relacionadas: string
-}
-
-interface ClientesFilters {
-  texto: string
-  estado: '' | ClienteEstado
-  segmento: '' | ClienteSegmento
-  fechaAltaDesde: string
-}
-
-const clientesFixture: ClienteListItem[] = [
-  {
-    id: 'CLI-MVP-1001',
-    referencia: 'CLI-2026-0001',
-    alias: 'Alias anonimo A',
-    estado: 'Activo demo',
-    segmento: 'Particular demo',
-    fechaAlta: '2026-01-12',
-    resultado: 'Listado minimizado',
-    datos: 'PII bloqueada',
-    relacionadas: 'Tabs relacionadas pendientes',
-  },
-  {
-    id: 'CLI-MVP-1002',
-    referencia: 'CLI-2026-0002',
-    alias: 'Alias anonimo B',
-    estado: 'En revision',
-    segmento: 'Empresa demo',
-    fechaAlta: '2026-02-18',
-    resultado: 'Pendiente de SDD',
-    datos: 'Datos personales no incluidos',
-    relacionadas: 'Polizas y recibos no operativos',
-  },
-  {
-    id: 'CLI-MVP-1003',
-    referencia: 'CLI-2026-0003',
-    alias: 'Alias anonimo C',
-    estado: 'Bloqueado PII',
-    segmento: 'Colectivo demo',
-    fechaAlta: '2026-03-05',
-    resultado: 'Solo trazabilidad demo',
-    datos: 'Contacto y bancarios bloqueados',
-    relacionadas: 'Riesgos, siniestros y suplementos pendientes',
-  },
-  {
-    id: 'CLI-MVP-1004',
-    referencia: 'CLI-2026-0004',
-    alias: 'Alias anonimo D',
-    estado: 'Activo demo',
-    segmento: 'Particular demo',
-    fechaAlta: '2026-04-21',
-    resultado: 'Fixture local',
-    datos: 'Documento legal bloqueado',
-    relacionadas: 'Ficha no operativa',
-  },
-]
-
-const pageSizeOptions = [2, 10, 25]
-const topBadges = ['Read-only', 'Fixture', 'PII bloqueada']
-const moduleActions = [
-  { label: 'Buscar clientes demo', icon: 'pi pi-search', active: true },
-  { label: 'Abrir ficha bloqueado', icon: 'pi pi-id-card' },
-  { label: 'Exportar bloqueado', icon: 'pi pi-download' },
-  { label: 'Desglose bloqueado', icon: 'pi pi-sitemap' },
-]
-const blockedActionsDescription =
-  'Acciones de clientes bloqueadas en el MVP read-only hasta SDD, contrato API, permisos, UAT y decision de minimizacion PII.'
-
-const filters = reactive<ClientesFilters>({
-  texto: '',
-  estado: '',
-  segmento: '',
-  fechaAltaDesde: '',
-})
-
-const draftFilters = reactive<ClientesFilters>({
-  texto: '',
-  estado: '',
-  segmento: '',
-  fechaAltaDesde: '',
-})
-
-const pagination = reactive({
-  page: 1,
-  pageSize: 2,
-})
+import {
+  clienteEstadoOptions,
+  clienteSegmentoOptions,
+  clientesBlockedActionsDescription,
+  clientesModuleActions,
+  clientesPageSizeOptions,
+  clientesTopBadges,
+} from './fixtures'
+import { useClientesFixture } from './useClientesFixture'
 
 const router = useRouter()
 const { session, userLabel, logout } = useAuthSession()
+const {
+  draftFilters,
+  pagination,
+  total,
+  totalPages,
+  pagedItems,
+  firstVisible,
+  lastVisible,
+  resultLabel,
+  tableCaption,
+  canGoPrevious,
+  canGoNext,
+  searchClientes,
+  clearFilters,
+  changePage,
+  changePageSize,
+  formatDate,
+} = useClientesFixture()
 
 const sessionLabel = computed(() => {
   return session.value?.currentBrokerId ? `Broker ${session.value.currentBrokerId}` : 'Modo fixture'
 })
 
 const sessionNeedsAttention = computed(() => false)
-
-const filteredItems = computed(() => {
-  const texto = normalizeText(filters.texto)
-
-  return clientesFixture.filter((item) => {
-    const matchesTexto =
-      !texto ||
-      normalizeText(item.referencia).includes(texto) ||
-      normalizeText(item.alias).includes(texto)
-    const matchesEstado = !filters.estado || item.estado === filters.estado
-    const matchesSegmento = !filters.segmento || item.segmento === filters.segmento
-    const matchesFechaAlta = !filters.fechaAltaDesde || item.fechaAlta >= filters.fechaAltaDesde
-
-    return matchesTexto && matchesEstado && matchesSegmento && matchesFechaAlta
-  })
-})
-
-const total = computed(() => filteredItems.value.length)
-const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pagination.pageSize)))
-const pagedItems = computed(() => {
-  const start = (pagination.page - 1) * pagination.pageSize
-  return filteredItems.value.slice(start, start + pagination.pageSize)
-})
-const firstVisible = computed(() =>
-  total.value === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1,
-)
-const lastVisible = computed(() => Math.min(pagination.page * pagination.pageSize, total.value))
-const resultLabel = computed(() => (total.value === 1 ? 'cliente demo' : 'clientes demo'))
-const tableCaption = computed(
-  () =>
-    `Clientes fixture read-only: ${firstVisible.value}-${lastVisible.value} de ${total.value} ${resultLabel.value}. Datos minimizados sin PII real ni API backend.`,
-)
-const canGoPrevious = computed(() => pagination.page > 1)
-const canGoNext = computed(() => pagination.page < totalPages.value)
-
-function normalizeText(value: string) {
-  return value.trim().toLocaleLowerCase('es-ES')
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('es-ES').format(new Date(`${value}T00:00:00`))
-}
-
-function copyFilters(target: ClientesFilters, source: ClientesFilters) {
-  target.texto = source.texto
-  target.estado = source.estado
-  target.segmento = source.segmento
-  target.fechaAltaDesde = source.fechaAltaDesde
-}
-
-function searchClientes() {
-  copyFilters(filters, draftFilters)
-  pagination.page = 1
-}
-
-function clearFilters() {
-  copyFilters(draftFilters, {
-    texto: '',
-    estado: '',
-    segmento: '',
-    fechaAltaDesde: '',
-  })
-  copyFilters(filters, draftFilters)
-  pagination.page = 1
-}
-
-function changePage(page: number) {
-  if (page >= 1 && page <= totalPages.value) {
-    pagination.page = page
-  }
-}
-
-function changePageSize(event: Event) {
-  pagination.pageSize = Number((event.target as HTMLSelectElement).value)
-  pagination.page = 1
-}
 
 async function signOut() {
   await logout()
@@ -201,12 +54,12 @@ async function signOut() {
     section-title="Clientes"
     :session-label="sessionLabel"
     :session-needs-attention="sessionNeedsAttention"
-    :top-badges="topBadges"
+    :top-badges="clientesTopBadges"
     :user-label="userLabel"
     show-sign-out
     @sign-out="signOut"
   >
-    <p id="clientes-blocked-actions" class="sr-only" v-text="blockedActionsDescription"></p>
+    <p id="clientes-blocked-actions" class="sr-only" v-text="clientesBlockedActionsDescription"></p>
 
     <div id="clientes-content" class="polizas-toolbar">
       <div>
@@ -217,7 +70,7 @@ async function signOut() {
       <div class="toolbar-groups">
         <div class="action-group">
           <button
-            v-for="action in moduleActions"
+            v-for="action in clientesModuleActions"
             :key="action.label"
             class="square-action"
             :class="{ active: action.active }"
@@ -314,9 +167,9 @@ async function signOut() {
                   aria-label="Estado"
                 >
                   <option value=""></option>
-                  <option>Activo demo</option>
-                  <option>En revision</option>
-                  <option>Bloqueado PII</option>
+                  <option v-for="estado in clienteEstadoOptions" :key="estado">
+                    {{ estado }}
+                  </option>
                 </select>
                 <button
                   type="button"
@@ -338,9 +191,9 @@ async function signOut() {
                   aria-label="Segmento"
                 >
                   <option value=""></option>
-                  <option>Particular demo</option>
-                  <option>Empresa demo</option>
-                  <option>Colectivo demo</option>
+                  <option v-for="segmento in clienteSegmentoOptions" :key="segmento">
+                    {{ segmento }}
+                  </option>
                 </select>
                 <button
                   type="button"
@@ -470,7 +323,7 @@ async function signOut() {
         <div class="page-size-control">
           <label for="clientes-page-size">Filas</label>
           <select id="clientes-page-size" :value="pagination.pageSize" @change="changePageSize">
-            <option v-for="option in pageSizeOptions" :key="option" :value="option">
+            <option v-for="option in clientesPageSizeOptions" :key="option" :value="option">
               {{ option }}
             </option>
           </select>

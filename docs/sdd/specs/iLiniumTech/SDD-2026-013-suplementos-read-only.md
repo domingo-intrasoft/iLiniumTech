@@ -218,6 +218,14 @@ Manual/UAT:
 - Crear tarea DBA para confirmar origen de lectura, vistas/tablas autorizadas, filtros por broker y campos prohibidos.
 - Crear tarea seguridad para clasificacion PII/importes/banco/documentos/riesgo y threat review del modulo.
 
+## Actualizacion de implementacion 2026-05-18
+
+- Implementado primer corte backend in-memory read-only: `GET /api/suplementos/catalogs` y `GET /api/suplementos`.
+- Permisos implementados: `suplementos.catalogs` y `suplementos.read`.
+- La implementacion no consulta SQL real, no devuelve tomador, beneficiario, documento, contacto, direccion, banco, importes, documentos, adjuntos, workflows ni acciones operativas.
+- Este corte no desbloquea datos reales; SQL y CRUD siguen bloqueados hasta UAT/DBA/security review y SDD de escritura si aplica.
+- Tests dirigidos `SuplementosApiTests`: OK.
+
 ## Definicion de hecho
 
 - [ ] SDD revisada por producto, backend/datos, frontend y seguridad.

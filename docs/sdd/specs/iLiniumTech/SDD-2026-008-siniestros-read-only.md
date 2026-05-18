@@ -20,6 +20,8 @@ La documentacion AppBuilder disponible en `docs/appbuilder/pages/siniestros/READ
 
 Decision de arquitectura: iLiniumTech no debe reconstruir AppBuilder como runtime dinamico. La futura pagina de `Siniestros`, si se implementa con datos, debe quedar como Vue/TypeScript estatico y API .NET explicita, con permisos iLiniumTech, broker validado y minimizacion de datos.
 
+Actualizacion 2026-05-18: se implementa el primer contrato backend in-memory/read-only para `Siniestros` con `GET /api/siniestros/catalogs` y `GET /api/siniestros`. Este avance no activa SQL real, datos reales, detalle, exportacion ni escrituras; sirve como base tecnica para adaptar el frontend y validar permisos propios.
+
 ## Objetivo
 
 Preparar el primer incremento funcional de `Siniestros` como listado read-only minimizado, sin detalle y sin exportacion:
@@ -109,6 +111,7 @@ Campos prohibidos en el primer corte:
 - [ ] Antes de implementar API real, DBA confirma origen de lectura autorizado y regla por broker.
 - [ ] `GET /api/siniestros/catalogs` exige `siniestros.catalogs`.
 - [ ] `GET /api/siniestros` exige `siniestros.read`.
+- [x] Primer backend in-memory/read-only implementado sin SQL real.
 - [ ] El backend no consulta datos si falta broker o el broker no esta permitido.
 - [ ] Filtros y sort fuera de whitelist devuelven error sanitizado.
 - [ ] El listado no devuelve campos sensibles prohibidos.

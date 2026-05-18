@@ -35,6 +35,102 @@ public static class PolizasPermissions
     public static bool IsLegacyApiKeyCompatible(string permission) => LegacyApiKeyPermissions.Contains(permission);
 }
 
+public static class SiniestrosPermissions
+{
+    public const string Catalogs = "siniestros.catalogs";
+    public const string Read = "siniestros.read";
+
+    private static readonly HashSet<string> ActivePermissions = new(StringComparer.Ordinal)
+    {
+        Catalogs,
+        Read
+    };
+
+    public static bool IsActive(string permission) => ActivePermissions.Contains(permission);
+}
+
+public static class RecibosPermissions
+{
+    public const string Catalogs = "recibos.catalogs";
+    public const string Read = "recibos.read";
+
+    private static readonly HashSet<string> ActivePermissions = new(StringComparer.Ordinal)
+    {
+        Catalogs,
+        Read
+    };
+
+    public static bool IsActive(string permission) => ActivePermissions.Contains(permission);
+}
+
+public static class ClientesPermissions
+{
+    public const string Catalogs = "clientes.catalogs";
+    public const string Read = "clientes.read";
+
+    private static readonly HashSet<string> ActivePermissions = new(StringComparer.Ordinal)
+    {
+        Catalogs,
+        Read
+    };
+
+    public static bool IsActive(string permission) => ActivePermissions.Contains(permission);
+}
+
+public static class AgendaPermissions
+{
+    public const string Catalogs = "agenda.catalogs";
+    public const string Read = "agenda.read";
+
+    private static readonly HashSet<string> ActivePermissions = new(StringComparer.Ordinal)
+    {
+        Catalogs,
+        Read
+    };
+
+    public static bool IsActive(string permission) => ActivePermissions.Contains(permission);
+}
+
+public static class PropuestasPermissions
+{
+    public const string Catalogs = "propuestas.catalogs";
+    public const string Read = "propuestas.read";
+
+    private static readonly HashSet<string> ActivePermissions = new(StringComparer.Ordinal)
+    {
+        Catalogs,
+        Read
+    };
+
+    public static bool IsActive(string permission) => ActivePermissions.Contains(permission);
+}
+
+public static class SuplementosPermissions
+{
+    public const string Catalogs = "suplementos.catalogs";
+    public const string Read = "suplementos.read";
+
+    private static readonly HashSet<string> ActivePermissions = new(StringComparer.Ordinal)
+    {
+        Catalogs,
+        Read
+    };
+
+    public static bool IsActive(string permission) => ActivePermissions.Contains(permission);
+}
+
+public static class IlnPermissions
+{
+    public static bool IsActive(string permission) =>
+        PolizasPermissions.IsActive(permission) ||
+        SiniestrosPermissions.IsActive(permission) ||
+        RecibosPermissions.IsActive(permission) ||
+        ClientesPermissions.IsActive(permission) ||
+        AgendaPermissions.IsActive(permission) ||
+        PropuestasPermissions.IsActive(permission) ||
+        SuplementosPermissions.IsActive(permission);
+}
+
 public static class PolizasAuthorizationPolicies
 {
     public const string Catalogs = PolizasPermissions.Catalogs;
@@ -43,6 +139,42 @@ public static class PolizasAuthorizationPolicies
     public const string Create = PolizasPermissions.Create;
     public const string Update = PolizasPermissions.Update;
     public const string Delete = PolizasPermissions.Delete;
+}
+
+public static class SiniestrosAuthorizationPolicies
+{
+    public const string Catalogs = SiniestrosPermissions.Catalogs;
+    public const string Read = SiniestrosPermissions.Read;
+}
+
+public static class RecibosAuthorizationPolicies
+{
+    public const string Catalogs = RecibosPermissions.Catalogs;
+    public const string Read = RecibosPermissions.Read;
+}
+
+public static class ClientesAuthorizationPolicies
+{
+    public const string Catalogs = ClientesPermissions.Catalogs;
+    public const string Read = ClientesPermissions.Read;
+}
+
+public static class AgendaAuthorizationPolicies
+{
+    public const string Catalogs = AgendaPermissions.Catalogs;
+    public const string Read = AgendaPermissions.Read;
+}
+
+public static class PropuestasAuthorizationPolicies
+{
+    public const string Catalogs = PropuestasPermissions.Catalogs;
+    public const string Read = PropuestasPermissions.Read;
+}
+
+public static class SuplementosAuthorizationPolicies
+{
+    public const string Catalogs = SuplementosPermissions.Catalogs;
+    public const string Read = SuplementosPermissions.Read;
 }
 
 public sealed record PolizasPermissionRequirement(string Permission) : IAuthorizationRequirement;

@@ -1,201 +1,39 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
 
-type ReciboSituacion = 'Pendiente' | 'Cobrado' | 'Anulado'
-type ReciboTipo = 'Prima' | 'Extorno' | 'Regularizacion'
-
-interface ReciboListItem {
-  id: string
-  recibo: string
-  poliza: string
-  cliente: string
-  compania: string
-  tipo: ReciboTipo
-  situacion: ReciboSituacion
-  efecto: string
-  vencimiento: string
-  cobro: string
-  canal: string
-  importeDemo: string
-}
-
-interface RecibosFilters {
-  recibo: string
-  poliza: string
-  situacion: '' | ReciboSituacion
-  tipo: '' | ReciboTipo
-  vencimientoDesde: string
-}
-
-const recibosFixture: ReciboListItem[] = [
-  {
-    id: 'REC-MVP-1001',
-    recibo: 'REC-2026-0001',
-    poliza: 'POL-2026-0001',
-    cliente: 'Cliente anonimo 1',
-    compania: 'Compania demo norte',
-    tipo: 'Prima',
-    situacion: 'Pendiente',
-    efecto: '2026-01-01',
-    vencimiento: '2026-02-01',
-    cobro: 'No operativo',
-    canal: 'Canal demo',
-    importeDemo: 'Importe demo A',
-  },
-  {
-    id: 'REC-MVP-1002',
-    recibo: 'REC-2026-0002',
-    poliza: 'POL-2026-0002',
-    cliente: 'Cliente anonimo 2',
-    compania: 'Compania demo sur',
-    tipo: 'Regularizacion',
-    situacion: 'Cobrado',
-    efecto: '2026-02-15',
-    vencimiento: '2026-03-15',
-    cobro: 'Cobro demo confirmado',
-    canal: 'Canal demo mediador',
-    importeDemo: 'Importe demo B',
-  },
-  {
-    id: 'REC-MVP-1003',
-    recibo: 'REC-2026-0003',
-    poliza: 'POL-2026-0003',
-    cliente: 'Cliente anonimo 3',
-    compania: 'Compania demo este',
-    tipo: 'Extorno',
-    situacion: 'Anulado',
-    efecto: '2026-04-01',
-    vencimiento: '2026-05-01',
-    cobro: 'No operativo',
-    canal: 'Canal demo compania',
-    importeDemo: 'Importe demo C',
-  },
-]
-
-const pageSizeOptions = [10, 25, 50]
-const topBadges = ['Read-only', 'Fixture']
-const moduleActions = [
-  { label: 'Buscar recibos', icon: 'pi pi-search', active: true },
-  { label: 'Detalle pendiente', icon: 'pi pi-eye' },
-  { label: 'Exportacion pendiente', icon: 'pi pi-download' },
-]
-const blockedActionsDescription =
-  'Acciones de recibos bloqueadas en el MVP read-only hasta SDD, contrato API, permisos, UAT y decision de cobros/remesas/datos bancarios.'
-
-const filters = reactive<RecibosFilters>({
-  recibo: '',
-  poliza: '',
-  situacion: '',
-  tipo: '',
-  vencimientoDesde: '',
-})
-
-const draftFilters = reactive<RecibosFilters>({
-  recibo: '',
-  poliza: '',
-  situacion: '',
-  tipo: '',
-  vencimientoDesde: '',
-})
-
-const pagination = reactive({
-  page: 1,
-  pageSize: 25,
-})
+import { blockedActionsDescription, moduleActions, pageSizeOptions, topBadges } from './fixtures'
+import { useRecibosFixture } from './useRecibosFixture'
 
 const router = useRouter()
 const { session, userLabel, logout } = useAuthSession()
+const {
+  canGoNext,
+  canGoPrevious,
+  changePage,
+  changePageSize,
+  clearFilters,
+  draftFilters,
+  firstVisible,
+  formatDate,
+  lastVisible,
+  pagedItems,
+  pagination,
+  resultLabel,
+  searchRecibos,
+  tableCaption,
+  total,
+  totalPages,
+} = useRecibosFixture()
 
 const sessionLabel = computed(() => {
   return session.value?.currentBrokerId ? `Broker ${session.value.currentBrokerId}` : 'Modo fixture'
 })
 
 const sessionNeedsAttention = computed(() => false)
-
-const filteredItems = computed(() => {
-  const recibo = normalizeText(filters.recibo)
-  const poliza = normalizeText(filters.poliza)
-
-  return recibosFixture.filter((item) => {
-    const matchesRecibo =
-      !recibo ||
-      normalizeText(item.recibo).includes(recibo) ||
-      normalizeText(item.cliente).includes(recibo)
-    const matchesPoliza = !poliza || normalizeText(item.poliza).includes(poliza)
-    const matchesSituacion = !filters.situacion || item.situacion === filters.situacion
-    const matchesTipo = !filters.tipo || item.tipo === filters.tipo
-    const matchesVencimiento =
-      !filters.vencimientoDesde || item.vencimiento >= filters.vencimientoDesde
-
-    return matchesRecibo && matchesPoliza && matchesSituacion && matchesTipo && matchesVencimiento
-  })
-})
-
-const total = computed(() => filteredItems.value.length)
-const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pagination.pageSize)))
-const pagedItems = computed(() => {
-  const start = (pagination.page - 1) * pagination.pageSize
-  return filteredItems.value.slice(start, start + pagination.pageSize)
-})
-const firstVisible = computed(() =>
-  total.value === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1,
-)
-const lastVisible = computed(() => Math.min(pagination.page * pagination.pageSize, total.value))
-const resultLabel = computed(() => (total.value === 1 ? 'recibo' : 'recibos'))
-const tableCaption = computed(
-  () =>
-    `Recibos fixture read-only: ${firstVisible.value}-${lastVisible.value} de ${total.value} ${resultLabel.value}. Datos sanitizados con importes demo anonimizados y sin API backend.`,
-)
-const canGoPrevious = computed(() => pagination.page > 1)
-const canGoNext = computed(() => pagination.page < totalPages.value)
-
-function normalizeText(value: string) {
-  return value.trim().toLocaleLowerCase('es-ES')
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('es-ES').format(new Date(`${value}T00:00:00`))
-}
-
-function copyFilters(target: RecibosFilters, source: RecibosFilters) {
-  target.recibo = source.recibo
-  target.poliza = source.poliza
-  target.situacion = source.situacion
-  target.tipo = source.tipo
-  target.vencimientoDesde = source.vencimientoDesde
-}
-
-function searchRecibos() {
-  copyFilters(filters, draftFilters)
-  pagination.page = 1
-}
-
-function clearFilters() {
-  copyFilters(draftFilters, {
-    recibo: '',
-    poliza: '',
-    situacion: '',
-    tipo: '',
-    vencimientoDesde: '',
-  })
-  copyFilters(filters, draftFilters)
-  pagination.page = 1
-}
-
-function changePage(page: number) {
-  if (page >= 1 && page <= totalPages.value) {
-    pagination.page = page
-  }
-}
-
-function changePageSize(event: Event) {
-  pagination.pageSize = Number((event.target as HTMLSelectElement).value)
-  pagination.page = 1
-}
 
 async function signOut() {
   await logout()

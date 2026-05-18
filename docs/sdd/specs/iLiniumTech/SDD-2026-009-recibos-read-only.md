@@ -20,6 +20,8 @@ El frontend actual ya expone `/recibos` como ruta protegida fixture/read-only, c
 
 Decision de arquitectura: iLiniumTech no es un runtime dinamico tipo AppBuilder. Cualquier futura pantalla funcional de `Recibos` debe quedar como Vue/TypeScript estatico y API .NET explicita, con permisos iLiniumTech, broker validado, SQL parametrizado y minimizacion financiera/PII.
 
+Actualizacion 2026-05-18: se implementa el primer contrato backend in-memory/read-only para `Recibos` con `GET /api/recibos/catalogs` y `GET /api/recibos`. Este avance no activa SQL real, datos reales, importes reales, banco, remesas, cobro, detalle, exportacion ni escrituras; sirve como base tecnica para adaptar el frontend y validar permisos propios.
+
 ## Objetivo
 
 Preparar el primer incremento funcional de `Recibos` como listado read-only minimizado, sin importes reales, sin detalle, sin cobro y sin exportacion:
@@ -115,6 +117,7 @@ Regla explicita: `recibos.read` no concede importes reales. Los importes requier
 - [ ] Seguridad confirma que el primer corte no devuelve importes reales, banco ni PII no aprobada.
 - [ ] `GET /api/recibos/catalogs` exige `recibos.catalogs`.
 - [ ] `GET /api/recibos` exige `recibos.read`.
+- [x] Primer backend in-memory/read-only implementado sin SQL real, sin importes reales y sin banco.
 - [ ] `recibos.read` no devuelve importes reales.
 - [ ] El backend no consulta datos si falta broker o el broker no esta permitido.
 - [ ] Filtros y sort fuera de whitelist devuelven error sanitizado.

@@ -1,204 +1,39 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
 
-type AgendaEstado = 'Pendiente' | 'Programado' | 'Cerrado'
-type AgendaPrioridad = 'Alta' | 'Media' | 'Baja'
-
-interface AgendaListItem {
-  id: string
-  referencia: string
-  asunto: string
-  estado: AgendaEstado
-  prioridad: AgendaPrioridad
-  fechaInicio: string
-  horaInicio: string
-  fechaFin: string
-  horaFin: string
-  objetoRelacionado: string
-  origen: string
-}
-
-interface AgendaFilters {
-  texto: string
-  estado: '' | AgendaEstado
-  prioridad: '' | AgendaPrioridad
-  fechaDesde: string
-}
-
-const agendaFixture: AgendaListItem[] = [
-  {
-    id: 'AGE-MVP-1001',
-    referencia: 'AGE-2026-0001',
-    asunto: 'Revision demo de documentacion',
-    estado: 'Pendiente',
-    prioridad: 'Alta',
-    fechaInicio: '2026-05-18',
-    horaInicio: '09:30',
-    fechaFin: '2026-05-18',
-    horaFin: '10:00',
-    objetoRelacionado: 'POL-DEMO-0001',
-    origen: 'Fixture local',
-  },
-  {
-    id: 'AGE-MVP-1002',
-    referencia: 'AGE-2026-0002',
-    asunto: 'Seguimiento demo de tramite',
-    estado: 'Programado',
-    prioridad: 'Media',
-    fechaInicio: '2026-05-21',
-    horaInicio: '12:00',
-    fechaFin: '2026-05-21',
-    horaFin: '12:30',
-    objetoRelacionado: 'SIN-DEMO-0002',
-    origen: 'Fixture local',
-  },
-  {
-    id: 'AGE-MVP-1003',
-    referencia: 'AGE-2026-0003',
-    asunto: 'Cierre demo de tarea interna',
-    estado: 'Cerrado',
-    prioridad: 'Baja',
-    fechaInicio: '2026-05-24',
-    horaInicio: '16:00',
-    fechaFin: '2026-05-24',
-    horaFin: '16:20',
-    objetoRelacionado: 'REC-DEMO-0003',
-    origen: 'Fixture local',
-  },
-  {
-    id: 'AGE-MVP-1004',
-    referencia: 'AGE-2026-0004',
-    asunto: 'Control demo de agenda semanal',
-    estado: 'Programado',
-    prioridad: 'Alta',
-    fechaInicio: '2026-06-02',
-    horaInicio: '11:15',
-    fechaFin: '2026-06-02',
-    horaFin: '11:45',
-    objetoRelacionado: 'GEN-DEMO-0004',
-    origen: 'Fixture local',
-  },
-]
-
-const pageSizeOptions = [2, 10, 25]
-const topBadges = ['Read-only', 'Fixture']
-const moduleActions = [
-  { label: 'Buscar agenda', icon: 'pi pi-search', active: true },
-  { label: 'Crear evento bloqueado', icon: 'pi pi-plus' },
-  { label: 'Reprogramar bloqueado', icon: 'pi pi-calendar-times' },
-  { label: 'Exportar bloqueado', icon: 'pi pi-download' },
-]
-const blockedActionsDescription =
-  'Acciones de agenda bloqueadas en el MVP read-only hasta SDD, contrato API, permisos, UAT y decision de minimizacion de PII/asuntos sensibles.'
-
-const filters = reactive<AgendaFilters>({
-  texto: '',
-  estado: '',
-  prioridad: '',
-  fechaDesde: '',
-})
-
-const draftFilters = reactive<AgendaFilters>({
-  texto: '',
-  estado: '',
-  prioridad: '',
-  fechaDesde: '',
-})
-
-const pagination = reactive({
-  page: 1,
-  pageSize: 2,
-})
+import { blockedActionsDescription, moduleActions, pageSizeOptions, topBadges } from './fixtures'
+import { useAgendaFixture } from './useAgendaFixture'
 
 const router = useRouter()
 const { session, userLabel, logout } = useAuthSession()
+const {
+  canGoNext,
+  canGoPrevious,
+  changePage,
+  changePageSize,
+  clearFilters,
+  draftFilters,
+  firstVisible,
+  formatDate,
+  lastVisible,
+  pagedItems,
+  pagination,
+  resultLabel,
+  searchAgenda,
+  tableCaption,
+  total,
+  totalPages,
+} = useAgendaFixture()
 
 const sessionLabel = computed(() => {
   return session.value?.currentBrokerId ? `Broker ${session.value.currentBrokerId}` : 'Modo fixture'
 })
 
 const sessionNeedsAttention = computed(() => false)
-
-const filteredItems = computed(() => {
-  const texto = normalizeText(filters.texto)
-
-  return agendaFixture.filter((item) => {
-    const matchesText =
-      !texto ||
-      normalizeText(item.referencia).includes(texto) ||
-      normalizeText(item.asunto).includes(texto) ||
-      normalizeText(item.objetoRelacionado).includes(texto)
-    const matchesEstado = !filters.estado || item.estado === filters.estado
-    const matchesPrioridad = !filters.prioridad || item.prioridad === filters.prioridad
-    const matchesFecha = !filters.fechaDesde || item.fechaInicio >= filters.fechaDesde
-
-    return matchesText && matchesEstado && matchesPrioridad && matchesFecha
-  })
-})
-
-const total = computed(() => filteredItems.value.length)
-const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pagination.pageSize)))
-const pagedItems = computed(() => {
-  const start = (pagination.page - 1) * pagination.pageSize
-  return filteredItems.value.slice(start, start + pagination.pageSize)
-})
-const firstVisible = computed(() =>
-  total.value === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1,
-)
-const lastVisible = computed(() => Math.min(pagination.page * pagination.pageSize, total.value))
-const resultLabel = computed(() => (total.value === 1 ? 'evento' : 'eventos'))
-const tableCaption = computed(
-  () =>
-    `Agenda fixture read-only: ${firstVisible.value}-${lastVisible.value} de ${total.value} ${resultLabel.value}. Datos sanitizados sin calendario dinamico ni API backend.`,
-)
-const canGoPrevious = computed(() => pagination.page > 1)
-const canGoNext = computed(() => pagination.page < totalPages.value)
-
-function normalizeText(value: string) {
-  return value.trim().toLocaleLowerCase('es-ES')
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('es-ES').format(new Date(`${value}T00:00:00`))
-}
-
-function copyFilters(target: AgendaFilters, source: AgendaFilters) {
-  target.texto = source.texto
-  target.estado = source.estado
-  target.prioridad = source.prioridad
-  target.fechaDesde = source.fechaDesde
-}
-
-function searchAgenda() {
-  copyFilters(filters, draftFilters)
-  pagination.page = 1
-}
-
-function clearFilters() {
-  copyFilters(draftFilters, {
-    texto: '',
-    estado: '',
-    prioridad: '',
-    fechaDesde: '',
-  })
-  copyFilters(filters, draftFilters)
-  pagination.page = 1
-}
-
-function changePage(page: number) {
-  if (page >= 1 && page <= totalPages.value) {
-    pagination.page = page
-  }
-}
-
-function changePageSize(event: Event) {
-  pagination.pageSize = Number((event.target as HTMLSelectElement).value)
-  pagination.page = 1
-}
 
 async function signOut() {
   await logout()

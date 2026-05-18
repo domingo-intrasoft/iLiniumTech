@@ -70,3 +70,19 @@ Fecha: 2026-05-16.
 - Readiness operativo documentado en `docs/appbuilder/pages/propuestas/operational-readiness.md`.
 - La SDD draft `SDD-2026-012` limita el primer corte futuro a listado read-only minimizado.
 - Detalle, cliente real, importes, documentos, tarificacion, emision, conversion, exportacion, workflows e integraciones siguen bloqueados hasta SDD posterior.
+
+## Actualizacion contrato fixture 2026-05-18
+
+- `PropuestasView.vue` queda consumiendo `types.ts`, `fixtures.ts` y `usePropuestasFixture.ts`.
+- Se mantiene `/propuestas` como fixture/read-only sin API ni datos reales.
+- No se asume que `Propuestas` equivalga a `Solicitudes`.
+- Emision, conversion, documentos, importes reales y workflows siguen bloqueados.
+- Prueba dirigida ejecutada: `npm run test:unit -- PropuestasView.test.ts` OK, 4 tests.
+
+## Actualizacion backend read-only 2026-05-18
+
+- Se crea API in-memory read-only: `GET /api/propuestas/catalogs` y `GET /api/propuestas`.
+- Permisos propios: `propuestas.catalogs` y `propuestas.read`; la API key legacy no concede acceso.
+- Contrato recortado a referencia, estado, ramo, fecha alta y canal; no publica solicitante, vigencia, resultado, importes, documentos, tarificacion ni conversion.
+- No hay SQL real, detalle, exportacion, documentos ni escrituras.
+- Prueba dirigida ejecutada: `dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "Propuestas"` OK, 5 tests.

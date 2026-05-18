@@ -60,3 +60,18 @@ Fecha: 2026-05-16
 - Readiness operativo documentado en `docs/appbuilder/pages/clientes/operational-readiness.md`.
 - La SDD draft `SDD-2026-010` limita el primer corte futuro a listado read-only minimizado.
 - Ficha, tabs relacionadas, documento, contacto, direccion, banco, metricas, exportacion y escrituras siguen bloqueados hasta SDD posterior.
+
+## Actualizacion contrato fixture 2026-05-18
+
+- `ClientesView.vue` queda consumiendo `types.ts`, `fixtures.ts` y `useClientesFixture.ts`.
+- Se mantiene `/clientes` como fixture/read-only sin API ni datos reales.
+- PII real, documento, contacto, direccion, banco y metricas reales siguen bloqueados.
+- Prueba dirigida ejecutada: `npm run test:unit -- ClientesView.test.ts` OK, 4 tests.
+
+## Actualizacion backend read-only 2026-05-18
+
+- Se crea API in-memory read-only: `GET /api/clientes/catalogs` y `GET /api/clientes`.
+- Permisos propios: `clientes.catalogs` y `clientes.read`; la API key legacy no concede acceso.
+- Contrato minimizado sin documento, contacto, direccion, banco ni PII ampliada.
+- No hay SQL real, detalle, exportacion ni escrituras.
+- Prueba dirigida ejecutada: `dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "Clientes"` OK, 5 tests.

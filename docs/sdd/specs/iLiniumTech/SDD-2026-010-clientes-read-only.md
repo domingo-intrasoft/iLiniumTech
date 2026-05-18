@@ -214,6 +214,14 @@ Manual/UAT:
 - Crear tarea DBA para confirmar origen de lectura, filtros por broker y campos prohibidos.
 - Crear tarea seguridad para clasificacion PII y threat review del modulo.
 
+## Actualizacion de implementacion 2026-05-18
+
+- Implementado primer corte backend in-memory read-only: `GET /api/clientes/catalogs` y `GET /api/clientes`.
+- Permisos implementados: `clientes.catalogs` y `clientes.read`.
+- La implementacion no consulta SQL real, no devuelve documento, contacto, direccion, banco ni PII ampliada, y no habilita detalle/exportacion/escritura.
+- Este corte no desbloquea datos reales; SQL y CRUD siguen bloqueados hasta UAT/DBA/security review y SDD de escritura si aplica.
+- Tests dirigidos `ClientesApiTests`: OK.
+
 ## Definicion de hecho
 
 - [ ] SDD revisada por producto, backend/datos, frontend y seguridad.
