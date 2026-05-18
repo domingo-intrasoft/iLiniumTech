@@ -16,6 +16,7 @@ Avanzar el MVP con incrementos pequenos, seguros y validados, sin activar datos 
 | `d6b09c4` | Frontend accesibilidad | Acciones bloqueadas de Agenda comparten descripcion accesible sobre SDD/API/permisos/UAT y minimizacion de PII/asuntos sensibles. |
 | `c5cd403` | Frontend accesibilidad | Acciones bloqueadas de Propuestas comparten descripcion accesible sobre SDD/API/permisos/UAT y emision/conversion/documentos. |
 | `fd98387` | Frontend accesibilidad | Acciones bloqueadas de Recibos comparten descripcion accesible sobre SDD/API/permisos/UAT y cobros/remesas/datos bancarios. |
+| `cae0866` | Frontend accesibilidad | Acciones bloqueadas de Suplementos comparten descripcion accesible sobre SDD/API/permisos/UAT y workflows/adjuntos/datos restringidos. |
 
 ## Validaciones ejecutadas
 
@@ -80,12 +81,25 @@ Validacion tras descripcion accesible de acciones bloqueadas en Recibos:
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
 
+Validacion tras descripcion accesible de acciones bloqueadas en Suplementos:
+
+- `npx vitest run src/features/suplementos/SuplementosView.test.ts`: `4/4` tests OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run test:unit`: `195/195` tests OK.
+- `npm run build`: OK.
+- `npm run test:e2e -- domain-fixtures`: `1` smoke OK con `CI=1`, incluyendo `/suplementos`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
 ## Riesgos residuales
 
 - `Clientes` sigue siendo fixture/read-only con PII real bloqueada; no autoriza ficha real, exportacion, desglose, contacto ni datos bancarios sin SDD/API/UAT.
 - `Agenda` sigue siendo fixture/read-only con calendario dinamico, reprogramacion, participantes, workflows y asuntos sensibles bloqueados hasta SDD/API/UAT.
 - `Propuestas` sigue siendo fixture/read-only; crear, convertir a poliza, documentos, detalle, exportacion y emision siguen bloqueados hasta SDD/API/permisos/UAT.
 - `Recibos` sigue siendo fixture/read-only; detalle, exportacion, cobros, remesas, documentos y datos bancarios siguen bloqueados hasta SDD/API/permisos/UAT.
+- `Suplementos` sigue siendo fixture/read-only; detalle, exportacion, workflows, adjuntos y datos restringidos siguen bloqueados hasta SDD/API/permisos/UAT.
 - Las paginas tecnicas siguen siendo fixture/read-only o superficies bloqueadas; no autorizan API, datos reales, escrituras, exportaciones ni permisos nuevos sin SDD/API/UAT.
 - `DemoSession`, API key MVP y headers MVP siguen siendo compatibilidad local/demo, no autenticacion productiva.
 - Datos reales SQL, DBA/UAT, permisos finales y proveedor auth siguen bloqueados externamente.
