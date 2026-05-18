@@ -20,10 +20,15 @@ public static class DependencyInjection
             services.AddScoped<IPolizasRepository>(provider => new SqlPolizasRepository(
                 provider.GetRequiredService<IPolizasConnectionStringProvider>(),
                 provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
+            services.AddScoped<IPolizasWriteRepository>(provider => new SqlPolizasWriteRepository(
+                provider.GetRequiredService<IPolizasConnectionStringProvider>(),
+                provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
             return services;
         }
 
-        services.AddScoped<IPolizasRepository, InMemoryPolizasRepository>();
+        services.AddSingleton<InMemoryPolizasRepository>();
+        services.AddScoped<IPolizasRepository>(provider => provider.GetRequiredService<InMemoryPolizasRepository>());
+        services.AddScoped<IPolizasWriteRepository>(provider => provider.GetRequiredService<InMemoryPolizasRepository>());
         return services;
     }
 

@@ -9,4 +9,10 @@ public interface IPolizasService
     Task<PolizaDetail?> GetByIdAsync(string id, CancellationToken cancellationToken, string? ramo = null);
 
     Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken);
+
+    Task<PolizaCreateResult> CreateAsync(PolizaCreateRequest request, CancellationToken cancellationToken);
+
+    Task<bool> UpdateAsync(string id, PolizaUpdateRequest request, CancellationToken cancellationToken);
+
+    Task<bool> DeleteAsync(string id, CancellationToken cancellationToken);
 }

@@ -827,36 +827,84 @@ public sealed class PolizasApiTests
         body.Should().NotContain("POL-MVP-0001");
     }
 
-    [Theory]
-    [InlineData("POST", "/api/polizas", PolizasPermissions.Create)]
-    [InlineData("PUT", "/api/polizas/1001", PolizasPermissions.Update)]
-    [InlineData("DELETE", "/api/polizas/1001", PolizasPermissions.Delete)]
-    public async Task Demo_session_with_write_permission_and_gate_enabled_reaches_placeholder_only(
-        string method,
-        string url,
-        string permission)
+    [Fact]
+    public async Task Create_poliza_with_write_permission_and_gate_enabled_returns_created_id()
     {
         await using var factory = new TestApiFactory(new Dictionary<string, string?>
         {
-            ["Auth:Demo:Permissions:0"] = permission,
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Create,
             ["Polizas:WritesEnabled"] = "true"
         });
         using var client = factory.CreateClient();
         await LoginDemoAsync(client);
-        client.DefaultRequestHeaders.Add("X-Correlation-Id", "crud-placeholder");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "crud-created");
 
-        using var response = await client.SendAsync(CreateWriteRequest(method, url));
+        using var response = await client.SendAsync(CreateWriteRequest("POST", "/api/polizas"));
         var body = await response.Content.ReadAsStringAsync();
+        var result = await response.Content.ReadFromJsonAsync<PolizaCreateResult>();
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
-        response.Headers.GetValues("X-Correlation-Id").Should().Contain("crud-placeholder");
-        body.Should().Contain("POLIZAS_CRUD_NOT_IMPLEMENTED");
-        body.Should().Contain("\"correlationId\":\"crud-placeholder\"");
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("crud-created");
+        response.Headers.Location.Should().NotBeNull();
+        result?.Id.Should().NotBeNullOrWhiteSpace();
         body.Should().NotContain("POL-MVP-0001");
     }
 
     [Fact]
-    public async Task Create_poliza_validates_payload_before_placeholder()
+    public async Task Update_and_delete_existing_non_mvp_poliza_return_not_found_or_not_writable()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Update,
+            ["Auth:Demo:Permissions:1"] = PolizasPermissions.Delete,
+            ["Polizas:WritesEnabled"] = "true"
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var update = await client.PutAsJsonAsync("/api/polizas/1001", new
+        {
+            numero = "POL-MVP-0001"
+        });
+        var updateBody = await update.Content.ReadAsStringAsync();
+        var delete = await client.DeleteAsync("/api/polizas/1001");
+        var deleteBody = await delete.Content.ReadAsStringAsync();
+
+        update.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        updateBody.Should().Contain("POLIZAS_NOT_FOUND_OR_NOT_WRITABLE");
+        delete.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        deleteBody.Should().Contain("POLIZAS_NOT_FOUND_OR_NOT_WRITABLE");
+    }
+
+    [Fact]
+    public async Task Create_update_delete_poliza_flow_works_for_mvp_created_record()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Create,
+            ["Auth:Demo:Permissions:1"] = PolizasPermissions.Update,
+            ["Auth:Demo:Permissions:2"] = PolizasPermissions.Delete,
+            ["Polizas:WritesEnabled"] = "true"
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var create = await client.SendAsync(CreateWriteRequest("POST", "/api/polizas"));
+        var created = await create.Content.ReadFromJsonAsync<PolizaCreateResult>();
+        created?.Id.Should().NotBeNullOrWhiteSpace();
+
+        var update = await client.SendAsync(CreateWriteRequest("PUT", $"/api/polizas/{created!.Id}"));
+        var delete = await client.DeleteAsync($"/api/polizas/{created.Id}");
+        var secondDelete = await client.DeleteAsync($"/api/polizas/{created.Id}");
+
+        create.StatusCode.Should().Be(HttpStatusCode.Created);
+        update.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        delete.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        secondDelete.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task Create_poliza_validates_payload_before_write()
     {
         await using var factory = new TestApiFactory(new Dictionary<string, string?>
         {
@@ -877,11 +925,11 @@ public sealed class PolizasApiTests
         response.Headers.GetValues("X-Correlation-Id").Should().Contain("create-validation");
         body.Should().Contain("POLIZAS_VALIDATION_ERROR");
         body.Should().Contain("Aplicacion is required.");
-        body.Should().NotContain("POLIZAS_CRUD_NOT_IMPLEMENTED");
+        body.Should().NotContain("POLIZAS_NOT_FOUND_OR_NOT_WRITABLE");
     }
 
     [Fact]
-    public async Task Update_poliza_validates_stable_numeric_id_before_placeholder()
+    public async Task Update_poliza_validates_stable_numeric_id_before_write()
     {
         await using var factory = new TestApiFactory(new Dictionary<string, string?>
         {
@@ -902,7 +950,7 @@ public sealed class PolizasApiTests
         response.Headers.GetValues("X-Correlation-Id").Should().Contain("update-id-validation");
         body.Should().Contain("POLIZAS_VALIDATION_ERROR");
         body.Should().Contain("Poliza id must be a positive integer.");
-        body.Should().NotContain("POLIZAS_CRUD_NOT_IMPLEMENTED");
+        body.Should().NotContain("POLIZAS_NOT_FOUND_OR_NOT_WRITABLE");
     }
 
     [Fact]
@@ -1832,6 +1880,20 @@ public sealed class PolizasApiTests
 
         public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
             throw new InvalidOperationException("ConnectionStrings:PolizasReadOnly is missing.");
+
+        public Task<PolizaCreateResult> CreateAsync(
+            PolizaCreateRequest request,
+            CancellationToken cancellationToken) =>
+            throw new InvalidOperationException("ConnectionStrings:PolizasReadOnly is missing.");
+
+        public Task<bool> UpdateAsync(
+            string id,
+            PolizaUpdateRequest request,
+            CancellationToken cancellationToken) =>
+            throw new InvalidOperationException("ConnectionStrings:PolizasReadOnly is missing.");
+
+        public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken) =>
+            throw new InvalidOperationException("ConnectionStrings:PolizasReadOnly is missing.");
     }
 
     private sealed class ThrowingUnexpectedPolizasService : IPolizasService
@@ -1850,6 +1912,20 @@ public sealed class PolizasApiTests
             throw new InvalidOperationException(FailureMessage);
 
         public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
+            throw new InvalidOperationException(FailureMessage);
+
+        public Task<PolizaCreateResult> CreateAsync(
+            PolizaCreateRequest request,
+            CancellationToken cancellationToken) =>
+            throw new InvalidOperationException(FailureMessage);
+
+        public Task<bool> UpdateAsync(
+            string id,
+            PolizaUpdateRequest request,
+            CancellationToken cancellationToken) =>
+            throw new InvalidOperationException(FailureMessage);
+
+        public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken) =>
             throw new InvalidOperationException(FailureMessage);
     }
 }

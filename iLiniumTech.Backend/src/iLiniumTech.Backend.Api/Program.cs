@@ -424,12 +424,16 @@ polizas.MapGet("/{id}", async (HttpContext httpContext, [FromServices] IPolizasS
 .RequireAuthorization(PolizasAuthorizationPolicies.Detail)
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
-polizas.MapPost("/", (HttpContext httpContext, [FromBody] PolizaCreateRequest? request) =>
+polizas.MapPost("/", async (
+    HttpContext httpContext,
+    [FromServices] IPolizasService service,
+    [FromBody] PolizaCreateRequest? request,
+    CancellationToken cancellationToken) =>
 {
     try
     {
-        PolizasWriteValidator.ValidateCreate(request);
-        return PolizasCrudNotImplementedResult(httpContext);
+        var result = await service.CreateAsync(request!, cancellationToken);
+        return Results.Created($"/api/polizas/{result.Id}", result);
     }
     catch (PolizasValidationException exception)
     {
@@ -441,13 +445,19 @@ polizas.MapPost("/", (HttpContext httpContext, [FromBody] PolizaCreateRequest? r
     .AddEndpointFilter(RequirePolizasWritesEnabledAsync)
     .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
-polizas.MapPut("/{id}", (HttpContext httpContext, string id, [FromBody] PolizaUpdateRequest? request) =>
+polizas.MapPut("/{id}", async (
+    HttpContext httpContext,
+    [FromServices] IPolizasService service,
+    string id,
+    [FromBody] PolizaUpdateRequest? request,
+    CancellationToken cancellationToken) =>
 {
     try
     {
-        _ = PolizasWriteValidator.ValidateAndParseId(id);
-        PolizasWriteValidator.ValidateUpdate(request);
-        return PolizasCrudNotImplementedResult(httpContext);
+        var updated = await service.UpdateAsync(id, request!, cancellationToken);
+        return updated
+            ? Results.NoContent()
+            : PolizasNotFoundOrNotWritableResult(httpContext);
     }
     catch (PolizasValidationException exception)
     {
@@ -459,12 +469,18 @@ polizas.MapPut("/{id}", (HttpContext httpContext, string id, [FromBody] PolizaUp
     .AddEndpointFilter(RequirePolizasWritesEnabledAsync)
     .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
-polizas.MapDelete("/{id}", (HttpContext httpContext, string id) =>
+polizas.MapDelete("/{id}", async (
+    HttpContext httpContext,
+    [FromServices] IPolizasService service,
+    string id,
+    CancellationToken cancellationToken) =>
 {
     try
     {
-        _ = PolizasWriteValidator.ValidateAndParseId(id);
-        return PolizasCrudNotImplementedResult(httpContext);
+        var deleted = await service.DeleteAsync(id, cancellationToken);
+        return deleted
+            ? Results.NoContent()
+            : PolizasNotFoundOrNotWritableResult(httpContext);
     }
     catch (PolizasValidationException exception)
     {
@@ -691,12 +707,12 @@ static IResult ErrorResult(HttpContext context, int statusCode, string code, str
             CorrelationId: EnsureCorrelationId(context))),
         statusCode: statusCode);
 
-static IResult PolizasCrudNotImplementedResult(HttpContext context) =>
+static IResult PolizasNotFoundOrNotWritableResult(HttpContext context) =>
     ErrorResult(
         context,
-        StatusCodes.Status501NotImplemented,
-        "POLIZAS_CRUD_NOT_IMPLEMENTED",
-        "Polizas CRUD commands are not implemented yet.");
+        StatusCodes.Status404NotFound,
+        "POLIZAS_NOT_FOUND_OR_NOT_WRITABLE",
+        "Poliza no encontrada o no modificable.");
 
 static IResult PolizasValidationErrorResult(HttpContext context, PolizasValidationException exception) =>
     Results.BadRequest(new ErrorResponse(new ErrorBody(

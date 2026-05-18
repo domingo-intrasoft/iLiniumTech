@@ -2,7 +2,7 @@ using iLiniumTech.Backend.Domain.Polizas;
 
 namespace iLiniumTech.Backend.Application.Polizas;
 
-public sealed class PolizasService(IPolizasRepository repository) : IPolizasService
+public sealed class PolizasService(IPolizasRepository repository, IPolizasWriteRepository writeRepository) : IPolizasService
 {
     public Task<PagedResult<PolizaListItem>> SearchAsync(PolizasSearchRequest request, CancellationToken cancellationToken)
     {
@@ -23,4 +23,23 @@ public sealed class PolizasService(IPolizasRepository repository) : IPolizasServ
 
     public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
         repository.GetCatalogsAsync(cancellationToken);
+
+    public Task<PolizaCreateResult> CreateAsync(PolizaCreateRequest request, CancellationToken cancellationToken)
+    {
+        PolizasWriteValidator.ValidateCreate(request);
+        return writeRepository.CreateAsync(request, cancellationToken);
+    }
+
+    public Task<bool> UpdateAsync(string id, PolizaUpdateRequest request, CancellationToken cancellationToken)
+    {
+        var parsedId = PolizasWriteValidator.ValidateAndParseId(id);
+        PolizasWriteValidator.ValidateUpdate(request);
+        return writeRepository.UpdateAsync(parsedId, request, cancellationToken);
+    }
+
+    public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken)
+    {
+        var parsedId = PolizasWriteValidator.ValidateAndParseId(id);
+        return writeRepository.DeleteAsync(parsedId, cancellationToken);
+    }
 }

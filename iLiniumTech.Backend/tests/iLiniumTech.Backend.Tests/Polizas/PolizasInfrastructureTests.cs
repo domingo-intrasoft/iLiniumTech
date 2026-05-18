@@ -21,6 +21,8 @@ public sealed class PolizasInfrastructureTests
         using var provider = services.BuildServiceProvider();
         provider.GetRequiredService<IPolizasRepository>()
             .Should().BeOfType<InMemoryPolizasRepository>();
+        provider.GetRequiredService<IPolizasWriteRepository>()
+            .Should().BeOfType<InMemoryPolizasRepository>();
     }
 
     [Fact]
@@ -60,6 +62,8 @@ public sealed class PolizasInfrastructureTests
         using var provider = services.BuildServiceProvider();
         provider.GetRequiredService<IPolizasRepository>()
             .Should().BeOfType<SqlPolizasRepository>();
+        provider.GetRequiredService<IPolizasWriteRepository>()
+            .Should().BeOfType<SqlPolizasWriteRepository>();
         provider.GetRequiredService<IPolizasConnectionStringProvider>()
             .Should().BeOfType<StaticPolizasConnectionStringProvider>();
     }

@@ -3,8 +3,12 @@ using iLiniumTech.Backend.Domain.Polizas;
 
 namespace iLiniumTech.Backend.Infrastructure.Polizas;
 
-public sealed class InMemoryPolizasRepository : IPolizasRepository
+public sealed class InMemoryPolizasRepository : IPolizasRepository, IPolizasWriteRepository
 {
+    private static readonly object Sync = new();
+    private static readonly HashSet<string> MvpCreatedIds = new(StringComparer.Ordinal);
+    private static int nextMvpId = 900000;
+
     private static readonly IReadOnlyList<PolizaListItem> Items =
     [
         new(
@@ -142,6 +146,35 @@ public sealed class InMemoryPolizasRepository : IPolizasRepository
 
     public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
         Task.FromResult(Catalogs);
+
+    public Task<PolizaCreateResult> CreateAsync(PolizaCreateRequest request, CancellationToken cancellationToken)
+    {
+        string id;
+        lock (Sync)
+        {
+            nextMvpId++;
+            id = nextMvpId.ToString();
+            MvpCreatedIds.Add(id);
+        }
+
+        return Task.FromResult(new PolizaCreateResult(id));
+    }
+
+    public Task<bool> UpdateAsync(int id, PolizaUpdateRequest request, CancellationToken cancellationToken)
+    {
+        lock (Sync)
+        {
+            return Task.FromResult(MvpCreatedIds.Contains(id.ToString()));
+        }
+    }
+
+    public Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
+    {
+        lock (Sync)
+        {
+            return Task.FromResult(MvpCreatedIds.Remove(id.ToString()));
+        }
+    }
 
     private static IEnumerable<PolizaListItem> ApplySort(IEnumerable<PolizaListItem> query, PolizasSort sort)
     {
