@@ -96,3 +96,30 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-Documenta
 ```
 
 Resultado: ver cierre de la tarea integradora de Operativa seguros.
+
+## Actualizacion T-001-SIN-FE-CONTRACT-FIXTURE - 2026-05-18
+
+Alcance de esta actualizacion:
+
+- Se separan los tipos del contrato fixture en `siniestrosTypes.ts`.
+- Se separa el dataset fixture anonimizado en `siniestrosFixture.ts`.
+- Se separa la logica local de filtros, paginacion y captions en `useSiniestrosFixture.ts`.
+- `SiniestrosView.vue` queda como composicion de UI sobre el composable.
+- No se crean servicios API, endpoints backend, datos reales, escrituras ni exportaciones.
+- Las acciones de detalle/exportacion siguen bloqueadas por `siniestros-blocked-actions`.
+
+Evidencia de validacion:
+
+| Comando | Resultado |
+| --- | --- |
+| `npx vitest run src/features/siniestros/SiniestrosView.test.ts` | OK, 2 tests |
+| `npm run format` | OK |
+| `npm run lint` | OK |
+| `npm run test:unit` | OK, 39 archivos y 198 tests |
+| `npm run build` | OK |
+
+Riesgos residuales:
+
+- `Siniestros` sigue siendo fixture local read-only.
+- No existe API real ni contrato SQL autorizado.
+- El paso a datos reales sigue bloqueado por UAT, DBA, permisos y revision de seguridad segun `SDD-2026-008`.

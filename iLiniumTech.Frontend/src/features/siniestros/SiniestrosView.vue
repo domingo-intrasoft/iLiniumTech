@@ -1,78 +1,13 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
 
-type SiniestroEstado = 'En revision' | 'Abierto' | 'Cerrado'
-type SiniestroPrioridad = 'Alta' | 'Media' | 'Baja'
+import { siniestroEstados, siniestroPrioridades } from './siniestrosTypes'
+import { useSiniestrosFixture } from './useSiniestrosFixture'
 
-interface SiniestroListItem {
-  id: string
-  referencia: string
-  poliza: string
-  cliente: string
-  compania: string
-  situacion: string
-  estado: SiniestroEstado
-  prioridad: SiniestroPrioridad
-  fechaSiniestro: string
-  fechaParte: string
-  tramitador: string
-}
-
-interface SiniestrosFilters {
-  referencia: string
-  poliza: string
-  estado: '' | SiniestroEstado
-  prioridad: '' | SiniestroPrioridad
-  fechaDesde: string
-}
-
-const siniestrosFixture: SiniestroListItem[] = [
-  {
-    id: 'SIN-MVP-1001',
-    referencia: 'SIN-2026-0001',
-    poliza: 'POL-2026-0001',
-    cliente: 'Cliente anonimo 1',
-    compania: 'Compania demo norte',
-    situacion: 'Pendiente de documentacion',
-    estado: 'En revision',
-    prioridad: 'Alta',
-    fechaSiniestro: '2026-02-04',
-    fechaParte: '2026-02-05',
-    tramitador: 'Equipo tramitacion A',
-  },
-  {
-    id: 'SIN-MVP-1002',
-    referencia: 'SIN-2026-0002',
-    poliza: 'POL-2026-0002',
-    cliente: 'Cliente anonimo 2',
-    compania: 'Compania demo sur',
-    situacion: 'Peritacion solicitada',
-    estado: 'Abierto',
-    prioridad: 'Media',
-    fechaSiniestro: '2026-03-12',
-    fechaParte: '2026-03-13',
-    tramitador: 'Equipo tramitacion B',
-  },
-  {
-    id: 'SIN-MVP-1003',
-    referencia: 'SIN-2026-0003',
-    poliza: 'POL-2026-0003',
-    cliente: 'Cliente anonimo 3',
-    compania: 'Compania demo este',
-    situacion: 'Cierre tecnico validado',
-    estado: 'Cerrado',
-    prioridad: 'Baja',
-    fechaSiniestro: '2026-01-18',
-    fechaParte: '2026-01-20',
-    tramitador: 'Equipo tramitacion C',
-  },
-]
-
-const pageSizeOptions = [10, 25, 50]
 const topBadges = ['Read-only', 'Fixture']
 const moduleActions = [
   { label: 'Buscar siniestros', icon: 'pi pi-search', active: true },
@@ -82,26 +17,24 @@ const moduleActions = [
 const blockedActionsDescription =
   'Acciones de siniestros bloqueadas en el MVP read-only hasta SDD, contrato API, permisos y UAT.'
 
-const filters = reactive<SiniestrosFilters>({
-  referencia: '',
-  poliza: '',
-  estado: '',
-  prioridad: '',
-  fechaDesde: '',
-})
-
-const draftFilters = reactive<SiniestrosFilters>({
-  referencia: '',
-  poliza: '',
-  estado: '',
-  prioridad: '',
-  fechaDesde: '',
-})
-
-const pagination = reactive({
-  page: 1,
-  pageSize: 25,
-})
+const {
+  canGoNext,
+  canGoPrevious,
+  changePage,
+  changePageSize,
+  clearFilters,
+  draftFilters,
+  firstVisible,
+  lastVisible,
+  pageSizeOptions,
+  pagedItems,
+  pagination,
+  resultLabel,
+  searchSiniestros,
+  tableCaption,
+  total,
+  totalPages,
+} = useSiniestrosFixture()
 
 const router = useRouter()
 const { session, userLabel, logout } = useAuthSession()
@@ -112,84 +45,12 @@ const sessionLabel = computed(() => {
 
 const sessionNeedsAttention = computed(() => false)
 
-const filteredItems = computed(() => {
-  const referencia = normalizeText(filters.referencia)
-  const poliza = normalizeText(filters.poliza)
-
-  return siniestrosFixture.filter((item) => {
-    const matchesReferencia =
-      !referencia ||
-      normalizeText(item.referencia).includes(referencia) ||
-      normalizeText(item.cliente).includes(referencia)
-    const matchesPoliza = !poliza || normalizeText(item.poliza).includes(poliza)
-    const matchesEstado = !filters.estado || item.estado === filters.estado
-    const matchesPrioridad = !filters.prioridad || item.prioridad === filters.prioridad
-    const matchesFecha = !filters.fechaDesde || item.fechaSiniestro >= filters.fechaDesde
-
-    return matchesReferencia && matchesPoliza && matchesEstado && matchesPrioridad && matchesFecha
-  })
-})
-
-const total = computed(() => filteredItems.value.length)
-const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pagination.pageSize)))
-const pagedItems = computed(() => {
-  const start = (pagination.page - 1) * pagination.pageSize
-  return filteredItems.value.slice(start, start + pagination.pageSize)
-})
-const firstVisible = computed(() =>
-  total.value === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1,
-)
-const lastVisible = computed(() => Math.min(pagination.page * pagination.pageSize, total.value))
-const resultLabel = computed(() => (total.value === 1 ? 'siniestro' : 'siniestros'))
-const tableCaption = computed(
-  () =>
-    `Siniestros fixture read-only: ${firstVisible.value}-${lastVisible.value} de ${total.value} ${resultLabel.value}. Datos sanitizados sin API backend ni datos reales.`,
-)
-const canGoPrevious = computed(() => pagination.page > 1)
-const canGoNext = computed(() => pagination.page < totalPages.value)
-
-function normalizeText(value: string) {
-  return value.trim().toLocaleLowerCase('es-ES')
-}
-
 function formatDate(value: string) {
   return new Intl.DateTimeFormat('es-ES').format(new Date(`${value}T00:00:00`))
 }
 
-function copyFilters(target: SiniestrosFilters, source: SiniestrosFilters) {
-  target.referencia = source.referencia
-  target.poliza = source.poliza
-  target.estado = source.estado
-  target.prioridad = source.prioridad
-  target.fechaDesde = source.fechaDesde
-}
-
-function searchSiniestros() {
-  copyFilters(filters, draftFilters)
-  pagination.page = 1
-}
-
-function clearFilters() {
-  copyFilters(draftFilters, {
-    referencia: '',
-    poliza: '',
-    estado: '',
-    prioridad: '',
-    fechaDesde: '',
-  })
-  copyFilters(filters, draftFilters)
-  pagination.page = 1
-}
-
-function changePage(page: number) {
-  if (page >= 1 && page <= totalPages.value) {
-    pagination.page = page
-  }
-}
-
-function changePageSize(event: Event) {
-  pagination.pageSize = Number((event.target as HTMLSelectElement).value)
-  pagination.page = 1
+function changePageSizeFromEvent(event: Event) {
+  changePageSize(Number((event.target as HTMLSelectElement).value))
 }
 
 async function signOut() {
@@ -338,9 +199,9 @@ async function signOut() {
                   aria-label="Estado"
                 >
                   <option value=""></option>
-                  <option>En revision</option>
-                  <option>Abierto</option>
-                  <option>Cerrado</option>
+                  <option v-for="estado in siniestroEstados" :key="estado" :value="estado">
+                    {{ estado }}
+                  </option>
                 </select>
                 <button
                   type="button"
@@ -368,9 +229,13 @@ async function signOut() {
                   aria-label="Prioridad"
                 >
                   <option value=""></option>
-                  <option>Alta</option>
-                  <option>Media</option>
-                  <option>Baja</option>
+                  <option
+                    v-for="prioridad in siniestroPrioridades"
+                    :key="prioridad"
+                    :value="prioridad"
+                  >
+                    {{ prioridad }}
+                  </option>
                 </select>
                 <button
                   type="button"
@@ -501,7 +366,11 @@ async function signOut() {
       <footer class="pagination-bar" aria-label="Paginacion de siniestros">
         <div class="page-size-control">
           <label for="siniestros-page-size">Filas</label>
-          <select id="siniestros-page-size" :value="pagination.pageSize" @change="changePageSize">
+          <select
+            id="siniestros-page-size"
+            :value="pagination.pageSize"
+            @change="changePageSizeFromEvent"
+          >
             <option v-for="option in pageSizeOptions" :key="option" :value="option">
               {{ option }}
             </option>

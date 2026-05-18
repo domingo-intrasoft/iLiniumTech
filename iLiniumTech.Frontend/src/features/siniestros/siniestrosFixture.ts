@@ -1,0 +1,43 @@
+import type { SiniestroListItem } from './siniestrosTypes'
+
+export const siniestrosFixture: SiniestroListItem[] = [
+  {
+    id: 'SIN-MVP-1001',
+    referencia: 'SIN-2026-0001',
+    poliza: 'POL-2026-0001',
+    cliente: 'Cliente anonimo 1',
+    compania: 'Compania demo norte',
+    situacion: 'Pendiente de documentacion',
+    estado: 'En revision',
+    prioridad: 'Alta',
+    fechaSiniestro: '2026-02-04',
+    fechaParte: '2026-02-05',
+    tramitador: 'Equipo tramitacion A',
+  },
+  {
+    id: 'SIN-MVP-1002',
+    referencia: 'SIN-2026-0002',
+    poliza: 'POL-2026-0002',
+    cliente: 'Cliente anonimo 2',
+    compania: 'Compania demo sur',
+    situacion: 'Peritacion solicitada',
+    estado: 'Abierto',
+    prioridad: 'Media',
+    fechaSiniestro: '2026-03-12',
+    fechaParte: '2026-03-13',
+    tramitador: 'Equipo tramitacion B',
+  },
+  {
+    id: 'SIN-MVP-1003',
+    referencia: 'SIN-2026-0003',
+    poliza: 'POL-2026-0003',
+    cliente: 'Cliente anonimo 3',
+    compania: 'Compania demo este',
+    situacion: 'Cierre tecnico validado',
+    estado: 'Cerrado',
+    prioridad: 'Baja',
+    fechaSiniestro: '2026-01-18',
+    fechaParte: '2026-01-20',
+    tramitador: 'Equipo tramitacion C',
+  },
+]

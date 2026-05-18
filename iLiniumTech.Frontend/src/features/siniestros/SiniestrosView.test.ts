@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useSession } from '@/services/session'
 
+import { siniestrosFixture } from './siniestrosFixture'
 import SiniestrosView from './SiniestrosView.vue'
 
 const runtimeMarkers =
@@ -60,10 +61,14 @@ describe('SiniestrosView smoke', () => {
 
   afterEach(() => {
     vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
     useSession().resetSession()
   })
 
   it('renders the read-only fixture shell, filters rows, and exposes no unsafe runtime details', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
     const wrapper = await mountSiniestrosView()
     await settleSiniestrosView()
 
@@ -120,9 +125,15 @@ describe('SiniestrosView smoke', () => {
     )
 
     const smokeDom = wrapper.html()
+    const fixturePayload = JSON.stringify(siniestrosFixture)
+    expect(fetchMock).not.toHaveBeenCalled()
     expect(smokeDom).not.toMatch(runtimeMarkers)
+    expect(fixturePayload).not.toMatch(runtimeMarkers)
     expect(smokeDom).not.toMatch(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)
+    expect(fixturePayload).not.toMatch(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)
     expect(smokeDom).not.toMatch(/\b\d{4}\s?[A-Z]{3}\b/)
+    expect(fixturePayload).not.toMatch(/\b\d{4}\s?[A-Z]{3}\b/)
+    expect(fixturePayload).not.toMatch(/\b\d{8}[A-Z]\b/i)
   })
 
   it('shows the empty state for unsupported fixture filters', async () => {

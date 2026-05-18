@@ -29,37 +29,37 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-001-SIN-FE-CONTRACT-FIXTURE`
+ID: `T-002-REC-FE-CONTRACT-FIXTURE`
 
 Estado: `READY`
 
-Nombre: preparar `Siniestros` frontend como modulo fixture con contrato local separado.
+Nombre: preparar `Recibos` frontend como modulo fixture con contrato local separado.
 
 Objetivo:
 
-- Reducir el acoplamiento de `SiniestrosView.vue` separando tipos, fixture y logica de filtrado/paginacion en archivos propios.
+- Reducir el acoplamiento de `RecibosView.vue` separando tipos, fixture y logica de filtrado/paginacion en archivos propios.
 - Mantener la pantalla igual para el usuario.
-- No crear backend, servicios API ni datos reales.
-- Dejar el modulo listo para que una futura tarea cambie el origen fixture por API cuando `SDD-2026-008` tenga UAT/DBA.
+- No crear backend, servicios API, datos reales, cobros, remesas ni exportaciones.
+- Dejar el modulo listo para que una futura tarea cambie el origen fixture por API cuando `SDD-2026-009` tenga UAT/DBA.
 
 Fuentes a leer, sin buscar mas salvo bloqueo:
 
 - `AGENTS.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md`
-- `docs/appbuilder/pages/siniestros/README.md`
-- `docs/qa/siniestros-mvp-evidence.md`
-- `iLiniumTech.Frontend/src/features/siniestros/SiniestrosView.vue`
-- `iLiniumTech.Frontend/src/features/siniestros/SiniestrosView.test.ts`
+- `docs/sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md`
+- `docs/appbuilder/pages/recibos/README.md`
+- `docs/qa/recibos-mvp-evidence.md`
+- `iLiniumTech.Frontend/src/features/recibos/RecibosView.vue`
+- `iLiniumTech.Frontend/src/features/recibos/RecibosView.test.ts`
 
 Archivos que puede tocar:
 
-- `iLiniumTech.Frontend/src/features/siniestros/SiniestrosView.vue`
-- `iLiniumTech.Frontend/src/features/siniestros/SiniestrosView.test.ts`
-- `iLiniumTech.Frontend/src/features/siniestros/siniestrosTypes.ts`
-- `iLiniumTech.Frontend/src/features/siniestros/siniestrosFixture.ts`
-- `iLiniumTech.Frontend/src/features/siniestros/useSiniestrosFixture.ts`
-- `docs/qa/siniestros-mvp-evidence.md`
+- `iLiniumTech.Frontend/src/features/recibos/RecibosView.vue`
+- `iLiniumTech.Frontend/src/features/recibos/RecibosView.test.ts`
+- `iLiniumTech.Frontend/src/features/recibos/recibosTypes.ts`
+- `iLiniumTech.Frontend/src/features/recibos/recibosFixture.ts`
+- `iLiniumTech.Frontend/src/features/recibos/useRecibosFixture.ts`
+- `docs/qa/recibos-mvp-evidence.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 
 Archivos que NO debe tocar:
@@ -75,20 +75,20 @@ Archivos que NO debe tocar:
 
 Pasos de implementacion:
 
-1. Extraer tipos `SiniestroListItem`, `SiniestrosFilters`, estados y prioridades a `siniestrosTypes.ts`.
-2. Extraer `siniestrosFixture` a `siniestrosFixture.ts`, manteniendo datos demo anonimizados.
-3. Extraer filtrado, paginacion, `tableCaption`, `firstVisible`, `lastVisible`, `totalPages` y acciones de filtros a `useSiniestrosFixture.ts`.
-4. Dejar `SiniestrosView.vue` como composicion de UI que consume el composable.
-5. Mantener acciones de detalle/exportacion deshabilitadas y descritas por `siniestros-blocked-actions`.
-6. Ampliar o ajustar `SiniestrosView.test.ts` para cubrir que no hay llamadas API, no se renderiza metadata/runtime AppBuilder, no hay PII y los filtros siguen funcionando.
-7. Actualizar `docs/qa/siniestros-mvp-evidence.md` con la evidencia del cambio.
-8. Si todo pasa, marcar esta tarea `DONE` y mover **Siguiente tarea activa** a `T-002-REC-FE-CONTRACT-FIXTURE`.
+1. Extraer tipos `ReciboListItem`, `RecibosFilters`, situaciones y tipos a `recibosTypes.ts`.
+2. Extraer `recibosFixture` a `recibosFixture.ts`, manteniendo datos demo anonimizados y sin banco/importes reales.
+3. Extraer filtrado, paginacion, `tableCaption`, `firstVisible`, `lastVisible`, `totalPages` y acciones de filtros a `useRecibosFixture.ts`.
+4. Dejar `RecibosView.vue` como composicion de UI que consume el composable.
+5. Mantener acciones de detalle/exportacion/cobro deshabilitadas y descritas por `recibos-blocked-actions`.
+6. Ampliar o ajustar `RecibosView.test.ts` para cubrir que no hay llamadas API, no se renderiza metadata/runtime AppBuilder, no hay secretos/datos bancarios y los filtros siguen funcionando.
+7. Actualizar `docs/qa/recibos-mvp-evidence.md` con la evidencia del cambio.
+8. Si todo pasa, marcar esta tarea `DONE` y mover **Siguiente tarea activa** a `T-003-CLI-FE-CONTRACT-FIXTURE`.
 
 Pruebas obligatorias:
 
 ```powershell
 cd .\iLiniumTech.Frontend
-npx vitest run src/features/siniestros/SiniestrosView.test.ts
+npx vitest run src/features/recibos/RecibosView.test.ts
 npm run format
 npm run lint
 npm run test:unit
@@ -101,8 +101,8 @@ git diff --check
 
 Criterios de aceptacion:
 
-- La UI visible de `/siniestros` no pierde funcionalidad fixture.
-- No aparece `AppBuilder`, `IAP_`, `QueryStatic`, SQL, connection strings, emails, telefonos, documentos ni matriculas reales en DOM/fixtures.
+- La UI visible de `/recibos` no pierde funcionalidad fixture.
+- No aparece `AppBuilder`, `IAP_`, `QueryStatic`, SQL, connection strings, emails, telefonos, documentos, IBAN, cuentas bancarias ni importes reales en DOM/fixtures.
 - No se crea API ni servicio frontend.
 - Los tests unitarios y build frontend pasan.
 - La evidencia QA queda actualizada.
@@ -125,8 +125,8 @@ Objetivo: que cada pagina fixture tenga estructura mantenible y lista para API f
 
 | ID | Estado | Tarea | Archivos permitidos | No tocar | Pruebas |
 | --- | --- | --- | --- | --- | --- |
-| `T-001-SIN-FE-CONTRACT-FIXTURE` | `READY` | Separar contrato fixture de Siniestros. | `src/features/siniestros/**`, `docs/qa/siniestros-mvp-evidence.md` | backend, services, router, layout | frontend completo |
-| `T-002-REC-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Recibos sin importes reales ni banco. | `src/features/recibos/**`, `docs/qa/recibos-mvp-evidence.md` | backend, services, router, layout | frontend completo |
+| `T-001-SIN-FE-CONTRACT-FIXTURE` | `DONE` | Separar contrato fixture de Siniestros. | `src/features/siniestros/**`, `docs/qa/siniestros-mvp-evidence.md` | backend, services, router, layout | frontend completo |
+| `T-002-REC-FE-CONTRACT-FIXTURE` | `READY` | Separar contrato fixture de Recibos sin importes reales ni banco. | `src/features/recibos/**`, `docs/qa/recibos-mvp-evidence.md` | backend, services, router, layout | frontend completo |
 | `T-003-CLI-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Clientes con PII bloqueada. | `src/features/clientes/**`, `docs/qa/clientes-mvp-evidence.md` | backend, services, router, layout | frontend completo |
 | `T-004-AGE-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Agenda con rango/listado, sin calendario interactivo. | `src/features/agenda/**`, `docs/qa/agenda-mvp-evidence.md` | backend, services, router, layout | frontend completo |
 | `T-005-PRO-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Propuestas sin conversion, documentos ni importes reales. | `src/features/propuestas/**`, `docs/qa/propuestas-mvp-evidence.md` | backend, services, router, layout | frontend completo |
@@ -237,3 +237,4 @@ Gate completo:
 ## Registro de evidencias del plan
 
 - 2026-05-18: creado el plan continuo y seleccionada `T-001-SIN-FE-CONTRACT-FIXTURE` como siguiente tarea segura.
+- 2026-05-18: `T-001-SIN-FE-CONTRACT-FIXTURE` cerrada. Se separaron tipos, fixture y composable de `Siniestros`; validacion OK con test dirigido, format, lint, unit, build, baseline documental, secret scan y `git diff --check`. El cursor queda en `T-002-REC-FE-CONTRACT-FIXTURE`.
