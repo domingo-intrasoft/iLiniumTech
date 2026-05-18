@@ -20,6 +20,7 @@ Avanzar el MVP con incrementos pequenos, seguros y validados, sin activar datos 
 | Este bloque | Polizas CRUD BBDD | Smoke API/UI visible contra backend SQL local: alta, busqueda, edicion, baja tecnica y limpieza exacta sin residuales. |
 | Bloque 06:31 | Gobierno IA | Paquete activo de agentes por pagina creado y enlazado desde roadmap, plan maestro, readiness y task pack. |
 | Bloque 07:01 | SDD Siniestros | `SDD-2026-008` abierta como draft de listado read-only minimizado, sin detalle ni datos sensibles. |
+| Bloque 07:31 | SDD Recibos | `SDD-2026-009` abierta como draft de listado read-only minimizado, sin importes reales ni datos bancarios. |
 
 ## Validaciones ejecutadas
 
@@ -120,6 +121,13 @@ Validacion tras SDD draft de Siniestros:
 - `git diff --check`: OK.
 - No se ejecutan tests frontend/backend salvo que se detecte cambio runtime; este bloque solo crea/actualiza documentacion.
 
+Validacion tras SDD draft de Recibos:
+
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+- No se ejecutan tests frontend/backend salvo que se detecte cambio runtime; este bloque solo crea/actualiza documentacion.
+
 ## Riesgos residuales
 
 - Polizas CRUD BBDD queda cerrado como MVP local con evidencia API/UI visible; quedan UAT funcional, auth productiva, permisos finales y confirmacion DBA de triggers/campos para escrituras no sinteticas.
@@ -134,7 +142,8 @@ Validacion tras SDD draft de Siniestros:
 - `Autos Particulares` sigue aparcado por decision de producto.
 - El rollout por pagina no autoriza por si mismo datos reales, APIs, escrituras, exportaciones ni permisos nuevos; cada pagina debe abrir SDD propia antes de salir del carril fixture/bloqueado.
 - `SDD-2026-008` deja `Siniestros` en draft: el primer corte propuesto es solo listado read-only minimizado y sigue bloqueado hasta UAT/DBA, permisos, origen de lectura autorizado y security review.
+- `SDD-2026-009` deja `Recibos` en draft: el primer corte propuesto es solo listado read-only minimizado sin importes reales y sigue bloqueado hasta UAT/DBA, permisos, origen de lectura autorizado y security review.
 
 ## Siguiente paso sugerido
 
-Preparar `SDD Recibos read-only` o revisar preguntas UAT/DBA de `Siniestros` antes de programar API.
+Revisar preguntas UAT/DBA de `Siniestros` y `Recibos`, o preparar la siguiente SDD read-only para `Clientes`.

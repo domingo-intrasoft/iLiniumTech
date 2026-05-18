@@ -44,7 +44,7 @@ Resumen ejecutivo:
 | Polizas / Autos Particulares | Aparcada; ruta tecnica deshabilitada, no reactivada | Sin documento de pagina en esta carpeta; ver [`SDD-2026-006`](../../sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md) |
 | Polizas / Flotas | MVP estatico visible; scope bajo Polizas; datos/API pendientes | [`polizas-flotas/README.md`](polizas-flotas/README.md) |
 | Polizas / Colectivas | MVP estatico visible; scope bajo Polizas; datos/API pendientes | [`polizas-colectivas/README.md`](polizas-colectivas/README.md) |
-| Recibos | MVP estatico visible; datos/API/importes pendientes | [`recibos/README.md`](recibos/README.md) |
+| Recibos | MVP estatico visible; SDD draft de listado read-only minimizado; datos/API/importes pendientes | [`recibos/README.md`](recibos/README.md), [`SDD-2026-009`](../../sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md) |
 | Suplementos | MVP estatico visible; datos/API pendientes | [`suplementos/README.md`](suplementos/README.md) |
 | Siniestros | MVP estatico visible; SDD draft de listado read-only minimizado; datos/API/PII pendientes | [`siniestros/README.md`](siniestros/README.md), [`SDD-2026-008`](../../sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md) |
 | Liq.Cia | MVP estatico visible; datos/API/importes pendientes | [`liq-cia/README.md`](liq-cia/README.md) |

@@ -33,6 +33,7 @@ Puntos aparcados o no cerrados:
 - `Autos Particulares` existe como incremento tecnico anterior, pero no es el objetivo MVP actual. No debe ampliarse ni presentarse como objetivo principal sin nueva confirmacion funcional, SDD y UAT.
 - Las paginas estaticas del menu son visibles para orientar navegacion y pruebas, pero estan bloqueadas para datos reales, filtros funcionales, escrituras, exportaciones, permisos finos o APIs propias hasta SDD/API/UAT. El paquete activo de coordinacion por pagina esta en `docs/appbuilder/pages/page-agent-rollout.md`.
 - `Siniestros` tiene SDD draft abierta como primera pagina posterior a Polizas: `docs/sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md`. El alcance propuesto es solo listado read-only minimizado; detalle, intervinientes, importes, EIAC, observaciones, exportacion y escrituras quedan fuera hasta SDD posterior.
+- `Recibos` tiene SDD draft abierta como segunda pagina posterior a Polizas: `docs/sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md`. El alcance propuesto es solo listado read-only minimizado sin importes reales; detalle, banco, remesas, cobro, EIAC, exportacion y escrituras quedan fuera hasta SDD posterior.
 - La autenticacion productiva no esta decidida.
 - Falta matriz real de permisos por broker, perfil, oficina, gestor y usuario.
 - SQL de Polizas CRUD ya tiene smoke transaccional con rollback, lectura SQL real, visibilidad post-create a nivel repositorio y smoke API/UI visible con alta, busqueda, edicion, baja tecnica y limpieza exacta contra BBDD local autorizada; quedan UAT funcional, auth productiva, permisos finales y confirmacion DBA de triggers/campos para escrituras no sinteticas.
@@ -504,7 +505,7 @@ DoD y evidencia:
 2. No ampliar Polizas hacia campos sensibles, escrituras no MVP, delete real ni datos enriquecidos sin UAT/DBA y SDD nueva.
 3. Crear agentes por pagina del menu para planificar y desarrollar el resto con SDD propia, usando `docs/appbuilder/pages/page-agent-rollout.md` como paquete operativo.
 4. Cada pagina nueva debe empezar por analisis AppBuilder, contrato iLiniumTech explicito, permisos, datos afectados, rollback y UAT.
-5. Priorizar las siguientes superficies por valor demostrable y bajo riesgo: `Siniestros` listado read-only minimizado segun `SDD-2026-008`, despues Recibos, Clientes, Agenda y Propuestas. El detalle ampliado de Polizas queda como mejora posterior con SDD si toca datos sensibles o UX/contrato.
+5. Priorizar las siguientes superficies por valor demostrable y bajo riesgo: `Siniestros` listado read-only minimizado segun `SDD-2026-008`, `Recibos` listado read-only minimizado segun `SDD-2026-009`, despues Clientes, Agenda y Propuestas. El detalle ampliado de Polizas queda como mejora posterior con SDD si toca datos sensibles o UX/contrato.
 6. Ejecutar regresion backend/frontend, E2E y auditorias en cada incremento.
 7. Documentar evidencia QA y riesgos residuales por pagina.
 8. Consolidar CI/preview dry-run y branch protection.

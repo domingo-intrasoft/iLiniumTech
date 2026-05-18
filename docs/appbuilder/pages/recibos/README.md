@@ -12,6 +12,10 @@ Ronda: documentacion y analisis. No se programa, no se ejecuta SQL, no se ejecut
 
 Hay evidencia local suficiente para afirmar que `Recibos` existe como opcion historica de gestion/busqueda y como dominio de datos (`Recibo`, `PBI_Recibos`, vistas auxiliares), pero no hay evidencia local suficiente de una pagina AppBuilder completa de `Recibos` con metadata de pantalla, layout, pestanas, submenus, acciones especificas, permisos historicos por grupo o contrato de UAT.
 
+Actualizacion 2026-05-18: iLiniumTech ya contiene ruta protegida `/recibos` y vista Vue fixture/read-only con datos sanitizados, filtros locales, importes demo anonimizados y acciones de detalle/exportacion/cobro bloqueadas. Esa vista no autoriza API, datos reales, importes reales, datos bancarios, detalle, exportacion ni escritura sin SDD, permisos, DBA/UAT y revision de seguridad.
+
+SDD draft abierta para el primer corte futuro: [`SDD-2026-009 Recibos read-only minimizado`](../../../sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md). La SDD limita el primer incremento a listado read-only minimizado y deja importes reales, banco, remesas, detalle, EIAC, exportacion y escrituras fuera de alcance.
+
 Por tanto, el desarrollo de una pagina iLiniumTech de `Recibos` debe quedar bloqueado hasta obtener una de estas entradas:
 
 - metadata AppBuilder sanitizada de la pantalla real de `Recibos`;
@@ -64,12 +68,12 @@ En `iLiniumTech.Frontend/src/layout/appNavigation.ts`, `Recibos` aparece como it
 
 - etiqueta: `Recibos`;
 - icono: `pi pi-money-bill`;
-- estado: `disabled: true`;
-- ruta: no definida;
+- estado actual iLiniumTech: `fixture`;
+- ruta: `/recibos`;
 - permiso iLiniumTech: no definido;
 - hijos: no definidos.
 
-Esto confirma que iLiniumTech conoce el hueco de navegacion, pero todavia no hay pagina estatica propia.
+Esto confirma que iLiniumTech ya tiene una superficie visible fixture/read-only para navegacion y pruebas. No existe aun contrato funcional con datos reales ni API propia.
 
 ### AppBuilder frontend
 
