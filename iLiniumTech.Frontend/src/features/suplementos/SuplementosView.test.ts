@@ -97,6 +97,29 @@ describe('SuplementosView smoke', () => {
     const disabledActions = wrapper.findAll('button[disabled]')
     expect(disabledActions.length).toBeGreaterThanOrEqual(7)
     expect(wrapper.findAll('button.table-icon-action[disabled]')).toHaveLength(2)
+    expect(wrapper.get('#suplementos-blocked-actions').text()).toContain(
+      'Acciones de suplementos bloqueadas en el MVP read-only',
+    )
+    expect(
+      wrapper.get('button[aria-label="Detalle pendiente"]').attributes('aria-describedby'),
+    ).toBe('suplementos-blocked-actions')
+    expect(
+      wrapper
+        .findAll('button')
+        .find((button) => button.text().includes('Guardar busqueda'))
+        ?.attributes('aria-describedby'),
+    ).toBe('suplementos-blocked-actions')
+    expect(
+      wrapper.get('button[aria-label="Opciones de situacion"]').attributes('aria-describedby'),
+    ).toBe('suplementos-blocked-actions')
+    expect(
+      wrapper
+        .get('input[aria-label="Campos restringidos bloqueados"]')
+        .attributes('aria-describedby'),
+    ).toBe('suplementos-blocked-actions')
+    expect(wrapper.get('button.table-icon-action').attributes('aria-describedby')).toBe(
+      'suplementos-blocked-actions',
+    )
   })
 
   it('filters fixture rows with a simple local search', async () => {

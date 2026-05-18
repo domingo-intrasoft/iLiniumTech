@@ -82,6 +82,8 @@ const moduleActions = [
   { label: 'Detalle pendiente', icon: 'pi pi-eye' },
   { label: 'Exportacion pendiente', icon: 'pi pi-download' },
 ]
+const blockedActionsDescription =
+  'Acciones de suplementos bloqueadas en el MVP read-only hasta SDD, contrato API, permisos, UAT y decision de workflows/adjuntos/datos restringidos.'
 
 const filters = reactive<SuplementosFilters>({
   texto: '',
@@ -217,6 +219,8 @@ async function signOut() {
         <h1>Suplementos</h1>
       </div>
 
+      <p id="suplementos-blocked-actions" class="sr-only" v-text="blockedActionsDescription"></p>
+
       <div class="toolbar-groups">
         <div class="action-group">
           <button
@@ -226,6 +230,7 @@ async function signOut() {
             :class="{ active: action.active }"
             type="button"
             :aria-label="action.label"
+            aria-describedby="suplementos-blocked-actions"
             disabled
           >
             <i :class="action.icon" aria-hidden="true"></i>
@@ -262,11 +267,11 @@ async function signOut() {
             <i class="pi pi-trash" aria-hidden="true"></i>
             Limpiar Filtros
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="suplementos-blocked-actions" disabled>
             <i class="pi pi-save" aria-hidden="true"></i>
             Guardar busqueda
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="suplementos-blocked-actions" disabled>
             <i class="pi pi-download" aria-hidden="true"></i>
             Exportar
           </button>
@@ -291,7 +296,12 @@ async function signOut() {
                   type="search"
                   aria-label="Referencia o concepto"
                 />
-                <button type="button" aria-label="Opciones de referencia" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de referencia"
+                  aria-describedby="suplementos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -306,7 +316,12 @@ async function signOut() {
                   type="search"
                   aria-label="Poliza"
                 />
-                <button type="button" aria-label="Opciones de poliza" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de poliza"
+                  aria-describedby="suplementos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -322,7 +337,12 @@ async function signOut() {
                   <option>Domiciliacion</option>
                   <option>Renovacion</option>
                 </select>
-                <button type="button" aria-label="Opciones de tipo" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de tipo"
+                  aria-describedby="suplementos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -348,7 +368,12 @@ async function signOut() {
                   <option>Validado</option>
                   <option>Bloqueado</option>
                 </select>
-                <button type="button" aria-label="Opciones de situacion" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de situacion"
+                  aria-describedby="suplementos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -363,7 +388,12 @@ async function signOut() {
                   type="date"
                   aria-label="Fecha efecto desde"
                 />
-                <button type="button" aria-label="Opciones de fecha" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de fecha"
+                  aria-describedby="suplementos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -381,8 +411,14 @@ async function signOut() {
                   value="Fuera del MVP read-only"
                   disabled
                   aria-label="Campos restringidos bloqueados"
+                  aria-describedby="suplementos-blocked-actions"
                 />
-                <button type="button" aria-label="Campos restringidos bloqueados" disabled>
+                <button
+                  type="button"
+                  aria-label="Campos restringidos bloqueados"
+                  aria-describedby="suplementos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-lock" aria-hidden="true"></i>
                 </button>
               </span>
@@ -432,6 +468,7 @@ async function signOut() {
                   class="table-icon-action"
                   type="button"
                   :aria-label="`Detalle pendiente para suplemento ${item.referencia}`"
+                  aria-describedby="suplementos-blocked-actions"
                   title="Detalle pendiente de SDD/API"
                   disabled
                 >
