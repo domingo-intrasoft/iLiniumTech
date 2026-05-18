@@ -82,7 +82,29 @@ public sealed class HeaderPolizasExecutionContextAccessorTests
         var act = () => accessor.Current;
 
         act.Should().Throw<PolizasExecutionContextException>()
-            .WithMessage("*X-Broker-Id*positive integer*");
+            .WithMessage("*X-Broker-Id*non-zero integer*");
+    }
+
+    [Fact]
+    public void Current_accepts_negative_appbuilder_broker_id_from_headers()
+    {
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Headers[HeaderPolizasExecutionContextAccessor.BrokerIdHeaderName] = "-5529";
+        var accessor = new HeaderPolizasExecutionContextAccessor(
+            new HttpContextAccessor { HttpContext = httpContext },
+            new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Polizas:AllowHeaderExecutionContext"] = "true"
+                })
+                .Build(),
+            DevelopmentEnvironment());
+
+        var current = accessor.Current;
+
+        current.Should().NotBeNull();
+        current!.BrokerId.Should().Be(-5529);
+        current.EntityMainId.Should().Be(-5529);
     }
 
     [Fact]
@@ -111,6 +133,26 @@ public sealed class HeaderPolizasExecutionContextAccessorTests
         current.ProfileId.Should().Be(11);
         current.ProfileTypeId.Should().Be("fallback-profile");
         current.IsAdmin.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Current_accepts_negative_appbuilder_broker_id_from_configuration()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Polizas:BrokerId"] = "-5529"
+            })
+            .Build();
+        var accessor = new HeaderPolizasExecutionContextAccessor(
+            new HttpContextAccessor { HttpContext = new DefaultHttpContext() },
+            configuration,
+            DevelopmentEnvironment());
+
+        var current = accessor.Current;
+
+        current.Should().NotBeNull();
+        current!.BrokerId.Should().Be(-5529);
     }
 
     [Fact]

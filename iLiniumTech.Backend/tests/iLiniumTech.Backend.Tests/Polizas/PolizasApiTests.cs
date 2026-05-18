@@ -323,6 +323,39 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Demo_login_allows_negative_broker_ids_from_appbuilder_master()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:AllowedBrokerIds:0"] = "-5529",
+            ["Polizas:UserId"] = "10",
+            ["Polizas:ProfileId"] = "11",
+            ["Polizas:ProfileTypeId"] = "configured-profile",
+            ["Polizas:IsAdmin"] = "false"
+        });
+        using var client = factory.CreateClient();
+
+        var login = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            username = "demo@iliniumtech.local",
+            password = "demo",
+            brokerId = -5529
+        });
+        var loginBody = await login.Content.ReadAsStringAsync();
+
+        login.StatusCode.Should().Be(HttpStatusCode.OK);
+        loginBody.Should().Contain("\"currentBrokerId\":-5529");
+        loginBody.Should().Contain("\"allowedBrokerIds\":[-5529]");
+
+        var me = await client.GetAsync("/api/me");
+        var meBody = await me.Content.ReadAsStringAsync();
+
+        me.StatusCode.Should().Be(HttpStatusCode.OK);
+        meBody.Should().Contain("\"brokerId\":-5529");
+        meBody.Should().Contain("\"allowedBrokerIds\":[-5529]");
+    }
+
+    [Fact]
     public async Task Demo_login_rejects_invalid_credentials_without_setting_session_cookie()
     {
         await using var factory = new TestApiFactory();
@@ -363,6 +396,7 @@ public sealed class PolizasApiTests
         response.Headers.TryGetValues("Set-Cookie", out _).Should().BeFalse();
         response.Headers.GetValues("X-Correlation-Id").Should().Contain("login-broker-validation");
         body.Should().Contain("AUTH_BROKER_VALIDATION_ERROR");
+        body.Should().Contain("non-zero broker");
         body.Should().Contain("\"correlationId\":\"login-broker-validation\"");
         body.Should().NotContain("84");
         body.Should().NotContain("password");

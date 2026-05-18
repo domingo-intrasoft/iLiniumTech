@@ -9,7 +9,7 @@ public sealed class ConfiguredPolizasExecutionContextAccessor(IConfiguration con
         get
         {
             var brokerId = ReadInt("Polizas:BrokerId", "ILINIUMTECH:BROKER_ID");
-            return brokerId is null or <= 0
+            return brokerId is null or 0
                 ? null
                 : new PolizasExecutionContext(
                     BrokerId: brokerId.Value,

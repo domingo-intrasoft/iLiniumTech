@@ -124,6 +124,24 @@ Archivos modificados:
 - `iLiniumTech.Backend/tests/iLiniumTech.Backend.Tests/Polizas/PolizasApiTests.cs`
 - `iLiniumTech.Backend/tests/iLiniumTech.Backend.Tests/Polizas/PolizasInfrastructureTests.cs`
 
+## Broker real AppBuilder
+
+Hallazgo durante preparacion de smoke local contra BBDD:
+
+- Las conexiones modelo activas en el maestro local pueden usar `IdentityId` negativo.
+- La primera regla MVP de login/contexto rechazaba `brokerId <= 0`, lo que impedia probar con `CurrentBrokerId` real de AppBuilder.
+- La regla se ajusta a `brokerId != 0` para broker y allowed brokers.
+- `UserId` y `ProfileId` mantienen validacion positiva cuando aplica.
+- Se anaden tests de login demo y contexto por headers/configuracion con broker negativo.
+
+Archivos modificados:
+
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Api/Program.cs`
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Api/Security/HeaderPolizasExecutionContextAccessor.cs`
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Infrastructure/Polizas/Connections/ConfiguredPolizasExecutionContextAccessor.cs`
+- `iLiniumTech.Backend/tests/iLiniumTech.Backend.Tests/Polizas/PolizasApiTests.cs`
+- `iLiniumTech.Backend/tests/iLiniumTech.Backend.Tests/Polizas/HeaderPolizasExecutionContextAccessorTests.cs`
+
 ## Validaciones ejecutadas
 
 Backend:
@@ -195,6 +213,22 @@ dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Relea
 ```
 
 Resultado: `139/139` tests OK.
+
+Broker negativo AppBuilder:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "PolizasApiTests|HeaderPolizasExecutionContextAccessorTests|PolizasInfrastructureTests"
+```
+
+Resultado: `98/98` tests OK.
+
+Suite backend completa tras broker real AppBuilder:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release
+```
+
+Resultado: `142/142` tests OK.
 
 Integracion backend de escritura:
 

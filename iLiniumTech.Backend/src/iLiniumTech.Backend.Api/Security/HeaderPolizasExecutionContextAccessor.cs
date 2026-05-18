@@ -26,9 +26,9 @@ public sealed class HeaderPolizasExecutionContextAccessor(
             }
 
             var allowHeaderContext = HeaderExecutionContextPolicy.IsEnabled(configuration, environment);
-            var brokerId = (allowHeaderContext ? ReadPositiveIntHeader(BrokerIdHeaderName) : null)
+            var brokerId = (allowHeaderContext ? ReadNonZeroIntHeader(BrokerIdHeaderName) : null)
                 ?? ReadIntConfiguration("Polizas:BrokerId", "ILINIUMTECH:BROKER_ID");
-            return brokerId is null or <= 0
+            return brokerId is null or 0
                 ? null
                 : new PolizasExecutionContext(
                     BrokerId: brokerId.Value,
@@ -51,7 +51,7 @@ public sealed class HeaderPolizasExecutionContextAccessor(
             return null;
         }
 
-        var brokerId = ReadPositiveIntClaim(PolizasContextClaimTypes.BrokerId);
+        var brokerId = ReadNonZeroIntClaim(PolizasContextClaimTypes.BrokerId);
         return brokerId is null
             ? null
             : new PolizasExecutionContext(
@@ -75,6 +75,19 @@ public sealed class HeaderPolizasExecutionContextAccessor(
             : throw new PolizasExecutionContextException($"{headerName} must be a positive integer.");
     }
 
+    private int? ReadNonZeroIntHeader(string headerName)
+    {
+        var value = ReadStringHeader(headerName, out var wasPresent);
+        if (!wasPresent)
+        {
+            return null;
+        }
+
+        return int.TryParse(value, out var parsed) && parsed != 0
+            ? parsed
+            : throw new PolizasExecutionContextException($"{headerName} must be a non-zero integer.");
+    }
+
     private bool? ReadBoolHeader(string headerName)
     {
         var value = ReadStringHeader(headerName, out var wasPresent);
@@ -94,6 +107,12 @@ public sealed class HeaderPolizasExecutionContextAccessor(
     {
         var value = ReadStringClaim(claimType);
         return int.TryParse(value, out var parsed) && parsed > 0 ? parsed : null;
+    }
+
+    private int? ReadNonZeroIntClaim(string claimType)
+    {
+        var value = ReadStringClaim(claimType);
+        return int.TryParse(value, out var parsed) && parsed != 0 ? parsed : null;
     }
 
     private bool? ReadBoolClaim(string claimType)

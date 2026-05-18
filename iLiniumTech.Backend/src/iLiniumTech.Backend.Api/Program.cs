@@ -188,13 +188,13 @@ app.MapPost("/api/auth/login", async (
             "Username and password are required.");
     }
 
-    if (request.BrokerId is <= 0)
+    if (request.BrokerId is 0)
     {
         return ErrorResult(
             httpContext,
             StatusCodes.Status400BadRequest,
             "AUTH_BROKER_VALIDATION_ERROR",
-            "A positive broker identifier is required.");
+            "A non-zero broker identifier is required.");
     }
 
     var expectedPassword = ReadDemoPassword(configuration, environment);
@@ -247,17 +247,17 @@ app.MapPost("/api/auth/broker", async (
     HttpContext httpContext,
     [FromBody] BrokerSelectionRequest? request) =>
 {
-    if (request?.BrokerId is null || request.BrokerId <= 0)
+    if (request?.BrokerId is null or 0)
     {
         return ErrorResult(
             httpContext,
             StatusCodes.Status400BadRequest,
             "AUTH_BROKER_VALIDATION_ERROR",
-            "A positive broker identifier is required.");
+            "A non-zero broker identifier is required.");
     }
 
     var requestedBrokerId = request.BrokerId.Value;
-    var allowedBrokerIds = ReadIntClaims(httpContext.User, PolizasContextClaimTypes.AllowedBrokerId);
+    var allowedBrokerIds = ReadBrokerIdClaims(httpContext.User, PolizasContextClaimTypes.AllowedBrokerId);
     if (allowedBrokerIds.Count == 0 || !allowedBrokerIds.Contains(requestedBrokerId))
     {
         return ErrorResult(
@@ -325,7 +325,7 @@ app.MapGet("/api/me", (
             PolizasExecutionContextRequired: RequiresPolizasExecutionContext(configuration),
             User: CreateAuthUserResponse(httpContext.User),
             Application: CreateApplicationResponse(httpContext.User),
-            AllowedBrokerIds: ReadIntClaims(httpContext.User, PolizasContextClaimTypes.AllowedBrokerId),
+            AllowedBrokerIds: ReadBrokerIdClaims(httpContext.User, PolizasContextClaimTypes.AllowedBrokerId),
             Permissions: ReadStringClaims(httpContext.User, PolizasContextClaimTypes.Permission),
             AuthMode: httpContext.User.Identity?.AuthenticationType ?? "unknown"));
     }
@@ -652,7 +652,7 @@ static bool IsBrokerAllowedForAuthenticatedContext(ClaimsPrincipal user, int bro
         return true;
     }
 
-    var allowedBrokerIds = ReadIntClaims(user, PolizasContextClaimTypes.AllowedBrokerId);
+    var allowedBrokerIds = ReadBrokerIdClaims(user, PolizasContextClaimTypes.AllowedBrokerId);
     return allowedBrokerIds.Contains(brokerId);
 }
 
@@ -793,10 +793,10 @@ static string? ReadDemoPassword(IConfiguration configuration, IHostEnvironment e
 
 static LoginResponse CreateDemoSession(string username, int? requestedBrokerId, IConfiguration configuration)
 {
-    var brokerId = requestedBrokerId is > 0
+    var brokerId = requestedBrokerId is not null and not 0
         ? requestedBrokerId
-        : ReadPositiveIntConfiguration(configuration, "Auth:Demo:BrokerId")
-            ?? ReadPositiveIntConfiguration(configuration, "Polizas:BrokerId");
+        : ReadNonZeroIntConfiguration(configuration, "Auth:Demo:BrokerId")
+            ?? ReadNonZeroIntConfiguration(configuration, "Polizas:BrokerId");
     var userId = ReadPositiveIntConfiguration(configuration, "Auth:Demo:UserId")
         ?? ReadPositiveIntConfiguration(configuration, "Polizas:UserId")
         ?? 1;
@@ -840,7 +840,7 @@ static LoginResponse CreateDemoSessionFromCurrentPrincipal(ClaimsPrincipal user,
         ProfileId: ReadFirstIntClaim(user, PolizasContextClaimTypes.ProfileId),
         ProfileTypeId: ReadFirstStringClaim(user, PolizasContextClaimTypes.ProfileTypeId),
         IsAdmin: ReadBoolClaim(user, PolizasContextClaimTypes.IsAdmin) ?? false,
-        AllowedBrokerIds: ReadIntClaims(user, PolizasContextClaimTypes.AllowedBrokerId),
+        AllowedBrokerIds: ReadBrokerIdClaims(user, PolizasContextClaimTypes.AllowedBrokerId),
         Permissions: ReadStringClaims(user, PolizasContextClaimTypes.Permission));
 }
 
@@ -910,6 +910,14 @@ static IReadOnlyList<int> ReadIntClaims(ClaimsPrincipal user, string claimType) 
         .Distinct()
         .ToArray();
 
+static IReadOnlyList<int> ReadBrokerIdClaims(ClaimsPrincipal user, string claimType) =>
+    user.FindAll(claimType)
+        .Select(claim => int.TryParse(claim.Value, out var parsed) ? parsed : (int?)null)
+        .Where(value => value is not null and not 0)
+        .Select(value => value!.Value)
+        .Distinct()
+        .ToArray();
+
 static int? ReadFirstIntClaim(ClaimsPrincipal user, string claimType)
 {
     var values = ReadIntClaims(user, claimType);
@@ -959,7 +967,7 @@ static IReadOnlyList<int> ReadDemoAllowedBrokerIds(IConfiguration configuration,
     if (configuredBrokerIds.Exists())
     {
         return configuredBrokerIds.Get<int[]>()?
-            .Where(value => value > 0)
+            .Where(value => value != 0)
             .Distinct()
             .ToArray() ?? [];
     }
@@ -969,6 +977,9 @@ static IReadOnlyList<int> ReadDemoAllowedBrokerIds(IConfiguration configuration,
 
 static int? ReadPositiveIntConfiguration(IConfiguration configuration, string key) =>
     int.TryParse(configuration[key], out var parsed) && parsed > 0 ? parsed : null;
+
+static int? ReadNonZeroIntConfiguration(IConfiguration configuration, string key) =>
+    int.TryParse(configuration[key], out var parsed) && parsed != 0 ? parsed : null;
 
 static string DisplayNameFromUsername(string username)
 {
