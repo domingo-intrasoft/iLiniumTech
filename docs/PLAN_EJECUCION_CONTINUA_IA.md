@@ -22,44 +22,48 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 - `Polizas CRUD BBDD` queda como vertical MVP local de referencia, con smoke API/UI visible contra BBDD local de pruebas.
 - `/login`, shell, menu lateral y rutas protegidas del menu existen.
 - `Autos Particulares` queda aparcado; no ampliarlo.
-- Paginas del menu distintas de Polizas siguen en carril fixture/read-only o bloqueadas.
+- Proximo MVP activo: paridad visual de `/polizas` con AppBuilder publicado, manteniendo CRUD real y sin simulaciones.
+- Paginas del menu distintas de Polizas siguen en carril fixture/read-only o bloqueadas y quedan pospuestas hasta cerrar el siguiente corte visual de Polizas.
 - Ronda documental por pagina completada en `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`.
 - SDD drafts existentes para `Siniestros`, `Recibos`, `Clientes`, `Agenda`, `Propuestas` y `Suplementos`.
 - No activar datos reales, APIs nuevas, escrituras, exportaciones ni permisos nuevos para paginas fixture sin SDD aprobada, contrato API, UAT/DBA y seguridad.
 
 ## Siguiente tarea activa
 
-ID: `T-002-REC-FE-CONTRACT-FIXTURE`
+ID: `T-043-POL-APPBUILDER-VISUAL-SHELL`
 
 Estado: `READY`
 
-Nombre: preparar `Recibos` frontend como modulo fixture con contrato local separado.
+Nombre: aproximar `/polizas` al shell/grid visual de AppBuilder publicado.
 
 Objetivo:
 
-- Reducir el acoplamiento de `RecibosView.vue` separando tipos, fixture y logica de filtrado/paginacion en archivos propios.
-- Mantener la pantalla igual para el usuario.
-- No crear backend, servicios API, datos reales, cobros, remesas ni exportaciones.
-- Dejar el modulo listo para que una futura tarea cambie el origen fixture por API cuando `SDD-2026-009` tenga UAT/DBA.
+- Rediseñar la primera pantalla de `Polizas` para que se parezca claramente a la captura AppBuilder: toolbar compacta, buscador en grid, tabla densa, columnas objetivo y badges.
+- Mantener CRUD real, permisos y backend existentes.
+- No crear datos simulados, logos falsos, acciones falsas ni metadata runtime.
+- No tocar backend ni servicios API en este primer corte visual.
 
 Fuentes a leer, sin buscar mas salvo bloqueo:
 
 - `AGENTS.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md`
-- `docs/appbuilder/pages/recibos/README.md`
-- `docs/qa/recibos-mvp-evidence.md`
-- `iLiniumTech.Frontend/src/features/recibos/RecibosView.vue`
-- `iLiniumTech.Frontend/src/features/recibos/RecibosView.test.ts`
+- `docs/sdd/specs/iLiniumTech/SDD-2026-014-polizas-appbuilder-visual-parity.md`
+- `docs/appbuilder/pages/polizas/visual-parity-mvp.md`
+- `docs/qa/polizas-crud-bbdd-evidence.md`
+- `iLiniumTech.Frontend/src/features/polizas/PolizasView.vue`
+- `iLiniumTech.Frontend/src/features/polizas/PolizasTable.vue`
+- `iLiniumTech.Frontend/src/features/polizas/PolizasFilters.vue`
+- `iLiniumTech.Frontend/src/assets/styles/main.scss`
 
 Archivos que puede tocar:
 
-- `iLiniumTech.Frontend/src/features/recibos/RecibosView.vue`
-- `iLiniumTech.Frontend/src/features/recibos/RecibosView.test.ts`
-- `iLiniumTech.Frontend/src/features/recibos/recibosTypes.ts`
-- `iLiniumTech.Frontend/src/features/recibos/recibosFixture.ts`
-- `iLiniumTech.Frontend/src/features/recibos/useRecibosFixture.ts`
-- `docs/qa/recibos-mvp-evidence.md`
+- `iLiniumTech.Frontend/src/features/polizas/PolizasView.vue`
+- `iLiniumTech.Frontend/src/features/polizas/PolizasTable.vue`
+- `iLiniumTech.Frontend/src/features/polizas/PolizasFilters.vue`
+- `iLiniumTech.Frontend/src/features/polizas/PolizasView.test.ts`
+- `iLiniumTech.Frontend/src/features/polizas/PolizasTable.test.ts`
+- `iLiniumTech.Frontend/src/assets/styles/main.scss`
+- `docs/qa/polizas-visual-parity-evidence.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 
 Archivos que NO debe tocar:
@@ -67,7 +71,6 @@ Archivos que NO debe tocar:
 - `iLiniumTech.Backend/**`
 - `iLiniumTech.Frontend/src/services/**`
 - `iLiniumTech.Frontend/src/router/**`
-- `iLiniumTech.Frontend/src/layout/**`
 - `docs/sdd/**`
 - `docs/appbuilder/pages/page-agent-rollout.md`
 - `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`
@@ -75,20 +78,20 @@ Archivos que NO debe tocar:
 
 Pasos de implementacion:
 
-1. Extraer tipos `ReciboListItem`, `RecibosFilters`, situaciones y tipos a `recibosTypes.ts`.
-2. Extraer `recibosFixture` a `recibosFixture.ts`, manteniendo datos demo anonimizados y sin banco/importes reales.
-3. Extraer filtrado, paginacion, `tableCaption`, `firstVisible`, `lastVisible`, `totalPages` y acciones de filtros a `useRecibosFixture.ts`.
-4. Dejar `RecibosView.vue` como composicion de UI que consume el composable.
-5. Mantener acciones de detalle/exportacion/cobro deshabilitadas y descritas por `recibos-blocked-actions`.
-6. Ampliar o ajustar `RecibosView.test.ts` para cubrir que no hay llamadas API, no se renderiza metadata/runtime AppBuilder, no hay secretos/datos bancarios y los filtros siguen funcionando.
-7. Actualizar `docs/qa/recibos-mvp-evidence.md` con la evidencia del cambio.
-8. Si todo pasa, marcar esta tarea `DONE` y mover **Siguiente tarea activa** a `T-003-CLI-FE-CONTRACT-FIXTURE`.
+1. Reordenar la superficie de `PolizasView.vue` para acercarla a AppBuilder: toolbar compacta, scopes a la derecha, contador visible y buscador integrado sobre el grid.
+2. Ajustar `PolizasTable.vue` a grid denso con columnas objetivo usando solo campos reales existentes.
+3. Añadir/ajustar estilos en `main.scss` para densidad, lineas de tabla, badges y toolbar compacta; evitar cards grandes.
+4. Mantener acciones sin implementacion real bloqueadas/deshabilitadas y accesibles.
+5. No fabricar logos ni campos inexistentes; si falta dato real, documentarlo en `polizas-visual-parity-evidence.md`.
+6. Actualizar tests unitarios de Polizas para el nuevo layout.
+7. Ejecutar validacion frontend completa y secret scan.
+8. Si todo pasa, marcar esta tarea `DONE` y mover **Siguiente tarea activa** a `T-044-POL-APPBUILDER-VISUAL-SMOKE`.
 
 Pruebas obligatorias:
 
 ```powershell
 cd .\iLiniumTech.Frontend
-npx vitest run src/features/recibos/RecibosView.test.ts
+npx vitest run src/features/polizas/PolizasView.test.ts src/features/polizas/PolizasTable.test.ts
 npm run format
 npm run lint
 npm run test:unit
@@ -101,11 +104,12 @@ git diff --check
 
 Criterios de aceptacion:
 
-- La UI visible de `/recibos` no pierde funcionalidad fixture.
-- No aparece `AppBuilder`, `IAP_`, `QueryStatic`, SQL, connection strings, emails, telefonos, documentos, IBAN, cuentas bancarias ni importes reales en DOM/fixtures.
-- No se crea API ni servicio frontend.
-- Los tests unitarios y build frontend pasan.
-- La evidencia QA queda actualizada.
+- `/polizas` se reconoce como pariente visual claro de AppBuilder publicado.
+- CRUD real y lectura backend/fixture existentes no se rompen.
+- No se crean datos simulados, logos falsos ni acciones falsas.
+- Los scopes sin SDD/API/UAT siguen bloqueados.
+- Tests unitarios, lint y build pasan.
+- Evidencia QA visual queda actualizada.
 - Commit pequeno y explicable.
 
 Riesgo de conflicto: bajo si se respetan los archivos permitidos.
@@ -126,7 +130,7 @@ Objetivo: que cada pagina fixture tenga estructura mantenible y lista para API f
 | ID | Estado | Tarea | Archivos permitidos | No tocar | Pruebas |
 | --- | --- | --- | --- | --- | --- |
 | `T-001-SIN-FE-CONTRACT-FIXTURE` | `DONE` | Separar contrato fixture de Siniestros. | `src/features/siniestros/**`, `docs/qa/siniestros-mvp-evidence.md` | backend, services, router, layout | frontend completo |
-| `T-002-REC-FE-CONTRACT-FIXTURE` | `READY` | Separar contrato fixture de Recibos sin importes reales ni banco. | `src/features/recibos/**`, `docs/qa/recibos-mvp-evidence.md` | backend, services, router, layout | frontend completo |
+| `T-002-REC-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Recibos sin importes reales ni banco. | `src/features/recibos/**`, `docs/qa/recibos-mvp-evidence.md` | backend, services, router, layout | frontend completo |
 | `T-003-CLI-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Clientes con PII bloqueada. | `src/features/clientes/**`, `docs/qa/clientes-mvp-evidence.md` | backend, services, router, layout | frontend completo |
 | `T-004-AGE-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Agenda con rango/listado, sin calendario interactivo. | `src/features/agenda/**`, `docs/qa/agenda-mvp-evidence.md` | backend, services, router, layout | frontend completo |
 | `T-005-PRO-FE-CONTRACT-FIXTURE` | `TODO` | Separar contrato fixture de Propuestas sin conversion, documentos ni importes reales. | `src/features/propuestas/**`, `docs/qa/propuestas-mvp-evidence.md` | backend, services, router, layout | frontend completo |
@@ -173,6 +177,8 @@ Objetivo: endurecer lo ya conseguido en Polizas sin ampliar reglas no aprobadas.
 | `T-040-POL-UAT-FIELDS` | `BLOCKED_HUMAN` | Confirmar campos editables definitivos y semantica de baja. | UAT/DBA |
 | `T-041-POL-AUDIT-WRITES` | `TODO` | Disenar auditoria de escritura sin datos sensibles. | puede ser documental |
 | `T-042-POL-CRUD-REGRESSION-SMOKE` | `TODO` | Mantener smoke local API/UI de CRUD real sin secretos. | BBDD local disponible |
+| `T-043-POL-APPBUILDER-VISUAL-SHELL` | `READY` | Aproximar `/polizas` al shell/grid visual de AppBuilder publicado sin simular datos. | captura usuario y SDD-2026-014 |
+| `T-044-POL-APPBUILDER-VISUAL-SMOKE` | `TODO` | Ejecutar smoke visual y documentar diferencias pendientes frente a AppBuilder. | `T-043` |
 
 ### Fase 6 - Reporting, liquidaciones y superficies tecnicas
 
@@ -238,3 +244,4 @@ Gate completo:
 
 - 2026-05-18: creado el plan continuo y seleccionada `T-001-SIN-FE-CONTRACT-FIXTURE` como siguiente tarea segura.
 - 2026-05-18: `T-001-SIN-FE-CONTRACT-FIXTURE` cerrada. Se separaron tipos, fixture y composable de `Siniestros`; validacion OK con test dirigido, format, lint, unit, build, baseline documental, secret scan y `git diff --check`. El cursor queda en `T-002-REC-FE-CONTRACT-FIXTURE`.
+- 2026-05-18: el usuario redefine el siguiente MVP: `/polizas` debe parecerse a la pantalla AppBuilder publicada, pero manteniendo CRUD real y sin atajos/simulaciones. `T-002` queda pospuesta y el cursor pasa a `T-043-POL-APPBUILDER-VISUAL-SHELL`.

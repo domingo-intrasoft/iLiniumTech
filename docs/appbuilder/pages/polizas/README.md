@@ -10,6 +10,12 @@ Estado: documentacion completada con evidencia local. No se ha programado runtim
 
 iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadata heredada se usa para analisis, trazabilidad, SDD y scaffolding revisado. La aplicacion final debe compilar y funcionar como frontend Vue/TypeScript estatico y backend API explicita.
 
+## Objetivo visual activo
+
+Desde el 2026-05-18, el siguiente MVP de `Polizas` debe priorizar paridad visual con la pantalla AppBuilder publicada aportada por el usuario. La guia operativa esta en `visual-parity-mvp.md` y la SDD en `docs/sdd/specs/iLiniumTech/SDD-2026-014-polizas-appbuilder-visual-parity.md`.
+
+La fidelidad visual no autoriza atajos: sin metadata runtime, sin datos simulados, sin logos inventados, sin acciones falsas y sin perder el CRUD real contra backend/BBDD local de pruebas ya conseguido.
+
 Para `Polizas`, eso significa:
 
 - no renderizar pantallas desde `IAP_Component`;
