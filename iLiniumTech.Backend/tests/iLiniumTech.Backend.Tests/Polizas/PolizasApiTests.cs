@@ -298,6 +298,9 @@ public sealed class PolizasApiTests
         loginBody.Should().Contain("\"currentBrokerId\":42");
         loginBody.Should().Contain("\"displayName\":\"demo\"");
         loginBody.Should().Contain("polizas.read");
+        loginBody.Should().NotContain(PolizasPermissions.Create);
+        loginBody.Should().NotContain(PolizasPermissions.Update);
+        loginBody.Should().NotContain(PolizasPermissions.Delete);
         loginBody.Should().NotContain("demo@iliniumtech.local");
         loginBody.Should().NotContain("password");
 
@@ -313,6 +316,9 @@ public sealed class PolizasApiTests
         meBody.Should().Contain("\"displayName\":\"demo\"");
         meBody.Should().Contain("\"application\":{\"key\":\"iliniumtech\",\"name\":\"iLiniumTech\"}");
         meBody.Should().Contain("polizas.detail");
+        meBody.Should().NotContain(PolizasPermissions.Create);
+        meBody.Should().NotContain(PolizasPermissions.Update);
+        meBody.Should().NotContain(PolizasPermissions.Delete);
         meBody.Should().Contain("\"authMode\":\"DemoSession\"");
     }
 
@@ -730,6 +736,123 @@ public sealed class PolizasApiTests
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         body.Should().Contain("POLIZAS_ACCESS_DENIED");
         body.Should().NotContain(ThrowingUnexpectedPolizasService.FailureMessage);
+    }
+
+    [Theory]
+    [InlineData("POST", "/api/polizas")]
+    [InlineData("PUT", "/api/polizas/POL-1001")]
+    [InlineData("DELETE", "/api/polizas/POL-1001")]
+    public async Task Polizas_write_endpoints_require_authentication(string method, string url)
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+
+        using var response = await client.SendAsync(CreateWriteRequest(method, url));
+
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Api_key_mvp_does_not_grant_polizas_write_permissions_in_development()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-ILiniumTech-Api-Key", "test-key");
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "api-key-write-denied");
+
+        var response = await client.PostAsJsonAsync("/api/polizas", new
+        {
+            numero = "POL-MVP-0001"
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("api-key-write-denied");
+        body.Should().Contain("POLIZAS_ACCESS_DENIED");
+        body.Should().NotContain(PolizasPermissions.Create);
+        body.Should().NotContain("POL-MVP-0001");
+    }
+
+    [Theory]
+    [InlineData("POST", "/api/polizas", PolizasPermissions.Create)]
+    [InlineData("PUT", "/api/polizas/POL-1001", PolizasPermissions.Update)]
+    [InlineData("DELETE", "/api/polizas/POL-1001", PolizasPermissions.Delete)]
+    public async Task Demo_session_without_required_write_permission_returns_forbidden(
+        string method,
+        string url,
+        string requiredPermission)
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Catalogs,
+            ["Auth:Demo:Permissions:1"] = PolizasPermissions.Read,
+            ["Auth:Demo:Permissions:2"] = PolizasPermissions.Detail
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        using var response = await client.SendAsync(CreateWriteRequest(method, url));
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        body.Should().Contain("POLIZAS_ACCESS_DENIED");
+        body.Should().NotContain(requiredPermission);
+        body.Should().NotContain("POLIZAS_WRITES_DISABLED");
+    }
+
+    [Theory]
+    [InlineData("POST", "/api/polizas", PolizasPermissions.Create)]
+    [InlineData("PUT", "/api/polizas/POL-1001", PolizasPermissions.Update)]
+    [InlineData("DELETE", "/api/polizas/POL-1001", PolizasPermissions.Delete)]
+    public async Task Demo_session_with_write_permission_is_blocked_when_writes_are_disabled(
+        string method,
+        string url,
+        string permission)
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = permission
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "writes-disabled");
+
+        using var response = await client.SendAsync(CreateWriteRequest(method, url));
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("writes-disabled");
+        body.Should().Contain("POLIZAS_WRITES_DISABLED");
+        body.Should().Contain("\"correlationId\":\"writes-disabled\"");
+        body.Should().NotContain("POL-MVP-0001");
+    }
+
+    [Theory]
+    [InlineData("POST", "/api/polizas", PolizasPermissions.Create)]
+    [InlineData("PUT", "/api/polizas/POL-1001", PolizasPermissions.Update)]
+    [InlineData("DELETE", "/api/polizas/POL-1001", PolizasPermissions.Delete)]
+    public async Task Demo_session_with_write_permission_and_gate_enabled_reaches_placeholder_only(
+        string method,
+        string url,
+        string permission)
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = permission,
+            ["Polizas:WritesEnabled"] = "true"
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "crud-placeholder");
+
+        using var response = await client.SendAsync(CreateWriteRequest(method, url));
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotImplemented);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("crud-placeholder");
+        body.Should().Contain("POLIZAS_CRUD_NOT_IMPLEMENTED");
+        body.Should().Contain("\"correlationId\":\"crud-placeholder\"");
+        body.Should().NotContain("POL-MVP-0001");
     }
 
     [Fact]
@@ -1536,6 +1659,20 @@ public sealed class PolizasApiTests
         });
 
         login.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    private static HttpRequestMessage CreateWriteRequest(string method, string url)
+    {
+        var request = new HttpRequestMessage(new HttpMethod(method), url);
+        if (!string.Equals(method, "DELETE", StringComparison.OrdinalIgnoreCase))
+        {
+            request.Content = JsonContent.Create(new
+            {
+                numero = "POL-MVP-0001"
+            });
+        }
+
+        return request;
     }
 
     private static string CreateDemoSessionCookie(

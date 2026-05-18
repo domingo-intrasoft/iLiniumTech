@@ -67,6 +67,12 @@ builder.Services.AddAuthorization(options =>
         policy.Requirements.Add(new PolizasPermissionRequirement(PolizasPermissions.Read)));
     options.AddPolicy(PolizasAuthorizationPolicies.Detail, policy =>
         policy.Requirements.Add(new PolizasPermissionRequirement(PolizasPermissions.Detail)));
+    options.AddPolicy(PolizasAuthorizationPolicies.Create, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(PolizasPermissions.Create)));
+    options.AddPolicy(PolizasAuthorizationPolicies.Update, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(PolizasPermissions.Update)));
+    options.AddPolicy(PolizasAuthorizationPolicies.Delete, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(PolizasPermissions.Delete)));
 });
 builder.Services.AddSingleton<IAuthorizationHandler, PolizasPermissionAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, SanitizedAuthorizationMiddlewareResultHandler>();
@@ -418,6 +424,32 @@ polizas.MapGet("/{id}", async (HttpContext httpContext, [FromServices] IPolizasS
 .RequireAuthorization(PolizasAuthorizationPolicies.Detail)
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
+polizas.MapPost("/", (HttpContext httpContext) => PolizasCrudNotImplementedResult(httpContext))
+    .WithName("CreatePoliza")
+    .RequireAuthorization(PolizasAuthorizationPolicies.Create)
+    .AddEndpointFilter(RequirePolizasWritesEnabledAsync)
+    .AddEndpointFilter(RequirePolizasExecutionContextAsync);
+
+polizas.MapPut("/{id}", (HttpContext httpContext, string id) =>
+{
+    _ = id;
+    return PolizasCrudNotImplementedResult(httpContext);
+})
+    .WithName("UpdatePoliza")
+    .RequireAuthorization(PolizasAuthorizationPolicies.Update)
+    .AddEndpointFilter(RequirePolizasWritesEnabledAsync)
+    .AddEndpointFilter(RequirePolizasExecutionContextAsync);
+
+polizas.MapDelete("/{id}", (HttpContext httpContext, string id) =>
+{
+    _ = id;
+    return PolizasCrudNotImplementedResult(httpContext);
+})
+    .WithName("DeletePoliza")
+    .RequireAuthorization(PolizasAuthorizationPolicies.Delete)
+    .AddEndpointFilter(RequirePolizasWritesEnabledAsync)
+    .AddEndpointFilter(RequirePolizasExecutionContextAsync);
+
 autosParticulares.MapGet("/catalogs", async (
     [FromServices] IPolizasService service,
     CancellationToken cancellationToken) =>
@@ -508,6 +540,22 @@ autosParticulares.MapGet("/polizas/{id}", async (
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
 app.Run();
+
+static ValueTask<object?> RequirePolizasWritesEnabledAsync(
+    EndpointFilterInvocationContext context,
+    EndpointFilterDelegate next)
+{
+    var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+    var environment = context.HttpContext.RequestServices.GetRequiredService<IHostEnvironment>();
+
+    return IsPolizasWritesEnabled(configuration, environment)
+        ? next(context)
+        : ValueTask.FromResult<object?>(ErrorResult(
+            context.HttpContext,
+            StatusCodes.Status403Forbidden,
+            "POLIZAS_WRITES_DISABLED",
+            "Polizas write operations are disabled for this environment."));
+}
 
 static async ValueTask<object?> RequirePolizasExecutionContextAsync(
     EndpointFilterInvocationContext context,
@@ -617,6 +665,13 @@ static IResult ErrorResult(HttpContext context, int statusCode, string code, str
             CorrelationId: EnsureCorrelationId(context))),
         statusCode: statusCode);
 
+static IResult PolizasCrudNotImplementedResult(HttpContext context) =>
+    ErrorResult(
+        context,
+        StatusCodes.Status501NotImplemented,
+        "POLIZAS_CRUD_NOT_IMPLEMENTED",
+        "Polizas CRUD commands are not implemented yet.");
+
 static bool RequiresPolizasExecutionContext(IConfiguration configuration)
 {
     if (!string.Equals(configuration["Polizas:Repository"], "Sql", StringComparison.OrdinalIgnoreCase))
@@ -634,6 +689,25 @@ static bool RequiresPolizasExecutionContext(IConfiguration configuration)
             ?? configuration["ILINIUMTECH:REQUIRE_POLIZAS_EXECUTION_CONTEXT"],
             out var requireExecutionContext)
         && requireExecutionContext;
+}
+
+static bool IsPolizasWritesEnabled(IConfiguration configuration, IHostEnvironment environment)
+{
+    var configured = bool.TryParse(
+            configuration["Polizas:WritesEnabled"]
+            ?? configuration["ILINIUMTECH:POLIZAS_WRITES_ENABLED"],
+            out var enabled)
+        && enabled;
+    if (!configured)
+    {
+        return false;
+    }
+
+    return environment.IsDevelopment() ||
+        string.Equals(
+            configuration["Polizas:WritesEnabledDemoOptIn"],
+            HeaderExecutionContextPolicy.DemoOptInRequiredValue,
+            StringComparison.Ordinal);
 }
 
 static bool IsHeaderExecutionContextEnabled(IConfiguration configuration, IHostEnvironment environment) =>
