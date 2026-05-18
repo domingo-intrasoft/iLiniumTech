@@ -140,16 +140,34 @@ describe('AgendaView smoke', () => {
       .findAll('button')
       .find((button) => button.text().includes('Exportar'))
 
+    expect(wrapper.get('#agenda-blocked-actions').text()).toContain(
+      'Acciones de agenda bloqueadas en el MVP read-only',
+    )
     expect(createButton?.attributes('disabled')).toBeDefined()
+    expect(createButton?.attributes('aria-describedby')).toBe('agenda-blocked-actions')
     expect(rescheduleButton?.attributes('disabled')).toBeDefined()
+    expect(rescheduleButton?.attributes('aria-describedby')).toBe('agenda-blocked-actions')
     expect(exportButton?.attributes('disabled')).toBeDefined()
-    expect(wrapper.findAll('button.table-icon-action[disabled]')).toHaveLength(2)
+    expect(exportButton?.attributes('aria-describedby')).toBe('agenda-blocked-actions')
+    expect(
+      wrapper
+        .get('button[aria-label="Opciones de texto o referencia"]')
+        .attributes('aria-describedby'),
+    ).toBe('agenda-blocked-actions')
+    const tableActions = wrapper.findAll('button.table-icon-action[disabled]')
+    expect(tableActions).toHaveLength(2)
+    expect(tableActions[0]?.attributes('aria-describedby')).toBe('agenda-blocked-actions')
     expect(
       (
         wrapper.get('input[aria-label="Campos y acciones sensibles bloqueados"]')
           .element as HTMLInputElement
       ).value,
     ).toBe('Bloqueado: PII/asuntos sensibles, sin API ni escrituras')
+    expect(
+      wrapper
+        .get('input[aria-label="Campos y acciones sensibles bloqueados"]')
+        .attributes('aria-describedby'),
+    ).toBe('agenda-blocked-actions')
 
     const smokeDom = wrapper.html()
     expect(smokeDom).not.toMatch(unsafeRuntimeMarkers)

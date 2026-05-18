@@ -92,6 +92,8 @@ const moduleActions = [
   { label: 'Reprogramar bloqueado', icon: 'pi pi-calendar-times' },
   { label: 'Exportar bloqueado', icon: 'pi pi-download' },
 ]
+const blockedActionsDescription =
+  'Acciones de agenda bloqueadas en el MVP read-only hasta SDD, contrato API, permisos, UAT y decision de minimizacion de PII/asuntos sensibles.'
 
 const filters = reactive<AgendaFilters>({
   texto: '',
@@ -215,6 +217,8 @@ async function signOut() {
     show-sign-out
     @sign-out="signOut"
   >
+    <p id="agenda-blocked-actions" class="sr-only" v-text="blockedActionsDescription"></p>
+
     <div id="agenda-content" class="polizas-toolbar">
       <div>
         <p class="section-kicker">MVP read-only</p>
@@ -230,6 +234,7 @@ async function signOut() {
             :class="{ active: action.active }"
             type="button"
             :aria-label="action.label"
+            aria-describedby="agenda-blocked-actions"
             disabled
           >
             <i :class="action.icon" aria-hidden="true"></i>
@@ -269,15 +274,15 @@ async function signOut() {
             <i class="pi pi-trash" aria-hidden="true"></i>
             Limpiar Filtros
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="agenda-blocked-actions" disabled>
             <i class="pi pi-plus" aria-hidden="true"></i>
             Crear
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="agenda-blocked-actions" disabled>
             <i class="pi pi-calendar-times" aria-hidden="true"></i>
             Reprogramar
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="agenda-blocked-actions" disabled>
             <i class="pi pi-download" aria-hidden="true"></i>
             Exportar
           </button>
@@ -302,7 +307,12 @@ async function signOut() {
                   type="search"
                   aria-label="Texto o referencia"
                 />
-                <button type="button" aria-label="Opciones de texto o referencia" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de texto o referencia"
+                  aria-describedby="agenda-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -317,7 +327,12 @@ async function signOut() {
                   <option>Programado</option>
                   <option>Cerrado</option>
                 </select>
-                <button type="button" aria-label="Opciones de estado" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de estado"
+                  aria-describedby="agenda-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -336,7 +351,12 @@ async function signOut() {
                   <option>Media</option>
                   <option>Baja</option>
                 </select>
-                <button type="button" aria-label="Opciones de prioridad" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de prioridad"
+                  aria-describedby="agenda-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -353,7 +373,12 @@ async function signOut() {
                   type="date"
                   aria-label="Fecha desde"
                 />
-                <button type="button" aria-label="Opciones de fecha" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de fecha"
+                  aria-describedby="agenda-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -371,8 +396,14 @@ async function signOut() {
                   value="Bloqueado: PII/asuntos sensibles, sin API ni escrituras"
                   disabled
                   aria-label="Campos y acciones sensibles bloqueados"
+                  aria-describedby="agenda-blocked-actions"
                 />
-                <button type="button" aria-label="Campos y acciones sensibles bloqueados" disabled>
+                <button
+                  type="button"
+                  aria-label="Campos y acciones sensibles bloqueados"
+                  aria-describedby="agenda-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-lock" aria-hidden="true"></i>
                 </button>
               </span>
@@ -422,6 +453,7 @@ async function signOut() {
                   class="table-icon-action"
                   type="button"
                   :aria-label="`Desglose bloqueado para agenda ${item.referencia}`"
+                  aria-describedby="agenda-blocked-actions"
                   title="Desglose pendiente de SDD/API"
                   disabled
                 >
