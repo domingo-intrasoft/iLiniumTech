@@ -22,8 +22,8 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 - `Polizas CRUD BBDD` queda como vertical MVP local de referencia, con smoke API/UI visible contra BBDD local de pruebas.
 - `/login`, shell, menu lateral y rutas protegidas del menu existen.
 - `Autos Particulares` queda aparcado; no ampliarlo.
-- Proximo MVP activo: paridad visual de `/polizas` con AppBuilder publicado, manteniendo CRUD real y sin simulaciones.
-- Paginas del menu distintas de Polizas siguen en carril fixture/read-only o bloqueadas y quedan pospuestas hasta cerrar el siguiente corte visual de Polizas.
+- Paridad visual de `/polizas` con AppBuilder publicado refinada en segundo corte: chrome demo, menu lateral compacto, buscador iconificado, grid plano y menor ruido visual sin simular datos.
+- Paginas del menu distintas de Polizas siguen en carril fixture/read-only o bloqueadas; el siguiente bloque vuelve a la cola pequena salvo nueva prioridad humana.
 - Ronda documental por pagina completada en `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`.
 - SDD drafts existentes para `Siniestros`, `Recibos`, `Clientes`, `Agenda`, `Propuestas` y `Suplementos`.
 - No activar datos reales, APIs nuevas, escrituras, exportaciones ni permisos nuevos para paginas fixture sin SDD aprobada, contrato API, UAT/DBA y seguridad.
@@ -43,7 +43,7 @@ Objetivo:
 - No tocar backend, router, servicios compartidos ni layout global.
 - Documentar evidencia QA de Recibos como siguiente superficie tras cerrar Polizas MVP local.
 
-Fuentes a leer, sin buscar mas salvo bloqueo:
+Fuentes a leer, sin buscar mas salvo bloqueo real:
 
 - `AGENTS.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
@@ -169,6 +169,8 @@ Objetivo: endurecer lo ya conseguido en Polizas sin ampliar reglas no aprobadas.
 | `T-042-POL-CRUD-REGRESSION-SMOKE` | `DONE` | Mantener smoke local API/UI de CRUD real sin secretos. | BBDD local disponible |
 | `T-043-POL-APPBUILDER-VISUAL-SHELL` | `DONE` | Aproximar `/polizas` al shell/grid visual de AppBuilder publicado sin simular datos. | captura usuario y SDD-2026-014 |
 | `T-044-POL-APPBUILDER-VISUAL-SMOKE` | `DONE` | Ejecutar smoke visual y documentar diferencias pendientes frente a AppBuilder. | `T-043` |
+| `T-045-POL-APPBUILDER-VISUAL-PARITY-REFINE` | `DONE` | Segundo corte de paridad visual: barra demo, chrome AppBuilder, menu compacto, buscador icon-only, grid sin warnings visibles y estados reales normalizados. | captura usuario y feedback visual 2026-05-18 |
+| `T-046-POL-APPBUILDER-ASSETS-UAT` | `BLOCKED_HUMAN` | Validar logos/columnas sensibles/campos reales necesarios para pixel parity. | UAT/producto/DBA, origen autorizado de logos y datos |
 
 ### Fase 6 - Reporting, liquidaciones y superficies tecnicas
 

@@ -94,19 +94,60 @@ function appBuilderCellValue(item: PolizaListItem, key: string) {
   return ''
 }
 
+function normalizedStatus(value: string) {
+  return value.trim().toLocaleLowerCase('es-ES')
+}
+
+function isActiveStatus(value: string) {
+  const normalized = normalizedStatus(value)
+
+  return (
+    normalized === 'vigor' ||
+    normalized === 'en vigor' ||
+    normalized === 'ev' ||
+    normalized === 'situacionpoliza-ev' ||
+    normalized.endsWith('-ev')
+  )
+}
+
 function statusLabel(value: string) {
-  return value.trim().toLocaleLowerCase('es-ES') === 'vigor'
-    ? 'En Vigor'
-    : formatPolizaValue(value, 'string')
+  if (isActiveStatus(value)) {
+    return 'En Vigor'
+  }
+
+  return formatPolizaValue(value, 'string')
 }
 
 function statusClass(value: string) {
-  const normalized = value.trim().toLocaleLowerCase('es-ES')
   return {
     'policy-status-badge': true,
-    'status-active': normalized === 'vigor',
-    'status-muted': normalized !== 'vigor',
+    'status-active': isActiveStatus(value),
+    'status-muted': !isActiveStatus(value),
   }
+}
+
+function formattedCellValue(item: PolizaListItem, key: string) {
+  return formatPolizaValue(appBuilderCellValue(item, key), 'string', item.moneda)
+}
+
+function isPendingCellValue(item: PolizaListItem, key: string) {
+  return formattedCellValue(item, key) === POLIZA_EMPTY_VALUE
+}
+
+function companyLogoLabel(item: PolizaListItem) {
+  const value = formattedCellValue(item, 'compania')
+
+  if (value === POLIZA_EMPTY_VALUE) {
+    return 'CIA'
+  }
+
+  const normalized = value.trim()
+
+  if (/^-?\d+$/.test(normalized)) {
+    return `CIA ${normalized.replace('-', '')}`
+  }
+
+  return normalized.length > 12 ? normalized.slice(0, 12) : normalized
 }
 
 function changePage(page: number) {
@@ -147,6 +188,14 @@ function canEditItem(item: PolizaListItem) {
 
 function canDeleteItem(item: PolizaListItem) {
   return props.canDeleteMvp && isMvpEditable(item) && props.writeBusyId === null
+}
+
+function showEditAction(item: PolizaListItem) {
+  return canEditItem(item) || props.writeBusyId === item.id
+}
+
+function showDeleteAction(item: PolizaListItem) {
+  return canDeleteItem(item) || props.writeBusyId === item.id
 }
 
 function writeActionTitle(item: PolizaListItem, action: 'edit' | 'delete') {
@@ -195,7 +244,11 @@ function writeActionTitle(item: PolizaListItem, action: 'edit' | 'delete') {
       {{ detailUnavailableMessage }}
     </p>
 
-    <p v-if="writesAllowed" :id="writeUnavailableMessageId" class="results-permission-warning">
+    <p
+      v-if="writesAllowed"
+      :id="writeUnavailableMessageId"
+      class="results-permission-warning sr-only"
+    >
       <i class="pi pi-shield" aria-hidden="true"></i>
       Escritura limitada a registros {{ POLIZA_MVP_PREFIX }}.
     </p>
@@ -288,17 +341,8 @@ function writeActionTitle(item: PolizaListItem, action: 'edit' | 'delete') {
                 >
                   <i class="pi pi-ellipsis-v" aria-hidden="true"></i>
                 </button>
-                <RouterLink
-                  v-if="canOpenDetail"
-                  class="table-icon-action"
-                  :to="detailRoute(item)"
-                  :aria-label="`Ver detalle de poliza ${item.numero}`"
-                  title="Ver detalle"
-                >
-                  <i class="pi pi-eye" aria-hidden="true"></i>
-                </RouterLink>
                 <button
-                  v-else
+                  v-if="!canOpenDetail"
                   class="table-icon-action"
                   type="button"
                   :aria-label="`Detalle no disponible para poliza ${item.numero}`"
@@ -311,6 +355,7 @@ function writeActionTitle(item: PolizaListItem, action: 'edit' | 'delete') {
                   <i class="pi pi-eye-slash" aria-hidden="true"></i>
                 </button>
                 <button
+                  v-if="showEditAction(item)"
                   class="table-icon-action write-action"
                   type="button"
                   :aria-label="`Editar poliza ${item.numero}`"
@@ -324,6 +369,7 @@ function writeActionTitle(item: PolizaListItem, action: 'edit' | 'delete') {
                   <i class="pi pi-pencil" aria-hidden="true"></i>
                 </button>
                 <button
+                  v-if="showDeleteAction(item)"
                   class="table-icon-action write-action danger"
                   type="button"
                   :aria-label="`Eliminar poliza ${item.numero}`"
@@ -337,30 +383,43 @@ function writeActionTitle(item: PolizaListItem, action: 'edit' | 'delete') {
                   <i class="pi pi-trash" aria-hidden="true"></i>
                 </button>
               </span>
-              <span v-else-if="column.kind === 'field'" class="dense-cell">
-                {{
-                  formatPolizaValue(appBuilderCellValue(item, column.key), 'string', item.moneda)
-                }}
+              <span v-else-if="column.key === 'compania'" class="company-logo-cell">
+                <span>{{ companyLogoLabel(item) }}</span>
+              </span>
+              <span
+                v-else-if="column.kind === 'field'"
+                class="dense-cell"
+                :class="{ 'pending-data-cell': isPendingCellValue(item, column.key) }"
+                :aria-label="isPendingCellValue(item, column.key) ? POLIZA_EMPTY_VALUE : undefined"
+                :title="
+                  isPendingCellValue(item, column.key)
+                    ? 'Dato no entregado por la API actual'
+                    : undefined
+                "
+              >
+                <template v-if="!isPendingCellValue(item, column.key)">
+                  {{ formattedCellValue(item, column.key) }}
+                </template>
               </span>
               <RouterLink
                 v-else-if="column.kind === 'poliza' && canOpenDetail"
                 class="table-link policy-number-link"
                 :to="detailRoute(item)"
               >
-                {{
-                  formatPolizaValue(appBuilderCellValue(item, column.key), 'string', item.moneda)
-                }}
+                {{ formattedCellValue(item, column.key) }}
               </RouterLink>
               <span v-else-if="column.kind === 'poliza'" class="policy-number-link readonly">
-                {{
-                  formatPolizaValue(appBuilderCellValue(item, column.key), 'string', item.moneda)
-                }}
+                {{ formattedCellValue(item, column.key) }}
               </span>
               <span v-else-if="column.kind === 'status'" :class="statusClass(item.estado)">
                 {{ statusLabel(item.estado) }}
               </span>
-              <span v-else class="pending-data-cell" title="Dato no entregado por la API actual">
-                {{ POLIZA_EMPTY_VALUE }}
+              <span
+                v-else
+                class="pending-data-cell"
+                :aria-label="POLIZA_EMPTY_VALUE"
+                title="Dato no entregado por la API actual"
+              >
               </span>
             </td>
           </tr>

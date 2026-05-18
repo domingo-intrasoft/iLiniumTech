@@ -107,8 +107,66 @@ Conclusion T-044: el corte visual queda aceptado para escritorio y documentado. 
 - La barra superior global se aproxima con el shell actual; no se copian usuarios, contadores ni datos de entorno de AppBuilder.
 - Los scopes `Flotas`, `Colectivas` y `Externas` siguen bloqueados o como rutas estaticas sin datos reales.
 
+## Refinamiento T-045
+
+Fecha: 2026-05-18.
+
+Motivo: el usuario comparo la captura de AppBuilder publicado con el MVP y marco diferencias significativas de chrome, menu lateral, buscador y tabla.
+
+Cambios aplicados:
+
+- `AppShell` permite un modo visual AppBuilder para Polizas, con barra superior naranja de entorno demo, breadcrumb con slash final y badge `AunnaTech | Portal (DEMO)`.
+- `AppSideMenu` permite ocultar submenus y leyenda en modo AppBuilder para aproximarse al menu lateral publicado sin eliminar rutas ni permisos.
+- `/polizas` activa ese chrome especifico y oculta visualmente el runtime strip cuando solo contiene contexto normal; errores y avisos funcionales siguen existiendo en DOM y se muestran si aparecen.
+- El buscador de Polizas se compacta como franja de grid con botones icon-only, manteniendo textos accesibles y acciones bloqueadas.
+- La tabla queda mas plana y densa: summary visual oculto, warning de escritura solo accesible, acciones de fila reducidas al menu contextual salvo escrituras MVP realmente permitidas.
+- `situacionpoliza-EV`, `EV`, `Vigor` y equivalentes se presentan como badge verde `En Vigor` sin cambiar el valor de backend.
+- Las celdas sin contrato de listado dejan de mostrar `No informado` de forma visible; conservan `aria-label` y `title` para no simular datos.
+- `Cia.` usa un fallback visual compacto basado en el valor entregado por la API/fixture, sin logos falsos.
+
+Validacion dirigida ejecutada:
+
+```powershell
+cd .\iLiniumTech.Frontend
+npx vitest run src/features/polizas/PolizasFilters.test.ts src/features/polizas/PolizasView.test.ts src/features/polizas/PolizasTable.test.ts src/layout/AppShell.test.ts src/layout/AppSideMenu.test.ts
+```
+
+Resultado: `38/38` tests OK.
+
+Validacion completa ejecutada:
+
+```powershell
+cd .\iLiniumTech.Frontend
+npm run format
+npm run lint
+npm run test:unit
+npm run build
+```
+
+Resultados: format OK, lint OK, unit completo `201/201` tests OK y build OK.
+
+```powershell
+cd ..
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
+git diff --check
+```
+
+Resultados: baseline documental OK, secret scan sin leaks y `git diff --check` sin errores. Git mostro avisos de finales de linea CRLF habituales en Windows, sin fallar el comando.
+
+Smoke visual ejecutado:
+
+- Navegador embebido local: `http://127.0.0.1:5175/polizas?page=1&pageSize=25`.
+- Resultado medido: barra demo visible, menu lateral sin subnav/leyenda, runtime normal oculto, buscador visible, tabla visible, `25` filas reales renderizadas, badge `En Vigor`, sin `No informado` visible en celdas pendientes.
+- Smoke controlado fixture en `http://127.0.0.1:5181/polizas?page=1&pageSize=25`, viewport `1900x970`: barra demo `1900x26`, sidebar `68px`, topbar `54px`, toolbar `43px`, buscador `49px`, subnav/leyenda ausentes, badge `En Vigor`.
+
+Notas de honestidad:
+
+- No se incorporan logos reales, documento, riesgo/matricula ni nombres no entregados por contrato.
+- La paridad pixel-perfect queda bloqueada hasta que producto/UAT autorice origen de logos, campos sensibles y reglas de visualizacion exactas.
+
 ## Riesgos residuales
 
-- La paridad visual aun requiere smoke visual manual con usuario si se quiere medir pixel a pixel contra AppBuilder.
-- Densificar la tabla puede requerir ajustes responsive en un segundo corte.
+- La paridad visual pixel-perfect aun requiere smoke visual manual con usuario y activos reales autorizados.
+- Densificar la tabla puede requerir ajustes responsive posteriores.
 - Cualquier dato sensible nuevo para rellenar columnas debe pasar por SDD, backend explicito, permisos y UAT.

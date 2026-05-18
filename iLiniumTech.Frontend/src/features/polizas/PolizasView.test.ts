@@ -229,7 +229,7 @@ describe('PolizasView smoke', () => {
     expect(wrapper.get('.summary-header').text()).toContain('1 poliza')
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
 
-    const detailLink = wrapper.get('.table-icon-action')
+    const detailLink = wrapper.get('.policy-number-link')
     expect(detailLink.attributes('href')).toContain('/polizas/POL-1002')
     expect(detailLink.attributes('href')).toContain('numero=0002')
     expect(detailLink.attributes('href')).toContain('page=1')
@@ -256,11 +256,9 @@ describe('PolizasView smoke', () => {
     const { wrapper } = await mountPolizasView()
     await settlePolizasView()
 
-    expect(wrapper.findAll('a.table-icon-action')).toHaveLength(polizasFixture.items.length)
     expect(wrapper.findAll('a.table-link')).toHaveLength(polizasFixture.items.length)
-    expect(wrapper.get('a.table-icon-action').attributes('aria-label')).toContain(
-      'Ver detalle de poliza',
-    )
+    expect(wrapper.find('a.table-icon-action').exists()).toBe(false)
+    expect(wrapper.get('a.table-link').attributes('href')).toContain('/polizas/POL-1001')
   })
 
   it('creates MVP polizas only when backend session grants polizas.create', async () => {
@@ -333,10 +331,10 @@ describe('PolizasView smoke', () => {
     const editActions = wrapper.findAll('button[aria-label^="Editar poliza"]')
     const deleteActions = wrapper.findAll('button[aria-label^="Eliminar poliza"]')
 
+    expect(editActions).toHaveLength(1)
+    expect(deleteActions).toHaveLength(1)
     expect(editActions[0].attributes('disabled')).toBeUndefined()
     expect(deleteActions[0].attributes('disabled')).toBeUndefined()
-    expect(editActions[1].attributes('disabled')).toBeDefined()
-    expect(deleteActions[1].attributes('disabled')).toBeDefined()
 
     await editActions[0].trigger('click')
     await wrapper.get('.poliza-crud-form input[type="text"]').setValue('ILMVP-UI-0002')

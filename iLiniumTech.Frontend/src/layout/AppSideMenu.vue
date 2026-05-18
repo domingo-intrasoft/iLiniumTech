@@ -18,6 +18,15 @@ import {
 const route = useRoute()
 const { session } = useSession()
 
+const props = withDefaults(
+  defineProps<{
+    appbuilderChrome?: boolean
+  }>(),
+  {
+    appbuilderChrome: false,
+  },
+)
+
 const activePath = computed(() => route.path)
 
 function itemUnavailable(item: AppNavigationItem) {
@@ -114,7 +123,11 @@ function statusLegendTitle(status: (typeof appNavigationStatusLegend)[number]) {
 </script>
 
 <template>
-  <aside class="il-sidebar" aria-label="Menu principal">
+  <aside
+    class="il-sidebar"
+    :class="{ 'appbuilder-side-menu': props.appbuilderChrome }"
+    aria-label="Menu principal"
+  >
     <RouterLink class="broker-logo" to="/polizas" aria-label="Ir a Polizas">
       <span aria-hidden="true"></span>
       AUXFISE
@@ -166,7 +179,7 @@ function statusLegendTitle(status: (typeof appNavigationStatusLegend)[number]) {
             ></span>
           </span>
 
-          <ul v-if="item.children?.length" class="side-subnav">
+          <ul v-if="item.children?.length && !props.appbuilderChrome" class="side-subnav">
             <li v-for="child in item.children" :key="child.label">
               <span :id="navigationDescriptionId(child, item)" hidden>{{
                 childAccessibleDescription(item, child)
@@ -209,7 +222,11 @@ function statusLegendTitle(status: (typeof appNavigationStatusLegend)[number]) {
       </ul>
     </nav>
 
-    <div class="side-status-legend" aria-label="Leyenda de estados del menu">
+    <div
+      v-if="!props.appbuilderChrome"
+      class="side-status-legend"
+      aria-label="Leyenda de estados del menu"
+    >
       <span class="side-status-legend-title">Estado</span>
       <span
         v-for="status in appNavigationStatusLegend"

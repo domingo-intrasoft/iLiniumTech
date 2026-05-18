@@ -571,6 +571,7 @@ onMounted(() => {
     :active-broker-id="session?.brokerId ?? null"
     :broker-changing="brokerChanging"
     :broker-error="brokerError"
+    appbuilder-chrome
     show-sign-out
     @broker-change="changeBroker"
     @sign-out="signOut"
@@ -652,7 +653,13 @@ onMounted(() => {
       </div>
     </div>
 
-    <section class="runtime-strip" aria-label="Contexto de polizas">
+    <section
+      class="runtime-strip"
+      :class="{
+        'runtime-strip-compact': !crudSuccess && !crudError && !contextBlocked && !brokerError,
+      }"
+      aria-label="Contexto de polizas"
+    >
       <span><i class="pi pi-lock" aria-hidden="true"></i> {{ crudStateLabel }}</span>
       <span><i class="pi pi-database" aria-hidden="true"></i> {{ dataOriginLabel }}</span>
       <span v-if="crudSuccess" class="success" role="status">

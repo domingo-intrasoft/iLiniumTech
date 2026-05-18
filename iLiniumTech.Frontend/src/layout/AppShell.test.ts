@@ -92,6 +92,27 @@ describe('AppShell', () => {
     expect(breadcrumb.get('[aria-current="page"]').text()).toBe('Polizas')
   })
 
+  it('can render the AppBuilder-like chrome without changing the default shell contract', () => {
+    const wrapper = mount(AppShell, {
+      props: {
+        contentId: 'content',
+        sectionTitle: 'Polizas',
+        sessionLabel: 'Broker 42',
+        appbuilderChrome: true,
+      },
+      global: {
+        stubs: {
+          AppSideMenu: true,
+        },
+      },
+    })
+
+    expect(wrapper.get('main').classes()).toContain('appbuilder-chrome')
+    expect(wrapper.get('.demo-environment-strip').text()).toContain('ENTORNO DEMO')
+    expect(wrapper.get('.environment-badge').text()).toBe('AunnaTech | Portal (DEMO)')
+    expect(wrapper.get('nav[aria-label="Ruta actual"]').text()).toBe('Inicio/Polizas/')
+  })
+
   it('marks placeholder topbar actions as unavailable in the MVP', () => {
     const wrapper = mount(AppShell, {
       props: {

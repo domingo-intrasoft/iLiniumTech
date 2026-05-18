@@ -62,13 +62,24 @@ describe('PolizasTable', () => {
     expect(wrapper.findAll('tbody tr')).toHaveLength(5)
   })
 
-  it('renders explicit detail actions for each row', () => {
+  it('uses the policy number as the visible detail affordance', () => {
     const wrapper = mountTable()
 
-    const detailActions = wrapper.findAll('a.table-icon-action')
+    const detailLinks = wrapper.findAll('.policy-number-link')
 
-    expect(detailActions).toHaveLength(polizasFixture.items.length)
-    expect(detailActions[0].attributes('aria-label')).toContain('Ver detalle de poliza')
+    expect(wrapper.find('a.table-icon-action').exists()).toBe(false)
+    expect(detailLinks).toHaveLength(polizasFixture.items.length)
+    expect(detailLinks[0].text()).toBe('POL-2026-0001')
+  })
+
+  it('maps backend status codes to the AppBuilder active badge', () => {
+    const wrapper = mountTable({
+      items: [{ ...polizasFixture.items[0], estado: 'situacionpoliza-EV' }],
+      total: 1,
+    })
+
+    expect(wrapper.find('.policy-status-badge').text()).toBe('En Vigor')
+    expect(wrapper.find('.policy-status-badge').classes()).toContain('status-active')
   })
 
   it('enables write actions only for MVP rows with stable numeric ids', async () => {
@@ -85,10 +96,10 @@ describe('PolizasTable', () => {
     const deleteActions = wrapper.findAll('button[aria-label^="Eliminar poliza"]')
 
     expect(wrapper.text()).toContain('Escritura limitada a registros ILMVP-.')
+    expect(editActions).toHaveLength(1)
+    expect(deleteActions).toHaveLength(1)
     expect(editActions[0].attributes('disabled')).toBeUndefined()
     expect(deleteActions[0].attributes('disabled')).toBeUndefined()
-    expect(editActions[1].attributes('disabled')).toBeDefined()
-    expect(deleteActions[1].attributes('disabled')).toBeDefined()
 
     await editActions[0].trigger('click')
     await deleteActions[0].trigger('click')

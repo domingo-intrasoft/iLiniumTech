@@ -215,6 +215,28 @@ select:focus-visible {
   background: #edf3f8;
 }
 
+.ilinium-shell.appbuilder-chrome {
+  grid-template-rows: 26px minmax(0, 1fr);
+  background: #eef3f8;
+}
+
+.demo-environment-strip {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  grid-column: 1 / -1;
+  display: flex;
+  min-height: 26px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #ffffff;
+  background: #b75507;
+  font-size: 0.76rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .ilinium-shell.menu-collapsed {
   grid-template-columns: 0 minmax(0, 1fr);
 }
@@ -235,6 +257,14 @@ select:focus-visible {
   overflow: hidden;
   color: #ffffff;
   background: #002f47;
+}
+
+.appbuilder-chrome .il-sidebar {
+  top: 26px;
+  grid-column: 1;
+  grid-row: 2;
+  height: calc(100vh - 26px);
+  background: #00324a;
 }
 
 .broker-logo {
@@ -399,6 +429,12 @@ select:focus-visible {
   background: #f4f8fb;
 }
 
+.appbuilder-chrome .workspace {
+  grid-column: 2;
+  grid-row: 2;
+  background: #eef3f8;
+}
+
 .workspace-topbar {
   position: sticky;
   top: 0;
@@ -410,6 +446,14 @@ select:focus-visible {
   min-height: 44px;
   padding: 0 10px;
   border-bottom: 1px solid #dbe5ef;
+  background: #f4f8fb;
+}
+
+.appbuilder-chrome .workspace-topbar {
+  top: 26px;
+  min-height: 54px;
+  grid-template-columns: minmax(250px, 1fr) auto minmax(520px, 1fr);
+  padding: 0 12px 0 8px;
   background: #f4f8fb;
 }
 
@@ -428,6 +472,12 @@ select:focus-visible {
   gap: 10px;
   color: #59708c;
   font-size: 1.05rem;
+}
+
+.appbuilder-chrome .breadcrumb-line {
+  gap: 9px;
+  color: #577092;
+  font-size: 1rem;
 }
 
 .breadcrumb-line strong {
@@ -461,6 +511,12 @@ select:focus-visible {
   line-height: 1;
 }
 
+.appbuilder-chrome .environment-badge {
+  align-self: center;
+  padding: 4px 8px;
+  font-size: 0.61rem;
+}
+
 .environment-badge.warning {
   background: #9c5a00;
 }
@@ -469,6 +525,10 @@ select:focus-visible {
   justify-content: flex-end;
   gap: 14px;
   min-width: 0;
+}
+
+.appbuilder-chrome .top-actions {
+  gap: 15px;
 }
 
 .broker-selector {
@@ -482,6 +542,10 @@ select:focus-visible {
   padding: 0 7px;
   color: #344359;
   background: #ffffff;
+}
+
+.appbuilder-chrome .broker-selector {
+  display: none;
 }
 
 .broker-selector i {
@@ -512,11 +576,24 @@ select:focus-visible {
   font-weight: 700;
 }
 
+.appbuilder-chrome .round-badge {
+  width: 18px;
+  height: 18px;
+  color: #009fe3;
+  background: #f8fcff;
+  font-size: 0.48rem;
+}
+
 .user-name {
   color: #0100ff;
   font-size: 1rem;
   font-weight: 500;
   white-space: nowrap;
+}
+
+.appbuilder-chrome .user-name {
+  color: #0100ff;
+  font-size: 1rem;
 }
 
 .polizas-toolbar {
@@ -723,6 +800,88 @@ select:focus-visible {
   margin-bottom: 9px;
   color: #18334c;
   font-size: 1.05rem;
+}
+
+.appbuilder-chrome .polizas-toolbar {
+  min-height: 42px;
+  gap: 10px;
+  padding: 4px 6px 4px 12px;
+  border-top: 0;
+  background: #e8eef5;
+}
+
+.appbuilder-chrome .polizas-toolbar .toolbar-groups {
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.appbuilder-chrome .polizas-toolbar .action-group {
+  gap: 2px;
+  border-color: #b7c8d9;
+  border-radius: 6px;
+  padding: 1px 5px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.appbuilder-chrome .polizas-toolbar .square-action {
+  width: 34px;
+  height: 28px;
+  border-color: #a3b7cc;
+  color: #31435c;
+}
+
+.appbuilder-chrome .polizas-toolbar .square-action.active {
+  background: #ffffff;
+  box-shadow: inset 0 -3px 0 #31435c;
+}
+
+.appbuilder-chrome .polizas-toolbar .context-buttons {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.appbuilder-chrome .polizas-toolbar .context-buttons a,
+.appbuilder-chrome .polizas-toolbar .context-buttons button {
+  min-height: 34px;
+  border-radius: 4px;
+  padding: 0 8px;
+  background: #002f47;
+  font-size: 0.9rem;
+}
+
+.runtime-strip-compact {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: normal;
+}
+
+.appbuilder-chrome .runtime-strip:not(.runtime-strip-compact) {
+  min-height: 30px;
+  padding: 4px 8px;
+}
+
+.appbuilder-chrome .tab-strip {
+  height: 38px;
+  align-items: flex-end;
+  gap: 3px;
+  padding: 0 10px;
+  background: #f8fbff;
+}
+
+.appbuilder-chrome .tab {
+  height: 31px;
+}
+
+.appbuilder-chrome .tab-strip strong {
+  margin-bottom: 8px;
+  color: #18334c;
 }
 
 .mvp-module-page {
@@ -982,6 +1141,65 @@ select:focus-visible {
 .polizas-search-panel .field-control {
   min-height: 29px;
   border-radius: 4px;
+}
+
+.appbuilder-chrome .polizas-search-panel {
+  margin: 0 8px 0;
+  border-right: 1px solid #d6e2ee;
+  border-left: 1px solid #d6e2ee;
+}
+
+.appbuilder-chrome .polizas-grid-search {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 7px 8px;
+  border-bottom: 1px solid #dbe6ef;
+}
+
+.appbuilder-chrome .polizas-main-search {
+  width: 410px;
+  max-width: calc(100vw - 190px);
+  min-height: 32px;
+}
+
+.appbuilder-chrome .search-action-buttons {
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
+  gap: 3px;
+}
+
+.appbuilder-chrome .search-action-buttons button {
+  width: 28px;
+  min-width: 28px;
+  min-height: 30px;
+  justify-content: center;
+  gap: 0;
+  overflow: hidden;
+  border-color: #aebdd0;
+  padding: 0;
+  font-size: 0;
+}
+
+.appbuilder-chrome .search-action-buttons button i {
+  font-size: 0.82rem;
+}
+
+.appbuilder-chrome .search-action-buttons .compact-action {
+  width: 32px;
+  min-width: 32px;
+}
+
+.appbuilder-chrome .polizas-grid-search > .pi-chevron-up {
+  margin-left: 1px;
+  color: #002f47;
+  font-size: 0.84rem;
+}
+
+.appbuilder-chrome .advanced-filter-panel {
+  display: none;
 }
 
 .autos-criteria-card {
@@ -1260,6 +1478,25 @@ tbody tr:hover {
   border-color: #d2deea;
 }
 
+.appbuilder-chrome .polizas-results-grid {
+  margin: 0 8px 16px;
+  border-top: 0;
+  background: #ffffff;
+}
+
+.appbuilder-chrome .polizas-results-grid .summary-header {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: normal;
+}
+
 .polizas-results-grid .summary-header {
   min-height: 32px;
   padding: 5px 8px;
@@ -1275,6 +1512,12 @@ tbody tr:hover {
   font-size: 0.78rem;
 }
 
+.appbuilder-chrome .appbuilder-table {
+  min-width: 1320px;
+  color: #21344c;
+  font-size: 0.74rem;
+}
+
 .appbuilder-table th,
 .appbuilder-table td {
   height: 42px;
@@ -1282,6 +1525,14 @@ tbody tr:hover {
   border-right: 1px solid #e1e9f2;
   border-bottom: 1px solid #dbe5ef;
   vertical-align: middle;
+}
+
+.appbuilder-chrome .appbuilder-table th,
+.appbuilder-chrome .appbuilder-table td {
+  height: 43px;
+  padding: 4px 8px;
+  border-right-color: #d9e4ee;
+  border-bottom-color: #d8e3ee;
 }
 
 .appbuilder-table th {
@@ -1292,6 +1543,13 @@ tbody tr:hover {
   text-transform: none;
 }
 
+.appbuilder-chrome .appbuilder-table th {
+  height: 33px;
+  color: #1f3048;
+  background: #f8fbff;
+  font-size: 0.7rem;
+}
+
 .appbuilder-table th:first-child,
 .appbuilder-table td:first-child {
   width: 34px;
@@ -1300,7 +1558,7 @@ tbody tr:hover {
 
 .appbuilder-table th:nth-child(2),
 .appbuilder-table td:nth-child(2) {
-  width: 116px;
+  width: 54px;
 }
 
 .appbuilder-table th:nth-child(3),
@@ -1308,9 +1566,19 @@ tbody tr:hover {
   width: 120px;
 }
 
+.appbuilder-chrome .appbuilder-table th:nth-child(3),
+.appbuilder-chrome .appbuilder-table td:nth-child(3) {
+  width: 112px;
+}
+
 .appbuilder-table th:nth-child(4),
 .appbuilder-table td:nth-child(4) {
   width: 160px;
+}
+
+.appbuilder-chrome .appbuilder-table th:nth-child(4),
+.appbuilder-chrome .appbuilder-table td:nth-child(4) {
+  width: 180px;
 }
 
 .appbuilder-table th:nth-child(5),
@@ -1323,6 +1591,26 @@ tbody tr:hover {
 .appbuilder-table th:nth-child(8),
 .appbuilder-table td:nth-child(8) {
   width: 112px;
+}
+
+.appbuilder-chrome .appbuilder-table th:nth-child(7),
+.appbuilder-chrome .appbuilder-table td:nth-child(7) {
+  min-width: 360px;
+}
+
+.appbuilder-chrome .appbuilder-table th:nth-child(8),
+.appbuilder-chrome .appbuilder-table td:nth-child(8) {
+  width: 120px;
+}
+
+.appbuilder-chrome .appbuilder-table th:nth-child(9),
+.appbuilder-chrome .appbuilder-table td:nth-child(9) {
+  min-width: 160px;
+}
+
+.appbuilder-chrome .appbuilder-table th:nth-child(10),
+.appbuilder-chrome .appbuilder-table td:nth-child(10) {
+  min-width: 260px;
 }
 
 .column-heading {
@@ -1351,6 +1639,10 @@ tbody tr:hover {
   gap: 3px;
 }
 
+.appbuilder-chrome .row-action-cluster {
+  gap: 2px;
+}
+
 .row-menu-action,
 .polizas-results-grid .table-icon-action {
   display: inline-grid;
@@ -1361,6 +1653,12 @@ tbody tr:hover {
   border-radius: 3px;
   color: #004e75;
   background: transparent;
+}
+
+.appbuilder-chrome .row-menu-action,
+.appbuilder-chrome .polizas-results-grid .table-icon-action {
+  width: 20px;
+  height: 22px;
 }
 
 .row-menu-action:disabled,
@@ -1379,6 +1677,30 @@ tbody tr:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: middle;
+}
+
+.company-logo-cell {
+  display: inline-flex;
+  width: 54px;
+  min-height: 22px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #d3deea;
+  color: #0a4d73;
+  background: #ffffff;
+  font-size: 0.58rem;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.company-logo-cell span {
+  max-width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .policy-number-link {
@@ -1416,6 +1738,12 @@ tbody tr:hover {
 .pending-data-cell {
   color: #8293a6;
   font-style: italic;
+}
+
+.appbuilder-chrome .pending-data-cell {
+  display: inline-block;
+  min-width: 1px;
+  color: transparent;
 }
 
 .polizas-results-grid .pagination-bar {

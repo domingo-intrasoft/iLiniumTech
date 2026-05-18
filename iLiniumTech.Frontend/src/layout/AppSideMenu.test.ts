@@ -35,12 +35,13 @@ function createTestRouter() {
   })
 }
 
-async function mountMenu(path = '/polizas') {
+async function mountMenu(path = '/polizas', props: { appbuilderChrome?: boolean } = {}) {
   const router = createTestRouter()
   await router.push(path)
   await router.isReady()
 
   return mount(AppSideMenu, {
+    props,
     global: {
       plugins: [router],
     },
@@ -120,6 +121,15 @@ describe('AppSideMenu', () => {
 
     expect(wrapper.get('.has-children').classes()).toContain('active')
     expect(wrapper.find('[aria-current="page"]').exists()).toBe(false)
+  })
+
+  it('hides nested menu and status legend in AppBuilder chrome mode', async () => {
+    const wrapper = await mountMenu('/polizas', { appbuilderChrome: true })
+
+    expect(wrapper.get('.il-sidebar').classes()).toContain('appbuilder-side-menu')
+    expect(wrapper.find('.side-subnav').exists()).toBe(false)
+    expect(wrapper.find('.side-status-legend').exists()).toBe(false)
+    expect(wrapper.get('.side-nav a[href="/polizas"]').text()).toContain('Polizas')
   })
 
   it('marks MVP pages active from the static menu', async () => {

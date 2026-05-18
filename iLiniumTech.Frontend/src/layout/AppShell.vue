@@ -25,6 +25,7 @@ const props = withDefaults(
     activeBrokerId?: number | null
     brokerChanging?: boolean
     brokerError?: string | null
+    appbuilderChrome?: boolean
   }>(),
   {
     sessionNeedsAttention: false,
@@ -35,6 +36,7 @@ const props = withDefaults(
     activeBrokerId: null,
     brokerChanging: false,
     brokerError: null,
+    appbuilderChrome: false,
   },
 )
 
@@ -67,10 +69,18 @@ function focusMainContent(event: MouseEvent) {
 </script>
 
 <template>
-  <main class="ilinium-shell" :class="{ 'menu-collapsed': !sideMenuOpen }">
+  <main
+    class="ilinium-shell"
+    :class="{ 'menu-collapsed': !sideMenuOpen, 'appbuilder-chrome': appbuilderChrome }"
+  >
     <a class="skip-link" :href="`#${contentId}`" @click="focusMainContent">Saltar al contenido</a>
+    <div v-if="appbuilderChrome" class="demo-environment-strip">
+      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      ENTORNO DEMO - Los cambios NO se reflejan en produccion
+    </div>
     <AppSideMenu
       id="app-side-menu"
+      :appbuilder-chrome="appbuilderChrome"
       :aria-hidden="!sideMenuOpen"
       :inert="sideMenuOpen ? undefined : true"
     />
@@ -92,11 +102,13 @@ function focusMainContent(event: MouseEvent) {
           <strong>Inicio</strong>
           <span>/</span>
           <strong aria-current="page">{{ sectionTitle }}</strong>
+          <span v-if="appbuilderChrome">/</span>
         </nav>
 
         <span class="environment-badge" :class="{ warning: sessionNeedsAttention }">
-          {{ sessionLabel }}
+          {{ appbuilderChrome ? 'AunnaTech | Portal (DEMO)' : sessionLabel }}
         </span>
+        <span v-if="appbuilderChrome" class="sr-only">{{ sessionLabel }}</span>
 
         <div class="top-actions" aria-label="Acciones de usuario">
           <p id="app-shell-placeholder-actions" class="sr-only">
