@@ -278,7 +278,7 @@ Objetivo: convertir Polizas en una pantalla diaria de trabajo con CRUD controlad
 
 SDD activa: `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`.
 
-Estado 2026-05-18: backend CRUD, baja tecnica MVP, UI de alta/edicion/baja, smoke SQL transaccional y smoke API/UI real de lectura con backend SQL estan implementados. El siguiente bloque obligatorio es cerrar create/update/baja tecnica via API/UI sobre la misma BBDD local de lectura, revisando antes el contrato de `primaAnual` porque la vista real usada en smoke no expone `PAnualCartera`.
+Estado 2026-05-18: backend CRUD, baja tecnica MVP, UI de alta/edicion/baja, smoke SQL transaccional, smoke API/UI real de lectura y smoke API CRUD mutante con rollback estan implementados. El siguiente bloque obligatorio es cerrar el contrato de lectura post-create, porque la vista heredada `dbo.Pantalla_Polizas` no muestra la fila sintetica creada en transaccion.
 
 Pasos y tareas:
 
@@ -296,7 +296,8 @@ Pasos y tareas:
 - Bloquear escrituras si `Polizas:WritesEnabled` no esta activo.
 - No usar delete fisico en el MVP: aplicar baja tecnica solo a registros `ILMVP-`, marcandolos `ILMVP-DELETED-` y ocultandolos del listado/detalle.
 - Mantener lectura SQL compatible con la vista real local: `ClienteId`, `CiaId`, `Riesgo` vacio y `PrimaAnual = 0` cuando no existan columnas enriquecidas.
-- Resolver si `primaAnual` se elimina del formulario inicial o se persiste por otra columna/regla validada por DBA/UAT.
+- Mantener `primaAnual` como read-only: no se envia desde UI y el backend rechaza valores explicitos en create/update hasta columna/regla DBA/UAT.
+- Resolver si las altas MVP deben aparecer inmediatamente por `dbo.Pantalla_Polizas` o si la lectura post-create necesita otro contrato.
 - Preparar pruebas de regresion para filtros, limpieza, paginacion, detalle, alta, edicion, borrado permitido y borrado bloqueado.
 
 Agentes:
@@ -312,7 +313,7 @@ DoD y evidencia:
 - Pruebas SQL locales con rollback o limpieza verificable.
 - Smoke `/polizas` y `/polizas/:id`.
 - Smoke create -> read -> update -> baja tecnica cuando exista UI CRUD.
-- Smoke API/UI real contra backend SQL local antes de abrir desarrollo del resto de paginas; ya existe para login/listado/permisos/validaciones no mutantes, falta CRUD mutante con limpieza verificable.
+- Smoke API/UI real contra backend SQL local antes de abrir desarrollo del resto de paginas; ya existe para login/listado/permisos/validaciones no mutantes y CRUD mutante API con rollback, falta cerrar visibilidad post-create por la vista.
 - Sin nombres SQL/AppBuilder/metadata en DOM.
 - Sin secretos ni datos personales reales versionados.
 - UAT o bloqueo funcional documentado.

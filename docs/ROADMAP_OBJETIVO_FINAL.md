@@ -161,11 +161,12 @@ DoD objetivo:
 - Frontend habilita acciones CRUD solo cuando `/api/me` expone permisos y contexto valido.
 - Prueba local transaccional create -> update -> baja tecnica ejecutada sin versionar connection strings, credenciales, dumps ni PII, y verificada sin filas `ILMVP-%` residuales.
 - Smoke API/UI real de login, `/api/me`, catalogos, listado SQL, permisos CRUD y validaciones no mutantes ejecutado contra backend SQL local.
+- `primaAnual` queda fuera de escritura: la UI no lo envia y la API rechaza valores explicitos hasta decision DBA/UAT.
+- Smoke API CRUD mutante create -> update -> baja tecnica ejecutado con rollback y `ResidualBefore=0` / `ResidualAfterRollback=0`.
 
 Pendiente tecnico:
 
-- Ejecutar flujo mutante create -> read -> update -> baja tecnica via API/UI sobre la misma BBDD local de lectura, con limpieza verificable.
-- Resolver contrato de `primaAnual`: la BBDD local de smoke no expone `PAnualCartera` en la vista/tabla objetivo de ese broker.
+- Resolver contrato de lectura post-create: la fila sintetica creada en transaccion no aparece en `dbo.Pantalla_Polizas` antes de la baja tecnica.
 - Confirmar campos editables definitivos con UAT.
 - Convertir catalogos necesarios para escritura en datos fiables o mantenerlos como valores controlados.
 - Diseñar auditoria de escritura sin datos sensibles.

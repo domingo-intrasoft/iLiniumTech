@@ -66,7 +66,8 @@ Incremento aplicado despues del gate:
 - `PUT /api/polizas/{id}` valida id tecnico numerico y payload parcial.
 - `DELETE /api/polizas/{id}` valida id tecnico numerico.
 - Los ids de escritura deben ser enteros positivos, alineados con `dbo.Poliza.Id`; `Poliza.Poliza` no vale como id de escritura.
-- La validacion inicial solo contempla campos aprobados por SDD: numero, aplicacion, ciaId, clienteId, estado, ramo, tipoPoliza, fechaEfecto, fechaVencimiento y primaAnual.
+- La validacion inicial contempla campos aprobados por SDD: numero, aplicacion, ciaId, clienteId, estado, ramo, tipoPoliza, fechaEfecto y fechaVencimiento.
+- `primaAnual` queda read-only en CRUD hasta que DBA/UAT confirme una columna persistible en el modelo real usado para smoke.
 - No se incorporan documento, telefono, email, direccion, banco, riesgo completo, matricula, bastidor ni campos de cobro/gestores.
 
 Archivos modificados:
@@ -307,14 +308,42 @@ Smoke API/UI real contra backend SQL local:
 - Smoke UI con frontend temporal `VITE_USE_BACKEND=true` y `VITE_AUTH_MODE=demo-session`: `UiSqlSmoke=OK`, URL `/polizas?page=1&pageSize=25`, `25` filas renderizadas, badge total `(47778)` y boton `Nueva poliza MVP` habilitado.
 - Captura local no versionada generada en `%TEMP%\iliniumtech-ui-playwright-smoke\polizas-sql-smoke.png`.
 
+Smoke API CRUD mutante con rollback:
+
+- Se retira `primaAnual` del camino de escritura real para no depender de `PAnualCartera`.
+- `POST /api/polizas` y `PUT /api/polizas/{id}` rechazan `primaAnual` explicito con `POLIZAS_VALIDATION_ERROR`.
+- Smoke temporal in-process con `WebApplicationFactory`, backend SQL local, `DemoSession`, `Polizas:WritesEnabled=true` y `TransactionScope` rollback: `ApiCrudRollbackSmoke=OK`.
+- Resultado smoke CRUD: login 200, create 201, id creado numerico, update 204, delete/baja tecnica 204, detalle posterior 404.
+- Conteo verificable sobre BBDD modelo: `ResidualBefore=0` y `ResidualAfterRollback=0` para filas `ILMVP-%`.
+- Observacion: la fila sintetica creada en transaccion no queda visible por `dbo.Pantalla_Polizas` antes de la baja tecnica; queda pendiente cerrar con DBA/UAT si las altas MVP deben aparecer inmediatamente en la vista heredada o si se requiere otro contrato de lectura post-create.
+
+Validacion adicional tras retirar `primaAnual` de escritura:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "PolizasSqlCommandBuilderTests|PolizasWriteValidatorTests|PolizasApiTests"
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release
+cd .\iLiniumTech.Frontend
+npm run format
+npm run lint
+npm run test:unit
+npm run build
+cd ..
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-DependencyAudit.ps1 -FailOnFindings
+git diff --check
+```
+
+Resultados: backend especifico `109/109` OK, backend completo `147/147` OK, frontend unit `198/198` OK, format/lint/build OK, documentation baseline OK, secret scan sin leaks, dependency audit `0` findings y diff check sin errores.
+
 ## Riesgos residuales
 
 - Las escrituras sobre `dbo.Poliza` pueden disparar triggers heredados no cubiertos por tests unitarios.
 - El delete fisico no debe aplicarse a polizas existentes ni a altas MVP mientras no haya regla UAT/DBA; la version actual aplica baja tecnica y oculta el registro.
 - `DemoSession`, API key MVP y headers locales no son seguridad productiva.
 - Los campos sensibles de cliente, direccion, banco, riesgo y contacto siguen fuera de alcance hasta SDD/UAT especifica.
-- La BBDD usada para smoke real de lectura no expone `PAnualCartera`; el contrato de `primaAnual` debe revisarse antes de ejecutar un create/update real via API/UI sobre ese modelo.
-- Aun falta validar el flujo CRUD completo via API/UI con limpieza verificable en la misma BBDD local usada para lectura real.
+- La BBDD usada para smoke real de lectura no expone `PAnualCartera`; `primaAnual` queda read-only hasta decision DBA/UAT.
+- El flujo create/update/baja tecnica via API queda validado con rollback, pero la lectura post-create por `dbo.Pantalla_Polizas` no muestra la fila sintetica; queda pendiente decidir contrato funcional de visibilidad.
 
 ## Siguiente paso obligatorio
 
@@ -326,6 +355,7 @@ Antes de desarrollar el resto de paginas del menu, continuar Polizas CRUD BBDD e
 4. Hecho: crear builder de comandos SQL parametrizados e integracion transaccional sobre `dbo.Poliza`.
 5. Hecho parcial: probar create/update/baja tecnica contra BBDD local con rollback y sin filas residuales `ILMVP-%`.
 6. Hecho parcial: activar UI CRUD solo cuando `/api/me` indique permisos y contexto valido.
-7. Hecho parcial: smoke API/UI real contra backend SQL local con lectura, permisos CRUD y validaciones no mutantes.
-8. Pendiente: resolver contrato de `primaAnual`/columnas persistibles para la BBDD real de smoke y ejecutar create/update/baja tecnica via API/UI con limpieza verificable.
-9. Pendiente: cuando Polizas CRUD este cerrado con evidencia, crear agentes por pagina del menu para evolucionar las siguientes superficies.
+7. Hecho: smoke API/UI real contra backend SQL local con lectura, permisos CRUD y validaciones no mutantes.
+8. Hecho: retirar `primaAnual` de escritura y ejecutar create/update/baja tecnica via API SQL con rollback y limpieza verificable.
+9. Pendiente: cerrar contrato de lectura post-create, porque `dbo.Pantalla_Polizas` no muestra la fila sintetica creada en transaccion.
+10. Pendiente: cuando Polizas CRUD este cerrado con evidencia, crear agentes por pagina del menu para evolucionar las siguientes superficies.

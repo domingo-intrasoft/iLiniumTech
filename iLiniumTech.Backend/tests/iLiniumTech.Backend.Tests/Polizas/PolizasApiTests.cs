@@ -963,6 +963,37 @@ public sealed class PolizasApiTests
     }
 
     [Fact]
+    public async Task Create_poliza_rejects_prima_anual_until_writable_column_is_confirmed()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Create,
+            ["Polizas:WritesEnabled"] = "true"
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var response = await client.PostAsJsonAsync("/api/polizas", new
+        {
+            numero = "ILMVP-0001",
+            aplicacion = "MVP",
+            ciaId = 1,
+            clienteId = 1,
+            estado = "Vigor",
+            ramo = "Autos",
+            tipoPoliza = "Cartera",
+            fechaEfecto = new DateOnly(2026, 1, 1),
+            fechaVencimiento = new DateOnly(2026, 12, 31),
+            primaAnual = 1
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        body.Should().Contain("POLIZAS_VALIDATION_ERROR");
+        body.Should().Contain("PrimaAnual is read-only until DBA/UAT confirms a writable column.");
+    }
+
+    [Fact]
     public async Task Update_poliza_validates_stable_numeric_id_before_write()
     {
         await using var factory = new TestApiFactory(new Dictionary<string, string?>
@@ -985,6 +1016,28 @@ public sealed class PolizasApiTests
         body.Should().Contain("POLIZAS_VALIDATION_ERROR");
         body.Should().Contain("Poliza id must be a positive integer.");
         body.Should().NotContain("POLIZAS_NOT_FOUND_OR_NOT_WRITABLE");
+    }
+
+    [Fact]
+    public async Task Update_poliza_rejects_prima_anual_until_writable_column_is_confirmed()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Update,
+            ["Polizas:WritesEnabled"] = "true"
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var response = await client.PutAsJsonAsync("/api/polizas/1001", new
+        {
+            primaAnual = 1
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        body.Should().Contain("POLIZAS_VALIDATION_ERROR");
+        body.Should().Contain("PrimaAnual is read-only until DBA/UAT confirms a writable column.");
     }
 
     [Fact]
@@ -1808,8 +1861,7 @@ public sealed class PolizasApiTests
                 ramo = "Autos",
                 tipoPoliza = "Cartera",
                 fechaEfecto = new DateOnly(2026, 1, 1),
-                fechaVencimiento = new DateOnly(2026, 12, 31),
-                primaAnual = 123.45m
+                fechaVencimiento = new DateOnly(2026, 12, 31)
             });
         }
         else if (string.Equals(method, "PUT", StringComparison.OrdinalIgnoreCase))

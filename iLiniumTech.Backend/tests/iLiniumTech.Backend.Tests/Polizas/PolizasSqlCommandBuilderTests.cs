@@ -24,9 +24,11 @@ public sealed class PolizasSqlCommandBuilderTests
         query.CommandText.Should().Contain("[IdSistemaOrigen]");
         query.CommandText.Should().Contain("[IdFraccionPago]");
         query.CommandText.Should().Contain("[IdGestor]");
+        query.CommandText.Should().NotContain("[PAnualCartera]");
         query.CommandText.Should().Contain("@fraccionPago");
         query.CommandText.Should().Contain("@gestor");
         query.CommandText.Should().Contain("@sistemaOrigen");
+        query.CommandText.Should().NotContain("@primaAnual");
         query.CommandText.Should().NotContain("DELETE FROM [dbo].[Poliza] --");
         query.Parameters.Should().Contain(parameter =>
             parameter.Name == "@numero" &&
@@ -59,12 +61,12 @@ public sealed class PolizasSqlCommandBuilderTests
         var query = _builder.BuildUpdateCommand(
             1001,
             new PolizaUpdateRequest(
-                Numero: "ILMVP-EDIT'; DROP TABLE Poliza --",
-                PrimaAnual: 99.95m));
+                Numero: "ILMVP-EDIT'; DROP TABLE Poliza --"));
 
         query.CommandText.Should().Contain("UPDATE [dbo].[Poliza]");
         query.CommandText.Should().Contain("SET [Poliza] = @numero");
-        query.CommandText.Should().Contain("[PAnualCartera] = @primaAnual");
+        query.CommandText.Should().NotContain("[PAnualCartera]");
+        query.CommandText.Should().NotContain("@primaAnual");
         query.CommandText.Should().Contain("WHERE [Id] = @id");
         query.CommandText.Should().Contain("AND [Poliza] LIKE @mvpNumeroLike");
         query.CommandText.Should().Contain("AND [Poliza] NOT LIKE @mvpDeletedNumeroLike");
@@ -128,5 +130,5 @@ public sealed class PolizasSqlCommandBuilderTests
             TipoPoliza: "Cartera",
             FechaEfecto: new DateOnly(2026, 1, 1),
             FechaVencimiento: new DateOnly(2026, 12, 31),
-            PrimaAnual: 123.45m);
+            PrimaAnual: null);
 }

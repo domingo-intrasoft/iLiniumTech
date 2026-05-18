@@ -7,7 +7,6 @@ public static class PolizasWriteValidator
     private const int NumeroMaxLength = 50;
     private const int AplicacionMaxLength = 30;
     private const int CatalogValueMaxLength = 100;
-    private const decimal PrimaAnualMaxValue = 999_999_999.99m;
 
     public static int ValidateAndParseId(string? id)
     {
@@ -41,7 +40,7 @@ public static class PolizasWriteValidator
         ValidateRequiredText(request.TipoPoliza, "TipoPoliza", CatalogValueMaxLength);
         ValidateRequiredDate(request.FechaEfecto, "FechaEfecto");
         ValidateOptionalDateRange(request.FechaEfecto, request.FechaVencimiento);
-        ValidateOptionalMoney(request.PrimaAnual, "PrimaAnual");
+        ValidatePrimaAnualNotWritable(request.PrimaAnual);
     }
 
     public static void ValidateUpdate(PolizaUpdateRequest? request)
@@ -51,11 +50,7 @@ public static class PolizasWriteValidator
             throw new PolizasValidationException("Poliza update payload is required.");
         }
 
-        if (HasNoChanges(request))
-        {
-            throw new PolizasValidationException("At least one editable field is required.");
-        }
-
+        ValidatePrimaAnualNotWritable(request.PrimaAnual);
         ValidateOptionalText(request.Numero, "Numero", NumeroMaxLength);
         if (request.Numero is not null)
         {
@@ -66,7 +61,11 @@ public static class PolizasWriteValidator
         ValidateOptionalText(request.Ramo, "Ramo", CatalogValueMaxLength);
         ValidateOptionalText(request.TipoPoliza, "TipoPoliza", CatalogValueMaxLength);
         ValidateOptionalDateRange(request.FechaEfecto, request.FechaVencimiento);
-        ValidateOptionalMoney(request.PrimaAnual, "PrimaAnual");
+
+        if (HasNoChanges(request))
+        {
+            throw new PolizasValidationException("At least one editable field is required.");
+        }
     }
 
     private static bool HasNoChanges(PolizaUpdateRequest request) =>
@@ -76,8 +75,7 @@ public static class PolizasWriteValidator
         request.Ramo is null &&
         request.TipoPoliza is null &&
         request.FechaEfecto is null &&
-        request.FechaVencimiento is null &&
-        request.PrimaAnual is null;
+        request.FechaVencimiento is null;
 
     private static void ValidateRequiredText(string? value, string fieldName, int maxLength)
     {
@@ -152,16 +150,13 @@ public static class PolizasWriteValidator
         }
     }
 
-    private static void ValidateOptionalMoney(decimal? value, string fieldName)
+    private static void ValidatePrimaAnualNotWritable(decimal? value)
     {
         if (value is null)
         {
             return;
         }
 
-        if (value < 0 || value > PrimaAnualMaxValue)
-        {
-            throw new PolizasValidationException($"{fieldName} must be between 0 and {PrimaAnualMaxValue}.");
-        }
+        throw new PolizasValidationException("PrimaAnual is read-only until DBA/UAT confirms a writable column.");
     }
 }

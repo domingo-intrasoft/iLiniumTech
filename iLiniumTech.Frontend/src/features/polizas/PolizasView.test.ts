@@ -277,6 +277,7 @@ describe('PolizasView smoke', () => {
         tipoPoliza: 'Cartera',
       }),
     )
+    expect(mocks.apiPost.mock.calls[0]?.[1]).not.toHaveProperty('primaAnual')
     expect(wrapper.text()).toContain('Poliza MVP creada.')
   })
 
@@ -329,6 +330,7 @@ describe('PolizasView smoke', () => {
       '/api/polizas/101',
       expect.objectContaining({ numero: 'ILMVP-UI-0002' }),
     )
+    expect(mocks.apiPut.mock.calls[0]?.[1]).not.toHaveProperty('primaAnual')
 
     await deleteActions[0].trigger('click')
     await settlePolizasView()

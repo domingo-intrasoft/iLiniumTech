@@ -19,7 +19,6 @@ public sealed class PolizasSqlCommandBuilder
                 [F_EfectoPrimero],
                 [F_Efecto],
                 [F_Vencimiento],
-                [PAnualCartera],
                 [IdFraccionPago],
                 [IdGestor],
                 [IdSistemaOrigen]
@@ -35,7 +34,6 @@ public sealed class PolizasSqlCommandBuilder
                 @fechaEfecto,
                 @fechaEfecto,
                 @fechaVencimiento,
-                @primaAnual,
                 @fraccionPago,
                 @gestor,
                 @sistemaOrigen
@@ -55,7 +53,6 @@ public sealed class PolizasSqlCommandBuilder
                 Text("@tipoPoliza", request.TipoPoliza!, 100),
                 Date("@fechaEfecto", request.FechaEfecto!.Value),
                 NullableDate("@fechaVencimiento", request.FechaVencimiento),
-                Decimal("@primaAnual", request.PrimaAnual),
                 Text("@fraccionPago", PolizasMvpWriteDefaults.FraccionPago, 100),
                 Text("@gestor", PolizasMvpWriteDefaults.Gestor, 100),
                 Text("@sistemaOrigen", PolizasMvpWriteDefaults.SistemaOrigen, 100)
@@ -79,7 +76,6 @@ public sealed class PolizasSqlCommandBuilder
         AddTextAssignment(assignments, parameters, "[IdTipoPoliza]", "@tipoPoliza", request.TipoPoliza, 100);
         AddFechaEfectoAssignments(assignments, parameters, request.FechaEfecto);
         AddNullableDateAssignment(assignments, parameters, "[F_Vencimiento]", "@fechaVencimiento", request.FechaVencimiento);
-        AddDecimalAssignment(assignments, parameters, "[PAnualCartera]", "@primaAnual", request.PrimaAnual);
 
         if (assignments.Count == 0)
         {
@@ -167,22 +163,6 @@ public sealed class PolizasSqlCommandBuilder
         parameters.Add(Date(parameterName, value.Value));
     }
 
-    private static void AddDecimalAssignment(
-        ICollection<string> assignments,
-        ICollection<PolizasSqlParameter> parameters,
-        string column,
-        string parameterName,
-        decimal? value)
-    {
-        if (value is null)
-        {
-            return;
-        }
-
-        assignments.Add($"{column} = {parameterName}");
-        parameters.Add(Decimal(parameterName, value));
-    }
-
     private static PolizasSqlParameter Text(string name, string value, int size) =>
         new(name, value.Trim(), SqlDbType.NVarChar, size);
 
@@ -194,7 +174,4 @@ public sealed class PolizasSqlCommandBuilder
 
     private static PolizasSqlParameter NullableDate(string name, DateOnly? value) =>
         value is null ? new PolizasSqlParameter(name, DBNull.Value, SqlDbType.Date) : Date(name, value.Value);
-
-    private static PolizasSqlParameter Decimal(string name, decimal? value) =>
-        new(name, value is null ? DBNull.Value : value.Value, SqlDbType.Decimal);
 }

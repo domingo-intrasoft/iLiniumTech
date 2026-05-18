@@ -34,7 +34,6 @@ const form = reactive({
   tipoPoliza: 'Cartera',
   fechaEfecto: '2026-01-01',
   fechaVencimiento: '2026-12-31',
-  primaAnual: '0',
 })
 
 const panelTitle = computed(() =>
@@ -47,7 +46,6 @@ const numeroUsesReservedDeletedPrefix = computed(() =>
 )
 const ciaIdNumber = computed(() => Number(form.ciaId))
 const clienteIdNumber = computed(() => Number(form.clienteId))
-const primaAnualNumber = computed(() => Number(form.primaAnual))
 
 const validationError = computed(() => {
   if (!numeroIsMvp.value) {
@@ -84,10 +82,6 @@ const validationError = computed(() => {
     return 'La fecha de vencimiento no puede ser anterior al efecto.'
   }
 
-  if (!Number.isFinite(primaAnualNumber.value) || primaAnualNumber.value < 0) {
-    return 'Prima anual debe ser un numero no negativo.'
-  }
-
   return null
 })
 
@@ -103,7 +97,6 @@ function resetForm() {
     form.tipoPoliza = editableItem.tipoPoliza ?? ''
     form.fechaEfecto = props.item.fechaEfecto || '2026-01-01'
     form.fechaVencimiento = props.item.fechaVencimiento || ''
-    form.primaAnual = String(props.item.primaAnual ?? 0)
     return
   }
 
@@ -116,7 +109,6 @@ function resetForm() {
   form.tipoPoliza = 'Cartera'
   form.fechaEfecto = '2026-01-01'
   form.fechaVencimiento = '2026-12-31'
-  form.primaAnual = '0'
 }
 
 function submitForm() {
@@ -131,7 +123,6 @@ function submitForm() {
     ramo: form.ramo,
     fechaEfecto: form.fechaEfecto,
     fechaVencimiento: form.fechaVencimiento || null,
-    primaAnual: primaAnualNumber.value,
   }
 
   if (props.mode === 'create') {
@@ -226,10 +217,6 @@ watch(
       <label>
         Vencimiento
         <input v-model="form.fechaVencimiento" type="date" />
-      </label>
-      <label>
-        Prima anual
-        <input v-model="form.primaAnual" type="number" min="0" step="0.01" required />
       </label>
 
       <p v-if="validationError" class="form-state warning" role="status">

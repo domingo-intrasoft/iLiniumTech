@@ -90,17 +90,27 @@ public sealed class PolizasWriteValidatorTests
     }
 
     [Fact]
-    public void ValidateCreate_rejects_negative_prima()
+    public void ValidateCreate_rejects_prima_anual_until_writable_column_is_confirmed()
     {
         var request = CreateValidRequest() with
         {
-            PrimaAnual = -1
+            PrimaAnual = 1
         };
 
         var act = () => PolizasWriteValidator.ValidateCreate(request);
 
         act.Should().Throw<PolizasValidationException>()
-            .WithMessage("*PrimaAnual*");
+            .WithMessage("PrimaAnual is read-only until DBA/UAT confirms a writable column.");
+    }
+
+    [Fact]
+    public void ValidateUpdate_rejects_prima_anual_until_writable_column_is_confirmed()
+    {
+        var act = () => PolizasWriteValidator.ValidateUpdate(new PolizaUpdateRequest(
+            PrimaAnual: 1));
+
+        act.Should().Throw<PolizasValidationException>()
+            .WithMessage("PrimaAnual is read-only until DBA/UAT confirms a writable column.");
     }
 
     [Fact]
@@ -171,5 +181,5 @@ public sealed class PolizasWriteValidatorTests
             TipoPoliza: "Cartera",
             FechaEfecto: new DateOnly(2026, 1, 1),
             FechaVencimiento: new DateOnly(2026, 12, 31),
-            PrimaAnual: 123.45m);
+            PrimaAnual: null);
 }

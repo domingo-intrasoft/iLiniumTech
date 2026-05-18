@@ -26,7 +26,6 @@ export interface PolizaCreatePayload {
   tipoPoliza: string
   fechaEfecto: string
   fechaVencimiento: string | null
-  primaAnual: number
 }
 
 export interface PolizaUpdatePayload {
@@ -37,7 +36,6 @@ export interface PolizaUpdatePayload {
   tipoPoliza?: string
   fechaEfecto?: string
   fechaVencimiento?: string | null
-  primaAnual?: number
 }
 
 export interface PolizaCreateResult {

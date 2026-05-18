@@ -98,7 +98,7 @@ Campos candidatos para primer CRUD local, pendientes de UAT:
 | `tipoPoliza` | `Poliza.IdTipoPoliza` | Create/Update | Valor catalogado. |
 | `fechaEfecto` | `Poliza.F_Efecto` y `F_EfectoPrimero` | Create/Update | Fecha ISO valida. |
 | `fechaVencimiento` | `Poliza.F_Vencimiento` | Create/Update | Opcional; si existe debe ser mayor o igual a efecto. |
-| `primaAnual` | Pendiente de confirmar | Create/Update | Decimal no negativo si el modelo autorizado expone columna persistible. En el smoke real de lectura no existe `PAnualCartera`; no ejecutar escritura real de prima hasta decision DBA/UAT. |
+| `primaAnual` | Pendiente de confirmar | Fuera de CRUD MVP | Read-only. En el smoke real de lectura no existe `PAnualCartera`; cualquier valor explicito en create/update se rechaza hasta decision DBA/UAT. |
 
 Marcador obligatorio para registros creados por el MVP:
 
