@@ -162,7 +162,7 @@ DoD objetivo:
 
 Pendiente tecnico:
 
-- Implementar contrato backend CRUD y adaptar frontend.
+- Ejecutar smoke API/UI real contra backend SQL local con `Polizas:WritesEnabled`, permisos de escritura y limpieza verificable.
 - Confirmar campos editables definitivos con UAT.
 - Convertir catalogos necesarios para escritura en datos fiables o mantenerlos como valores controlados.
 - Diseñar auditoria de escritura sin datos sensibles.

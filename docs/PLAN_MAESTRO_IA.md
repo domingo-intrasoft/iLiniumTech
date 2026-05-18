@@ -34,7 +34,7 @@ Puntos aparcados o no cerrados:
 - Las paginas estaticas del menu son visibles para orientar navegacion y pruebas, pero estan bloqueadas para datos reales, filtros funcionales, escrituras, exportaciones, permisos finos o APIs propias hasta SDD/API/UAT.
 - La autenticacion productiva no esta decidida.
 - Falta matriz real de permisos por broker, perfil, oficina, gestor y usuario.
-- Falta validar SQL contra BBDD autorizada y confirmar claves de `SESSION_CONTEXT` con DBA.
+- SQL de Polizas CRUD ya tiene smoke transaccional con rollback contra BBDD local autorizada; falta smoke API/UI real con backend SQL y confirmar claves de `SESSION_CONTEXT` con DBA.
 - Falta destino preview real, environments, secrets y branch protection final.
 - Falta UAT funcional con responsable humano y datos autorizados.
 
@@ -278,6 +278,8 @@ Objetivo: convertir Polizas en una pantalla diaria de trabajo con CRUD controlad
 
 SDD activa: `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`.
 
+Estado 2026-05-18: backend CRUD, baja tecnica MVP, UI de alta/edicion/baja y smoke SQL transaccional estan implementados. El siguiente bloque obligatorio es smoke API/UI real con backend SQL, `Polizas:WritesEnabled`, permisos de escritura y limpieza verificable.
+
 Pasos y tareas:
 
 - Mantener listado, busqueda, filtros y paginacion con estado predecible.
@@ -308,6 +310,7 @@ DoD y evidencia:
 - Pruebas SQL locales con rollback o limpieza verificable.
 - Smoke `/polizas` y `/polizas/:id`.
 - Smoke create -> read -> update -> baja tecnica cuando exista UI CRUD.
+- Smoke API/UI real contra backend SQL local antes de abrir desarrollo del resto de paginas.
 - Sin nombres SQL/AppBuilder/metadata en DOM.
 - Sin secretos ni datos personales reales versionados.
 - UAT o bloqueo funcional documentado.
