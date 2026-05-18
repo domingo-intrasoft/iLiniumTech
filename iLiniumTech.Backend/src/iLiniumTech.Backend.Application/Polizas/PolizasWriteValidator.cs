@@ -9,12 +9,19 @@ public static class PolizasWriteValidator
     private const int CatalogValueMaxLength = 100;
     private const decimal PrimaAnualMaxValue = 999_999_999.99m;
 
-    public static void ValidateId(string? id)
+    public static int ValidateAndParseId(string? id)
     {
         if (!int.TryParse(id, out var parsed) || parsed <= 0)
         {
             throw new PolizasValidationException("Poliza id must be a positive integer.");
         }
+
+        return parsed;
+    }
+
+    public static void ValidateId(string? id)
+    {
+        _ = ValidateAndParseId(id);
     }
 
     public static void ValidateCreate(PolizaCreateRequest? request)

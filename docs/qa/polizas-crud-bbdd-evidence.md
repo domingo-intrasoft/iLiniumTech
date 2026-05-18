@@ -77,6 +77,26 @@ Archivos modificados:
 - `iLiniumTech.Backend/tests/iLiniumTech.Backend.Tests/Polizas/PolizasApiTests.cs`
 - `iLiniumTech.Backend/tests/iLiniumTech.Backend.Tests/Polizas/PolizasWriteValidatorTests.cs`
 
+## Builder SQL de comandos
+
+Incremento aplicado despues del contrato:
+
+- Se crea `PolizasSqlCommandBuilder`.
+- `BuildCreateCommand` genera `INSERT` parametrizado sobre `dbo.Poliza`.
+- El alta escribe siempre `IdSistemaOrigen = 'origen-iLiniumTech-MVP'`.
+- `BuildUpdateCommand` genera `UPDATE` parametrizado por `dbo.Poliza.Id`.
+- La actualizacion inicial queda restringida a registros con marcador MVP para mantener el CRUD local reversible.
+- `BuildDeleteCommand` genera `DELETE` parametrizado por `dbo.Poliza.Id`.
+- El borrado fisico inicial queda restringido a registros con marcador MVP.
+- Los comandos de update/delete reciben id entero validado y usan `@id` con tipo `Int`.
+- El origen MVP se pasa como `@idSistemaOrigen`, no concatenado como literal de SQL.
+- Los tests verifican que valores de usuario no se concatenan en `CommandText`.
+
+Archivos modificados:
+
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Infrastructure/Polizas/Sql/PolizasSqlCommandBuilder.cs`
+- `iLiniumTech.Backend/tests/iLiniumTech.Backend.Tests/Polizas/PolizasSqlCommandBuilderTests.cs`
+
 ## Validaciones ejecutadas
 
 Backend:
@@ -125,11 +145,36 @@ dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Relea
 
 Resultado: `134/134` tests OK.
 
+Builder SQL de comandos:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter PolizasSqlCommandBuilderTests
+```
+
+Resultado: `5/5` tests OK.
+
+Builder SQL junto a API y validadores:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "PolizasSqlCommandBuilderTests|PolizasWriteValidatorTests|PolizasApiTests"
+```
+
+Resultado: `103/103` tests OK.
+
+Suite backend completa tras builder SQL:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release
+```
+
+Resultado: `139/139` tests OK.
+
 Pendiente aun para fases CRUD:
 
 - Prueba local create -> read -> update -> read -> delete con registro marcado `IdSistemaOrigen = 'origen-iLiniumTech-MVP'`.
-- Implementacion real de comandos SQL create/update/delete tras los endpoints placeholder.
-- Tests SQL/transaccionales de create/update/delete y borrado bloqueado para registros no MVP.
+- Integrar los comandos SQL en un repositorio de escritura transaccional.
+- Probar endpoints reales create/update/delete sustituyendo el placeholder `501`.
+- Pruebas de BBDD local con limpieza verificable.
 
 ## Riesgos residuales
 
@@ -146,7 +191,7 @@ Antes de desarrollar el resto de paginas del menu, continuar Polizas CRUD BBDD e
 1. Hecho: anadir permisos backend `polizas.create`, `polizas.update` y `polizas.delete`, sin concederlos por defecto.
 2. Hecho: anadir gate `Polizas:WritesEnabled` para bloquear escrituras por defecto.
 3. Hecho: crear DTOs y validaciones de create/update.
-4. Pendiente: implementar comandos SQL parametrizados y transaccionales sobre `dbo.Poliza`.
+4. Parcial: crear builder de comandos SQL parametrizados sobre `dbo.Poliza`; pendiente integracion transaccional.
 5. Pendiente: probar create/read/update/delete contra BBDD local sin dejar datos residuales sensibles.
 6. Pendiente: activar UI CRUD solo cuando `/api/me` indique permisos y contexto valido.
 7. Pendiente: cuando Polizas CRUD este cerrado con evidencia, crear agentes por pagina del menu para evolucionar las siguientes superficies.

@@ -112,11 +112,11 @@ public sealed class PolizasWriteValidatorTests
     [Theory]
     [InlineData("1")]
     [InlineData("1001")]
-    public void ValidateId_accepts_positive_integer_ids(string id)
+    public void ValidateAndParseId_accepts_positive_integer_ids(string id)
     {
-        var act = () => PolizasWriteValidator.ValidateId(id);
+        var parsed = PolizasWriteValidator.ValidateAndParseId(id);
 
-        act.Should().NotThrow();
+        parsed.Should().Be(int.Parse(id));
     }
 
     [Theory]
@@ -125,9 +125,9 @@ public sealed class PolizasWriteValidatorTests
     [InlineData("0")]
     [InlineData("-1")]
     [InlineData("POL-1001")]
-    public void ValidateId_rejects_non_numeric_or_non_positive_ids(string? id)
+    public void ValidateAndParseId_rejects_non_numeric_or_non_positive_ids(string? id)
     {
-        var act = () => PolizasWriteValidator.ValidateId(id);
+        var act = () => PolizasWriteValidator.ValidateAndParseId(id);
 
         act.Should().Throw<PolizasValidationException>()
             .WithMessage("Poliza id must be a positive integer.");

@@ -445,7 +445,7 @@ polizas.MapPut("/{id}", (HttpContext httpContext, string id, [FromBody] PolizaUp
 {
     try
     {
-        PolizasWriteValidator.ValidateId(id);
+        _ = PolizasWriteValidator.ValidateAndParseId(id);
         PolizasWriteValidator.ValidateUpdate(request);
         return PolizasCrudNotImplementedResult(httpContext);
     }
@@ -463,7 +463,7 @@ polizas.MapDelete("/{id}", (HttpContext httpContext, string id) =>
 {
     try
     {
-        PolizasWriteValidator.ValidateId(id);
+        _ = PolizasWriteValidator.ValidateAndParseId(id);
         return PolizasCrudNotImplementedResult(httpContext);
     }
     catch (PolizasValidationException exception)
