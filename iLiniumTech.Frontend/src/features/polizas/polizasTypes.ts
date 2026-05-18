@@ -13,6 +13,37 @@ export interface PolizaListItem {
   moneda: string
 }
 
+export const POLIZA_MVP_PREFIX = 'ILMVP-'
+export const POLIZA_MVP_DELETED_PREFIX = 'ILMVP-DELETED-'
+
+export interface PolizaCreatePayload {
+  numero: string
+  aplicacion: string
+  ciaId: number
+  clienteId: number
+  estado: string
+  ramo: string
+  tipoPoliza: string
+  fechaEfecto: string
+  fechaVencimiento: string | null
+  primaAnual: number
+}
+
+export interface PolizaUpdatePayload {
+  numero?: string
+  aplicacion?: string
+  estado?: string
+  ramo?: string
+  tipoPoliza?: string
+  fechaEfecto?: string
+  fechaVencimiento?: string | null
+  primaAnual?: number
+}
+
+export interface PolizaCreateResult {
+  id: string
+}
+
 export interface PolizaDetail extends PolizaListItem {
   certificado: string
   tipoPoliza: string

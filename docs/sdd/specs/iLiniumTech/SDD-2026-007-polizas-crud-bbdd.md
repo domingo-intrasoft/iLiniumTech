@@ -46,7 +46,7 @@ Entregar un MVP profesional de `Polizas` con CRUD controlado contra BBDD local d
 - `Create`: crear polizas de prueba marcadas como originadas por iLiniumTech MVP.
 - `Read`: mantener listado, filtros y detalle contra BBDD, usando identificador estable.
 - `Update`: editar solo campos permitidos por contrato y permisos.
-- `Delete`: permitir borrado fisico solo para registros creados por iLiniumTech MVP o, si producto lo redefine, sustituir por anulacion/logical delete con SDD/UAT.
+- `Delete`: en el MVP local no hace borrado fisico; aplica baja tecnica sobre registros `ILMVP-` y los oculta del listado/detalle. Cualquier anulacion real o borrado fisico queda pendiente de UAT/DBA.
 
 La primera implementacion debe ser segura aunque sea limitada. Es preferible un CRUD parcial, probado y bloqueado por permisos/configuracion, antes que abrir escrituras generales sobre cartera real.
 
@@ -69,7 +69,7 @@ Rutas objetivo bajo `/api/polizas`:
 - `GET /api/polizas/{id}`: detalle por `dbo.Poliza.Id` en SQL.
 - `POST /api/polizas`: alta controlada de poliza MVP.
 - `PUT /api/polizas/{id}` o `PATCH /api/polizas/{id}`: modificacion de campos permitidos.
-- `DELETE /api/polizas/{id}`: borrado restringido a registros creados por el MVP o accion equivalente aprobada.
+- `DELETE /api/polizas/{id}`: baja tecnica restringida a registros creados por el MVP o accion equivalente aprobada.
 
 Permisos objetivo:
 
@@ -90,8 +90,8 @@ Campos candidatos para primer CRUD local, pendientes de UAT:
 | --- | --- | --- | --- |
 | `numero` | `Poliza.Poliza` | Create/Update | Obligatorio en create; longitud maxima 50; validar unicidad junto a `ciaId` y `aplicacion` si aplica. |
 | `aplicacion` | `Poliza.Aplicacion` | Create/Update | Valor controlado; longitud maxima 30. |
-| `ciaId` | `Poliza.CiaId` | Create | Obligatorio; entero positivo. |
-| `clienteId` | `Poliza.ClienteId` | Create | Obligatorio; entero positivo; no exponer documento ni datos personales. |
+| `ciaId` | `Poliza.CiaId` | Create | Obligatorio; entero distinto de cero. La BBDD AppBuilder local puede usar ids negativos. |
+| `clienteId` | `Poliza.ClienteId` | Create | Obligatorio; entero distinto de cero; no exponer documento ni datos personales. |
 | `estado` | `Poliza.IdSituacion` | Create/Update | Valor catalogado. |
 | `ramo` | `Poliza.IdRamo` | Create/Update | Valor catalogado. |
 | `tipoPoliza` | `Poliza.IdTipoPoliza` | Create/Update | Valor catalogado. |
@@ -101,9 +101,11 @@ Campos candidatos para primer CRUD local, pendientes de UAT:
 
 Marcador obligatorio para registros creados por el MVP:
 
-- `IdSistemaOrigen = 'origen-iLiniumTech-MVP'`
+- numero tecnico con prefijo `ILMVP-`;
+- baja tecnica con prefijo reservado `ILMVP-DELETED-`;
+- `IdSistemaOrigen` catalogado existente en BBDD local mientras no haya alta de catalogo propio validada por DBA.
 
-El borrado fisico inicial solo puede afectar registros con ese marcador. Para registros existentes, `DELETE` debe devolver error funcional seguro hasta que producto defina anulacion/baja.
+La BBDD local no contiene aun un catalogo propio `origen-iLiniumTech-MVP`; por tanto, la defensa operativa inicial para update/delete es el prefijo tecnico. Para registros existentes no `ILMVP-`, `DELETE` debe devolver error funcional seguro hasta que producto defina anulacion/baja.
 
 ## Plan por fases
 
@@ -127,8 +129,8 @@ El borrado fisico inicial solo puede afectar registros con ese marcador. Para re
 ### Fase C - Prueba BBDD local
 
 - Ejecutar pruebas contra BBDD local autorizada sin versionar credenciales.
-- Para escrituras de prueba, usar registros marcados `origen-iLiniumTech-MVP`.
-- Probar create -> read -> update -> read -> delete en entorno local.
+- Para escrituras de prueba, usar registros con numero `ILMVP-`.
+- Probar create -> read -> update -> read -> baja tecnica en entorno local.
 - No dejar datos residuales salvo que se documenten como fixture local intencionada.
 
 ### Fase D - Frontend CRUD
@@ -151,7 +153,7 @@ Cuando el CRUD de `Polizas` este cerrado con evidencia, crear agentes por pagina
 - Las escrituras quedan bloqueadas por defecto y solo se habilitan con configuracion local/demo explicita.
 - Las rutas CRUD exigen permisos `polizas.create`, `polizas.update` y `polizas.delete` segun corresponda.
 - Las operaciones SQL usan parametros, transacciones y `SESSION_CONTEXT`.
-- El delete fisico inicial solo puede afectar registros marcados como creados por iLiniumTech MVP.
+- El delete MVP no debe ser fisico; debe aplicar baja tecnica solo a registros `ILMVP-`.
 - Frontend muestra acciones CRUD solo con permisos y contexto validos.
 - La evidencia local no contiene connection strings, credenciales, dumps ni PII real.
 
@@ -164,7 +166,7 @@ Cuando el CRUD de `Polizas` este cerrado con evidencia, crear agentes por pagina
 - No loguear SQL completo, parametros sensibles, documento, telefono, email, cuenta bancaria, direccion ni riesgo completo.
 - Mantener whitelist de campos editables en codigo iLiniumTech.
 - Usar transacciones y limpieza verificable en pruebas locales.
-- No permitir borrado fisico de registros no marcados `origen-iLiniumTech-MVP` hasta decision UAT.
+- No permitir borrado fisico de registros no marcados `ILMVP-` hasta decision UAT/DBA.
 
 ## Plan de pruebas
 
@@ -199,7 +201,7 @@ Seguridad:
 
 - `Pantalla_Polizas.Poliza` no es unico; usarlo como id de escritura puede modificar o borrar mas de una fila.
 - Triggers de `dbo.Poliza` pueden ejecutar reglas no documentadas por iLiniumTech.
-- Borrado fisico de polizas reales puede ser funcionalmente incorrecto; el MVP limita delete a registros marcados por iLiniumTech.
+- Borrado fisico de polizas reales puede ser funcionalmente incorrecto; el MVP usa baja tecnica sobre registros `ILMVP-` y oculta registros `ILMVP-DELETED-`.
 - API key, headers MVP y demo-session no son seguridad productiva.
 - Campos de cliente, banco, direccion y riesgo pueden exponer PII si se incorporan al formulario sin permisos.
 - `SESSION_CONTEXT` y reglas por broker/perfil/oficina/gestor siguen pendientes de validacion funcional completa.

@@ -83,13 +83,15 @@ Incremento aplicado despues del contrato:
 
 - Se crea `PolizasSqlCommandBuilder`.
 - `BuildCreateCommand` genera `INSERT` parametrizado sobre `dbo.Poliza`.
-- El alta escribe siempre `IdSistemaOrigen = 'origen-iLiniumTech-MVP'`.
+- El alta escribe `IdSistemaOrigen` con un valor ya catalogado en la BBDD local y exige numero tecnico con prefijo `ILMVP-`.
+- La BBDD local no contiene aun el catalogo propio `origen-iLiniumTech-MVP`; queda como decision DBA/UAT si se quiere crear ese origen mas adelante.
+- El alta incorpora defaults catalogados para fraccion de pago y gestor, necesarios para superar constraints heredadas.
 - `BuildUpdateCommand` genera `UPDATE` parametrizado por `dbo.Poliza.Id`.
 - La actualizacion inicial queda restringida a registros con marcador MVP para mantener el CRUD local reversible.
-- `BuildDeleteCommand` genera `DELETE` parametrizado por `dbo.Poliza.Id`.
-- El borrado fisico inicial queda restringido a registros con marcador MVP.
+- `BuildDeleteCommand` no hace borrado fisico: actualiza el numero a `ILMVP-DELETED-<Id>` y lo oculta del listado/detalle.
+- La baja tecnica inicial queda restringida a registros con prefijo `ILMVP-` no dados de baja previamente.
 - Los comandos de update/delete reciben id entero validado y usan `@id` con tipo `Int`.
-- El origen MVP se pasa como `@idSistemaOrigen`, no concatenado como literal de SQL.
+- Al comprobar BBDD local, el origen propio `origen-iLiniumTech-MVP` no existe en catalogo; la defensa temporal usa origen catalogado y prefijo tecnico `ILMVP-` para update/delete.
 - Los tests verifican que valores de usuario no se concatenan en `CommandText`.
 
 Archivos modificados:
@@ -246,17 +248,57 @@ dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Relea
 
 Resultado: `139/139` tests OK.
 
-Pendiente aun para fases CRUD:
+CRUD BBDD, baja tecnica y UI:
 
-- Prueba local create -> read -> update -> read -> delete con registro marcado `IdSistemaOrigen = 'origen-iLiniumTech-MVP'`.
-- Probar endpoints reales create/update/delete contra BBDD local autorizada con limpieza verificable.
-- Confirmar con DBA/UAT defaults/triggers de `dbo.Poliza` antes de considerar el CRUD SQL cerrado.
-- Activar UI CRUD solo cuando permisos y gate esten presentes.
+```powershell
+dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "PolizasSqlCommandBuilderTests|PolizasSqlQueryBuilderTests|PolizasWriteValidatorTests|PolizasApiTests|HeaderPolizasExecutionContextAccessorTests"
+```
+
+Resultado: `127/127` tests OK.
+
+```powershell
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release
+```
+
+Resultado: `144/144` tests OK.
+
+```powershell
+cd .\iLiniumTech.Frontend
+npm run format
+npm run lint
+npm run test:unit
+npm run build
+```
+
+Resultado: format/lint/build OK; unit tests `198/198` OK.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-DependencyAudit.ps1 -FailOnFindings
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-CorsAudit.ps1 -FailOnFindings
+git diff --check
+```
+
+Resultado: secret scan limpio, baseline documental OK, dependency audit `0` findings, CORS audit OK y diff check sin errores.
+
+Smoke navegador:
+
+- `http://127.0.0.1:5174/polizas` carga tras login demo local.
+- En modo fixture local la pantalla queda en `Solo lectura`, muestra `Fixture local` y el boton `Nueva poliza MVP` permanece deshabilitado, como corresponde sin backend BBDD/permisos de escritura.
+
+Validacion local BBDD autorizada:
+
+- Prueba SQL transaccional con rollback sobre BBDD local: `INSERT` OK, `UPDATE` OK y baja tecnica `ILMVP-DELETED-` OK.
+- Prueba transaccional ejecutando el `PolizasSqlCommandBuilder` actual: `BuilderInsert=OK`, `BuilderUpdateRows=1`, `BuilderSoftDeleteRows=1`.
+- La tabla `dbo.Poliza` tiene triggers activos; el intento de borrado fisico genero conflicto de FK con datos dependientes creados por triggers.
+- Conteo posterior en conexion nueva: `0` filas `ILMVP-%` residuales.
+- Queda pendiente smoke API extremo a extremo con configuracion local segura y UI contra backend real.
 
 ## Riesgos residuales
 
 - Las escrituras sobre `dbo.Poliza` pueden disparar triggers heredados no cubiertos por tests unitarios.
-- El delete fisico no debe aplicarse a polizas existentes; la primera version debe limitarlo a registros creados por el MVP.
+- El delete fisico no debe aplicarse a polizas existentes ni a altas MVP mientras no haya regla UAT/DBA; la version actual aplica baja tecnica y oculta el registro.
 - `DemoSession`, API key MVP y headers locales no son seguridad productiva.
 - Los campos sensibles de cliente, direccion, banco, riesgo y contacto siguen fuera de alcance hasta SDD/UAT especifica.
 - Aun falta validar el flujo CRUD completo con limpieza verificable en BBDD local.
@@ -269,6 +311,6 @@ Antes de desarrollar el resto de paginas del menu, continuar Polizas CRUD BBDD e
 2. Hecho: anadir gate `Polizas:WritesEnabled` para bloquear escrituras por defecto.
 3. Hecho: crear DTOs y validaciones de create/update.
 4. Hecho: crear builder de comandos SQL parametrizados e integracion transaccional sobre `dbo.Poliza`.
-5. Pendiente: probar create/read/update/delete contra BBDD local sin dejar datos residuales sensibles.
-6. Pendiente: activar UI CRUD solo cuando `/api/me` indique permisos y contexto valido.
+5. Hecho parcial: probar create/update/baja tecnica contra BBDD local con rollback y sin filas residuales `ILMVP-%`.
+6. Hecho parcial: activar UI CRUD solo cuando `/api/me` indique permisos y contexto valido.
 7. Pendiente: cuando Polizas CRUD este cerrado con evidencia, crear agentes por pagina del menu para evolucionar las siguientes superficies.

@@ -34,7 +34,7 @@ public sealed class PolizasWriteValidatorTests
     }
 
     [Fact]
-    public void ValidateCreate_rejects_non_positive_relational_ids()
+    public void ValidateCreate_rejects_zero_relational_ids()
     {
         var request = CreateValidRequest() with
         {
@@ -44,7 +44,34 @@ public sealed class PolizasWriteValidatorTests
         var act = () => PolizasWriteValidator.ValidateCreate(request);
 
         act.Should().Throw<PolizasValidationException>()
-            .WithMessage("CiaId must be a positive integer.");
+            .WithMessage("CiaId must be a non-zero integer.");
+    }
+
+    [Fact]
+    public void ValidateCreate_accepts_negative_appbuilder_relational_ids()
+    {
+        var request = CreateValidRequest() with
+        {
+            CiaId = -2639
+        };
+
+        var act = () => PolizasWriteValidator.ValidateCreate(request);
+
+        act.Should().NotThrow();
+    }
+
+    [Fact]
+    public void ValidateCreate_rejects_reserved_deleted_mvp_prefix()
+    {
+        var request = CreateValidRequest() with
+        {
+            Numero = $"{PolizasMvpWriteDefaults.DeletedNumeroPrefix}1001"
+        };
+
+        var act = () => PolizasWriteValidator.ValidateCreate(request);
+
+        act.Should().Throw<PolizasValidationException>()
+            .WithMessage("Numero cannot use the reserved MVP deleted prefix.");
     }
 
     [Fact]
@@ -135,7 +162,7 @@ public sealed class PolizasWriteValidatorTests
 
     private static PolizaCreateRequest CreateValidRequest() =>
         new(
-            Numero: "POL-MVP-0001",
+            Numero: "ILMVP-0001",
             Aplicacion: "MVP",
             CiaId: 1,
             ClienteId: 1,

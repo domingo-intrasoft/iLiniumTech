@@ -32,9 +32,10 @@ public static class PolizasWriteValidator
         }
 
         ValidateRequiredText(request.Numero, "Numero", NumeroMaxLength);
+        ValidateMvpNumero(request.Numero);
         ValidateRequiredText(request.Aplicacion, "Aplicacion", AplicacionMaxLength);
-        ValidatePositive(request.CiaId, "CiaId");
-        ValidatePositive(request.ClienteId, "ClienteId");
+        ValidateNonZero(request.CiaId, "CiaId");
+        ValidateNonZero(request.ClienteId, "ClienteId");
         ValidateRequiredText(request.Estado, "Estado", CatalogValueMaxLength);
         ValidateRequiredText(request.Ramo, "Ramo", CatalogValueMaxLength);
         ValidateRequiredText(request.TipoPoliza, "TipoPoliza", CatalogValueMaxLength);
@@ -56,6 +57,10 @@ public static class PolizasWriteValidator
         }
 
         ValidateOptionalText(request.Numero, "Numero", NumeroMaxLength);
+        if (request.Numero is not null)
+        {
+            ValidateMvpNumero(request.Numero);
+        }
         ValidateOptionalText(request.Aplicacion, "Aplicacion", AplicacionMaxLength);
         ValidateOptionalText(request.Estado, "Estado", CatalogValueMaxLength);
         ValidateOptionalText(request.Ramo, "Ramo", CatalogValueMaxLength);
@@ -107,11 +112,25 @@ public static class PolizasWriteValidator
         }
     }
 
-    private static void ValidatePositive(int? value, string fieldName)
+    private static void ValidateMvpNumero(string? value)
     {
-        if (value is null or <= 0)
+        if (value is null ||
+            !value.Trim().StartsWith(PolizasMvpWriteDefaults.NumeroPrefix, StringComparison.OrdinalIgnoreCase))
         {
-            throw new PolizasValidationException($"{fieldName} must be a positive integer.");
+            throw new PolizasValidationException($"Numero must start with {PolizasMvpWriteDefaults.NumeroPrefix} for MVP writes.");
+        }
+
+        if (value.Trim().StartsWith(PolizasMvpWriteDefaults.DeletedNumeroPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new PolizasValidationException("Numero cannot use the reserved MVP deleted prefix.");
+        }
+    }
+
+    private static void ValidateNonZero(int? value, string fieldName)
+    {
+        if (value is null or 0)
+        {
+            throw new PolizasValidationException($"{fieldName} must be a non-zero integer.");
         }
     }
 

@@ -2,7 +2,15 @@ import { apiClient } from '@/services/apiClient'
 import { assertRuntimeConfigReady } from '@/services/runtimeConfig'
 
 import { polizasCatalogsFixture, polizasDetailFixture, polizasFixture } from './polizasFixture'
-import type { PagedResult, PolizaDetail, PolizaListItem, PolizasCatalogs } from './polizasTypes'
+import type {
+  PagedResult,
+  PolizaCreatePayload,
+  PolizaCreateResult,
+  PolizaDetail,
+  PolizaListItem,
+  PolizasCatalogs,
+  PolizaUpdatePayload,
+} from './polizasTypes'
 
 export interface PolizasSearchParams {
   numero?: string
@@ -83,4 +91,28 @@ export async function getPolizaById(id: string): Promise<PolizaDetail | null> {
   }
 
   return polizasDetailFixture.find((item) => item.id === id) ?? null
+}
+
+function assertBackendWritesReady() {
+  if (import.meta.env.VITE_USE_BACKEND !== 'true') {
+    throw new Error('Las escrituras de polizas requieren backend BBDD habilitado.')
+  }
+
+  assertRuntimeConfigReady()
+}
+
+export async function createPoliza(payload: PolizaCreatePayload): Promise<PolizaCreateResult> {
+  assertBackendWritesReady()
+  const response = await apiClient.post<PolizaCreateResult>('/api/polizas', payload)
+  return response.data
+}
+
+export async function updatePoliza(id: string, payload: PolizaUpdatePayload): Promise<void> {
+  assertBackendWritesReady()
+  await apiClient.put(`/api/polizas/${encodeURIComponent(id)}`, payload)
+}
+
+export async function deletePoliza(id: string): Promise<void> {
+  assertBackendWritesReady()
+  await apiClient.delete(`/api/polizas/${encodeURIComponent(id)}`)
 }

@@ -26,6 +26,7 @@ public sealed class PolizasSqlQueryBuilderTests
         var query = _builder.BuildSearchQuery(request, new PolizasSort("fechaEfecto", Descending: true));
 
         query.CommandText.Should().Contain("[Poliza] LIKE @numero");
+        query.CommandText.Should().Contain("[Poliza] NOT LIKE 'ILMVP-DELETED-%'");
         query.CommandText.Should().Contain("[NombreCompleto] LIKE @cliente");
         query.CommandText.Should().Contain("[IdSituacion] = @estado");
         query.CommandText.Should().Contain("[Cia] = @compania");
@@ -52,6 +53,7 @@ public sealed class PolizasSqlQueryBuilderTests
             new PolizasSort("primaAnual", Descending: false));
 
         query.CommandText.Should().Contain("ORDER BY [PAnualCartera] ASC, [Poliza] ASC");
+        query.CommandText.Should().Contain("WHERE [Poliza] NOT LIKE 'ILMVP-DELETED-%'");
         query.CommandText.Should().NotContain("primaAnual ASC");
     }
 
@@ -124,7 +126,7 @@ public sealed class PolizasSqlQueryBuilderTests
     {
         var query = _builder.BuildDetailQuery("POL-1001'; SELECT 1 --");
 
-        query.CommandText.Should().Contain("WHERE [Id] = TRY_CONVERT(int, @id)");
+        query.CommandText.Should().Contain("WHERE [Id] = TRY_CONVERT(int, @id) AND [Poliza] NOT LIKE 'ILMVP-DELETED-%'");
         query.CommandText.Should().NotContain("SELECT 1 --");
         query.Parameters.Should().ContainSingle(parameter =>
             parameter.Name == "@id" && (string)parameter.Value == "POL-1001'; SELECT 1 --");
@@ -135,7 +137,7 @@ public sealed class PolizasSqlQueryBuilderTests
     {
         var query = _builder.BuildDetailQuery("1001", "Autos");
 
-        query.CommandText.Should().Contain("WHERE [Id] = TRY_CONVERT(int, @id) AND [IdRamo] = @ramo");
+        query.CommandText.Should().Contain("WHERE [Id] = TRY_CONVERT(int, @id) AND [Poliza] NOT LIKE 'ILMVP-DELETED-%' AND [IdRamo] = @ramo");
         query.Parameters.Should().Contain(parameter => parameter.Name == "@id" && (string)parameter.Value == "1001");
         query.Parameters.Should().Contain(parameter => parameter.Name == "@ramo" && (string)parameter.Value == "Autos");
     }

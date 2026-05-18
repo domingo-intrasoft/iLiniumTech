@@ -4,7 +4,7 @@ import { RouterLink, type LocationQueryRaw } from 'vue-router'
 
 import { polizasTableColumns, type PolizaTableColumn } from './polizasConstants'
 import { POLIZA_EMPTY_VALUE, formatPolizaValue } from './polizasFormatters'
-import type { PolizaListItem } from './polizasTypes'
+import { POLIZA_MVP_PREFIX, type PolizaListItem } from './polizasTypes'
 
 const props = withDefaults(
   defineProps<{
@@ -17,17 +17,25 @@ const props = withDefaults(
     detailQuery?: LocationQueryRaw
     canOpenDetail?: boolean
     detailUnavailableMessage?: string | null
+    canUpdateMvp?: boolean
+    canDeleteMvp?: boolean
+    writeBusyId?: string | null
   }>(),
   {
     detailQuery: undefined,
     canOpenDetail: true,
     detailUnavailableMessage: null,
+    canUpdateMvp: false,
+    canDeleteMvp: false,
+    writeBusyId: null,
   },
 )
 
 const emit = defineEmits<{
   'page-change': [page: number]
   'page-size-change': [pageSize: number]
+  edit: [item: PolizaListItem]
+  delete: [item: PolizaListItem]
   retry: []
 }>()
 
@@ -44,6 +52,8 @@ const detailUnavailableMessageId = 'polizas-detail-unavailable-message'
 const detailUnavailableMessage = computed(() =>
   canOpenDetail.value ? null : props.detailUnavailableMessage,
 )
+const writeUnavailableMessageId = 'polizas-write-unavailable-message'
+const writesAllowed = computed(() => props.canUpdateMvp || props.canDeleteMvp)
 const tableCaption = computed(
   () =>
     `Listado de polizas. Mostrando ${firstVisible.value}-${lastVisible.value} de ${props.total}.`,
@@ -76,6 +86,42 @@ function detailRoute(item: PolizaListItem) {
     query: props.detailQuery,
   }
 }
+
+function hasStableNumericId(item: PolizaListItem) {
+  return /^[1-9]\d*$/.test(item.id)
+}
+
+function isMvpEditable(item: PolizaListItem) {
+  return item.numero.startsWith(POLIZA_MVP_PREFIX) && hasStableNumericId(item)
+}
+
+function canEditItem(item: PolizaListItem) {
+  return props.canUpdateMvp && isMvpEditable(item) && props.writeBusyId === null
+}
+
+function canDeleteItem(item: PolizaListItem) {
+  return props.canDeleteMvp && isMvpEditable(item) && props.writeBusyId === null
+}
+
+function writeActionTitle(item: PolizaListItem, action: 'edit' | 'delete') {
+  if (props.writeBusyId === item.id) {
+    return 'Operacion en curso'
+  }
+
+  if (!isMvpEditable(item)) {
+    return `Solo registros ${POLIZA_MVP_PREFIX} con id estable pueden modificarse.`
+  }
+
+  if (action === 'edit' && !props.canUpdateMvp) {
+    return 'La sesion no tiene permiso de edicion.'
+  }
+
+  if (action === 'delete' && !props.canDeleteMvp) {
+    return 'La sesion no tiene permiso de borrado.'
+  }
+
+  return action === 'edit' ? 'Editar poliza MVP' : 'Eliminar poliza MVP'
+}
 </script>
 
 <template>
@@ -101,6 +147,11 @@ function detailRoute(item: PolizaListItem) {
     >
       <i class="pi pi-lock" aria-hidden="true"></i>
       {{ detailUnavailableMessage }}
+    </p>
+
+    <p v-if="writesAllowed" :id="writeUnavailableMessageId" class="results-permission-warning">
+      <i class="pi pi-shield" aria-hidden="true"></i>
+      Escritura limitada a registros {{ POLIZA_MVP_PREFIX }}.
     </p>
 
     <div v-if="loading" class="table-scroll" role="status" aria-label="Cargando polizas">
@@ -185,6 +236,32 @@ function detailRoute(item: PolizaListItem) {
                 disabled
               >
                 <i class="pi pi-eye-slash" aria-hidden="true"></i>
+              </button>
+              <button
+                class="table-icon-action write-action"
+                type="button"
+                :aria-label="`Editar poliza ${item.numero}`"
+                :aria-describedby="
+                  writesAllowed && !canEditItem(item) ? writeUnavailableMessageId : undefined
+                "
+                :title="writeActionTitle(item, 'edit')"
+                :disabled="!canEditItem(item)"
+                @click="emit('edit', item)"
+              >
+                <i class="pi pi-pencil" aria-hidden="true"></i>
+              </button>
+              <button
+                class="table-icon-action write-action danger"
+                type="button"
+                :aria-label="`Eliminar poliza ${item.numero}`"
+                :aria-describedby="
+                  writesAllowed && !canDeleteItem(item) ? writeUnavailableMessageId : undefined
+                "
+                :title="writeActionTitle(item, 'delete')"
+                :disabled="!canDeleteItem(item)"
+                @click="emit('delete', item)"
+              >
+                <i class="pi pi-trash" aria-hidden="true"></i>
               </button>
             </td>
             <td v-for="column in polizasTableColumns" :key="column.key">

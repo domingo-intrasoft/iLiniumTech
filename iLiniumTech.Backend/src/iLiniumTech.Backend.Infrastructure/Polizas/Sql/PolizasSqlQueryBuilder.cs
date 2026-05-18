@@ -6,6 +6,7 @@ namespace iLiniumTech.Backend.Infrastructure.Polizas.Sql;
 public sealed class PolizasSqlQueryBuilder
 {
     private const string SourceObject = "[dbo].[Pantalla_Polizas]";
+    private const string ExcludeDeletedMvpPolizasClause = "[Poliza] NOT LIKE 'ILMVP-DELETED-%'";
 
     private static readonly IReadOnlyDictionary<string, string> SortColumns =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -116,7 +117,7 @@ public sealed class PolizasSqlQueryBuilder
 
     public PolizasSqlQuery BuildDetailQuery(string id, string? ramo = null)
     {
-        var clauses = new List<string> { "[Id] = TRY_CONVERT(int, @id)" };
+        var clauses = new List<string> { "[Id] = TRY_CONVERT(int, @id)", ExcludeDeletedMvpPolizasClause };
         var parameters = new List<PolizasSqlParameter> { new("@id", id) };
 
         AddEquals(clauses, parameters, "[IdRamo]", "@ramo", ramo);
@@ -135,6 +136,7 @@ public sealed class PolizasSqlQueryBuilder
         var clauses = new List<string>();
         var parameters = new List<PolizasSqlParameter>();
 
+        clauses.Add(ExcludeDeletedMvpPolizasClause);
         AddLike(clauses, parameters, "[Poliza]", "@numero", request.Numero);
         AddLike(clauses, parameters, "[NombreCompleto]", "@cliente", request.Cliente);
         AddEquals(clauses, parameters, "[IdSituacion]", "@estado", request.Estado);
@@ -155,11 +157,6 @@ public sealed class PolizasSqlQueryBuilder
             parameters.Add(new PolizasSqlParameter(
                 "@fechaEfectoHastaExclusiva",
                 request.FechaEfectoHasta.Value.AddDays(1).ToDateTime(TimeOnly.MinValue)));
-        }
-
-        if (clauses.Count == 0)
-        {
-            return new PolizasWhereClause(string.Empty, parameters);
         }
 
         var builder = new StringBuilder("WHERE ");

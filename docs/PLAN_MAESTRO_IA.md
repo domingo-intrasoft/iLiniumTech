@@ -292,7 +292,7 @@ Pasos y tareas:
 - Crear DTOs de escritura separados de lectura.
 - Implementar create/update/delete con SQL parametrizado, transacciones y `SESSION_CONTEXT`.
 - Bloquear escrituras si `Polizas:WritesEnabled` no esta activo.
-- Limitar el delete fisico inicial a registros creados por iLiniumTech MVP, marcados como `IdSistemaOrigen = 'origen-iLiniumTech-MVP'`.
+- No usar delete fisico en el MVP: aplicar baja tecnica solo a registros `ILMVP-`, marcandolos `ILMVP-DELETED-` y ocultandolos del listado/detalle.
 - Preparar pruebas de regresion para filtros, limpieza, paginacion, detalle, alta, edicion, borrado permitido y borrado bloqueado.
 
 Agentes:
@@ -307,7 +307,7 @@ DoD y evidencia:
 - Unit tests frontend y backend de filtros, contratos, validaciones y permisos CRUD.
 - Pruebas SQL locales con rollback o limpieza verificable.
 - Smoke `/polizas` y `/polizas/:id`.
-- Smoke create -> read -> update -> delete cuando exista UI CRUD.
+- Smoke create -> read -> update -> baja tecnica cuando exista UI CRUD.
 - Sin nombres SQL/AppBuilder/metadata en DOM.
 - Sin secretos ni datos personales reales versionados.
 - UAT o bloqueo funcional documentado.
@@ -495,8 +495,8 @@ DoD y evidencia:
 1. Mantener como objetivo activo `SDD-2026-007 Polizas CRUD BBDD MVP`.
 2. Migrar identificador SQL de Polizas a `dbo.Poliza.Id` para evitar escrituras por numero duplicado.
 3. Anadir permisos `polizas.create`, `polizas.update`, `polizas.delete` y pruebas 401/403.
-4. Implementar backend CRUD local con `Polizas:WritesEnabled`, transacciones, SQL parametrizado y delete limitado a registros MVP.
-5. Ejecutar create -> read -> update -> delete contra BBDD local autorizada sin versionar credenciales.
+4. Implementar backend CRUD local con `Polizas:WritesEnabled`, transacciones, SQL parametrizado y baja tecnica limitada a registros MVP.
+5. Ejecutar create -> read -> update -> baja tecnica contra BBDD local autorizada sin versionar credenciales.
 6. Implementar UI CRUD en `/polizas` solo cuando backend y permisos esten listos.
 7. Ejecutar regresion backend/frontend, E2E y auditorias.
 8. Documentar evidencia QA y riesgos residuales.

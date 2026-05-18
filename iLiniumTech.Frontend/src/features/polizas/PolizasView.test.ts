@@ -8,12 +8,16 @@ import type { SessionContext } from '@/services/session'
 const mocks = vi.hoisted(() => ({
   apiGet: vi.fn(),
   apiPost: vi.fn(),
+  apiPut: vi.fn(),
+  apiDelete: vi.fn(),
 }))
 
 vi.mock('@/services/apiClient', () => ({
   apiClient: {
     get: mocks.apiGet,
     post: mocks.apiPost,
+    put: mocks.apiPut,
+    delete: mocks.apiDelete,
   },
 }))
 
@@ -88,14 +92,14 @@ function backendSession(overrides: Partial<SessionContext> = {}): SessionContext
   }
 }
 
-function setupBackendApi(session: SessionContext) {
+function setupBackendApi(session: SessionContext, polizasResult = polizasFixture) {
   mocks.apiGet.mockImplementation((url: string) => {
     if (url === '/api/me') {
       return Promise.resolve({ data: session })
     }
 
     if (url === '/api/polizas') {
-      return Promise.resolve({ data: polizasFixture })
+      return Promise.resolve({ data: polizasResult })
     }
 
     if (url === '/api/polizas/catalogs') {
@@ -112,11 +116,14 @@ describe('PolizasView smoke', () => {
     vi.stubEnv('VITE_BROKER_ID', '')
     mocks.apiGet.mockReset()
     mocks.apiPost.mockReset()
+    mocks.apiPut.mockReset()
+    mocks.apiDelete.mockReset()
     clearAuthSession()
     useSession().resetSession()
   })
 
   afterEach(() => {
+    vi.restoreAllMocks()
     vi.unstubAllEnvs()
     clearAuthSession()
     useSession().resetSession()
@@ -237,6 +244,98 @@ describe('PolizasView smoke', () => {
     expect(wrapper.get('a.table-icon-action').attributes('aria-label')).toContain(
       'Ver detalle de poliza',
     )
+  })
+
+  it('creates MVP polizas only when backend session grants polizas.create', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
+    setupBackendApi(
+      backendSession({
+        permissions: ['polizas.catalogs', 'polizas.read', 'polizas.detail', 'polizas.create'],
+      }),
+    )
+    mocks.apiPost.mockResolvedValueOnce({ data: { id: '101' } })
+
+    const { wrapper } = await mountPolizasView()
+    await settlePolizasView()
+
+    await wrapper.get('button[aria-label="Nueva poliza MVP"]').trigger('click')
+    await wrapper.get('.poliza-crud-form input[type="text"]').setValue('ILMVP-UI-0001')
+    await wrapper.get('.poliza-crud-form').trigger('submit')
+    await settlePolizasView()
+
+    expect(mocks.apiPost).toHaveBeenCalledWith(
+      '/api/polizas',
+      expect.objectContaining({
+        numero: 'ILMVP-UI-0001',
+        aplicacion: 'MVP',
+        ciaId: 1,
+        clienteId: 1,
+        estado: 'Vigor',
+        ramo: 'Autos',
+        tipoPoliza: 'Cartera',
+      }),
+    )
+    expect(wrapper.text()).toContain('Poliza MVP creada.')
+  })
+
+  it('edits and deletes only MVP rows with write permissions', async () => {
+    vi.stubEnv('VITE_USE_BACKEND', 'true')
+    vi.stubEnv('VITE_AUTH_MODE', 'demo-session')
+    vi.stubEnv('VITE_ILINIUMTECH_API_KEY', 'test-api-key')
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+
+    const mvpPolizas = {
+      ...polizasFixture,
+      total: 2,
+      items: [
+        { ...polizasFixture.items[0], id: '101', numero: 'ILMVP-UI-0001', aplicacion: 'MVP' },
+        polizasFixture.items[1],
+      ],
+    }
+    setupBackendApi(
+      backendSession({
+        permissions: [
+          'polizas.catalogs',
+          'polizas.read',
+          'polizas.detail',
+          'polizas.update',
+          'polizas.delete',
+        ],
+      }),
+      mvpPolizas,
+    )
+    mocks.apiPut.mockResolvedValueOnce({ data: {} })
+    mocks.apiDelete.mockResolvedValueOnce({ data: {} })
+
+    const { wrapper } = await mountPolizasView()
+    await settlePolizasView()
+
+    const editActions = wrapper.findAll('button[aria-label^="Editar poliza"]')
+    const deleteActions = wrapper.findAll('button[aria-label^="Eliminar poliza"]')
+
+    expect(editActions[0].attributes('disabled')).toBeUndefined()
+    expect(deleteActions[0].attributes('disabled')).toBeUndefined()
+    expect(editActions[1].attributes('disabled')).toBeDefined()
+    expect(deleteActions[1].attributes('disabled')).toBeDefined()
+
+    await editActions[0].trigger('click')
+    await wrapper.get('.poliza-crud-form input[type="text"]').setValue('ILMVP-UI-0002')
+    await wrapper.get('.poliza-crud-form').trigger('submit')
+    await settlePolizasView()
+
+    expect(mocks.apiPut).toHaveBeenCalledWith(
+      '/api/polizas/101',
+      expect.objectContaining({ numero: 'ILMVP-UI-0002' }),
+    )
+
+    await deleteActions[0].trigger('click')
+    await settlePolizasView()
+
+    expect(window.confirm).toHaveBeenCalledWith('Eliminar la poliza MVP ILMVP-UI-0001?')
+    expect(mocks.apiDelete).toHaveBeenCalledWith('/api/polizas/101')
+    expect(wrapper.text()).toContain('Poliza MVP eliminada.')
   })
 
   it('switches active broker through backend and refreshes polizas state', async () => {
@@ -365,7 +464,7 @@ describe('PolizasView smoke', () => {
     const { wrapper } = await mountPolizasView()
     await settlePolizasView()
 
-    const disabledDetailActions = wrapper.findAll('button.table-icon-action')
+    const disabledDetailActions = wrapper.findAll('button[aria-label^="Detalle no disponible"]')
 
     expect(wrapper.text()).toContain(
       'La sesion actual no tiene permiso para abrir el detalle de polizas.',

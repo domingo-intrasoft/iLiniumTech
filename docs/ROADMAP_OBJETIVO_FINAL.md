@@ -155,10 +155,10 @@ DoD objetivo:
 - `GET /api/polizas` y `GET /api/polizas/{id}` usan identificador estable compatible con CRUD.
 - Permisos nuevos: `polizas.create`, `polizas.update`, `polizas.delete`.
 - Escrituras bloqueadas por defecto salvo `Polizas:WritesEnabled=true` en entorno local/demo autorizado.
-- `POST /api/polizas`, `PUT/PATCH /api/polizas/{id}` y `DELETE /api/polizas/{id}` implementados con DTOs explicitos, validacion y SQL parametrizado.
-- Delete fisico inicial solo sobre registros creados por iLiniumTech MVP, marcados con `IdSistemaOrigen = 'origen-iLiniumTech-MVP'`.
+- `POST /api/polizas`, `PUT /api/polizas/{id}` y `DELETE /api/polizas/{id}` implementados con DTOs explicitos, validacion y SQL parametrizado.
+- `DELETE` MVP aplica baja tecnica con prefijo `ILMVP-DELETED-` sobre registros `ILMVP-`; no hace borrado fisico.
 - Frontend habilita acciones CRUD solo cuando `/api/me` expone permisos y contexto valido.
-- Prueba local create -> read -> update -> delete ejecutada sin versionar connection strings, credenciales, dumps ni PII.
+- Prueba local transaccional create -> update -> baja tecnica ejecutada sin versionar connection strings, credenciales, dumps ni PII, y verificada sin filas `ILMVP-%` residuales.
 
 Pendiente tecnico:
 

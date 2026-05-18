@@ -796,7 +796,7 @@ public sealed class PolizasApiTests
 
         var response = await client.PostAsJsonAsync("/api/polizas", new
         {
-            numero = "POL-MVP-0001"
+            numero = "ILMVP-0001"
         });
         var body = await response.Content.ReadAsStringAsync();
 
@@ -804,7 +804,7 @@ public sealed class PolizasApiTests
         response.Headers.GetValues("X-Correlation-Id").Should().Contain("api-key-write-denied");
         body.Should().Contain("POLIZAS_ACCESS_DENIED");
         body.Should().NotContain(PolizasPermissions.Create);
-        body.Should().NotContain("POL-MVP-0001");
+        body.Should().NotContain("ILMVP-0001");
     }
 
     [Theory]
@@ -858,7 +858,7 @@ public sealed class PolizasApiTests
         response.Headers.GetValues("X-Correlation-Id").Should().Contain("writes-disabled");
         body.Should().Contain("POLIZAS_WRITES_DISABLED");
         body.Should().Contain("\"correlationId\":\"writes-disabled\"");
-        body.Should().NotContain("POL-MVP-0001");
+        body.Should().NotContain("ILMVP-0001");
     }
 
     [Fact]
@@ -881,7 +881,7 @@ public sealed class PolizasApiTests
         response.Headers.GetValues("X-Correlation-Id").Should().Contain("crud-created");
         response.Headers.Location.Should().NotBeNull();
         result?.Id.Should().NotBeNullOrWhiteSpace();
-        body.Should().NotContain("POL-MVP-0001");
+        body.Should().NotContain("ILMVP-0001");
     }
 
     [Fact]
@@ -898,7 +898,7 @@ public sealed class PolizasApiTests
 
         var update = await client.PutAsJsonAsync("/api/polizas/1001", new
         {
-            numero = "POL-MVP-0001"
+            numero = "ILMVP-0001"
         });
         var updateBody = await update.Content.ReadAsStringAsync();
         var delete = await client.DeleteAsync("/api/polizas/1001");
@@ -951,7 +951,7 @@ public sealed class PolizasApiTests
 
         var response = await client.PostAsJsonAsync("/api/polizas", new
         {
-            numero = "POL-MVP-0001"
+            numero = "ILMVP-0001"
         });
         var body = await response.Content.ReadAsStringAsync();
 
@@ -976,7 +976,7 @@ public sealed class PolizasApiTests
 
         var response = await client.PutAsJsonAsync("/api/polizas/POL-1001", new
         {
-            numero = "POL-MVP-0001"
+            numero = "ILMVP-0001"
         });
         var body = await response.Content.ReadAsStringAsync();
 
@@ -1800,7 +1800,7 @@ public sealed class PolizasApiTests
         {
             request.Content = JsonContent.Create(new
             {
-                numero = "POL-MVP-0001",
+                numero = "ILMVP-0001",
                 aplicacion = "MVP",
                 ciaId = 1,
                 clienteId = 1,
@@ -1816,7 +1816,7 @@ public sealed class PolizasApiTests
         {
             request.Content = JsonContent.Create(new
             {
-                numero = "POL-MVP-0001"
+                numero = "ILMVP-0001"
             });
         }
 

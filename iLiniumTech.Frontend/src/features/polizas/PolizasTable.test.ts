@@ -49,10 +49,36 @@ describe('PolizasTable', () => {
   it('renders explicit detail actions for each row', () => {
     const wrapper = mountTable()
 
-    const detailActions = wrapper.findAll('.table-icon-action')
+    const detailActions = wrapper.findAll('a.table-icon-action')
 
     expect(detailActions).toHaveLength(polizasFixture.items.length)
     expect(detailActions[0].attributes('aria-label')).toContain('Ver detalle de poliza')
+  })
+
+  it('enables write actions only for MVP rows with stable numeric ids', async () => {
+    const wrapper = mountTable({
+      items: [
+        { ...polizasFixture.items[0], id: '101', numero: 'ILMVP-0001' },
+        polizasFixture.items[1],
+      ],
+      canUpdateMvp: true,
+      canDeleteMvp: true,
+    })
+
+    const editActions = wrapper.findAll('button[aria-label^="Editar poliza"]')
+    const deleteActions = wrapper.findAll('button[aria-label^="Eliminar poliza"]')
+
+    expect(wrapper.text()).toContain('Escritura limitada a registros ILMVP-.')
+    expect(editActions[0].attributes('disabled')).toBeUndefined()
+    expect(deleteActions[0].attributes('disabled')).toBeUndefined()
+    expect(editActions[1].attributes('disabled')).toBeDefined()
+    expect(deleteActions[1].attributes('disabled')).toBeDefined()
+
+    await editActions[0].trigger('click')
+    await deleteActions[0].trigger('click')
+
+    expect(wrapper.emitted('edit')?.[0]?.[0]).toMatchObject({ id: '101', numero: 'ILMVP-0001' })
+    expect(wrapper.emitted('delete')?.[0]?.[0]).toMatchObject({ id: '101', numero: 'ILMVP-0001' })
   })
 
   it('renders disabled detail actions with the access reason when detail permission is denied', () => {
@@ -61,7 +87,7 @@ describe('PolizasTable', () => {
       detailUnavailableMessage: 'La sesion actual no tiene permiso para abrir el detalle.',
     })
 
-    const disabledActions = wrapper.findAll('button.table-icon-action')
+    const disabledActions = wrapper.findAll('button[aria-label^="Detalle no disponible"]')
 
     expect(wrapper.get('#polizas-detail-unavailable-message').text()).toContain(
       'La sesion actual no tiene permiso para abrir el detalle.',

@@ -5,8 +5,6 @@ namespace iLiniumTech.Backend.Infrastructure.Polizas.Sql;
 
 public sealed class PolizasSqlCommandBuilder
 {
-    public const string MvpOrigin = "origen-iLiniumTech-MVP";
-
     public PolizasSqlQuery BuildCreateCommand(PolizaCreateRequest request)
     {
         const string commandText = """
@@ -22,9 +20,10 @@ public sealed class PolizasSqlCommandBuilder
                 [F_Efecto],
                 [F_Vencimiento],
                 [PAnualCartera],
+                [IdFraccionPago],
+                [IdGestor],
                 [IdSistemaOrigen]
             )
-            OUTPUT INSERTED.[Id]
             VALUES (
                 @numero,
                 @aplicacion,
@@ -37,8 +36,11 @@ public sealed class PolizasSqlCommandBuilder
                 @fechaEfecto,
                 @fechaVencimiento,
                 @primaAnual,
-                @idSistemaOrigen
+                @fraccionPago,
+                @gestor,
+                @sistemaOrigen
             );
+            SELECT CAST(SCOPE_IDENTITY() AS int);
             """;
 
         return new PolizasSqlQuery(
@@ -54,7 +56,9 @@ public sealed class PolizasSqlCommandBuilder
                 Date("@fechaEfecto", request.FechaEfecto!.Value),
                 NullableDate("@fechaVencimiento", request.FechaVencimiento),
                 Decimal("@primaAnual", request.PrimaAnual),
-                Text("@idSistemaOrigen", MvpOrigin, 100)
+                Text("@fraccionPago", PolizasMvpWriteDefaults.FraccionPago, 100),
+                Text("@gestor", PolizasMvpWriteDefaults.Gestor, 100),
+                Text("@sistemaOrigen", PolizasMvpWriteDefaults.SistemaOrigen, 100)
             ]);
     }
 
@@ -64,7 +68,8 @@ public sealed class PolizasSqlCommandBuilder
         var parameters = new List<PolizasSqlParameter>
         {
             Int("@id", id),
-            Text("@idSistemaOrigen", MvpOrigin, 100)
+            Text("@mvpNumeroLike", $"{PolizasMvpWriteDefaults.NumeroPrefix}%", 50),
+            Text("@mvpDeletedNumeroLike", $"{PolizasMvpWriteDefaults.DeletedNumeroPrefix}%", 50)
         };
 
         AddTextAssignment(assignments, parameters, "[Poliza]", "@numero", request.Numero, 50);
@@ -85,7 +90,8 @@ public sealed class PolizasSqlCommandBuilder
             UPDATE [dbo].[Poliza]
             SET {string.Join(",\n                ", assignments)}
             WHERE [Id] = @id
-              AND [IdSistemaOrigen] = @idSistemaOrigen;
+              AND [Poliza] LIKE @mvpNumeroLike
+              AND [Poliza] NOT LIKE @mvpDeletedNumeroLike;
             SELECT @@ROWCOUNT;
             """;
 
@@ -95,9 +101,11 @@ public sealed class PolizasSqlCommandBuilder
     public PolizasSqlQuery BuildDeleteCommand(int id)
     {
         const string commandText = """
-            DELETE FROM [dbo].[Poliza]
+            UPDATE [dbo].[Poliza]
+            SET [Poliza] = CONCAT(@mvpDeletedNumeroPrefix, CONVERT(nvarchar(20), [Id]))
             WHERE [Id] = @id
-              AND [IdSistemaOrigen] = @idSistemaOrigen;
+              AND [Poliza] LIKE @mvpNumeroLike
+              AND [Poliza] NOT LIKE @mvpDeletedNumeroLike;
             SELECT @@ROWCOUNT;
             """;
 
@@ -105,7 +113,9 @@ public sealed class PolizasSqlCommandBuilder
             commandText,
             [
                 Int("@id", id),
-                Text("@idSistemaOrigen", MvpOrigin, 100)
+                Text("@mvpNumeroLike", $"{PolizasMvpWriteDefaults.NumeroPrefix}%", 50),
+                Text("@mvpDeletedNumeroLike", $"{PolizasMvpWriteDefaults.DeletedNumeroPrefix}%", 50),
+                Text("@mvpDeletedNumeroPrefix", PolizasMvpWriteDefaults.DeletedNumeroPrefix, 50)
             ]);
     }
 

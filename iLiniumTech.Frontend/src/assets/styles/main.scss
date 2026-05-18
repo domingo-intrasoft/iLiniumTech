@@ -664,6 +664,12 @@ select:focus-visible {
   background: #fff7e8;
 }
 
+.runtime-strip .success {
+  border-color: #8abf9a;
+  color: #145c2c;
+  background: #eef9f1;
+}
+
 .tab {
   min-width: 30px;
   height: 31px;
@@ -1115,8 +1121,116 @@ tbody tr:hover {
   text-decoration: none;
 }
 
+.table-icon-action + .table-icon-action {
+  margin-left: 4px;
+}
+
 .table-icon-action:hover {
   background: #eef6fb;
+}
+
+.table-icon-action:disabled {
+  color: #9cadbf;
+  background: #f4f7fa;
+}
+
+.table-icon-action.danger:not(:disabled) {
+  color: #a12c2c;
+}
+
+.table-icon-action.write-action {
+  border-style: dashed;
+}
+
+.poliza-crud-panel {
+  margin: 12px 8px 0;
+  border: 1px solid #cddbe8;
+  background: #ffffff;
+}
+
+.poliza-crud-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #dce6ef;
+  padding: 10px 12px;
+  background: #f5f8fb;
+}
+
+.poliza-crud-header h2 {
+  margin: 0;
+  color: #17324a;
+  font-size: 0.9rem;
+}
+
+.poliza-crud-header span {
+  color: #60748b;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.poliza-crud-form {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(140px, 1fr));
+  gap: 10px;
+  padding: 12px;
+}
+
+.poliza-crud-form label {
+  display: grid;
+  gap: 4px;
+  color: #566b83;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.poliza-crud-form input,
+.poliza-crud-form select {
+  min-width: 0;
+  height: 32px;
+  border: 1px solid #bfd0e2;
+  border-radius: 5px;
+  padding: 5px 7px;
+  color: #253348;
+  background: #ffffff;
+}
+
+.form-state,
+.poliza-crud-actions {
+  grid-column: 1 / -1;
+}
+
+.form-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  border-radius: 5px;
+  padding: 9px 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.form-state.warning {
+  color: #714b0b;
+  background: #fff8ec;
+}
+
+.form-state.error {
+  color: #8a1f1f;
+  background: #fff6f6;
+}
+
+.poliza-crud-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.state-action.secondary {
+  color: #4b5f76;
+  background: #f8fbfd;
 }
 
 .pagination-bar {
@@ -1441,6 +1555,10 @@ tbody tr:hover {
     justify-content: flex-start;
   }
 
+  .poliza-crud-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .context-buttons {
     margin-left: 0;
     flex-wrap: wrap;
@@ -1511,6 +1629,10 @@ tbody tr:hover {
 
   .filter-field {
     grid-column: span 1 !important;
+  }
+
+  .poliza-crud-form {
+    grid-template-columns: 1fr;
   }
 
   .detail-hero {

@@ -12,8 +12,10 @@ import { clearAuthSession, switchAuthBroker, useAuthSession } from '@/features/a
 import AppShell from '@/layout/AppShell.vue'
 import { toPolizasUserError } from '@/services/apiErrors'
 
+import PolizaCrudPanel from './PolizaCrudPanel.vue'
 import PolizasFilters from './PolizasFilters.vue'
 import PolizasTable from './PolizasTable.vue'
+import { createPoliza, deletePoliza, updatePoliza } from './polizasApi'
 import {
   moduleActions,
   statusActions,
@@ -22,7 +24,13 @@ import {
   type PolizasSearchCriteria,
 } from './polizasConstants'
 import { usePolizas } from './usePolizas'
-import type { PolizasQueryFilters } from './polizasTypes'
+import {
+  POLIZA_MVP_PREFIX,
+  type PolizaCreatePayload,
+  type PolizaListItem,
+  type PolizasQueryFilters,
+  type PolizaUpdatePayload,
+} from './polizasTypes'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_PAGE_SIZE = 25
@@ -57,8 +65,18 @@ const blockedToolbarActionDescription =
 const blockedScopeActionDescription =
   'Scope de Polizas aparcado: no carga datos ni activa permisos hasta SDD, contrato API y UAT.'
 const POLIZAS_DETAIL_PERMISSION = 'polizas.detail'
+const POLIZAS_CREATE_PERMISSION = 'polizas.create'
+const POLIZAS_UPDATE_PERMISSION = 'polizas.update'
+const POLIZAS_DELETE_PERMISSION = 'polizas.delete'
 const brokerChanging = ref(false)
 const brokerError = ref<string | null>(null)
+const crudMode = ref<'create' | 'edit'>('create')
+const crudOpen = ref(false)
+const crudItem = ref<PolizaListItem | null>(null)
+const crudSaving = ref(false)
+const crudError = ref<string | null>(null)
+const crudSuccess = ref<string | null>(null)
+const writeBusyId = ref<string | null>(null)
 
 interface PolizasRouteState {
   filters: PolizasQueryFilters
@@ -309,6 +327,40 @@ const detailUnavailableMessage = computed(() =>
     ? null
     : 'La sesion actual no tiene permiso para abrir el detalle de polizas.',
 )
+const hasBackendWriteContext = computed(() => {
+  const currentSession = session.value
+
+  return (
+    isBackendMode &&
+    !contextBlocked.value &&
+    currentSession !== null &&
+    currentSession.authMode !== 'ApiKey' &&
+    (!currentSession.polizasExecutionContextRequired || currentSession.brokerId !== null)
+  )
+})
+const canCreatePoliza = computed(
+  () => hasBackendWriteContext.value && hasExplicitPermission(POLIZAS_CREATE_PERMISSION),
+)
+const canUpdatePoliza = computed(
+  () => hasBackendWriteContext.value && hasExplicitPermission(POLIZAS_UPDATE_PERMISSION),
+)
+const canDeletePoliza = computed(
+  () => hasBackendWriteContext.value && hasExplicitPermission(POLIZAS_DELETE_PERMISSION),
+)
+const crudStateLabel = computed(() =>
+  canCreatePoliza.value || canUpdatePoliza.value || canDeletePoliza.value
+    ? 'CRUD BBDD limitado'
+    : 'Solo lectura',
+)
+
+function hasExplicitPermission(permission: string) {
+  const permissions = session.value?.permissions
+  return Array.isArray(permissions) && permissions.includes(permission)
+}
+
+function isPolizaMvpEditable(item: PolizaListItem) {
+  return item.numero.startsWith(POLIZA_MVP_PREFIX) && /^[1-9]\d*$/.test(item.id)
+}
 
 async function executeSearch(criteria: PolizasSearchCriteria) {
   filters.numero = criteria.numero
@@ -388,6 +440,105 @@ async function signOut() {
   await router.replace({ name: 'login' })
 }
 
+function openCreatePanel() {
+  if (!canCreatePoliza.value) {
+    crudError.value = 'La sesion actual no tiene permiso para crear polizas MVP.'
+    return
+  }
+
+  crudMode.value = 'create'
+  crudItem.value = null
+  crudError.value = null
+  crudSuccess.value = null
+  crudOpen.value = true
+}
+
+function openEditPanel(item: PolizaListItem) {
+  if (!canUpdatePoliza.value || !isPolizaMvpEditable(item)) {
+    crudError.value = `Solo se pueden editar registros ${POLIZA_MVP_PREFIX} con id estable.`
+    return
+  }
+
+  crudMode.value = 'edit'
+  crudItem.value = item
+  crudError.value = null
+  crudSuccess.value = null
+  crudOpen.value = true
+}
+
+function closeCrudPanel() {
+  if (crudSaving.value) {
+    return
+  }
+
+  crudOpen.value = false
+  crudItem.value = null
+  crudError.value = null
+}
+
+async function submitCrud(payload: PolizaCreatePayload | PolizaUpdatePayload) {
+  crudSaving.value = true
+  crudError.value = null
+  crudSuccess.value = null
+
+  try {
+    if (crudMode.value === 'create') {
+      await createPoliza(payload as PolizaCreatePayload)
+      crudSuccess.value = 'Poliza MVP creada.'
+    } else if (crudItem.value) {
+      await updatePoliza(crudItem.value.id, payload as PolizaUpdatePayload)
+      crudSuccess.value = 'Poliza MVP actualizada.'
+    }
+
+    crudOpen.value = false
+    crudItem.value = null
+    await refreshWithRouteState()
+  } catch (exception) {
+    const userError = toPolizasUserError(exception, 'No se pudo guardar la poliza MVP.')
+    crudError.value = userError.message
+    if (userError.kind === 'unauthenticated') {
+      clearAuthSession()
+      await router.replace({ name: 'login' })
+    }
+  } finally {
+    crudSaving.value = false
+  }
+}
+
+async function deleteMvpPoliza(item: PolizaListItem) {
+  if (!canDeletePoliza.value || !isPolizaMvpEditable(item)) {
+    crudError.value = `Solo se pueden eliminar registros ${POLIZA_MVP_PREFIX} con id estable.`
+    return
+  }
+
+  const confirmed = window.confirm(`Eliminar la poliza MVP ${item.numero}?`)
+  if (!confirmed) {
+    return
+  }
+
+  writeBusyId.value = item.id
+  crudError.value = null
+  crudSuccess.value = null
+
+  try {
+    await deletePoliza(item.id)
+    crudSuccess.value = 'Poliza MVP eliminada.'
+    if (crudItem.value?.id === item.id) {
+      closeCrudPanel()
+    }
+    await refreshWithRouteState()
+  } catch (exception) {
+    const userError = toPolizasUserError(exception, 'No se pudo eliminar la poliza MVP.')
+    crudError.value = userError.message
+    if (userError.kind === 'unauthenticated') {
+      clearAuthSession()
+      await router.replace({ name: 'login' })
+    }
+  } finally {
+    writeBusyId.value = null
+  }
+}
+
 watch(
   () => route.query,
   async (query) => {
@@ -431,6 +582,17 @@ onMounted(() => {
       </p>
       <div class="toolbar-groups">
         <div class="action-group">
+          <button
+            class="square-action"
+            :class="{ active: canCreatePoliza }"
+            type="button"
+            aria-label="Nueva poliza MVP"
+            title="Nueva poliza MVP"
+            :disabled="!canCreatePoliza || crudSaving"
+            @click="openCreatePanel"
+          >
+            <i class="pi pi-plus" aria-hidden="true"></i>
+          </button>
           <button
             v-for="action in moduleActions"
             :key="action.label"
@@ -491,8 +653,16 @@ onMounted(() => {
     </div>
 
     <section class="runtime-strip" aria-label="Contexto de polizas">
-      <span><i class="pi pi-lock" aria-hidden="true"></i> Solo lectura</span>
+      <span><i class="pi pi-lock" aria-hidden="true"></i> {{ crudStateLabel }}</span>
       <span><i class="pi pi-database" aria-hidden="true"></i> {{ dataOriginLabel }}</span>
+      <span v-if="crudSuccess" class="success" role="status">
+        <i class="pi pi-check-circle" aria-hidden="true"></i>
+        {{ crudSuccess }}
+      </span>
+      <span v-if="crudError" class="warning" role="alert">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        {{ crudError }}
+      </span>
       <span v-if="contextBlocked" class="warning" role="alert">
         <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
         {{ runtimeError ?? 'Broker requerido' }}
@@ -523,6 +693,16 @@ onMounted(() => {
       @search="executeSearch"
       @clear="clearFilters"
     />
+    <PolizaCrudPanel
+      :mode="crudMode"
+      :open="crudOpen"
+      :catalogs="catalogs"
+      :item="crudItem"
+      :saving="crudSaving"
+      :error="crudError"
+      @close="closeCrudPanel"
+      @submit="submitCrud"
+    />
     <section
       v-if="activeFilterChips.length > 0"
       class="active-filter-summary"
@@ -544,8 +724,13 @@ onMounted(() => {
       :detail-query="detailQuery"
       :can-open-detail="canOpenPolizaDetail"
       :detail-unavailable-message="detailUnavailableMessage"
+      :can-update-mvp="canUpdatePoliza"
+      :can-delete-mvp="canDeletePoliza"
+      :write-busy-id="writeBusyId"
       @page-change="changePage"
       @page-size-change="changePageSize"
+      @edit="openEditPanel"
+      @delete="deleteMvpPoliza"
       @retry="refresh"
     />
   </AppShell>
