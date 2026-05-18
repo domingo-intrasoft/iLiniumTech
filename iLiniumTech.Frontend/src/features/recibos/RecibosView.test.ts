@@ -107,6 +107,29 @@ describe('RecibosView smoke', () => {
     const disabledActions = wrapper.findAll('button[disabled]')
     expect(disabledActions.length).toBeGreaterThanOrEqual(7)
     expect(wrapper.findAll('button.table-icon-action[disabled]')).toHaveLength(3)
+    expect(wrapper.get('#recibos-blocked-actions').text()).toContain(
+      'Acciones de recibos bloqueadas en el MVP read-only',
+    )
+    expect(
+      wrapper.get('button[aria-label="Detalle pendiente"]').attributes('aria-describedby'),
+    ).toBe('recibos-blocked-actions')
+    expect(
+      wrapper
+        .findAll('button')
+        .find((button) => button.text().includes('Guardar busqueda'))
+        ?.attributes('aria-describedby'),
+    ).toBe('recibos-blocked-actions')
+    expect(
+      wrapper.get('button[aria-label="Opciones de situacion"]').attributes('aria-describedby'),
+    ).toBe('recibos-blocked-actions')
+    expect(
+      wrapper
+        .get('input[aria-label="Campos financieros sensibles bloqueados"]')
+        .attributes('aria-describedby'),
+    ).toBe('recibos-blocked-actions')
+    expect(wrapper.get('button.table-icon-action').attributes('aria-describedby')).toBe(
+      'recibos-blocked-actions',
+    )
 
     const smokeDom = wrapper.html()
     expect(smokeDom).not.toMatch(runtimeMarkers)

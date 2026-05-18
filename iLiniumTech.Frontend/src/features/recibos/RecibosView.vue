@@ -83,6 +83,8 @@ const moduleActions = [
   { label: 'Detalle pendiente', icon: 'pi pi-eye' },
   { label: 'Exportacion pendiente', icon: 'pi pi-download' },
 ]
+const blockedActionsDescription =
+  'Acciones de recibos bloqueadas en el MVP read-only hasta SDD, contrato API, permisos, UAT y decision de cobros/remesas/datos bancarios.'
 
 const filters = reactive<RecibosFilters>({
   recibo: '',
@@ -218,6 +220,8 @@ async function signOut() {
         <h1>Recibos</h1>
       </div>
 
+      <p id="recibos-blocked-actions" class="sr-only" v-text="blockedActionsDescription"></p>
+
       <div class="toolbar-groups">
         <div class="action-group">
           <button
@@ -227,6 +231,7 @@ async function signOut() {
             :class="{ active: action.active }"
             type="button"
             :aria-label="action.label"
+            aria-describedby="recibos-blocked-actions"
             disabled
           >
             <i :class="action.icon" aria-hidden="true"></i>
@@ -266,11 +271,11 @@ async function signOut() {
             <i class="pi pi-trash" aria-hidden="true"></i>
             Limpiar Filtros
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="recibos-blocked-actions" disabled>
             <i class="pi pi-save" aria-hidden="true"></i>
             Guardar busqueda
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="recibos-blocked-actions" disabled>
             <i class="pi pi-download" aria-hidden="true"></i>
             Exportar
           </button>
@@ -295,7 +300,12 @@ async function signOut() {
                   type="search"
                   aria-label="Recibo o cliente"
                 />
-                <button type="button" aria-label="Opciones de recibo" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de recibo"
+                  aria-describedby="recibos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -310,7 +320,12 @@ async function signOut() {
                   type="search"
                   aria-label="Poliza"
                 />
-                <button type="button" aria-label="Opciones de poliza" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de poliza"
+                  aria-describedby="recibos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -329,7 +344,12 @@ async function signOut() {
                   <option>Cobrado</option>
                   <option>Anulado</option>
                 </select>
-                <button type="button" aria-label="Opciones de situacion" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de situacion"
+                  aria-describedby="recibos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -346,7 +366,12 @@ async function signOut() {
                   <option>Extorno</option>
                   <option>Regularizacion</option>
                 </select>
-                <button type="button" aria-label="Opciones de tipo" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de tipo"
+                  aria-describedby="recibos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -365,7 +390,12 @@ async function signOut() {
                   type="date"
                   aria-label="Vencimiento desde"
                 />
-                <button type="button" aria-label="Opciones de vencimiento" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de vencimiento"
+                  aria-describedby="recibos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -383,8 +413,14 @@ async function signOut() {
                   value="Fuera del MVP read-only"
                   disabled
                   aria-label="Campos financieros sensibles bloqueados"
+                  aria-describedby="recibos-blocked-actions"
                 />
-                <button type="button" aria-label="Campos financieros sensibles bloqueados" disabled>
+                <button
+                  type="button"
+                  aria-label="Campos financieros sensibles bloqueados"
+                  aria-describedby="recibos-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-lock" aria-hidden="true"></i>
                 </button>
               </span>
@@ -437,6 +473,7 @@ async function signOut() {
                   class="table-icon-action"
                   type="button"
                   :aria-label="`Detalle pendiente para recibo ${item.recibo}`"
+                  aria-describedby="recibos-blocked-actions"
                   title="Detalle pendiente de SDD/API"
                   disabled
                 >
