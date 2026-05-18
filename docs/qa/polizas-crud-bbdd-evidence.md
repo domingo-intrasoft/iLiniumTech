@@ -405,6 +405,18 @@ Resultados: documentation baseline OK, secret scan sin leaks y diff check sin er
 - La BBDD usada para smoke real de lectura no expone `PAnualCartera`; `primaAnual` queda read-only hasta decision DBA/UAT.
 - Polizas CRUD queda cerrado como MVP local con BBDD de pruebas; siguen pendientes UAT funcional, auth productiva, matriz real de permisos y confirmacion DBA sobre triggers/campos para escrituras no sinteticas.
 
+## Auditoria de escrituras
+
+Diseno inicial documentado en `docs/engineering/polizas-write-audit-design.md`.
+
+Estado:
+
+- No implementado en runtime.
+- No crea tablas, endpoints ni migraciones.
+- Define eventos candidatos para create/update/baja tecnica.
+- Prohibe registrar PII, payloads completos, connection strings, SQL completo, tokens, cookies y campos sensibles.
+- Deja pendientes UAT/DBA sobre ubicacion persistente, retencion, auditoria heredada por triggers y permisos de consulta.
+
 ## Siguiente paso obligatorio
 
 Para desarrollar el resto de paginas del menu, seguir este cierre de Polizas CRUD BBDD como base y avanzar en este orden:
@@ -419,4 +431,5 @@ Para desarrollar el resto de paginas del menu, seguir este cierre de Polizas CRU
 8. Hecho: retirar `primaAnual` de escritura y ejecutar create/update/baja tecnica via API SQL con rollback y limpieza verificable.
 9. Hecho: cerrar contrato de lectura post-create a nivel repositorio SQL; el backend ya no confirma altas invisibles.
 10. Hecho: repetir smoke API/UI real de alta visible con `CiaId`/`ClienteId` existentes y documentar el flujo extremo a extremo.
-11. Siguiente: crear agentes por pagina del menu para evolucionar las siguientes superficies con SDD propia y sin activar datos reales/escrituras hasta contrato equivalente.
+11. Hecho: documentar diseno inicial de auditoria de escrituras sin datos sensibles.
+12. Siguiente: mantener smoke local API/UI de CRUD real sin secretos y despues crear agentes por pagina del menu con SDD propia.

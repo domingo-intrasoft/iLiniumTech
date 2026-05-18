@@ -30,18 +30,18 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-041-POL-AUDIT-WRITES`
+ID: `T-042-POL-CRUD-REGRESSION-SMOKE`
 
 Estado: `READY`
 
-Nombre: disenar auditoria de escritura de Polizas sin datos sensibles.
+Nombre: mantener smoke local API/UI de CRUD real sin secretos.
 
 Objetivo:
 
-- Documentar un diseno inicial de auditoria para altas, actualizaciones y bajas tecnicas de Polizas.
-- No implementar runtime, tablas, endpoints ni migraciones en este paso.
-- Evitar datos personales, documentos, telefonos, direcciones, matriculas completas, connection strings o SQL sensible en logs/auditoria.
-- Definir eventos, campos permitidos, campos prohibidos, correlacion, permisos y riesgos para una SDD posterior si se implementa.
+- Reejecutar o preparar evidencia reproducible del smoke local API/UI de `Polizas` CRUD real.
+- Usar solo BBDD local de pruebas autorizada y secretos por variables de entorno o entorno local, nunca en Git.
+- Verificar create -> search/read -> update -> search/read -> baja tecnica -> no visible, con limpieza exacta o rollback.
+- Si falta entorno local o secretos, no simular: documentar bloqueo tecnico y no modificar codigo.
 
 Fuentes a leer, sin buscar mas salvo bloqueo:
 
@@ -49,12 +49,10 @@ Fuentes a leer, sin buscar mas salvo bloqueo:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`
 - `docs/qa/polizas-crud-bbdd-evidence.md`
-- `docs/qa/polizas-visual-parity-evidence.md`
-- `docs/engineering/README.md`
+- `README.md`
 
 Archivos que puede tocar:
 
-- `docs/engineering/polizas-write-audit-design.md`
 - `docs/qa/polizas-crud-bbdd-evidence.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 
@@ -62,6 +60,7 @@ Archivos que NO debe tocar:
 
 - `iLiniumTech.Backend/**`
 - `iLiniumTech.Frontend/**`
+- `docs/engineering/**`
 - `docs/sdd/**`
 - `docs/appbuilder/pages/page-agent-rollout.md`
 - `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`
@@ -69,11 +68,12 @@ Archivos que NO debe tocar:
 
 Pasos de implementacion:
 
-1. Crear `docs/engineering/polizas-write-audit-design.md` con proposito, no objetivos, eventos, campos permitidos, campos prohibidos, retencion, correlacion, seguridad y preguntas UAT/DBA.
-2. Enlazar el documento desde `docs/qa/polizas-crud-bbdd-evidence.md` como pendiente tecnico de auditoria.
-3. No tocar codigo ni proponer tablas concretas como implementadas.
-4. Ejecutar validacion documental, secret scan y `git diff --check`.
-5. Si todo pasa, marcar esta tarea `DONE` y mover el cursor a `T-042-POL-CRUD-REGRESSION-SMOKE`.
+1. Revisar si existe un smoke temporal reutilizable en `%TEMP%` o documentacion de ejecucion previa.
+2. Si el entorno local tiene variables disponibles, ejecutar el smoke API/UI real contra BBDD local de pruebas.
+3. Registrar solo resultados sanitizados: codigos HTTP, conteos, rollback/limpieza, sin connection strings, ids reales sensibles ni nombres de servidor.
+4. Si no se puede ejecutar, documentar bloqueo tecnico exacto y siguiente accion.
+5. Ejecutar validacion documental, secret scan y `git diff --check`.
+6. Si todo pasa, marcar esta tarea `DONE` y promover la siguiente tarea segura.
 
 Pruebas obligatorias:
 
@@ -85,10 +85,10 @@ git diff --check
 
 Criterios de aceptacion:
 
-- Documento de auditoria claro, accionable y sin secretos.
-- Campos sensibles quedan explicitamente prohibidos o minimizados.
-- Eventos CRUD MVP quedan definidos a nivel conceptual.
-- Preguntas UAT/DBA quedan separadas de decisiones ya tomadas.
+- Evidencia CRUD real queda actualizada o bloqueo tecnico queda claro.
+- No hay secretos ni datos personales versionados.
+- No se modifica codigo si el smoke no lo exige.
+- La limpieza exacta o rollback queda documentada cuando el smoke se ejecuta.
 - Commit pequeno y documental.
 
 Riesgo de conflicto: bajo si se respetan los archivos permitidos.
@@ -154,8 +154,8 @@ Objetivo: endurecer lo ya conseguido en Polizas sin ampliar reglas no aprobadas.
 | ID | Estado | Tarea | Precondicion |
 | --- | --- | --- |
 | `T-040-POL-UAT-FIELDS` | `BLOCKED_HUMAN` | Confirmar campos editables definitivos y semantica de baja. | UAT/DBA |
-| `T-041-POL-AUDIT-WRITES` | `READY` | Disenar auditoria de escritura sin datos sensibles. | puede ser documental |
-| `T-042-POL-CRUD-REGRESSION-SMOKE` | `TODO` | Mantener smoke local API/UI de CRUD real sin secretos. | BBDD local disponible |
+| `T-041-POL-AUDIT-WRITES` | `DONE` | Disenar auditoria de escritura sin datos sensibles. | puede ser documental |
+| `T-042-POL-CRUD-REGRESSION-SMOKE` | `READY` | Mantener smoke local API/UI de CRUD real sin secretos. | BBDD local disponible |
 | `T-043-POL-APPBUILDER-VISUAL-SHELL` | `DONE` | Aproximar `/polizas` al shell/grid visual de AppBuilder publicado sin simular datos. | captura usuario y SDD-2026-014 |
 | `T-044-POL-APPBUILDER-VISUAL-SMOKE` | `DONE` | Ejecutar smoke visual y documentar diferencias pendientes frente a AppBuilder. | `T-043` |
 
@@ -226,3 +226,4 @@ Gate completo:
 - 2026-05-18: el usuario redefine el siguiente MVP: `/polizas` debe parecerse a la pantalla AppBuilder publicada, pero manteniendo CRUD real y sin atajos/simulaciones. `T-002` queda pospuesta y el cursor pasa a `T-043-POL-APPBUILDER-VISUAL-SHELL`.
 - 2026-05-18: `T-043-POL-APPBUILDER-VISUAL-SHELL` cerrada. Se compactaron toolbar/buscador/tabla de `Polizas`, se agregaron columnas objetivo con valores neutros para datos no entregados por API, badge `En Vigor`, tests visuales de tabla y evidencia en `docs/qa/polizas-visual-parity-evidence.md`. Validacion OK con targeted tests `23/23`, format, lint, unit completo `198/198`, build, baseline documental, secret scan y `git diff --check`. El cursor queda en `T-044-POL-APPBUILDER-VISUAL-SMOKE`.
 - 2026-05-18: `T-044-POL-APPBUILDER-VISUAL-SMOKE` cerrada. Se ejecuto smoke en navegador local y smoke controlado de escritorio con Vite fixture temporal: toolbar, buscador, grid, columnas, scopes y badge `En Vigor` OK. Evidencia actualizada en `docs/qa/polizas-visual-parity-evidence.md`. El cursor queda en `T-041-POL-AUDIT-WRITES`.
+- 2026-05-18: `T-041-POL-AUDIT-WRITES` cerrada. Se creo `docs/engineering/polizas-write-audit-design.md` y se enlazo desde la evidencia CRUD. El diseno define eventos candidatos, campos permitidos, campos prohibidos, minimizacion, retencion y preguntas UAT/DBA sin implementar runtime ni guardar PII. El cursor queda en `T-042-POL-CRUD-REGRESSION-SMOKE`.
