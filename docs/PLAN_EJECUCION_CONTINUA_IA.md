@@ -30,36 +30,39 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-042-POL-CRUD-REGRESSION-SMOKE`
+ID: `T-002-REC-FE-CONTRACT-FIXTURE`
 
 Estado: `READY`
 
-Nombre: mantener smoke local API/UI de CRUD real sin secretos.
+Nombre: separar contrato fixture de Recibos sin importes reales ni banco.
 
 Objetivo:
 
-- Reejecutar o preparar evidencia reproducible del smoke local API/UI de `Polizas` CRUD real.
-- Usar solo BBDD local de pruebas autorizada y secretos por variables de entorno o entorno local, nunca en Git.
-- Verificar create -> search/read -> update -> search/read -> baja tecnica -> no visible, con limpieza exacta o rollback.
-- Si falta entorno local o secretos, no simular: documentar bloqueo tecnico y no modificar codigo.
+- Separar tipos, fixture y logica local de `Recibos` para que la pagina quede preparada para API futura.
+- Mantener la pagina como read-only/fixture: no datos reales, no banco, no importes reales, no escrituras, no exportaciones.
+- No tocar backend, router, servicios compartidos ni layout global.
+- Documentar evidencia QA de Recibos como siguiente superficie tras cerrar Polizas MVP local.
 
 Fuentes a leer, sin buscar mas salvo bloqueo:
 
 - `AGENTS.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`
-- `docs/qa/polizas-crud-bbdd-evidence.md`
-- `README.md`
+- `docs/sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md`
+- `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`
+- `iLiniumTech.Frontend/src/features/recibos/**`
 
 Archivos que puede tocar:
 
-- `docs/qa/polizas-crud-bbdd-evidence.md`
+- `iLiniumTech.Frontend/src/features/recibos/**`
+- `docs/qa/recibos-mvp-evidence.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 
 Archivos que NO debe tocar:
 
 - `iLiniumTech.Backend/**`
-- `iLiniumTech.Frontend/**`
+- `iLiniumTech.Frontend/src/services/**`
+- `iLiniumTech.Frontend/src/router/**`
+- `iLiniumTech.Frontend/src/layout/**`
 - `docs/engineering/**`
 - `docs/sdd/**`
 - `docs/appbuilder/pages/page-agent-rollout.md`
@@ -68,16 +71,24 @@ Archivos que NO debe tocar:
 
 Pasos de implementacion:
 
-1. Revisar si existe un smoke temporal reutilizable en `%TEMP%` o documentacion de ejecucion previa.
-2. Si el entorno local tiene variables disponibles, ejecutar el smoke API/UI real contra BBDD local de pruebas.
-3. Registrar solo resultados sanitizados: codigos HTTP, conteos, rollback/limpieza, sin connection strings, ids reales sensibles ni nombres de servidor.
-4. Si no se puede ejecutar, documentar bloqueo tecnico exacto y siguiente accion.
-5. Ejecutar validacion documental, secret scan y `git diff --check`.
-6. Si todo pasa, marcar esta tarea `DONE` y promover la siguiente tarea segura.
+1. Inventariar la estructura actual de `src/features/recibos`.
+2. Extraer tipos y fixture a archivos propios si aun estan incrustados en la vista.
+3. Crear composable/ayuda local solo si reduce complejidad y mantiene fixture read-only.
+4. Mantener textos y UI sanitizados: sin importes reales, banco, cuenta, remesas reales ni PII.
+5. Actualizar o crear tests unitarios de Recibos.
+6. Actualizar `docs/qa/recibos-mvp-evidence.md`.
+7. Ejecutar validacion frontend completa, baseline documental, secret scan y `git diff --check`.
+8. Si todo pasa, marcar esta tarea `DONE` y promover `T-003-CLI-FE-CONTRACT-FIXTURE`.
 
 Pruebas obligatorias:
 
 ```powershell
+cd .\iLiniumTech.Frontend
+npm run format
+npm run lint
+npm run test:unit
+npm run build
+cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
@@ -85,11 +96,11 @@ git diff --check
 
 Criterios de aceptacion:
 
-- Evidencia CRUD real queda actualizada o bloqueo tecnico queda claro.
-- No hay secretos ni datos personales versionados.
-- No se modifica codigo si el smoke no lo exige.
-- La limpieza exacta o rollback queda documentada cuando el smoke se ejecuta.
-- Commit pequeno y documental.
+- Recibos mantiene comportamiento read-only fixture.
+- No aparecen importes reales, banco, cuenta bancaria ni datos personales reales.
+- La estructura queda lista para un adaptador API futuro sin activar backend.
+- Tests frontend pasan.
+- Evidencia QA queda actualizada.
 
 Riesgo de conflicto: bajo si se respetan los archivos permitidos.
 
@@ -155,7 +166,7 @@ Objetivo: endurecer lo ya conseguido en Polizas sin ampliar reglas no aprobadas.
 | --- | --- | --- |
 | `T-040-POL-UAT-FIELDS` | `BLOCKED_HUMAN` | Confirmar campos editables definitivos y semantica de baja. | UAT/DBA |
 | `T-041-POL-AUDIT-WRITES` | `DONE` | Disenar auditoria de escritura sin datos sensibles. | puede ser documental |
-| `T-042-POL-CRUD-REGRESSION-SMOKE` | `READY` | Mantener smoke local API/UI de CRUD real sin secretos. | BBDD local disponible |
+| `T-042-POL-CRUD-REGRESSION-SMOKE` | `DONE` | Mantener smoke local API/UI de CRUD real sin secretos. | BBDD local disponible |
 | `T-043-POL-APPBUILDER-VISUAL-SHELL` | `DONE` | Aproximar `/polizas` al shell/grid visual de AppBuilder publicado sin simular datos. | captura usuario y SDD-2026-014 |
 | `T-044-POL-APPBUILDER-VISUAL-SMOKE` | `DONE` | Ejecutar smoke visual y documentar diferencias pendientes frente a AppBuilder. | `T-043` |
 
@@ -227,3 +238,4 @@ Gate completo:
 - 2026-05-18: `T-043-POL-APPBUILDER-VISUAL-SHELL` cerrada. Se compactaron toolbar/buscador/tabla de `Polizas`, se agregaron columnas objetivo con valores neutros para datos no entregados por API, badge `En Vigor`, tests visuales de tabla y evidencia en `docs/qa/polizas-visual-parity-evidence.md`. Validacion OK con targeted tests `23/23`, format, lint, unit completo `198/198`, build, baseline documental, secret scan y `git diff --check`. El cursor queda en `T-044-POL-APPBUILDER-VISUAL-SMOKE`.
 - 2026-05-18: `T-044-POL-APPBUILDER-VISUAL-SMOKE` cerrada. Se ejecuto smoke en navegador local y smoke controlado de escritorio con Vite fixture temporal: toolbar, buscador, grid, columnas, scopes y badge `En Vigor` OK. Evidencia actualizada en `docs/qa/polizas-visual-parity-evidence.md`. El cursor queda en `T-041-POL-AUDIT-WRITES`.
 - 2026-05-18: `T-041-POL-AUDIT-WRITES` cerrada. Se creo `docs/engineering/polizas-write-audit-design.md` y se enlazo desde la evidencia CRUD. El diseno define eventos candidatos, campos permitidos, campos prohibidos, minimizacion, retencion y preguntas UAT/DBA sin implementar runtime ni guardar PII. El cursor queda en `T-042-POL-CRUD-REGRESSION-SMOKE`.
+- 2026-05-18: `T-042-POL-CRUD-REGRESSION-SMOKE` cerrada. Se reejecuto el smoke temporal API/UI CRUD real contra BBDD local de pruebas con resultados sanitizados: create 201, detail 200, search 1, update 204, delete 204, detail post-delete 404, limpieza exacta API/UI y residuales `0`. Evidencia actualizada en `docs/qa/polizas-crud-bbdd-evidence.md`. El cursor queda en `T-002-REC-FE-CONTRACT-FIXTURE`.

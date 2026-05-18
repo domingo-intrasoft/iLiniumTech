@@ -386,6 +386,40 @@ dotnet run --project $env:TEMP\iliniumtech-api-crud-visible-smoke\iliniumtech-ap
 
 Resultados: `ApiSqlCrudVisibleSmoke=OK`, `UiSqlCrudVisibleSmoke=OK`, create 201, detalle post-create 200, busqueda post-create `1`, update 204, detalle post-update 200, delete 204, detalle post-delete 404, limpieza exacta API/UI sin residuales.
 
+Regresion T-042 ejecutada el 2026-05-18:
+
+```powershell
+dotnet run --project $env:TEMP\iliniumtech-api-crud-visible-smoke\iliniumtech-api-crud-visible-smoke.csproj
+```
+
+Resultados sanitizados:
+
+- resolucion de maestro y modelo local de pruebas: OK, sin imprimir connection strings ni credenciales;
+- listado directo sobre contrato de lectura: OK;
+- residuales exactos antes del smoke: `0`;
+- backend health/ready: OK;
+- login demo local: `200`;
+- `/api/me`: `200`, permisos CRUD presentes;
+- catalogos: `200`;
+- create: `201`;
+- id creado numerico: `true`;
+- detalle post-create: `200`;
+- busqueda post-create: `1`;
+- update: `204`;
+- detalle post-update: `200`;
+- numero actualizado verificado: `true`;
+- baja tecnica: `204`;
+- detalle post-delete: `404`;
+- limpieza API exacta: `1` fila tecnica;
+- residuales despues de limpieza API: `0`;
+- `ApiSqlCrudVisibleSmoke=OK`;
+- frontend health: OK;
+- `UiSqlCrudVisibleSmoke=OK`;
+- limpieza UI exacta: `1` fila tecnica;
+- residuales despues de limpieza UI: `0`.
+
+Observacion: el proyecto temporal de smoke emitio un warning CA2024 en codigo temporal fuera del repositorio. No afecta al codigo versionado de iLiniumTech.
+
 Validacion documental tras cierre:
 
 ```powershell
