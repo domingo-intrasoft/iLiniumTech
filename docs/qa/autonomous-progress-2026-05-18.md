@@ -17,6 +17,7 @@ Avanzar el MVP con incrementos pequenos, seguros y validados, sin activar datos 
 | `c5cd403` | Frontend accesibilidad | Acciones bloqueadas de Propuestas comparten descripcion accesible sobre SDD/API/permisos/UAT y emision/conversion/documentos. |
 | `fd98387` | Frontend accesibilidad | Acciones bloqueadas de Recibos comparten descripcion accesible sobre SDD/API/permisos/UAT y cobros/remesas/datos bancarios. |
 | `cae0866` | Frontend accesibilidad | Acciones bloqueadas de Suplementos comparten descripcion accesible sobre SDD/API/permisos/UAT y workflows/adjuntos/datos restringidos. |
+| Este bloque | Polizas CRUD BBDD | Smoke API/UI visible contra backend SQL local: alta, busqueda, edicion, baja tecnica y limpieza exacta sin residuales. |
 
 ## Validaciones ejecutadas
 
@@ -93,9 +94,19 @@ Validacion tras descripcion accesible de acciones bloqueadas en Suplementos:
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
 
+Validacion smoke API/UI visible de Polizas CRUD BBDD:
+
+- `dotnet run --project $env:TEMP\iliniumtech-api-crud-visible-smoke\iliniumtech-api-crud-visible-smoke.csproj`: `ApiSqlCrudVisibleSmoke=OK` y `UiSqlCrudVisibleSmoke=OK`.
+- Resultado API: create 201, detalle post-create 200, busqueda post-create `1`, update 204, detalle post-update 200, delete/baja tecnica 204 y detalle post-delete 404.
+- Resultado UI: login demo, `/polizas`, alta desde formulario Vue con `CiaId`/`ClienteId` existentes, busqueda por numero creado, edicion desde fila, busqueda por numero actualizado, baja tecnica desde fila y busqueda posterior sin resultados.
+- Limpieza: `CleanupExactRows=1`, `ResidualAfterCleanupExact=0` y `UiResidualAfterCleanupExact=0`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
 ## Riesgos residuales
 
-- Polizas CRUD BBDD avanza con smoke API/UI real de lectura, smoke API de endpoints/gates CRUD con rollback y smoke repositorio SQL de visibilidad post-create; queda pendiente repetir alta visible desde API/UI con `CiaId`/`ClienteId` existentes.
+- Polizas CRUD BBDD queda cerrado como MVP local con evidencia API/UI visible; quedan UAT funcional, auth productiva, permisos finales y confirmacion DBA de triggers/campos para escrituras no sinteticas.
 - `Clientes` sigue siendo fixture/read-only con PII real bloqueada; no autoriza ficha real, exportacion, desglose, contacto ni datos bancarios sin SDD/API/UAT.
 - `Agenda` sigue siendo fixture/read-only con calendario dinamico, reprogramacion, participantes, workflows y asuntos sensibles bloqueados hasta SDD/API/UAT.
 - `Propuestas` sigue siendo fixture/read-only; crear, convertir a poliza, documentos, detalle, exportacion y emision siguen bloqueados hasta SDD/API/permisos/UAT.
@@ -108,4 +119,4 @@ Validacion tras descripcion accesible de acciones bloqueadas en Suplementos:
 
 ## Siguiente paso sugerido
 
-Continuar Polizas CRUD BBDD: repetir el flujo API/UI de alta visible con valores existentes de cliente/compania, documentar evidencia y solo despues abrir agentes por pagina del menu.
+Crear agentes por pagina del menu para planificar y desarrollar el resto con SDD propia, empezando por superficies de mayor valor y menor riesgo sin activar datos reales ni escrituras hasta contrato equivalente.

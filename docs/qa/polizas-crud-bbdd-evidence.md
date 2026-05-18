@@ -14,7 +14,7 @@ Reglas de alcance:
 - El backend debe exponer API explicita y permisos propios.
 - Las escrituras deben estar desactivadas por defecto y solo habilitarse en entorno local/demo con configuracion explicita.
 - No se deben versionar connection strings, credenciales, nombres de servidores, dumps ni datos personales reales.
-- El resto de paginas del menu se abordara despues de cerrar Polizas CRUD, con agentes por pagina, SDD propia y evidencia independiente.
+- El resto de paginas del menu se aborda despues de este cierre MVP local, con agentes por pagina, SDD propia y evidencia independiente.
 
 ## Hallazgo tecnico que desbloquea CRUD
 
@@ -328,6 +328,16 @@ Smoke repositorio SQL CRUD con visibilidad post-create:
 - Limpieza verificable: `ResidualBefore=0` y `ResidualAfterRollback=0` para filas `ILMVP-%`.
 - Observacion funcional: el formulario requiere `CiaId` y `ClienteId` existentes/visibles en la BBDD de pruebas; si se informa un cliente inexistente, el backend no debe devolver `201`.
 
+Smoke API/UI CRUD visible con limpieza parametrizada:
+
+- Smoke temporal con backend real `dotnet run`, frontend Vite temporal en modo `demo-session`, `Polizas:Repository=Sql`, `Polizas:WritesEnabled=true` y permisos `polizas.create/update/delete`: `ApiSqlCrudVisibleSmoke=OK` y `UiSqlCrudVisibleSmoke=OK`.
+- El smoke API usa `HttpClient` contra proceso real, no `WebApplicationFactory`, para garantizar que la configuracion SQL entra antes del registro DI.
+- El alta API usa `CiaId` y `ClienteId` existentes/visibles en la BBDD local de pruebas y valores compatibles con el formulario MVP.
+- Resultado API visible: `/ready` 200, login 200, `/api/me` con permisos CRUD, catalogos 200, create 201, id numerico, detalle post-create 200, busqueda post-create `1`, update 204, detalle post-update 200 con numero actualizado, delete/baja tecnica 204 y detalle posterior 404.
+- Resultado UI visible: `/login -> /polizas`, boton `Nueva poliza MVP` habilitado, formulario de alta enviado desde Vue, captura del id de respuesta, busqueda por numero creado, edicion desde la fila, busqueda por numero actualizado, baja tecnica desde la fila y verificacion de `Sin resultados` tras buscar el numero dado de baja.
+- Limpieza verificable: `ResidualBeforeExact=0`, `CleanupExactRows=1`, `ResidualAfterCleanupExact=0` para el smoke API y `UiResidualAfterCleanupExact=0` para el smoke UI. La limpieza fisica directa se limita al id/numero tecnico unico creado por el smoke, no forma parte del comportamiento funcional de producto.
+- Captura local no versionada generada en `%TEMP%\iliniumtech-ui-playwright-smoke\polizas-ui-crud-visible-smoke.png`.
+
 Validacion adicional tras retirar `primaAnual` de escritura:
 
 ```powershell
@@ -368,6 +378,24 @@ git diff --check
 
 Resultados: backend especifico `117/117` OK, backend completo `149/149` OK, frontend `PolizasView.test.ts` `10/10` OK, frontend unit completo `198/198` OK, format/lint/build OK, documentation baseline OK, secret scan sin leaks, dependency audit `0` findings, CORS audit OK y diff check sin errores.
 
+Validacion smoke API/UI visible:
+
+```powershell
+dotnet run --project $env:TEMP\iliniumtech-api-crud-visible-smoke\iliniumtech-api-crud-visible-smoke.csproj
+```
+
+Resultados: `ApiSqlCrudVisibleSmoke=OK`, `UiSqlCrudVisibleSmoke=OK`, create 201, detalle post-create 200, busqueda post-create `1`, update 204, detalle post-update 200, delete 204, detalle post-delete 404, limpieza exacta API/UI sin residuales.
+
+Validacion documental tras cierre:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport
+git diff --check
+```
+
+Resultados: documentation baseline OK, secret scan sin leaks y diff check sin errores de whitespace.
+
 ## Riesgos residuales
 
 - Las escrituras sobre `dbo.Poliza` pueden disparar triggers heredados no cubiertos por tests unitarios.
@@ -375,20 +403,20 @@ Resultados: backend especifico `117/117` OK, backend completo `149/149` OK, fron
 - `DemoSession`, API key MVP y headers locales no son seguridad productiva.
 - Los campos sensibles de cliente, direccion, banco, riesgo y contacto siguen fuera de alcance hasta SDD/UAT especifica.
 - La BBDD usada para smoke real de lectura no expone `PAnualCartera`; `primaAnual` queda read-only hasta decision DBA/UAT.
-- La visibilidad post-create queda validada a nivel repositorio SQL cuando el alta usa cliente/compania existentes; falta repetir smoke API/UI completo con esos valores desde el formulario.
+- Polizas CRUD queda cerrado como MVP local con BBDD de pruebas; siguen pendientes UAT funcional, auth productiva, matriz real de permisos y confirmacion DBA sobre triggers/campos para escrituras no sinteticas.
 
 ## Siguiente paso obligatorio
 
-Antes de desarrollar el resto de paginas del menu, continuar Polizas CRUD BBDD en este orden:
+Para desarrollar el resto de paginas del menu, seguir este cierre de Polizas CRUD BBDD como base y avanzar en este orden:
 
 1. Hecho: anadir permisos backend `polizas.create`, `polizas.update` y `polizas.delete`, sin concederlos por defecto.
 2. Hecho: anadir gate `Polizas:WritesEnabled` para bloquear escrituras por defecto.
 3. Hecho: crear DTOs y validaciones de create/update.
 4. Hecho: crear builder de comandos SQL parametrizados e integracion transaccional sobre `dbo.Poliza`.
 5. Hecho: probar create/update/baja tecnica contra BBDD local con rollback y sin filas residuales `ILMVP-%`.
-6. Hecho parcial: activar UI CRUD solo cuando `/api/me` indique permisos y contexto valido.
+6. Hecho: activar UI CRUD solo cuando `/api/me` indique permisos y contexto valido.
 7. Hecho: smoke API/UI real contra backend SQL local con lectura, permisos CRUD y validaciones no mutantes.
 8. Hecho: retirar `primaAnual` de escritura y ejecutar create/update/baja tecnica via API SQL con rollback y limpieza verificable.
-9. Hecho parcial: cerrar contrato de lectura post-create a nivel repositorio SQL; el backend ya no confirma altas invisibles.
-10. Pendiente: repetir smoke API/UI real de alta con `CiaId`/`ClienteId` existentes y documentar el flujo visible extremo a extremo.
-11. Pendiente: cuando Polizas CRUD este cerrado con evidencia, crear agentes por pagina del menu para evolucionar las siguientes superficies.
+9. Hecho: cerrar contrato de lectura post-create a nivel repositorio SQL; el backend ya no confirma altas invisibles.
+10. Hecho: repetir smoke API/UI real de alta visible con `CiaId`/`ClienteId` existentes y documentar el flujo extremo a extremo.
+11. Siguiente: crear agentes por pagina del menu para evolucionar las siguientes superficies con SDD propia y sin activar datos reales/escrituras hasta contrato equivalente.

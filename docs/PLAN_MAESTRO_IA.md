@@ -34,7 +34,7 @@ Puntos aparcados o no cerrados:
 - Las paginas estaticas del menu son visibles para orientar navegacion y pruebas, pero estan bloqueadas para datos reales, filtros funcionales, escrituras, exportaciones, permisos finos o APIs propias hasta SDD/API/UAT.
 - La autenticacion productiva no esta decidida.
 - Falta matriz real de permisos por broker, perfil, oficina, gestor y usuario.
-- SQL de Polizas CRUD ya tiene smoke transaccional con rollback, lectura SQL real y visibilidad post-create validada a nivel repositorio contra BBDD local autorizada; falta repetir smoke API/UI de alta visible con valores existentes de cliente/compania y confirmar claves de `SESSION_CONTEXT` con DBA.
+- SQL de Polizas CRUD ya tiene smoke transaccional con rollback, lectura SQL real, visibilidad post-create a nivel repositorio y smoke API/UI visible con alta, busqueda, edicion, baja tecnica y limpieza exacta contra BBDD local autorizada; quedan UAT funcional, auth productiva, permisos finales y confirmacion DBA de triggers/campos para escrituras no sinteticas.
 - Falta destino preview real, environments, secrets y branch protection final.
 - Falta UAT funcional con responsable humano y datos autorizados.
 
@@ -50,7 +50,7 @@ El MVP vigente queda actualizado el 2026-05-18 y debe centrarse en:
 4. permisos backend efectivos para lectura y escritura de polizas;
 5. multi-tenant/broker validado antes de resolver conexion o escribir datos;
 6. calidad, seguridad, documentacion y evidencia de cierre;
-7. una vez cerrado Polizas CRUD, crear agentes por pagina del menu para analizar, documentar y evolucionar el resto de paginas con SDD propia.
+7. crear agentes por pagina del menu para analizar, documentar y evolucionar el resto de paginas con SDD propia, usando Polizas CRUD como vertical local de referencia.
 
 Todo lo que exceda ese MVP debe entrar como SDD propia.
 
@@ -278,7 +278,7 @@ Objetivo: convertir Polizas en una pantalla diaria de trabajo con CRUD controlad
 
 SDD activa: `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`.
 
-Estado 2026-05-18: backend CRUD, baja tecnica MVP, UI de alta/edicion/baja, smoke SQL transaccional, smoke API/UI real de lectura, smoke API de endpoints/gates CRUD con rollback y visibilidad post-create a nivel repositorio SQL estan implementados. El siguiente bloque obligatorio es repetir el flujo API/UI de alta visible usando `CiaId`/`ClienteId` existentes en la BBDD de pruebas.
+Estado 2026-05-18: backend CRUD, baja tecnica MVP, UI de alta/edicion/baja, smoke SQL transaccional, smoke API/UI real de lectura, smoke API de endpoints/gates CRUD con rollback, visibilidad post-create a nivel repositorio SQL y smoke API/UI visible extremo a extremo estan implementados. El siguiente bloque obligatorio es abrir agentes por pagina del menu, con SDD propia y sin activar datos reales ni escrituras hasta contrato equivalente.
 
 Pasos y tareas:
 
@@ -298,7 +298,7 @@ Pasos y tareas:
 - Mantener lectura SQL compatible con la vista real local: `ClienteId`, `CiaId`, `Riesgo` vacio y `PrimaAnual = 0` cuando no existan columnas enriquecidas.
 - Mantener `primaAnual` como read-only: no se envia desde UI y el backend rechaza valores explicitos en create/update hasta columna/regla DBA/UAT.
 - Mantener la regla de que el backend no confirma altas MVP que no sean visibles por el contrato de lectura del broker/contexto activo.
-- Repetir smoke API/UI de alta usando valores existentes de cliente/compania, porque un `ClienteId` inexistente no aparece por la vista heredada.
+- Mantener smoke API/UI de alta usando valores existentes de cliente/compania, porque un `ClienteId` inexistente no aparece por la vista heredada.
 - Preparar pruebas de regresion para filtros, limpieza, paginacion, detalle, alta, edicion, borrado permitido y borrado bloqueado.
 
 Agentes:
@@ -314,7 +314,7 @@ DoD y evidencia:
 - Pruebas SQL locales con rollback o limpieza verificable.
 - Smoke `/polizas` y `/polizas/:id`.
 - Smoke create -> read -> update -> baja tecnica cuando exista UI CRUD.
-- Smoke API/UI real contra backend SQL local antes de abrir desarrollo del resto de paginas; ya existe para login/listado/permisos/validaciones no mutantes y endpoints/gates CRUD con rollback, y la visibilidad post-create esta cerrada a nivel repositorio SQL. Falta smoke API/UI visible extremo a extremo.
+- Smoke API/UI real contra backend SQL local antes de abrir desarrollo del resto de paginas; ya cubre login/listado/permisos/validaciones no mutantes, endpoints/gates CRUD con rollback, visibilidad post-create a nivel repositorio SQL y flujo visible extremo a extremo create -> search -> update -> search -> baja tecnica.
 - Sin nombres SQL/AppBuilder/metadata en DOM.
 - Sin secretos ni datos personales reales versionados.
 - UAT o bloqueo funcional documentado.
@@ -440,8 +440,8 @@ Objetivo: anadir capacidades nuevas solo como producto explicito.
 
 Pasos y tareas:
 
-- No iniciar desarrollo real de otras paginas hasta cerrar el MVP de Polizas CRUD BBDD con evidencia o documentar un bloqueo tecnico explicito.
-- Cuando Polizas CRUD este cerrado, crear agentes por pagina del menu.
+- Polizas CRUD BBDD ya queda cerrado como MVP local con evidencia; no iniciar desarrollo real de otras paginas sin SDD/API/UAT propia.
+- Crear agentes por pagina del menu como siguiente bloque de trabajo.
 - Cada agente de pagina debe analizar componentes AppBuilder originales, documentar SDD/alcance y proponer implementacion estatica Vue/API explicita.
 - Priorizar con producto: detalle ampliado, exportacion, documentos, recibos, siniestros, acciones o escrituras.
 - Crear SDD por cada caso de uso.
@@ -499,16 +499,14 @@ DoD y evidencia:
 
 ## Orden recomendado de proximos incrementos
 
-1. Mantener como objetivo activo `SDD-2026-007 Polizas CRUD BBDD MVP`.
-2. Migrar identificador SQL de Polizas a `dbo.Poliza.Id` para evitar escrituras por numero duplicado.
-3. Anadir permisos `polizas.create`, `polizas.update`, `polizas.delete` y pruebas 401/403.
-4. Implementar backend CRUD local con `Polizas:WritesEnabled`, transacciones, SQL parametrizado y baja tecnica limitada a registros MVP.
-5. Ejecutar create -> read -> update -> baja tecnica contra BBDD local autorizada sin versionar credenciales.
-6. Implementar UI CRUD en `/polizas` solo cuando backend y permisos esten listos.
-7. Ejecutar regresion backend/frontend, E2E y auditorias.
-8. Documentar evidencia QA y riesgos residuales.
-9. Solo despues, crear agentes por pagina del menu para planificar y desarrollar el resto con SDD propia.
-10. Consolidar CI/preview dry-run y branch protection.
+1. Mantener `SDD-2026-007 Polizas CRUD BBDD MVP` como referencia cerrada para el vertical local de Polizas.
+2. No ampliar Polizas hacia campos sensibles, escrituras no MVP, delete real ni datos enriquecidos sin UAT/DBA y SDD nueva.
+3. Crear agentes por pagina del menu para planificar y desarrollar el resto con SDD propia.
+4. Cada pagina nueva debe empezar por analisis AppBuilder, contrato iLiniumTech explicito, permisos, datos afectados, rollback y UAT.
+5. Priorizar las siguientes superficies por valor demostrable y bajo riesgo: detalle ampliado de Polizas, Siniestros, Recibos, Clientes, Agenda y Propuestas.
+6. Ejecutar regresion backend/frontend, E2E y auditorias en cada incremento.
+7. Documentar evidencia QA y riesgos residuales por pagina.
+8. Consolidar CI/preview dry-run y branch protection.
 
 ## Riesgos principales
 

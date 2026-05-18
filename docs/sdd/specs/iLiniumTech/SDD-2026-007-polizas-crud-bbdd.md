@@ -153,11 +153,11 @@ Regla post-create:
 
 ### Fase E - Despues de Polizas
 
-Cuando el CRUD de `Polizas` este cerrado con evidencia, crear agentes por pagina del menu para analizar y evolucionar el resto de paginas. Cada agente debe partir de la documentacion AppBuilder ya generada, crear o actualizar SDD propia y no activar datos reales ni escrituras sin contrato equivalente.
+Con el CRUD local de `Polizas` cerrado con evidencia API/UI, crear agentes por pagina del menu para analizar y evolucionar el resto de paginas. Cada agente debe partir de la documentacion AppBuilder ya generada, crear o actualizar SDD propia y no activar datos reales ni escrituras sin contrato equivalente.
 
 ## Criterios de aceptacion
 
-- `Polizas CRUD BBDD` queda registrado como objetivo MVP activo en plan maestro, roadmap y reglas de agentes.
+- `Polizas CRUD BBDD` queda registrado como vertical MVP local de referencia en plan maestro, roadmap y reglas de agentes.
 - El backend no ejecuta metadata AppBuilder como runtime de CRUD.
 - El recurso SQL de escritura usa identificador estable `dbo.Poliza.Id` y no el numero visible duplicable.
 - Las escrituras quedan bloqueadas por defecto y solo se habilitan con configuracion local/demo explicita.
@@ -221,7 +221,7 @@ Seguridad:
 
 ## Definicion de hecho
 
-- Roadmap y plan maestro apuntan a `Polizas CRUD BBDD` como objetivo MVP activo.
+- Roadmap y plan maestro apuntan a `Polizas CRUD BBDD` como vertical MVP local de referencia.
 - CRUD backend implementado con permisos, configuracion, validacion y transacciones.
 - Frontend permite CRUD solo cuando hay permisos y contexto valido.
 - Pruebas locales contra BBDD ejecutadas sin dejar secretos ni datos sensibles versionados.

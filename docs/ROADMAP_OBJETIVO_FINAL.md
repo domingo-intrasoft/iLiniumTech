@@ -136,11 +136,11 @@ DoD:
 
 Estado: implementada; mantener regresion en CI.
 
-### Fase 1C - MVP Polizas CRUD BBDD activo
+### Fase 1C - MVP Polizas CRUD BBDD local cerrado
 
 SDD activa: [SDD-2026-007 Polizas CRUD BBDD MVP](sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md).
 
-Estado de producto actual: objetivo MVP vigente desde 2026-05-18. La pantalla de `Polizas` debe contemplar CRUD desde y hacia BBDD local de pruebas. El resto de paginas del menu se abordara despues mediante agentes por pagina, con SDD propia y sin activar datos reales ni escrituras hasta que `Polizas` quede cerrado con evidencia o bloqueo tecnico explicito.
+Estado de producto actual: objetivo MVP vigente desde 2026-05-18. La pantalla de `Polizas` ya contempla CRUD controlado desde y hacia BBDD local de pruebas con evidencia API/UI. El resto de paginas del menu se abordara mediante agentes por pagina, con SDD propia y sin activar datos reales ni escrituras hasta contrato equivalente.
 
 Hallazgos iniciales de BBDD local:
 
@@ -167,10 +167,10 @@ DoD objetivo:
 - Smoke API de endpoints/gates CRUD create -> update -> baja tecnica ejecutado con rollback y `ResidualBefore=0` / `ResidualAfterRollback=0`; no se toma como evidencia final del camino SQL mutante.
 - Smoke repositorio SQL create -> detail -> search -> update -> detail -> baja tecnica -> detail 404 ejecutado con rollback y sin filas `ILMVP-%` residuales.
 - El backend SQL no confirma altas que no sean visibles por el contrato de lectura del broker/contexto activo.
+- Smoke API/UI real visible create -> search -> update -> search -> baja tecnica -> search sin resultados ejecutado contra backend SQL local, con `CiaId`/`ClienteId` existentes y limpieza exacta sin residuales.
 
 Pendiente tecnico:
 
-- Repetir smoke API/UI real de alta visible usando `CiaId`/`ClienteId` existentes desde el formulario MVP.
 - Confirmar campos editables definitivos con UAT.
 - Convertir catalogos necesarios para escritura en datos fiables o mantenerlos como valores controlados.
 - Diseñar auditoria de escritura sin datos sensibles.
@@ -381,7 +381,7 @@ Objetivo: anadir detalle ampliado, acciones, escrituras o workflows solo como ca
 
 DoD:
 
-- `Polizas CRUD BBDD` cerrado con evidencia o bloqueo tecnico documentado antes de abrir desarrollo del resto de paginas.
+- `Polizas CRUD BBDD` cerrado como MVP local con evidencia antes de abrir desarrollo del resto de paginas.
 - Agentes por pagina creados para analizar, documentar y evolucionar cada pantalla despues de Polizas.
 - Cada accion nueva tiene SDD propia.
 - Se declaran datos afectados, permisos, auditoria, rollback y UAT.
@@ -391,7 +391,7 @@ DoD:
 
 Bloqueos actuales:
 
-- La prioridad activa es `Polizas CRUD BBDD`; el resto de paginas queda despues.
+- La prioridad activa pasa a agentes por pagina del menu; `Polizas CRUD BBDD` queda como vertical local de referencia.
 - Falta confirmar reglas funcionales reales y responsables UAT.
 
 ### Fase 7 - Preview profesional y operacion controlada
