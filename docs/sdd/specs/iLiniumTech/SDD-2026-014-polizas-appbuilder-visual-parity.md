@@ -26,6 +26,17 @@ El objetivo no es volver a AppBuilder ni renderizar metadata. La pantalla debe s
 - No inventar campos: si la API no entrega un dato real, la UI debe ocultarlo, mostrar valor neutro aprobado o marcarlo como pendiente tecnico, nunca fabricar informacion.
 - El CRUD real de `Polizas` permanece gobernado por `SDD-2026-007`.
 
+## Actualizacion de alcance - 2026-05-18
+
+Tras revisar la captura comparativa, la paridad ya no puede cerrarse solo con layout. El usuario identifica como brecha funcional que faltan `N. Documento`, nombre de cliente, `Ramo` descriptivo y `Riesgo/Matric.`.
+
+Decision:
+
+- ampliar el contrato de listado de `Polizas` para transportar esos campos desde la BBDD local de pruebas;
+- documentar la logica AppBuilder de lookups en `docs/appbuilder/pages/polizas/data-contract-analysis.md`;
+- mantener la pantalla como Vue/TypeScript estatico y API .NET explicita;
+- sanitizar rutas derivadas no activas, especialmente `Autos Particulares`, para no exponer campos sensibles fuera de su SDD.
+
 ## Objetivo del MVP visual
 
 Conseguir que `/polizas` se parezca de forma reconocible a la pantalla AppBuilder publicada:
@@ -112,9 +123,22 @@ Permitidos para primer incremento:
 - `docs/qa/polizas-visual-parity-evidence.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 
+Permitidos para el incremento de paridad de datos:
+
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Domain/Polizas/PolizaListItem.cs`
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Infrastructure/Polizas/Sql/PolizasSqlQueryBuilder.cs`
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Infrastructure/Polizas/SqlPolizasRepository.cs`
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Infrastructure/Polizas/InMemoryPolizasRepository.cs`
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Api/Program.cs`
+- `iLiniumTech.Backend/tests/iLiniumTech.Backend.Tests/Polizas/**`
+- `iLiniumTech.Frontend/src/features/polizas/**`
+- `docs/appbuilder/pages/polizas/data-contract-analysis.md`
+- `docs/appbuilder/pages/polizas/components/listado-grid.md`
+- `docs/qa/polizas-visual-parity-evidence.md`
+- `docs/PLAN_EJECUCION_CONTINUA_IA.md`
+
 Prohibidos sin nueva decision:
 
-- `iLiniumTech.Backend/**`
 - `iLiniumTech.Frontend/src/services/**`
 - `iLiniumTech.Frontend/src/router/**`
 - `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`
@@ -123,6 +147,9 @@ Prohibidos sin nueva decision:
 ## Criterios de aceptacion
 
 - `/polizas` se reconoce visualmente como la pantalla AppBuilder de referencia.
+- El listado muestra `documento`, `clienteNombre`, `ramo` descriptivo y `riesgo` cuando la API los entrega.
+- `clienteNombre` no se sustituye por codigo de cliente salvo fallback tecnico por dato vacio.
+- `ramo` se resuelve como descripcion de catalogo o fallback controlado al id.
 - No hay datos simulados nuevos.
 - Las acciones sin backend real siguen bloqueadas o deshabilitadas.
 - CRUD real existente no se rompe.

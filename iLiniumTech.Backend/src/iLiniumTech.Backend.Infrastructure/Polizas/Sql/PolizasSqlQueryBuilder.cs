@@ -5,54 +5,62 @@ namespace iLiniumTech.Backend.Infrastructure.Polizas.Sql;
 
 public sealed class PolizasSqlQueryBuilder
 {
-    private const string SourceObject = "[dbo].[Pantalla_Polizas]";
-    private const string ExcludeDeletedMvpPolizasClause = "[Poliza] NOT LIKE 'ILMVP-DELETED-%'";
+    private const string SourceObject = "[dbo].[vw_ClientePolizas]";
+    private const string SourceAlias = "[p]";
+    private const string ExcludeDeletedMvpPolizasClause = "[p].[Poliza] NOT LIKE 'ILMVP-DELETED-%'";
+    private const string RamoDescriptionExpression = "COALESCE(NULLIF(LTRIM(RTRIM(CAST([p].[Ramo] AS nvarchar(100)))), ''), CAST([p].[IdRamo] AS nvarchar(100)))";
+    private const string ClienteNombreExpression = "COALESCE(NULLIF(LTRIM(RTRIM(CAST([p].[RazonSocial] AS nvarchar(250)))), ''), CAST([p].[ClienteId] AS nvarchar(250)))";
+    private const string ClienteSearchExpression = "CONCAT(COALESCE(CAST([p].[RazonSocial] AS nvarchar(250)), ''), ' ', COALESCE(CAST([p].[NumDocumento] AS nvarchar(100)), ''), ' ', COALESCE(CAST([p].[ClienteId] AS nvarchar(50)), ''))";
 
     private static readonly IReadOnlyDictionary<string, string> SortColumns =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            ["numero"] = "[Poliza]",
-            ["aplicacion"] = "[Aplicacion]",
-            ["estado"] = "[IdSituacion]",
-            ["ramo"] = "[IdRamo]",
-            ["compania"] = "[CiaId]",
-            ["cliente"] = "[ClienteId]",
-            ["fechaEfecto"] = "[F_Efecto]",
-            ["fechaVencimiento"] = "[F_Vencimiento]",
-            ["primaAnual"] = "[Id]"
+            ["numero"] = "[p].[Poliza]",
+            ["aplicacion"] = "[p].[Aplicacion]",
+            ["estado"] = "[p].[IdSituacion]",
+            ["ramo"] = RamoDescriptionExpression,
+            ["compania"] = "[p].[CiaRazonSocial]",
+            ["cliente"] = ClienteNombreExpression,
+            ["fechaEfecto"] = "[p].[F_Efecto]",
+            ["fechaVencimiento"] = "[p].[F_Vencimiento]",
+            ["primaAnual"] = "[p].[PolizaId]"
         };
+
+    private static readonly string FromSource = $"FROM {SourceObject} AS {SourceAlias}";
 
     private static readonly string ListSelect = """
         SELECT
-            CAST([Id] AS nvarchar(100)) AS [Id],
-            CAST([Poliza] AS nvarchar(100)) AS [Numero],
-            CAST([Aplicacion] AS nvarchar(100)) AS [Aplicacion],
-            CAST([IdSituacion] AS nvarchar(100)) AS [Estado],
-            CAST([IdRamo] AS nvarchar(100)) AS [Ramo],
-            CAST([ClienteId] AS nvarchar(100)) AS [ClienteId],
-            CAST([ClienteId] AS nvarchar(250)) AS [ClienteNombre],
-            CAST([CiaId] AS nvarchar(150)) AS [Compania],
-            [F_Efecto] AS [FechaEfecto],
-            [F_Vencimiento] AS [FechaVencimiento],
+            CAST([p].[PolizaId] AS nvarchar(100)) AS [Id],
+            CAST([p].[Poliza] AS nvarchar(100)) AS [Numero],
+            CAST('' AS nvarchar(100)) AS [Aplicacion],
+            COALESCE(NULLIF(LTRIM(RTRIM(CAST([p].[Situacion] AS nvarchar(100)))), ''), CAST([p].[IdSituacion] AS nvarchar(100))) AS [Estado],
+            COALESCE(NULLIF(LTRIM(RTRIM(CAST([p].[Ramo] AS nvarchar(100)))), ''), CAST([p].[IdRamo] AS nvarchar(100))) AS [Ramo],
+            CAST([p].[ClienteId] AS nvarchar(100)) AS [ClienteId],
+            COALESCE(NULLIF(LTRIM(RTRIM(CAST([p].[RazonSocial] AS nvarchar(250)))), ''), CAST([p].[ClienteId] AS nvarchar(250))) AS [ClienteNombre],
+            CAST([p].[NumDocumento] AS nvarchar(100)) AS [Documento],
+            COALESCE(NULLIF(LTRIM(RTRIM(CAST([p].[CiaRazonSocial] AS nvarchar(150)))), ''), CAST([p].[CiaDgs] AS nvarchar(150))) AS [Compania],
+            CAST([p].[Riesgo] AS nvarchar(250)) AS [Riesgo],
+            [p].[F_Efecto] AS [FechaEfecto],
+            [p].[F_Vencimiento] AS [FechaVencimiento],
             CAST(0 AS decimal(18,2)) AS [PrimaAnual],
             CAST('EUR' AS nvarchar(3)) AS [Moneda]
         """;
 
     private static readonly string DetailSelect = """
         SELECT TOP (1)
-            CAST([Id] AS nvarchar(100)) AS [Id],
-            CAST([Poliza] AS nvarchar(100)) AS [Numero],
-            CAST([Poliza] AS nvarchar(100)) AS [Certificado],
-            CAST([IdTipoPoliza] AS nvarchar(100)) AS [TipoPoliza],
-            CAST([Aplicacion] AS nvarchar(100)) AS [Aplicacion],
-            CAST([IdSituacion] AS nvarchar(100)) AS [Estado],
-            CAST([IdRamo] AS nvarchar(100)) AS [Ramo],
-            CAST([ClienteId] AS nvarchar(100)) AS [ClienteId],
-            CAST([ClienteId] AS nvarchar(250)) AS [ClienteNombre],
-            CAST([CiaId] AS nvarchar(150)) AS [Compania],
-            CAST('' AS nvarchar(250)) AS [Riesgo],
-            [F_Efecto] AS [FechaEfecto],
-            [F_Vencimiento] AS [FechaVencimiento],
+            CAST([p].[PolizaId] AS nvarchar(100)) AS [Id],
+            CAST([p].[Poliza] AS nvarchar(100)) AS [Numero],
+            CAST([p].[Poliza] AS nvarchar(100)) AS [Certificado],
+            CAST('' AS nvarchar(100)) AS [TipoPoliza],
+            CAST('' AS nvarchar(100)) AS [Aplicacion],
+            COALESCE(NULLIF(LTRIM(RTRIM(CAST([p].[Situacion] AS nvarchar(100)))), ''), CAST([p].[IdSituacion] AS nvarchar(100))) AS [Estado],
+            COALESCE(NULLIF(LTRIM(RTRIM(CAST([p].[Ramo] AS nvarchar(100)))), ''), CAST([p].[IdRamo] AS nvarchar(100))) AS [Ramo],
+            CAST([p].[ClienteId] AS nvarchar(100)) AS [ClienteId],
+            COALESCE(NULLIF(LTRIM(RTRIM(CAST([p].[RazonSocial] AS nvarchar(250)))), ''), CAST([p].[ClienteId] AS nvarchar(250))) AS [ClienteNombre],
+            COALESCE(NULLIF(LTRIM(RTRIM(CAST([p].[CiaRazonSocial] AS nvarchar(150)))), ''), CAST([p].[CiaDgs] AS nvarchar(150))) AS [Compania],
+            CAST([p].[Riesgo] AS nvarchar(250)) AS [Riesgo],
+            [p].[F_Efecto] AS [FechaEfecto],
+            [p].[F_Vencimiento] AS [FechaVencimiento],
             CAST(0 AS decimal(18,2)) AS [PrimaAnual],
             CAST('EUR' AS nvarchar(3)) AS [Moneda],
             CAST('' AS nvarchar(100)) AS [Oficina],
@@ -65,10 +73,10 @@ public sealed class PolizasSqlQueryBuilder
             CAST('' AS nvarchar(100)) AS [CanalCobro],
             CAST('' AS nvarchar(100)) AS [FraccionPago],
             CAST('' AS nvarchar(100)) AS [Ccaa],
-            CAST('' AS nvarchar(100)) AS [Documento],
+            CAST([p].[NumDocumento] AS nvarchar(100)) AS [Documento],
             CAST('' AS nvarchar(100)) AS [Apellido1],
             CAST('' AS nvarchar(100)) AS [Apellido2],
-            CAST([ClienteId] AS nvarchar(250)) AS [Nombre],
+            COALESCE(NULLIF(LTRIM(RTRIM(CAST([p].[RazonSocial] AS nvarchar(250)))), ''), CAST([p].[ClienteId] AS nvarchar(250))) AS [Nombre],
             CAST('' AS nvarchar(20)) AS [Sexo],
             CAST('19000101' AS date) AS [FechaNacimiento],
             CAST(0 AS int) AS [Edad],
@@ -91,10 +99,10 @@ public sealed class PolizasSqlQueryBuilder
         var direction = sort.Descending ? "DESC" : "ASC";
         var tieBreaker = sort.Field.Equals("numero", StringComparison.OrdinalIgnoreCase)
             ? string.Empty
-            : ", [Poliza] ASC";
+            : ", [p].[Poliza] ASC";
         var commandText = $"""
             {ListSelect}
-            FROM {SourceObject}
+            {FromSource}
             {where.Clause}
             ORDER BY {orderColumn} {direction}{tieBreaker}
             OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY;
@@ -108,7 +116,7 @@ public sealed class PolizasSqlQueryBuilder
         var where = BuildWhereClause(request);
         var commandText = $"""
             SELECT COUNT_BIG(1)
-            FROM {SourceObject}
+            {FromSource}
             {where.Clause};
             """;
 
@@ -117,14 +125,14 @@ public sealed class PolizasSqlQueryBuilder
 
     public PolizasSqlQuery BuildDetailQuery(string id, string? ramo = null)
     {
-        var clauses = new List<string> { "[Id] = TRY_CONVERT(int, @id)", ExcludeDeletedMvpPolizasClause };
+        var clauses = new List<string> { "[p].[PolizaId] = TRY_CONVERT(int, @id)", ExcludeDeletedMvpPolizasClause };
         var parameters = new List<PolizasSqlParameter> { new("@id", id) };
 
-        AddEquals(clauses, parameters, "[IdRamo]", "@ramo", ramo);
+        AddEquals(clauses, parameters, "[p].[IdRamo]", "@ramo", ramo);
 
         var commandText = $"""
             {DetailSelect}
-            FROM {SourceObject}
+            {FromSource}
             WHERE {string.Join(" AND ", clauses)};
             """;
 
@@ -137,15 +145,15 @@ public sealed class PolizasSqlQueryBuilder
         var parameters = new List<PolizasSqlParameter>();
 
         clauses.Add(ExcludeDeletedMvpPolizasClause);
-        AddLike(clauses, parameters, "[Poliza]", "@numero", request.Numero);
-        AddLike(clauses, parameters, "CONVERT(nvarchar(50), [ClienteId])", "@cliente", request.Cliente);
-        AddEquals(clauses, parameters, "[IdSituacion]", "@estado", request.Estado);
-        AddEquals(clauses, parameters, "CONVERT(nvarchar(50), [CiaId])", "@compania", request.Compania);
-        AddEquals(clauses, parameters, "[IdRamo]", "@ramo", request.Ramo);
+        AddLike(clauses, parameters, "[p].[Poliza]", "@numero", request.Numero);
+        AddLike(clauses, parameters, ClienteSearchExpression, "@cliente", request.Cliente);
+        AddEquals(clauses, parameters, "[p].[IdSituacion]", "@estado", request.Estado);
+        AddEquals(clauses, parameters, "CONVERT(nvarchar(150), [p].[CiaRazonSocial])", "@compania", request.Compania);
+        AddEquals(clauses, parameters, "[p].[IdRamo]", "@ramo", request.Ramo);
 
         if (request.FechaEfectoDesde.HasValue)
         {
-            clauses.Add("[F_Efecto] >= @fechaEfectoDesde");
+            clauses.Add("[p].[F_Efecto] >= @fechaEfectoDesde");
             parameters.Add(new PolizasSqlParameter(
                 "@fechaEfectoDesde",
                 request.FechaEfectoDesde.Value.ToDateTime(TimeOnly.MinValue)));
@@ -153,7 +161,7 @@ public sealed class PolizasSqlQueryBuilder
 
         if (request.FechaEfectoHasta.HasValue)
         {
-            clauses.Add("[F_Efecto] < @fechaEfectoHastaExclusiva");
+            clauses.Add("[p].[F_Efecto] < @fechaEfectoHastaExclusiva");
             parameters.Add(new PolizasSqlParameter(
                 "@fechaEfectoHastaExclusiva",
                 request.FechaEfectoHasta.Value.AddDays(1).ToDateTime(TimeOnly.MinValue)));

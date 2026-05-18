@@ -29,7 +29,8 @@ No se trata de hacer un renderer de AppBuilder. La pantalla debe seguir siendo c
 ## Reglas de fidelidad
 
 - Si el backend no entrega logo real de compania, no se simula logo.
-- Si el backend no entrega `Certif.` o `N.º Documento`, no se inventa valor.
+- Si el backend no entrega `Certif.` o un campo objetivo, no se inventa valor.
+- `N.º Documento`, `Cliente`, `Ramo` y `Riesgo/Matric.` deben venir del contrato API real para cerrar paridad funcional de listado.
 - Si una accion no esta implementada de verdad, se muestra deshabilitada o se oculta.
 - Si una ruta scope no tiene SDD/API/UAT, se mantiene bloqueada.
 - Se prioriza densidad y estructura de AppBuilder sobre una UI tipo dashboard/landing.
@@ -49,9 +50,23 @@ Alcance:
 ## Diferencias aceptables en el primer corte
 
 - Logos reales de compania pueden quedar como texto/codigo si no hay dato autorizado.
-- Algunas columnas pueden aparecer vacias o no renderizarse si no existen en contrato API.
+- `Certif.` puede quedar vacio hasta contrato API/UAT.
 - Iconos de toolbar pueden estar deshabilitados si no hay accion real.
 - La barra superior puede aproximarse con los componentes actuales del shell sin copiar datos de sesion no disponibles.
+
+## Incremento de paridad de datos
+
+ID de plan: `T-047-POL-APPBUILDER-DATA-PARITY`
+
+Alcance:
+
+- Analizar metadata y codigo AppBuilder para entender campos directos y lookups.
+- Ampliar el contrato API de listado con `documento` y `riesgo`.
+- Proyectar `clienteNombre` desde `RazonSocial`/nombre descriptivo, no desde `ClienteId`.
+- Resolver `ramo` como descripcion de catalogo `Ramo`, con fallback controlado.
+- Renderizar esos datos en `PolizasTable.vue` sin simular valores.
+- Sanitizar rutas derivadas fuera de alcance, especialmente `Autos Particulares`.
+- Documentar la logica en `docs/appbuilder/pages/polizas/data-contract-analysis.md`.
 
 ## Evidencia requerida
 

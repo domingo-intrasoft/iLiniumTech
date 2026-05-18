@@ -49,7 +49,9 @@ describe('PolizasTable', () => {
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.find('.policy-status-badge').text()).toBe('En Vigor')
     expect(wrapper.find('.policy-number-link').text()).toBe('POL-2026-0001')
-    expect(wrapper.findAll('.pending-data-cell')).toHaveLength(6)
+    expect(wrapper.text()).toContain('00000001A')
+    expect(wrapper.text()).toContain('1234 ABC')
+    expect(wrapper.findAll('.pending-data-cell')).toHaveLength(2)
   })
 
   it('renders a loading table without losing column structure', () => {

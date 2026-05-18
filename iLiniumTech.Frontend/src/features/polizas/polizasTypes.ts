@@ -6,7 +6,9 @@ export interface PolizaListItem {
   ramo: string
   clienteId: string
   clienteNombre: string
+  documento: string
   compania: string
+  riesgo: string
   fechaEfecto: string
   fechaVencimiento: string
   primaAnual: number
@@ -45,7 +47,6 @@ export interface PolizaCreateResult {
 export interface PolizaDetail extends PolizaListItem {
   certificado: string
   tipoPoliza: string
-  riesgo: string
   oficina: string
   division: string
   colaborador1: string
@@ -56,7 +57,6 @@ export interface PolizaDetail extends PolizaListItem {
   canalCobro: string
   fraccionPago: string
   ccaa: string
-  documento: string
   apellido1: string
   apellido2: string
   nombre: string

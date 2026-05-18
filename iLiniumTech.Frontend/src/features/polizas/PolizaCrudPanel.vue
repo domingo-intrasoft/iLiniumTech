@@ -92,8 +92,8 @@ function resetForm() {
     const editableItem = props.item as PolizaListItem & { tipoPoliza?: string }
     form.numero = props.item.numero
     form.aplicacion = props.item.aplicacion || 'MVP'
-    form.estado = props.item.estado || 'Vigor'
-    form.ramo = props.item.ramo || 'Autos'
+    form.estado = catalogValueOrDefault(props.item.estado, props.catalogs.tipoPoliza, 'Vigor')
+    form.ramo = catalogValueOrDefault(props.item.ramo, props.catalogs.ramo, 'Autos')
     form.tipoPoliza = editableItem.tipoPoliza ?? ''
     form.fechaEfecto = props.item.fechaEfecto || '2026-01-01'
     form.fechaVencimiento = props.item.fechaVencimiento || ''
@@ -109,6 +109,21 @@ function resetForm() {
   form.tipoPoliza = 'polizaTipo-NU'
   form.fechaEfecto = '2026-01-01'
   form.fechaVencimiento = '2026-12-31'
+}
+
+function catalogValueOrDefault(
+  value: string,
+  options: Array<{ value: string; label: string }>,
+  fallback: string,
+) {
+  const normalized = value.trim().toLocaleLowerCase('es-ES')
+  const option = options.find(
+    (item) =>
+      item.value.trim().toLocaleLowerCase('es-ES') === normalized ||
+      item.label.trim().toLocaleLowerCase('es-ES') === normalized,
+  )
+
+  return option?.value ?? options[0]?.value ?? fallback
 }
 
 function submitForm() {

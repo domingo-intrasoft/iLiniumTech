@@ -536,7 +536,7 @@ autosParticulares.MapGet("/polizas", async (
     {
         var result = await service.SearchAsync(request, cancellationToken);
         return Results.Ok(new AutosParticularesPolizasResponse(
-            Items: result.Items,
+            Items: result.Items.Select(SanitizeAutosParticularesListItem).ToArray(),
             Page: result.Page,
             PageSize: result.PageSize,
             Total: result.Total,
@@ -691,6 +691,14 @@ static PolizaDetail SanitizeAutosParticularesDetail(PolizaDetail detail) =>
         Documento = string.Empty,
         Email = string.Empty,
         Telefono = string.Empty
+    };
+
+static PolizaListItem SanitizeAutosParticularesListItem(PolizaListItem item) =>
+    item with
+    {
+        ClienteId = string.Empty,
+        Documento = string.Empty,
+        Riesgo = string.IsNullOrWhiteSpace(item.Riesgo) ? string.Empty : "Vehiculo asegurado"
     };
 
 static Task WriteErrorAsync(HttpContext context, int statusCode, string code, string message)

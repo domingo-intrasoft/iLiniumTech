@@ -1546,6 +1546,9 @@ public sealed class PolizasApiTests
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         body.Should().Contain("\"items\"");
         body.Should().Contain("POL-2026-0001");
+        body.Should().Contain("\"clienteNombre\":\"Cliente anonimo 1\"");
+        body.Should().Contain("\"documento\":\"00000001A\"");
+        body.Should().Contain("\"riesgo\":\"1234 ABC\"");
     }
 
     [Fact]
@@ -1567,8 +1570,13 @@ public sealed class PolizasApiTests
         body.Should().Contain("\"divisionFiltroAplicado\":false");
         body.Should().Contain("\"divisionPendienteUat\":true");
         body.Should().Contain("\"total\":1");
+        body.Should().Contain("\"documento\":\"\"");
+        body.Should().Contain("\"riesgo\":\"Vehiculo asegurado\"");
         body.Should().NotContain("POL-2026-0002");
         body.Should().NotContain("\"ramo\":\"Hogar\"");
+        body.Should().NotContain("\"clienteId\":\"CLI-001\"");
+        body.Should().NotContain("00000001A");
+        body.Should().NotContain("1234 ABC");
         body.Should().NotContain("QueryStatic");
         body.Should().NotContain("Pantalla_Polizas");
     }

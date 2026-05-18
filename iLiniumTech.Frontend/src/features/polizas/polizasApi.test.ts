@@ -13,6 +13,8 @@ describe('polizas static frontend contract', () => {
       'aplicacion',
       'estado',
       'ramo',
+      'documento',
+      'riesgo',
       'fechaEfecto',
       'fechaVencimiento',
       'primaAnual',

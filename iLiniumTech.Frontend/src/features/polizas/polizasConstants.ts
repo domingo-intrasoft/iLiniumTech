@@ -49,6 +49,8 @@ export const polizasTableColumns: PolizaTableColumn[] = [
   { key: 'aplicacion', label: 'Aplicacion', type: 'string' },
   { key: 'estado', label: 'Situacion', type: 'string' },
   { key: 'ramo', label: 'Ramo', type: 'string' },
+  { key: 'documento', label: 'N. Documento', type: 'string' },
+  { key: 'riesgo', label: 'Riesgo/Matric.', type: 'string' },
   { key: 'fechaEfecto', label: 'Fecha efecto', type: 'date' },
   { key: 'fechaVencimiento', label: 'Fecha vencimiento', type: 'date' },
   { key: 'primaAnual', label: 'Prima anual', type: 'money' },

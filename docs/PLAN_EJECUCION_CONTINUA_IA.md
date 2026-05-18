@@ -22,7 +22,8 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 - `Polizas CRUD BBDD` queda como vertical MVP local de referencia, con smoke API/UI visible contra BBDD local de pruebas.
 - `/login`, shell, menu lateral y rutas protegidas del menu existen.
 - `Autos Particulares` queda aparcado; no ampliarlo.
-- Paridad visual de `/polizas` con AppBuilder publicado refinada en segundo corte: chrome demo, menu lateral compacto, buscador iconificado, grid plano y menor ruido visual sin simular datos.
+- Paridad visual de `/polizas` con AppBuilder publicado refinada en segundo corte: chrome demo, menu lateral compacto, buscador iconificado, grid plano y menor ruido visual.
+- Paridad de datos del grid de `Polizas` cerrada como MVP local/demo: `N. Documento`, cliente descriptivo, `Ramo` y `Riesgo/Matric.` salen del contrato API real y la logica AppBuilder queda documentada para el resto de paginas.
 - Paginas del menu distintas de Polizas siguen en carril fixture/read-only o bloqueadas; el siguiente bloque vuelve a la cola pequena salvo nueva prioridad humana.
 - Ronda documental por pagina completada en `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`.
 - SDD drafts existentes para `Siniestros`, `Recibos`, `Clientes`, `Agenda`, `Propuestas` y `Suplementos`.
@@ -171,6 +172,7 @@ Objetivo: endurecer lo ya conseguido en Polizas sin ampliar reglas no aprobadas.
 | `T-044-POL-APPBUILDER-VISUAL-SMOKE` | `DONE` | Ejecutar smoke visual y documentar diferencias pendientes frente a AppBuilder. | `T-043` |
 | `T-045-POL-APPBUILDER-VISUAL-PARITY-REFINE` | `DONE` | Segundo corte de paridad visual: barra demo, chrome AppBuilder, menu compacto, buscador icon-only, grid sin warnings visibles y estados reales normalizados. | captura usuario y feedback visual 2026-05-18 |
 | `T-046-POL-APPBUILDER-ASSETS-UAT` | `BLOCKED_HUMAN` | Validar logos/columnas sensibles/campos reales necesarios para pixel parity. | UAT/producto/DBA, origen autorizado de logos y datos |
+| `T-047-POL-APPBUILDER-DATA-PARITY` | `DONE` | Cerrar paridad de datos del grid: documento, cliente descriptivo, ramo lookup y riesgo/matricula. | feedback usuario 2026-05-18, SDD-2026-014 |
 
 ### Fase 6 - Reporting, liquidaciones y superficies tecnicas
 
@@ -241,3 +243,4 @@ Gate completo:
 - 2026-05-18: `T-044-POL-APPBUILDER-VISUAL-SMOKE` cerrada. Se ejecuto smoke en navegador local y smoke controlado de escritorio con Vite fixture temporal: toolbar, buscador, grid, columnas, scopes y badge `En Vigor` OK. Evidencia actualizada en `docs/qa/polizas-visual-parity-evidence.md`. El cursor queda en `T-041-POL-AUDIT-WRITES`.
 - 2026-05-18: `T-041-POL-AUDIT-WRITES` cerrada. Se creo `docs/engineering/polizas-write-audit-design.md` y se enlazo desde la evidencia CRUD. El diseno define eventos candidatos, campos permitidos, campos prohibidos, minimizacion, retencion y preguntas UAT/DBA sin implementar runtime ni guardar PII. El cursor queda en `T-042-POL-CRUD-REGRESSION-SMOKE`.
 - 2026-05-18: `T-042-POL-CRUD-REGRESSION-SMOKE` cerrada. Se reejecuto el smoke temporal API/UI CRUD real contra BBDD local de pruebas con resultados sanitizados: create 201, detail 200, search 1, update 204, delete 204, detail post-delete 404, limpieza exacta API/UI y residuales `0`. Evidencia actualizada en `docs/qa/polizas-crud-bbdd-evidence.md`. El cursor queda en `T-002-REC-FE-CONTRACT-FIXTURE`.
+- 2026-05-18: `T-047-POL-APPBUILDER-DATA-PARITY` cerrada. Se documento la logica AppBuilder de campos directos/lookups, se cambio lectura enriquecida de Polizas a `vw_ClientePolizas`, se incorporaron `documento` y `riesgo` al listado, `clienteNombre` ya no cae al codigo cliente, `Autos Particulares` sanitiza campos sensibles, smoke API/UI real OK contra BBDD local y validacion completa OK. El cursor vuelve a `T-002-REC-FE-CONTRACT-FIXTURE`.

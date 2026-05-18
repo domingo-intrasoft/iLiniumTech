@@ -306,7 +306,14 @@ describe('PolizasView smoke', () => {
       ...polizasFixture,
       total: 2,
       items: [
-        { ...polizasFixture.items[0], id: '101', numero: 'ILMVP-UI-0001', aplicacion: 'MVP' },
+        {
+          ...polizasFixture.items[0],
+          id: '101',
+          numero: 'ILMVP-UI-0001',
+          aplicacion: 'MVP',
+          estado: 'En Vigor',
+          ramo: 'No informado',
+        },
         polizasFixture.items[1],
       ],
     }
@@ -343,7 +350,7 @@ describe('PolizasView smoke', () => {
 
     expect(mocks.apiPut).toHaveBeenCalledWith(
       '/api/polizas/101',
-      expect.objectContaining({ numero: 'ILMVP-UI-0002' }),
+      expect.objectContaining({ numero: 'ILMVP-UI-0002', estado: 'Vigor', ramo: 'Autos' }),
     )
     expect(mocks.apiPut.mock.calls[0]?.[1]).not.toHaveProperty('primaAnual')
 

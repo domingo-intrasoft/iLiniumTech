@@ -103,7 +103,8 @@ Conclusion T-044: el corte visual queda aceptado para escritorio y documentado. 
 ## Diferencias pendientes frente a AppBuilder
 
 - Los logos de aseguradora no se muestran porque no hay fuente autorizada en el contrato actual.
-- `Certif.`, `N. Documento` y `Riesgo/Matric.` quedan con valor neutro hasta contrato API/UAT.
+- `Certif.` queda sin dato hasta contrato API/UAT.
+- `N. Documento`, `Cliente`, `Ramo` y `Riesgo/Matric.` pasan al carril de paridad de datos `T-047`.
 - La barra superior global se aproxima con el shell actual; no se copian usuarios, contadores ni datos de entorno de AppBuilder.
 - Los scopes `Flotas`, `Colectivas` y `Externas` siguen bloqueados o como rutas estaticas sin datos reales.
 
@@ -162,8 +163,93 @@ Smoke visual ejecutado:
 
 Notas de honestidad:
 
-- No se incorporan logos reales, documento, riesgo/matricula ni nombres no entregados por contrato.
-- La paridad pixel-perfect queda bloqueada hasta que producto/UAT autorice origen de logos, campos sensibles y reglas de visualizacion exactas.
+- T-045 no incorporo logos reales ni campos sensibles porque aun no estaban en contrato de listado.
+- T-047 incorpora documento, cliente, ramo descriptivo y riesgo porque el usuario lo convierte en objetivo explicito de MVP local/demo.
+- La paridad pixel-perfect queda bloqueada hasta que producto/UAT autorice origen de logos, campos sensibles y reglas de visualizacion exactas para produccion.
+
+## Paridad de datos T-047
+
+Fecha: 2026-05-18.
+
+Motivo: el usuario detecta que la comparacion contra AppBuilder sigue fallando porque el grid local no muestra `N. Documento`, nombre de cliente, `Ramo` descriptivo ni `Riesgo/Matric.`.
+
+Analisis documentado:
+
+- `docs/appbuilder/pages/polizas/data-contract-analysis.md`
+- `docs/appbuilder/pages/polizas/components/listado-grid.md`
+
+Cambios aplicados:
+
+- `PolizaListItem` incorpora `documento` y `riesgo`.
+- SQL de lectura usa `vw_ClientePolizas`, porque `Pantalla_Polizas` no contiene `NumDocumento`, `RazonSocial` ni `Riesgo`.
+- Se proyectan `NumDocumento`, `RazonSocial`, `Ramo` y `Riesgo` desde la vista de cliente-polizas.
+- `ramo` ya llega descriptivo en `vw_ClientePolizas`, siguiendo la logica AppBuilder de lookup descriptivo.
+- La busqueda `cliente` contempla nombre completo, documento y codigo cliente.
+- `PolizasTable.vue` deja de tratar `N. Documento` y `Riesgo/Matric.` como datos ausentes.
+- `Autos Particulares` sanitiza `documento`, `clienteId` y `riesgo` al seguir fuera del objetivo activo.
+
+Validacion dirigida inicial:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "PolizasSqlQueryBuilderTests|PolizasApiTests"
+cd .\iLiniumTech.Frontend
+npm run test:unit -- PolizasTable.test.ts polizasApi.test.ts
+```
+
+Resultados: backend dirigido `95/95` OK y frontend dirigido `15/15` OK.
+
+Correccion tras smoke SQL real:
+
+- El primer intento contra BBDD local demostro que `Pantalla_Polizas` no contiene `NumDocumento`, `RazonSocial` ni `Riesgo`.
+- Se inspecciono solo esquema, sin datos ni credenciales, y se eligio `vw_ClientePolizas` como origen explicito de lectura enriquecida.
+- La escritura sigue usando `dbo.Poliza`; la visibilidad tecnica post-create sigue apoyandose en `Pantalla_Polizas`.
+
+Smoke API/UI real final:
+
+```powershell
+dotnet run --project $env:TEMP\iliniumtech-api-crud-visible-smoke\iliniumtech-api-crud-visible-smoke.csproj
+```
+
+Resultados sanitizados:
+
+- API: `ApiSqlCrudVisibleSmoke=OK`;
+- create `201`;
+- detail post-create `200`;
+- search post-create `1`;
+- update `204`;
+- detail post-update `200`;
+- delete `204`;
+- detail post-delete `404`;
+- limpieza exacta API/UI sin residuales;
+- UI: `UiSqlCrudVisibleSmoke=OK`.
+
+Smoke visual en navegador embebido con procesos frescos:
+
+- URL: `http://127.0.0.1:5175/polizas?page=1&pageSize=25`;
+- `rowCount=25`;
+- columnas `N. Documento`, `Cliente`, `Ramo` y `Riesgo/Matric.` visibles;
+- sin skeleton, sin error y sin `No informado` visible;
+- badge `En Vigor` visible;
+- el valor de cliente ya no cae al codigo `4692`; se muestra texto descriptivo desde la vista de BBDD local.
+
+Validacion completa final:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release
+cd .\iLiniumTech.Frontend
+npm run format
+npm run lint
+npm run test:unit
+npm run build
+cd ..
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-DependencyAudit.ps1 -FailOnFindings
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-CorsAudit.ps1 -FailOnFindings
+git diff --check
+```
+
+Resultados: backend `149/149` OK, frontend unit `201/201` OK, format/lint/build OK, documentation baseline OK, secret scan sin leaks, dependency audit `0` findings, CORS audit OK y diff check sin errores.
 
 ## Riesgos residuales
 

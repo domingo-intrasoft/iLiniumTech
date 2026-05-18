@@ -66,17 +66,17 @@ Ese patron es evidencia historica. iLiniumTech no debe usar metadata para column
 | 10 | `Poliza` | Poliza | string | si | si | Mostrar como `numero` y enlace al detalle |
 | 20 | `Aplicacion` | Aplicacion | string | si | si | Mostrar si UAT confirma valor |
 | 30 | `IdTipoPoliza` | Tipo poliza | int | si | si | Convertir a descripcion de catalogo |
-| 40 | `NumDocumento` | Documento | string | si | si | No mostrar completo por defecto |
+| 40 | `NumDocumento` | Documento | string | si | si | Mostrar en MVP local/demo de paridad; requiere permiso/minimizacion antes de produccion |
 | 50 | `IdSituacion` | Situacion | int | si | si | Mostrar como `estado` |
 | 60 | `IdRamo` | Ramo | int | si | si | Mostrar como `ramo` |
-| 70 | `Riesgo` | Riesgo | string | si | si | Evaluar PII/matricula |
+| 70 | `Riesgo` | Riesgo | string | si | si | Mostrar en MVP local/demo de paridad; requiere permiso/minimizacion antes de produccion |
 | 80 | `F_Efecto` | Fecha efecto | date | si | si | Mostrar |
 | 90 | `F_Vencimiento` | Fecha vencimiento | date | si | si | Mostrar |
 | 100 | `F_Anulacion` | Fecha anulacion | date | si | si | Secundaria |
 | 110 | `IdMotivoAnulacion` | Motivo anulacion | int | si | si | Secundaria/catalogo |
 | 120 | `Cia` | Compania | string | si | si | Mostrar como descripcion |
 | 130 | `PAnualCartera` | Prima anual cartera | decimal | no | si | Mostrar con formato moneda |
-| 140 | `NombreCompleto` | Tomador | string | si | si | PII; mostrar segun decision |
+| 140 | `NombreCompleto` | Tomador | string | si | si | Mostrar como `clienteNombre`; no sustituir por `ClienteId` salvo fallback tecnico |
 | 150 | `AlertaInformativa` | Alerta informativa | bool | no | no | Indicador futuro |
 | 160 | `AlertaExclamativa` | Alerta exclamativa | bool | no | no | Indicador futuro |
 | 170 | `AlertaRstrictiva` | Alerta restrictiva | bool | no | no | Normalizar nombre, no propagar typo |
@@ -135,12 +135,24 @@ Prioridad de columnas MVP:
 
 Columnas diferidas:
 
-- documento;
 - motivo anulacion;
 - fecha anulacion;
-- riesgo/matricula;
 - alertas;
 - columnas de oficina, gestor o division si aparecen en detalle/filtros pero no en metadata de listado sanitizada.
+
+## Actualizacion 2026-05-18 - paridad de datos
+
+El usuario confirma que la comparacion contra AppBuilder requiere que el grid muestre datos reales para `N. Documento`, cliente descriptivo, `Ramo` y `Riesgo/Matric.`. La decision anterior de no mostrarlos por defecto se mantiene como cautela productiva, pero el MVP local/demo debe transportar esos campos para poder validar igualdad visual y funcional.
+
+Regla implementable:
+
+- `NumDocumento` -> `documento`;
+- `NombreCompleto` / `RazonSocial` -> `clienteNombre`;
+- `IdRamo` con lookup `Ramo` -> `ramo` descriptivo, no id crudo;
+- `Riesgo` -> `riesgo`;
+- rutas derivadas como `Autos Particulares` deben sanitizar estos campos si siguen aparcadas o fuera de SDD.
+
+Analisis detallado: `docs/appbuilder/pages/polizas/data-contract-analysis.md`.
 
 ## Propuesta API estatica
 

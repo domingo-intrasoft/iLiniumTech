@@ -46,11 +46,11 @@ const appBuilderColumns = [
   { key: 'compania', label: 'Cia.', kind: 'field' },
   { key: 'numero', label: 'Poliza', kind: 'poliza' },
   { key: 'certificado', label: 'Certif.', kind: 'missing' },
-  { key: 'documento', label: 'N. Documento', kind: 'missing' },
+  { key: 'documento', label: 'N. Documento', kind: 'field' },
   { key: 'clienteNombre', label: 'Cliente', kind: 'field' },
   { key: 'estado', label: 'Situacion', kind: 'status' },
   { key: 'ramo', label: 'Ramo', kind: 'field' },
-  { key: 'riesgo', label: 'Riesgo/Matric.', kind: 'missing' },
+  { key: 'riesgo', label: 'Riesgo/Matric.', kind: 'field' },
 ] as const
 const totalPages = computed(() => Math.max(1, Math.ceil(props.total / props.pageSize)))
 const firstVisible = computed(() => (props.total === 0 ? 0 : (props.page - 1) * props.pageSize + 1))
@@ -83,12 +83,20 @@ function appBuilderCellValue(item: PolizaListItem, key: string) {
     return item.clienteNombre
   }
 
+  if (key === 'documento') {
+    return item.documento
+  }
+
   if (key === 'estado') {
     return item.estado
   }
 
   if (key === 'ramo') {
     return item.ramo
+  }
+
+  if (key === 'riesgo') {
+    return item.riesgo
   }
 
   return ''
