@@ -6,6 +6,7 @@ Decision critica: iLiniumTech no sera un runtime dinamico tipo AppBuilder. La me
 
 Documento principal:
 
+- [docs/PLAN_EJECUCION_CONTINUA_IA.md](docs/PLAN_EJECUCION_CONTINUA_IA.md)
 - [docs/ROADMAP_OBJETIVO_FINAL.md](docs/ROADMAP_OBJETIVO_FINAL.md)
 - [docs/DECISION_PRODUCTO_ARQUITECTURA.md](docs/DECISION_PRODUCTO_ARQUITECTURA.md)
 - [docs/APPBUILDER_ANALISIS_ARQUITECTURA.md](docs/APPBUILDER_ANALISIS_ARQUITECTURA.md)
