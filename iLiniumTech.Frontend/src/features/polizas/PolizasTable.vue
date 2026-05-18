@@ -2,7 +2,6 @@
 import { computed } from 'vue'
 import { RouterLink, type LocationQueryRaw } from 'vue-router'
 
-import { polizasTableColumns, type PolizaTableColumn } from './polizasConstants'
 import { POLIZA_EMPTY_VALUE, formatPolizaValue } from './polizasFormatters'
 import { POLIZA_MVP_PREFIX, type PolizaListItem } from './polizasTypes'
 
@@ -41,6 +40,18 @@ const emit = defineEmits<{
 
 const pageSizeOptions = [10, 25, 50]
 const loadingRows = Array.from({ length: 5 }, (_, index) => index)
+const appBuilderColumns = [
+  { key: 'selector', label: '', kind: 'selector' },
+  { key: 'actions', label: '', kind: 'actions' },
+  { key: 'compania', label: 'Cia.', kind: 'field' },
+  { key: 'numero', label: 'Poliza', kind: 'poliza' },
+  { key: 'certificado', label: 'Certif.', kind: 'missing' },
+  { key: 'documento', label: 'N. Documento', kind: 'missing' },
+  { key: 'clienteNombre', label: 'Cliente', kind: 'field' },
+  { key: 'estado', label: 'Situacion', kind: 'status' },
+  { key: 'ramo', label: 'Ramo', kind: 'field' },
+  { key: 'riesgo', label: 'Riesgo/Matric.', kind: 'missing' },
+] as const
 const totalPages = computed(() => Math.max(1, Math.ceil(props.total / props.pageSize)))
 const firstVisible = computed(() => (props.total === 0 ? 0 : (props.page - 1) * props.pageSize + 1))
 const lastVisible = computed(() => Math.min(props.page * props.pageSize, props.total))
@@ -59,8 +70,43 @@ const tableCaption = computed(
     `Listado de polizas. Mostrando ${firstVisible.value}-${lastVisible.value} de ${props.total}.`,
 )
 
-function tableCellValue(item: PolizaListItem, column: PolizaTableColumn) {
-  return item[column.key]
+function appBuilderCellValue(item: PolizaListItem, key: string) {
+  if (key === 'compania') {
+    return item.compania
+  }
+
+  if (key === 'numero') {
+    return item.numero
+  }
+
+  if (key === 'clienteNombre') {
+    return item.clienteNombre
+  }
+
+  if (key === 'estado') {
+    return item.estado
+  }
+
+  if (key === 'ramo') {
+    return item.ramo
+  }
+
+  return ''
+}
+
+function statusLabel(value: string) {
+  return value.trim().toLocaleLowerCase('es-ES') === 'vigor'
+    ? 'En Vigor'
+    : formatPolizaValue(value, 'string')
+}
+
+function statusClass(value: string) {
+  const normalized = value.trim().toLocaleLowerCase('es-ES')
+  return {
+    'policy-status-badge': true,
+    'status-active': normalized === 'vigor',
+    'status-muted': normalized !== 'vigor',
+  }
 }
 
 function changePage(page: number) {
@@ -126,13 +172,13 @@ function writeActionTitle(item: PolizaListItem, action: 'edit' | 'delete') {
 
 <template>
   <section
-    class="results-summary"
+    class="results-summary polizas-results-grid"
     aria-labelledby="polizas-results-title"
     :aria-busy="loading"
     aria-live="polite"
   >
     <div class="summary-header">
-      <h2 id="polizas-results-title">Resultado</h2>
+      <h2 id="polizas-results-title">Polizas</h2>
       <span>
         <strong>{{ total }}</strong> {{ resultLabel }}
       </span>
@@ -156,25 +202,32 @@ function writeActionTitle(item: PolizaListItem, action: 'edit' | 'delete') {
 
     <div v-if="loading" class="table-scroll" role="status" aria-label="Cargando polizas">
       <span class="sr-only">Cargando polizas.</span>
-      <table>
+      <table class="appbuilder-table">
         <caption class="sr-only">
           Cargando listado de polizas.
         </caption>
         <thead>
           <tr>
-            <th scope="col">Acciones</th>
-            <th v-for="column in polizasTableColumns" :key="column.key" scope="col">
-              {{ column.label }}
+            <th v-for="column in appBuilderColumns" :key="column.key" scope="col">
+              <span v-if="column.label" class="column-heading">
+                <span>{{ column.label }}</span>
+                <i class="pi pi-filter" aria-hidden="true"></i>
+              </span>
+              <span v-else class="sr-only">
+                {{ column.kind === 'selector' ? 'Seleccion' : 'Acciones' }}
+              </span>
             </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="row in loadingRows" :key="row" class="skeleton-row">
-            <td>
-              <span class="skeleton-cell compact">{{ POLIZA_EMPTY_VALUE }}</span>
-            </td>
-            <td v-for="column in polizasTableColumns" :key="column.key">
-              <span class="skeleton-cell">{{ POLIZA_EMPTY_VALUE }}</span>
+            <td v-for="column in appBuilderColumns" :key="column.key">
+              <span
+                class="skeleton-cell"
+                :class="{ compact: column.kind === 'selector' || column.kind === 'actions' }"
+              >
+                {{ POLIZA_EMPTY_VALUE }}
+              </span>
             </td>
           </tr>
         </tbody>
@@ -202,81 +255,112 @@ function writeActionTitle(item: PolizaListItem, action: 'edit' | 'delete') {
     </div>
 
     <div v-else class="table-scroll">
-      <table>
+      <table class="appbuilder-table">
         <caption class="sr-only" v-text="tableCaption"></caption>
         <thead>
           <tr>
-            <th scope="col">Acciones</th>
-            <th v-for="column in polizasTableColumns" :key="column.key" scope="col">
-              {{ column.label }}
+            <th v-for="column in appBuilderColumns" :key="column.key" scope="col">
+              <span v-if="column.label" class="column-heading">
+                <span>{{ column.label }}</span>
+                <i class="pi pi-filter" aria-hidden="true"></i>
+              </span>
+              <span v-else class="sr-only">
+                {{ column.kind === 'selector' ? 'Seleccion' : 'Acciones' }}
+              </span>
             </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in items" :key="item.id">
-            <td>
-              <RouterLink
-                v-if="canOpenDetail"
-                class="table-icon-action"
-                :to="detailRoute(item)"
-                :aria-label="`Ver detalle de poliza ${item.numero}`"
-                title="Ver detalle"
-              >
-                <i class="pi pi-eye" aria-hidden="true"></i>
-              </RouterLink>
-              <button
-                v-else
-                class="table-icon-action"
-                type="button"
-                :aria-label="`Detalle no disponible para poliza ${item.numero}`"
-                :aria-describedby="
-                  detailUnavailableMessage ? detailUnavailableMessageId : undefined
-                "
-                title="Detalle no disponible"
-                disabled
-              >
-                <i class="pi pi-eye-slash" aria-hidden="true"></i>
-              </button>
-              <button
-                class="table-icon-action write-action"
-                type="button"
-                :aria-label="`Editar poliza ${item.numero}`"
-                :aria-describedby="
-                  writesAllowed && !canEditItem(item) ? writeUnavailableMessageId : undefined
-                "
-                :title="writeActionTitle(item, 'edit')"
-                :disabled="!canEditItem(item)"
-                @click="emit('edit', item)"
-              >
-                <i class="pi pi-pencil" aria-hidden="true"></i>
-              </button>
-              <button
-                class="table-icon-action write-action danger"
-                type="button"
-                :aria-label="`Eliminar poliza ${item.numero}`"
-                :aria-describedby="
-                  writesAllowed && !canDeleteItem(item) ? writeUnavailableMessageId : undefined
-                "
-                :title="writeActionTitle(item, 'delete')"
-                :disabled="!canDeleteItem(item)"
-                @click="emit('delete', item)"
-              >
-                <i class="pi pi-trash" aria-hidden="true"></i>
-              </button>
-            </td>
-            <td v-for="column in polizasTableColumns" :key="column.key">
-              <RouterLink
-                v-if="column.key === 'numero' && canOpenDetail"
-                class="table-link"
-                :to="detailRoute(item)"
-              >
-                {{ formatPolizaValue(tableCellValue(item, column), column.type, item.moneda) }}
-              </RouterLink>
-              <span v-else-if="column.key === 'numero'">
-                {{ formatPolizaValue(tableCellValue(item, column), column.type, item.moneda) }}
+            <td v-for="column in appBuilderColumns" :key="column.key">
+              <span
+                v-if="column.kind === 'selector'"
+                class="row-selector-dot"
+                aria-hidden="true"
+              ></span>
+              <span v-else-if="column.kind === 'actions'" class="row-action-cluster">
+                <button
+                  class="row-menu-action"
+                  type="button"
+                  :aria-label="`Menu contextual no disponible para poliza ${item.numero}`"
+                  title="Menu contextual pendiente de SDD"
+                  disabled
+                >
+                  <i class="pi pi-ellipsis-v" aria-hidden="true"></i>
+                </button>
+                <RouterLink
+                  v-if="canOpenDetail"
+                  class="table-icon-action"
+                  :to="detailRoute(item)"
+                  :aria-label="`Ver detalle de poliza ${item.numero}`"
+                  title="Ver detalle"
+                >
+                  <i class="pi pi-eye" aria-hidden="true"></i>
+                </RouterLink>
+                <button
+                  v-else
+                  class="table-icon-action"
+                  type="button"
+                  :aria-label="`Detalle no disponible para poliza ${item.numero}`"
+                  :aria-describedby="
+                    detailUnavailableMessage ? detailUnavailableMessageId : undefined
+                  "
+                  title="Detalle no disponible"
+                  disabled
+                >
+                  <i class="pi pi-eye-slash" aria-hidden="true"></i>
+                </button>
+                <button
+                  class="table-icon-action write-action"
+                  type="button"
+                  :aria-label="`Editar poliza ${item.numero}`"
+                  :aria-describedby="
+                    writesAllowed && !canEditItem(item) ? writeUnavailableMessageId : undefined
+                  "
+                  :title="writeActionTitle(item, 'edit')"
+                  :disabled="!canEditItem(item)"
+                  @click="emit('edit', item)"
+                >
+                  <i class="pi pi-pencil" aria-hidden="true"></i>
+                </button>
+                <button
+                  class="table-icon-action write-action danger"
+                  type="button"
+                  :aria-label="`Eliminar poliza ${item.numero}`"
+                  :aria-describedby="
+                    writesAllowed && !canDeleteItem(item) ? writeUnavailableMessageId : undefined
+                  "
+                  :title="writeActionTitle(item, 'delete')"
+                  :disabled="!canDeleteItem(item)"
+                  @click="emit('delete', item)"
+                >
+                  <i class="pi pi-trash" aria-hidden="true"></i>
+                </button>
               </span>
-              <span v-else>
-                {{ formatPolizaValue(tableCellValue(item, column), column.type, item.moneda) }}
+              <span v-else-if="column.kind === 'field'" class="dense-cell">
+                {{
+                  formatPolizaValue(appBuilderCellValue(item, column.key), 'string', item.moneda)
+                }}
+              </span>
+              <RouterLink
+                v-else-if="column.kind === 'poliza' && canOpenDetail"
+                class="table-link policy-number-link"
+                :to="detailRoute(item)"
+              >
+                {{
+                  formatPolizaValue(appBuilderCellValue(item, column.key), 'string', item.moneda)
+                }}
+              </RouterLink>
+              <span v-else-if="column.kind === 'poliza'" class="policy-number-link readonly">
+                {{
+                  formatPolizaValue(appBuilderCellValue(item, column.key), 'string', item.moneda)
+                }}
+              </span>
+              <span v-else-if="column.kind === 'status'" :class="statusClass(item.estado)">
+                {{ statusLabel(item.estado) }}
+              </span>
+              <span v-else class="pending-data-cell" title="Dato no entregado por la API actual">
+                {{ POLIZA_EMPTY_VALUE }}
               </span>
             </td>
           </tr>

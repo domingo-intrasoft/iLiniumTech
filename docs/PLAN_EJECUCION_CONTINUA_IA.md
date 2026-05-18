@@ -30,18 +30,18 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-043-POL-APPBUILDER-VISUAL-SHELL`
+ID: `T-044-POL-APPBUILDER-VISUAL-SMOKE`
 
 Estado: `READY`
 
-Nombre: aproximar `/polizas` al shell/grid visual de AppBuilder publicado.
+Nombre: ejecutar smoke visual y cerrar diferencias pendientes de `/polizas` frente a AppBuilder.
 
 Objetivo:
 
-- Rediseñar la primera pantalla de `Polizas` para que se parezca claramente a la captura AppBuilder: toolbar compacta, buscador en grid, tabla densa, columnas objetivo y badges.
-- Mantener CRUD real, permisos y backend existentes.
-- No crear datos simulados, logos falsos, acciones falsas ni metadata runtime.
-- No tocar backend ni servicios API en este primer corte visual.
+- Abrir `/polizas` en navegador local/demo y revisar visualmente el primer corte AppBuilder-like.
+- Confirmar que toolbar, buscador, tabla densa, columnas objetivo, badges y scopes bloqueados se ven correctamente.
+- Ajustar solo CSS/Vue menor si el smoke muestra solapes, texto cortado o rotura clara.
+- Documentar diferencias pendientes sin inventar datos, logos ni acciones.
 
 Fuentes a leer, sin buscar mas salvo bloqueo:
 
@@ -49,7 +49,7 @@ Fuentes a leer, sin buscar mas salvo bloqueo:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/sdd/specs/iLiniumTech/SDD-2026-014-polizas-appbuilder-visual-parity.md`
 - `docs/appbuilder/pages/polizas/visual-parity-mvp.md`
-- `docs/qa/polizas-crud-bbdd-evidence.md`
+- `docs/qa/polizas-visual-parity-evidence.md`
 - `iLiniumTech.Frontend/src/features/polizas/PolizasView.vue`
 - `iLiniumTech.Frontend/src/features/polizas/PolizasTable.vue`
 - `iLiniumTech.Frontend/src/features/polizas/PolizasFilters.vue`
@@ -78,14 +78,13 @@ Archivos que NO debe tocar:
 
 Pasos de implementacion:
 
-1. Reordenar la superficie de `PolizasView.vue` para acercarla a AppBuilder: toolbar compacta, scopes a la derecha, contador visible y buscador integrado sobre el grid.
-2. Ajustar `PolizasTable.vue` a grid denso con columnas objetivo usando solo campos reales existentes.
-3. Añadir/ajustar estilos en `main.scss` para densidad, lineas de tabla, badges y toolbar compacta; evitar cards grandes.
-4. Mantener acciones sin implementacion real bloqueadas/deshabilitadas y accesibles.
-5. No fabricar logos ni campos inexistentes; si falta dato real, documentarlo en `polizas-visual-parity-evidence.md`.
-6. Actualizar tests unitarios de Polizas para el nuevo layout.
-7. Ejecutar validacion frontend completa y secret scan.
-8. Si todo pasa, marcar esta tarea `DONE` y mover **Siguiente tarea activa** a `T-044-POL-APPBUILDER-VISUAL-SMOKE`.
+1. Revisar `docs/qa/polizas-visual-parity-evidence.md` y abrir `/polizas` en navegador local/demo.
+2. Validar checklist visual: toolbar compacta, scopes a la derecha, buscador `Buscar...`, tabla densa, columnas objetivo, badge `En Vigor`, acciones bloqueadas accesibles.
+3. Si hay defectos menores de layout, corregirlos solo en archivos permitidos y actualizar tests afectados.
+4. Si el defecto implica contrato API, datos sensibles, logos, PII o backend, no programar: documentar diferencia pendiente.
+5. Actualizar evidencia QA con resultado del smoke y diferencias pendientes.
+6. Ejecutar validacion frontend/documental minima.
+7. Si todo pasa, marcar esta tarea `DONE` y promover la siguiente tarea segura no bloqueada.
 
 Pruebas obligatorias:
 
@@ -104,9 +103,10 @@ git diff --check
 
 Criterios de aceptacion:
 
-- `/polizas` se reconoce como pariente visual claro de AppBuilder publicado.
+- Smoke visual de `/polizas` documentado.
+- No hay solapes, texto claramente cortado ni tabla rota en escritorio.
+- Diferencias por datos ausentes quedan documentadas como pendientes, no simuladas.
 - CRUD real y lectura backend/fixture existentes no se rompen.
-- No se crean datos simulados, logos falsos ni acciones falsas.
 - Los scopes sin SDD/API/UAT siguen bloqueados.
 - Tests unitarios, lint y build pasan.
 - Evidencia QA visual queda actualizada.
@@ -177,8 +177,8 @@ Objetivo: endurecer lo ya conseguido en Polizas sin ampliar reglas no aprobadas.
 | `T-040-POL-UAT-FIELDS` | `BLOCKED_HUMAN` | Confirmar campos editables definitivos y semantica de baja. | UAT/DBA |
 | `T-041-POL-AUDIT-WRITES` | `TODO` | Disenar auditoria de escritura sin datos sensibles. | puede ser documental |
 | `T-042-POL-CRUD-REGRESSION-SMOKE` | `TODO` | Mantener smoke local API/UI de CRUD real sin secretos. | BBDD local disponible |
-| `T-043-POL-APPBUILDER-VISUAL-SHELL` | `READY` | Aproximar `/polizas` al shell/grid visual de AppBuilder publicado sin simular datos. | captura usuario y SDD-2026-014 |
-| `T-044-POL-APPBUILDER-VISUAL-SMOKE` | `TODO` | Ejecutar smoke visual y documentar diferencias pendientes frente a AppBuilder. | `T-043` |
+| `T-043-POL-APPBUILDER-VISUAL-SHELL` | `DONE` | Aproximar `/polizas` al shell/grid visual de AppBuilder publicado sin simular datos. | captura usuario y SDD-2026-014 |
+| `T-044-POL-APPBUILDER-VISUAL-SMOKE` | `READY` | Ejecutar smoke visual y documentar diferencias pendientes frente a AppBuilder. | `T-043` |
 
 ### Fase 6 - Reporting, liquidaciones y superficies tecnicas
 
@@ -245,3 +245,4 @@ Gate completo:
 - 2026-05-18: creado el plan continuo y seleccionada `T-001-SIN-FE-CONTRACT-FIXTURE` como siguiente tarea segura.
 - 2026-05-18: `T-001-SIN-FE-CONTRACT-FIXTURE` cerrada. Se separaron tipos, fixture y composable de `Siniestros`; validacion OK con test dirigido, format, lint, unit, build, baseline documental, secret scan y `git diff --check`. El cursor queda en `T-002-REC-FE-CONTRACT-FIXTURE`.
 - 2026-05-18: el usuario redefine el siguiente MVP: `/polizas` debe parecerse a la pantalla AppBuilder publicada, pero manteniendo CRUD real y sin atajos/simulaciones. `T-002` queda pospuesta y el cursor pasa a `T-043-POL-APPBUILDER-VISUAL-SHELL`.
+- 2026-05-18: `T-043-POL-APPBUILDER-VISUAL-SHELL` cerrada. Se compactaron toolbar/buscador/tabla de `Polizas`, se agregaron columnas objetivo con valores neutros para datos no entregados por API, badge `En Vigor`, tests visuales de tabla y evidencia en `docs/qa/polizas-visual-parity-evidence.md`. Validacion OK con targeted tests `23/23`, format, lint, unit completo `198/198`, build, baseline documental, secret scan y `git diff --check`. El cursor queda en `T-044-POL-APPBUILDER-VISUAL-SMOKE`.

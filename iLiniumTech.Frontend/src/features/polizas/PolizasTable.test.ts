@@ -30,10 +30,26 @@ describe('PolizasTable', () => {
   it('renders rows with accessible result context', () => {
     const wrapper = mountTable()
 
-    expect(wrapper.find('#polizas-results-title').text()).toBe('Resultado')
+    expect(wrapper.find('#polizas-results-title').text()).toBe('Polizas')
     expect(wrapper.text()).toContain('2 polizas')
     expect(wrapper.get('caption').text()).toBe('Listado de polizas. Mostrando 1-2 de 2.')
+    expect(wrapper.get('table').classes()).toContain('appbuilder-table')
+    expect(wrapper.findAll('thead th').map((header) => header.text())).toEqual([
+      'Seleccion',
+      'Acciones',
+      'Cia.',
+      'Poliza',
+      'Certif.',
+      'N. Documento',
+      'Cliente',
+      'Situacion',
+      'Ramo',
+      'Riesgo/Matric.',
+    ])
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
+    expect(wrapper.find('.policy-status-badge').text()).toBe('En Vigor')
+    expect(wrapper.find('.policy-number-link').text()).toBe('POL-2026-0001')
+    expect(wrapper.findAll('.pending-data-cell')).toHaveLength(6)
   })
 
   it('renders a loading table without losing column structure', () => {

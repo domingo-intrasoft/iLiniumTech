@@ -144,11 +144,11 @@ watch(() => props.criteria, applyCriteria, { immediate: true, deep: true })
 
 <template>
   <section
-    class="search-panel"
+    class="search-panel polizas-search-panel"
     aria-label="Busqueda avanzada de polizas"
     :aria-busy="props.loading"
   >
-    <header class="search-actions">
+    <header class="search-actions polizas-grid-search">
       <p id="polizas-filter-blocked-actions" class="sr-only">
         {{ blockedFilterActionsDescription }}
       </p>
@@ -162,7 +162,31 @@ watch(() => props.criteria, applyCriteria, { immediate: true, deep: true })
       <p id="polizas-filter-unsupported" class="sr-only">
         {{ unsupportedFilterDescription }}
       </p>
+      <label class="polizas-main-search" for="polizas-filter-poliza">
+        <i class="pi pi-search" aria-hidden="true"></i>
+        <span class="sr-only">Buscar poliza</span>
+        <input
+          id="polizas-filter-poliza"
+          v-model="searchValues.poliza"
+          type="search"
+          placeholder="Buscar..."
+          aria-label="Poliza"
+          :aria-describedby="searchDescriptionId()"
+          :disabled="props.searchDisabled"
+          @keydown.enter.prevent="executeSearch"
+        />
+      </label>
       <div class="search-action-buttons">
+        <button
+          type="button"
+          class="icon-only"
+          aria-label="Opciones de filtro para Poliza no disponibles en el MVP"
+          :title="filterOptionActionDescription"
+          aria-describedby="polizas-filter-blocked-actions"
+          disabled
+        >
+          <i class="pi pi-cog" aria-hidden="true"></i>
+        </button>
         <button
           type="button"
           class="primary-action"
@@ -234,75 +258,83 @@ watch(() => props.criteria, applyCriteria, { immediate: true, deep: true })
       {{ props.error }}
     </p>
 
-    <div class="criteria-card">
-      <div class="criteria-select">
-        <button
-          type="button"
-          :title="blockedFilterActionsDescription"
-          aria-describedby="polizas-filter-blocked-actions"
-          disabled
-        >
-          Seleccione... <i class="pi pi-chevron-down" aria-hidden="true"></i>
-        </button>
-      </div>
-
-      <section v-for="section in polizasSearchSections" :key="section.title" class="filter-section">
-        <div class="filter-section-title">
-          <h2>{{ section.title }}</h2>
-          <i class="pi pi-minus" aria-hidden="true"></i>
-        </div>
-
-        <div v-for="(row, rowIndex) in section.rows" :key="rowIndex" class="filter-row">
-          <label
-            v-for="field in row"
-            :key="field.key"
-            class="filter-field"
-            :class="{ 'unsupported-filter': !fieldIsSupported(field) }"
-            :for="fieldControlId(field)"
-            :style="fieldStyle(field)"
-            :title="fieldTitle(field)"
+    <details class="advanced-filter-panel">
+      <summary>Filtros detallados</summary>
+      <div class="criteria-card">
+        <div class="criteria-select">
+          <button
+            type="button"
+            :title="blockedFilterActionsDescription"
+            aria-describedby="polizas-filter-blocked-actions"
+            disabled
           >
-            <span>{{ field.label }}</span>
-            <span class="field-control">
-              <select
-                v-if="field.control === 'select'"
-                :id="fieldControlId(field)"
-                v-model="searchValues[field.key]"
-                :aria-label="field.label"
-                :aria-describedby="fieldDescriptionIds(field)"
-                :disabled="fieldDisabled(field)"
-              >
-                <option value=""></option>
-                <option
-                  v-for="option in catalogOptions(field)"
-                  :key="option.value"
-                  :value="option.value"
-                >
-                  {{ option.label }}
-                </option>
-              </select>
-              <input
-                v-else
-                :id="fieldControlId(field)"
-                v-model="searchValues[field.key]"
-                :type="field.control === 'date' ? 'date' : 'search'"
-                :aria-label="field.label"
-                :aria-describedby="fieldDescriptionIds(field)"
-                :disabled="fieldDisabled(field)"
-              />
-              <button
-                type="button"
-                :aria-label="`Opciones de filtro para ${field.label} no disponibles en el MVP`"
-                :title="filterOptionActionDescription"
-                aria-describedby="polizas-filter-blocked-actions"
-                disabled
-              >
-                <i class="pi pi-filter" aria-hidden="true"></i>
-              </button>
-            </span>
-          </label>
+            Seleccione... <i class="pi pi-chevron-down" aria-hidden="true"></i>
+          </button>
         </div>
-      </section>
-    </div>
+
+        <section
+          v-for="section in polizasSearchSections"
+          :key="section.title"
+          class="filter-section"
+        >
+          <div class="filter-section-title">
+            <h2>{{ section.title }}</h2>
+            <i class="pi pi-minus" aria-hidden="true"></i>
+          </div>
+
+          <div v-for="(row, rowIndex) in section.rows" :key="rowIndex" class="filter-row">
+            <template v-for="field in row" :key="field.key">
+              <label
+                v-if="field.key !== 'poliza'"
+                class="filter-field"
+                :class="{ 'unsupported-filter': !fieldIsSupported(field) }"
+                :for="fieldControlId(field)"
+                :style="fieldStyle(field)"
+                :title="fieldTitle(field)"
+              >
+                <span>{{ field.label }}</span>
+                <span class="field-control">
+                  <select
+                    v-if="field.control === 'select'"
+                    :id="fieldControlId(field)"
+                    v-model="searchValues[field.key]"
+                    :aria-label="field.label"
+                    :aria-describedby="fieldDescriptionIds(field)"
+                    :disabled="fieldDisabled(field)"
+                  >
+                    <option value=""></option>
+                    <option
+                      v-for="option in catalogOptions(field)"
+                      :key="option.value"
+                      :value="option.value"
+                    >
+                      {{ option.label }}
+                    </option>
+                  </select>
+                  <input
+                    v-else
+                    :id="fieldControlId(field)"
+                    v-model="searchValues[field.key]"
+                    :type="field.control === 'date' ? 'date' : 'search'"
+                    :aria-label="field.label"
+                    :aria-describedby="fieldDescriptionIds(field)"
+                    :disabled="fieldDisabled(field)"
+                  />
+                  <button
+                    type="button"
+                    :aria-label="`Opciones de filtro para ${field.label} no disponibles en el MVP`"
+                    :title="filterOptionActionDescription"
+                    aria-describedby="polizas-filter-blocked-actions"
+                    disabled
+                  >
+                    <i class="pi pi-filter" aria-hidden="true"></i>
+                  </button>
+                </span>
+              </label>
+            </template>
+          </div>
+        </section>
+      </div>
+    </details>
   </section>
 </template>

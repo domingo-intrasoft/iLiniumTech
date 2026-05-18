@@ -155,6 +155,23 @@ describe('PolizasView smoke', () => {
     expect(wrapper.get('.context-buttons button[disabled]').attributes('aria-describedby')).toBe(
       'polizas-scope-blocked-actions',
     )
+    expect(wrapper.get('.polizas-search-panel').exists()).toBe(true)
+    expect(wrapper.get('#polizas-filter-poliza').attributes('placeholder')).toBe('Buscar...')
+    expect(wrapper.get('.advanced-filter-panel summary').text()).toBe('Filtros detallados')
+    expect(wrapper.get('table.appbuilder-table').exists()).toBe(true)
+    expect(wrapper.findAll('thead th').map((header) => header.text())).toEqual([
+      'Seleccion',
+      'Acciones',
+      'Cia.',
+      'Poliza',
+      'Certif.',
+      'N. Documento',
+      'Cliente',
+      'Situacion',
+      'Ramo',
+      'Riesgo/Matric.',
+    ])
+    expect(wrapper.get('.policy-status-badge').text()).toBe('En Vigor')
     expect(wrapper.get('.summary-header').text()).toContain(`${polizasFixture.total} polizas`)
     expect(wrapper.findAll('tbody tr')).toHaveLength(polizasFixture.total)
     expect(wrapper.text()).toContain('POL-2026-0001')
