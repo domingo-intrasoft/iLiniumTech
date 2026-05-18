@@ -109,3 +109,45 @@ Smoke visual en navegador:
 - Falta inventario validado de informes, formatos, parametros, permisos y responsables.
 - Falta decision de arquitectura sobre generacion local, delegada o externa de documentos.
 - Falta validacion DBA/UAT sobre fuentes, campos sensibles, broker, retencion y auditoria.
+
+## Readiness reporting 2026-05-18
+
+Revision documental sin cambios de aplicacion, API ni datos reales.
+
+Fuentes adicionales revisadas:
+
+- `AGENTS.md`
+- `README.md`
+- `docs/PLAN_MAESTRO_IA.md`
+- `docs/ROADMAP_OBJETIVO_FINAL.md`
+- `docs/appbuilder/pages/page-agent-rollout.md`
+- `docs/appbuilder/pages/informes/README.md`
+- `iLiniumTech.Frontend/src/features/informes/InformesView.vue`
+- `iLiniumTech.Frontend/src/features/informes/InformesView.test.ts`
+
+Estado actual:
+
+- `/informes` sigue siendo fixture local read-only, sin ejecucion, descarga, historial ni catalogo real aprobado.
+- La UI funciona como inventario de readiness/riesgo, no como catalogo productivo.
+- Los tests existentes mantienen bloqueadas las acciones y verifican ausencia de marcadores AppBuilder, SQL, secretos y datos reales.
+
+Acciones bloqueadas:
+
+- Ejecutar informe.
+- Descargar PDF, Excel u otro formato.
+- Historial, programacion, email, favoritos, compartir enlaces y administracion.
+- Uso directo de launcher externo o vistas `vw_rpt_*`.
+
+Riesgos residuales especificos:
+
+- Exfiltracion masiva de PII o datos financieros mediante exportacion.
+- Parametros de informe que salten broker, oficina, permisos o whitelists.
+- Retencion/cache de documentos generados sin politica.
+- Logs con parametros sensibles.
+
+Evidencia:
+
+- Readiness documentado en `docs/appbuilder/pages/informes/README.md`.
+- No se ejecutaron tests frontend/backend porque no hubo cambio runtime.
+- Validacion documental ligera ejecutada: `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1` OK.
+- `git diff --check` ejecutado sin errores bloqueantes; solo avisos LF/CRLF de normalizacion.

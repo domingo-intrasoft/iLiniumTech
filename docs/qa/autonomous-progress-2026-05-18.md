@@ -160,6 +160,17 @@ Validacion tras SDD draft de Suplementos:
 - `git diff --check`: OK.
 - No se ejecutan tests frontend/backend salvo que se detecte cambio runtime; este bloque solo crea/actualiza documentacion.
 
+Validacion tras ronda coordinada de readiness por dominios del menu:
+
+- Se reutilizaron agentes existentes por limite de hilos y se asignaron dominios: Negocio diario, Operativa seguros, Reporting/liquidaciones y Tecnico/admin/seguridad.
+- Se creo `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md` como traza de reparto, limites y criterios de integracion.
+- Se actualizaron READMEs o readiness docs de paginas del menu con estado actual, bloqueos, riesgos, permisos candidatos, dependencias UAT/DBA y criterios de aceptacion.
+- Se agregaron o actualizaron evidencias QA documentales por pagina.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1`: sin leaks.
+- `git diff --check`: OK.
+- No se ejecutaron tests frontend/backend porque el bloque es exclusivamente documental y no modifica runtime.
+
 ## Riesgos residuales
 
 - Polizas CRUD BBDD queda cerrado como MVP local con evidencia API/UI visible; quedan UAT funcional, auth productiva, permisos finales y confirmacion DBA de triggers/campos para escrituras no sinteticas.
@@ -179,7 +190,8 @@ Validacion tras SDD draft de Suplementos:
 - `SDD-2026-011` deja `Agenda` en draft: el primer corte propuesto es solo listado read-only por rango y sigue bloqueado hasta UAT/DBA, permisos, origen de lectura autorizado y security review.
 - `SDD-2026-012` deja `Propuestas` en draft: el primer corte propuesto es solo listado read-only minimizado y sigue bloqueado hasta UAT/DBA, permisos, origen de lectura autorizado, definicion funcional de Propuestas y security review.
 - `SDD-2026-013` deja `Suplementos` en draft: el primer corte propuesto es solo listado read-only minimizado y sigue bloqueado hasta UAT/DBA, permisos, origen de lectura autorizado, relacion con Polizas y security review.
+- La ronda de readiness por dominios no autoriza implementacion funcional nueva: sirve para elegir la proxima pagina con SDD/API/UAT y para acotar tareas futuras sin conflictos.
 
 ## Siguiente paso sugerido
 
-Revisar preguntas UAT/DBA de `Siniestros`, `Recibos`, `Clientes`, `Agenda`, `Propuestas` y `Suplementos`, o preparar la siguiente SDD read-only para `Liq.Cia`.
+Elegir una primera pagina post-Polizas para pasar de readiness documental a SDD/API read-only minimizada. Recomendacion tecnica: priorizar `Siniestros` solo si UAT/DBA confirma origen y minimizacion; si no, preparar `Liq.Cia`/`Liq.Col` como SDD financiera estrictamente read-only y sin importes reales hasta permisos/UAT.

@@ -50,3 +50,52 @@ Antes de conectar esta pantalla a datos reales hacen falta:
 `Flotas` queda inventariada como scope estatico bajo Polizas. Puede permanecer visible para orientar pruebas de navegacion, pero debe mostrarse y tratarse como bloqueada para datos reales hasta cumplir los bloqueos anteriores.
 
 No debe usarse metadata AppBuilder para construir menu, pantalla, permisos, queries ni workflows en runtime.
+
+## Readiness Operativa seguros 2026-05-18
+
+Estado actual:
+
+- Frontend estatico protegido en `/polizas/flotas`, con `PolizasFlotasView.vue`.
+- Test compartido: `PolizasScopesView.test.ts`.
+- Estado de navegacion esperado: `blockedSdd`.
+- No existe SDD funcional de Flotas ni permiso backend efectivo.
+
+Componentes/patrones detectados:
+
+- Usa `MvpPageShell` y una definicion estatica `MvpPageDefinition`.
+- Muestra acciones deshabilitadas: filtrar flotas, ver poliza y exportar.
+- Declara explicitamente que no infiere filtros por ramo, division, tipo o etiqueta.
+- El test verifica ausencia de marcadores runtime peligrosos y menciona permiso candidato `polizas.scope.flotas.read`.
+
+Bloqueos de PII, finanzas y workflows:
+
+- No conectar a `/api/polizas` mediante texto libre de scope.
+- No exponer cliente, documento, riesgo, vehiculo, matricula, bastidor, importes ni exportaciones.
+- No activar detalle real ni acciones sobre polizas de flota sin SDD propia.
+
+Permisos candidatos:
+
+- `polizas.scope.flotas.read` si producto confirma que Flotas es scope de Polizas.
+- Alternativa futura: permisos propios de un vertical si Flotas deja de ser simple scope.
+
+Dependencias UAT/DBA:
+
+- Confirmar regla funcional para identificar flotas.
+- Confirmar si sera filtro de Polizas, pagina hija o vertical independiente.
+- Confirmar origen SQL/vista y whitelists.
+- Confirmar minimizacion de PII/vehiculo e impacto multi-tenant.
+
+Tareas futuras pequenas:
+
+- `producto-polizas-flotas-scope-decision`: decidir modelo funcional.
+- `producto-sdd-polizas-flotas-readonly`: redactar SDD si se prioriza.
+- `backend-polizas-flotas-filter-design`: proponer enum/filtro cerrado, no implementarlo sin SDD.
+- `frontend-polizas-flotas-static-polish`: solo mejorar copy/test del placeholder.
+
+Criterios de aceptacion para desbloquear:
+
+- SDD aprobada con regla funcional y UAT.
+- Permiso backend definido y probado.
+- Broker validado antes de consultar.
+- Filtro estructural cerrado y whitelisted.
+- Sin metadata AppBuilder runtime ni SQL heredado.

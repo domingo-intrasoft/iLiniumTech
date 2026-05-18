@@ -698,3 +698,61 @@ Confirmacion de arquitectura:
 - No se consume metadata AppBuilder en frontend/backend.
 - No se han creado documentos de componentes sin evidencia.
 - La propuesta futura, si se desbloquea, debe ser Vue estatico + API explicita.
+
+## Readiness tecnico/admin actualizado 2026-05-18
+
+Estado actual en iLiniumTech:
+
+- Existe ruta protegida `/administracion` como pagina Vue estatica.
+- Existe fixture local read-only con filtros/paginacion locales y acciones deshabilitadas.
+- No existe API backend de administracion.
+- No existen permisos iLiniumTech aprobados para administracion.
+- No se han conectado usuarios reales, permisos reales, conexiones, configuracion interna ni auditoria real.
+- La evidencia frontend verifica que no se renderizan marcadores como `IAP_`, `QueryStatic`, `ComponentDataSource`, `SELECT *`, secretos ni datos reales.
+
+Acciones bloqueadas:
+
+- crear usuarios;
+- editar permisos;
+- exportar auditoria;
+- abrir detalle operativo;
+- consultar datos administrativos reales;
+- administrar Builder, menus, componentes, datasources, conexiones o workflows heredados.
+
+Permisos candidatos no aprobados:
+
+- `administracion.read`;
+- `administracion.users.read`;
+- `administracion.permissions.read`;
+- `administracion.permissions.update`;
+- `administracion.audit.read`;
+- `administracion.config.read`;
+- `administracion.config.update`.
+
+Threat model requerido antes de cualquier dato/API:
+
+- identidad productiva y permisos efectivos;
+- separacion entre administracion iLiniumTech y administracion AppBuilder/Builder;
+- acceso a usuarios, perfiles, permisos y auditoria;
+- minimizacion de PII y secretos;
+- auditoria de lecturas sensibles y escrituras;
+- aislamiento por broker, perfil y rol;
+- redaccion de errores y logs.
+
+Tareas futuras pequenas recomendadas:
+
+1. Confirmar con producto que significa `Administracion` en iLiniumTech.
+2. Decidir explicitamente si `Sistema > Builder` queda descartado, documentado como herramienta interna o migrado parcialmente.
+3. Preparar SDD read-only solo si hay owner UAT y caso de uso.
+4. Definir matriz de permisos candidata sin concederla en runtime.
+5. Mantener la pagina fixture bloqueada y sus tests de no secretos/no runtime AppBuilder.
+
+Criterios de aceptacion para avanzar:
+
+- SDD aprobada;
+- security review completada;
+- permisos backend definidos y probados;
+- contrato API explicito y no generico;
+- ninguna metadata AppBuilder como runtime;
+- ninguna exposicion de usuarios reales, permisos reales, conexiones, secretos, SQL o rutas internas;
+- UAT owner y datos sanitizados confirmados.

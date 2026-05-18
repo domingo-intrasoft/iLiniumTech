@@ -55,3 +55,9 @@ Fecha: 2026-05-16
 
 - La pantalla sigue sin SDD funcional completa ni contrato API; solo habilita un MVP visual read-only.
 - La futura conexion a datos reales requiere auth, broker efectivo, permisos `agenda.read`, minimizacion PII y validacion DBA/UAT.
+
+## Actualizacion operativa 2026-05-18
+
+- Readiness operativo documentado en `docs/appbuilder/pages/agenda/operational-readiness.md`.
+- La SDD draft `SDD-2026-011` limita el primer corte futuro a listado read-only por rango.
+- Calendario visual, detalle, descripcion larga, participantes, drag/drop, reprogramacion, exportacion y escrituras siguen bloqueados hasta SDD posterior.

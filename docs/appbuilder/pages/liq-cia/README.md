@@ -561,3 +561,64 @@ Bloqueado externo:
 - auth productiva;
 - clasificacion PII/financiera/bancaria;
 - decision de alcance read-only frente a escritura/conciliacion/importacion.
+
+## Readiness reporting/liquidaciones 2026-05-18
+
+Actualizacion documental sin cambios de aplicacion. Esta seccion contrasta la evidencia historica anterior con el estado actual de la feature Vue protegida `iLiniumTech.Frontend/src/features/liquidaciones-compania`.
+
+### Estado actual detectado
+
+- Existe superficie frontend estatica para `/liq-cia` con fixture local, filtros locales, tabla paginada y acciones sensibles deshabilitadas.
+- La pantalla se declara `Solo lectura`, `Fixture local sin API`, `Datos minimizados`, `Operaciones financieras bloqueadas` y `Sin importes reales`.
+- El listado usa referencias, compania, estado, oficina, fecha, periodo, resultado y origen; no proyecta importes reales, facturas, datos bancarios ni desglose financiero.
+- Los tests de `LiquidacionesCompaniaView` comprueban render read-only, filtros locales, empty state, acciones bloqueadas y ausencia de marcadores AppBuilder, SQL, secretos o datos financieros/bancarios reales.
+- No hay API backend, SDD funcional aprobada para datos reales, permisos productivos ni UAT/DBA que autoricen lectura financiera.
+
+### Acciones y exportaciones bloqueadas
+
+- Detalle de liquidacion.
+- Desglose financiero.
+- Exportacion.
+- Guardado de busqueda.
+- Banco, facturas, cierre, validacion, importacion, conciliacion, recalculo o cualquier escritura.
+
+### Riesgos a mantener visibles
+
+- Exposicion de importes de liquidacion, comisiones, facturas, movimientos bancarios o conciliacion.
+- Cruce de datos entre brokers/oficinas si el broker no se valida antes de consultar.
+- PII indirecta en compania, cliente, poliza, recibo, gestor, mediador, comentarios u observaciones.
+- Interpretacion incorrecta de total, liquido, comision, prima, importe bancario o estado de cierre.
+- Exportaciones financieras con mas campos que la UI o sin auditoria.
+
+### Permisos candidatos
+
+- `liqCia.catalogs`: catalogos de filtros aprobados.
+- `liqCia.read`: listado minimizado read-only.
+- `liqCia.detail`: detalle read-only minimizado.
+- `liqCia.financial`: importes, comisiones y desglose financiero.
+- `liqCia.bank`: datos bancarios o conciliacion.
+- `liqCia.export`: exportacion/reporting.
+- `liqCia.close`: cierre/reapertura, solo si una SDD futura lo autoriza.
+- `liqCia.write`: permiso paraguas de escritura futura, bloqueado por defecto.
+
+### Dependencias UAT/DBA
+
+- UAT debe confirmar objetivo de negocio, columnas minimas, filtros diarios, estados, significado de importes y si el primer incremento permite solo listado o tambien detalle.
+- DBA debe validar fuente read-only, claves estables, `SESSION_CONTEXT`, aislamiento por broker, indices, whitelists y campos sensibles.
+- Seguridad debe aprobar minimizacion, permisos financieros, tratamiento de exportaciones y logging sin PII/importes sensibles.
+
+### Tareas futuras pequenas
+
+- Redactar SDD read-only de `Liq.Cia` con listado minimizado y exportacion fuera de alcance.
+- Definir DTO de listado sin importes reales salvo permiso financiero explicito.
+- Inventariar filtros candidatos y descartes con UAT.
+- Proponer pruebas 401/403/tenant para `catalogs`, listado y detalle futuro.
+- Mantener fixture Vue como superficie de conversacion, no como contrato de datos reales.
+
+### Criterios de aceptacion para desbloquear
+
+- SDD aprobada que diga expresamente que datos financieros se pueden leer y bajo que permisos.
+- UAT owner y DBA owner asignados.
+- API explicita sin metadata AppBuilder ni SQL heredado libre.
+- Pruebas de 401/403, broker no permitido, filtros whitelist, minimizacion de importes/PII y errores sanitizados.
+- Exportacion, cierre, importacion, conciliacion y escrituras siguen bloqueadas salvo SDD especifica posterior.

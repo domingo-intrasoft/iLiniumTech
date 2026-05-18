@@ -523,3 +523,63 @@ Completado con evidencia:
 - evidencias de `ApplicationDetailConfig`, `AppConfig` y `Configuration_GET_ALL` documentadas;
 - ausencia de pagina concreta `Configuracion` documentada;
 - subagentes/component docs no creados por falta de tabs/submenus reales especificos de una pagina `Configuracion`.
+
+## Readiness tecnico/admin actualizado 2026-05-18
+
+Estado actual en iLiniumTech:
+
+- Existe ruta protegida `/configuracion` como pagina Vue estatica.
+- Existe fixture local read-only con valores demo y estados `Visible demo`, `Redactado` y `Bloqueado`.
+- No existe API backend de configuracion.
+- No existen permisos iLiniumTech aprobados para configuracion.
+- No se muestran secretos, valores de entorno, URLs internas, proveedores reales ni credenciales.
+- La evidencia frontend verifica que no se renderizan marcadores como `AppBuilder`, `IAP_`, `QueryStatic`, `ComponentDataSource`, `SELECT *`, URLs reales, tokens, passwords, emails ni documentos.
+
+Acciones bloqueadas:
+
+- editar configuracion;
+- rotar secretos;
+- validar integraciones;
+- guardar cambios;
+- consultar valores reales;
+- administrar configuracion heredada `appconfig-*` como contrato runtime.
+
+Permisos candidatos no aprobados:
+
+- `configuracion.read`;
+- `configuracion.edit`;
+- `configuracion.branding.read`;
+- `configuracion.branding.edit`;
+- `configuracion.security.read`;
+- `configuracion.security.edit`;
+- `configuracion.integrations.read`;
+- `configuracion.integrations.edit`;
+- `configuracion.audit.read`.
+
+Threat model requerido antes de cualquier dato/API:
+
+- clasificacion de configuraciones permitidas, prohibidas y secretas;
+- redaccion de valores sensibles en DTOs, errores y logs;
+- secret store o mecanismo corporativo para secretos;
+- auditoria de cambios;
+- control por entorno, tenant/broker y rol;
+- prevencion de open redirect, fuga de URLs internas y manipulacion de CSS/branding;
+- rollback o recuperacion para cambios criticos.
+
+Tareas futuras pequenas recomendadas:
+
+1. Decidir si `Configuracion` sera preferencias de usuario o configuracion administrativa.
+2. Crear inventario de valores no sensibles permitidos.
+3. Definir politica de redaccion `configurado/no configurado` para secretos.
+4. Preparar SDD si producto prioriza persistencia.
+5. Mantener tests de bloqueo y ausencia de secretos.
+
+Criterios de aceptacion para avanzar:
+
+- SDD aprobada con alcance de configuracion;
+- security review y politica de secretos aprobadas;
+- permisos backend especificos;
+- API explicita sin claves heredadas libres;
+- valores sensibles nunca devueltos completos al frontend;
+- auditoria de cambios con valores redaccionados;
+- pruebas de no secretos y no metadata runtime.

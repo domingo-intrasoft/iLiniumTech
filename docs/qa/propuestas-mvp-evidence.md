@@ -64,3 +64,9 @@ Fecha: 2026-05-16.
 - Falta confirmar si Propuestas equivale o no a otro concepto de negocio.
 - Falta definir origen de datos, permisos, UAT owner y contrato API.
 - La pantalla solo es evidencia MVP estatica read-only.
+
+## Actualizacion operativa 2026-05-18
+
+- Readiness operativo documentado en `docs/appbuilder/pages/propuestas/operational-readiness.md`.
+- La SDD draft `SDD-2026-012` limita el primer corte futuro a listado read-only minimizado.
+- Detalle, cliente real, importes, documentos, tarificacion, emision, conversion, exportacion, workflows e integraciones siguen bloqueados hasta SDD posterior.

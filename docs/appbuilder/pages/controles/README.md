@@ -521,3 +521,61 @@ Clasificacion:
 Conclusion:
 
 `Controles` no esta listo para desarrollo. El siguiente paso correcto es preguntar a producto que significa exactamente esta entrada de menu y obtener metadata sanitizada o validacion funcional antes de planificar frontend/backend.
+
+## Readiness tecnico/admin actualizado 2026-05-18
+
+Estado actual en iLiniumTech:
+
+- Existe ruta protegida `/controles` como pagina Vue estatica.
+- Existe fixture local read-only con controles candidatos, filtros locales y paginacion.
+- No existe API backend de controles.
+- No existen permisos iLiniumTech aprobados para controles.
+- No hay ejecucion real, validacion real, auditoria real ni workflow.
+- La evidencia frontend verifica que no se renderizan marcadores como `IAP_`, `QueryStatic`, `ComponentDataSource`, `connectionString`, `SELECT *`, `Pantalla_`, `appsettings`, `datasource`, PII ni secretos.
+
+Acciones bloqueadas:
+
+- validar alcance;
+- refrescar contra backend;
+- exportar;
+- abrir detalle real;
+- ejecutar controles;
+- activar workflows, scripts, procedimientos o motores heredados.
+
+Permisos candidatos no aprobados:
+
+- `controles.read`;
+- `controles.detail`;
+- `controles.create`;
+- `controles.update`;
+- `controles.disable`;
+- `controles.export`;
+- `controles.audit.read`;
+- `controles.execute`.
+
+Threat model requerido antes de cualquier dato/API:
+
+- definicion funcional de que significa `Controles`;
+- separacion explicita frente al motor de controles dinamicos AppBuilder;
+- permisos por lectura, detalle, exportacion y ejecucion;
+- bloqueo de workflows/scripts/procedimientos heredados;
+- minimizacion de PII si los controles son operativos;
+- auditoria de ejecuciones;
+- aislamiento por broker/perfil/rol.
+
+Tareas futuras pequenas recomendadas:
+
+1. Confirmar el significado funcional de `Controles`.
+2. Localizar metadata sanitizada solo como evidencia, no runtime.
+3. Crear SDD read-only si existe caso de negocio.
+4. Definir permisos candidatos sin concederlos.
+5. Mantener pagina fixture y tests de no runtime AppBuilder.
+
+Criterios de aceptacion para avanzar:
+
+- problema de negocio y owner UAT confirmados;
+- SDD aprobada;
+- security review si hay ejecucion o auditoria;
+- API explicita sin motor generico;
+- ninguna dependencia runtime de `IAP_Component`, `IAP_DataSource`, catalogos de controles o workflows;
+- acciones reales probadas con permisos backend y auditoria.

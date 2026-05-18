@@ -686,3 +686,57 @@ Bloqueado externo:
 - auth productiva;
 - matriz de permisos;
 - clasificacion PII y seguridad.
+
+## Readiness Operativa seguros 2026-05-18
+
+Estado actual:
+
+- Frontend fixture protegido en `/siniestros`, con `SiniestrosView.vue` y `SiniestrosView.test.ts`.
+- SDD draft relacionada: `SDD-2026-008 Siniestros read-only minimizado`.
+- Carril permitido ahora: documentacion, fixture read-only, tests de bloqueo y preparacion de UAT/DBA.
+- Carril bloqueado: API real, datos reales, detalle, exportacion, intervinientes, importes, EIAC, observaciones, documentos y escrituras.
+
+Patrones detectados en el frontend actual:
+
+- `AppShell` compartido.
+- Fixtures locales anonimizados.
+- Filtros locales por referencia/cliente, poliza, estado, prioridad y fecha desde.
+- Tabla paginada, empty state y acciones deshabilitadas.
+- Texto accesible `siniestros-blocked-actions` enlazado con botones bloqueados.
+- Tests que verifican render, filtrado, empty state, acciones bloqueadas y ausencia de marcadores runtime peligrosos.
+
+Bloqueos de PII, finanzas y workflows:
+
+- No exponer intervinientes, telefonos, emails, direcciones, matriculas, lesionados, descripcion, danos, observaciones ni textos libres.
+- No exponer reserva, indemnizacion, pagos, recobros, franquicias ni importes.
+- No conectar EIAC/aduana, agenda, documentos, pagos, validaciones ni workflows sin SDD posterior.
+- No usar vistas PBI/EIAC/aduana como origen productivo sin aprobacion DBA/UAT.
+
+Permisos candidatos:
+
+- Primer corte: `siniestros.catalogs`, `siniestros.read`.
+- Posteriores: `siniestros.detail`, `siniestros.participants`, `siniestros.financial`, `siniestros.eiac`, `siniestros.notes`, `siniestros.export`.
+- Escritura bloqueada: `siniestros.create`, `siniestros.update`, `siniestros.actions.write`, `siniestros.eiac.validate`, `siniestros.payments.write`, `siniestros.delete`.
+
+Dependencias UAT/DBA:
+
+- Confirmar columnas y filtros minimos del listado.
+- Confirmar origen SQL autorizado y regla de broker/tenant.
+- Confirmar catalogos de estado, situacion y prioridad.
+- Confirmar si tramitador puede mostrarse como equipo/alias o debe ocultarse.
+- Confirmar politica de 403/404 para no revelar existencia cruzada.
+
+Tareas futuras pequenas:
+
+- `producto-siniestros-uat-columns`: cerrar columnas/filtros del listado.
+- `backend-siniestros-readonly-contract`: disenar DTOs y validadores sin implementacion SQL real.
+- `security-siniestros-pii-review`: clasificar textos, intervinientes, EIAC e importes.
+- `frontend-siniestros-fixture-hardening`: mantener acciones bloqueadas y mejorar accesibilidad sin API.
+
+Criterios de aceptacion del siguiente incremento:
+
+- SDD revisada y UAT/DBA desbloqueados antes de datos reales.
+- Sin runtime AppBuilder ni SQL heredado.
+- Backend valida sesion, permiso y broker antes de consultar.
+- Listado no proyecta campos sensibles prohibidos.
+- Tests backend/frontend y auditorias aplicables documentados.

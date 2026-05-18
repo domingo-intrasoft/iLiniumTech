@@ -73,3 +73,26 @@ Antes de marcar Done un incremento de `Siniestros`:
 `Siniestros` esta validado solo como vista MVP estatica bloqueada y ruta/navegacion protegida por tests unitarios dirigidos. No esta listo para desarrollo funcional sin SDD, permisos, contrato API, decision de minimizacion PII y validacion DBA/UAT.
 
 No se introdujeron secretos, datos reales ni runtime AppBuilder. La metadata AppBuilder revisada se mantiene como evidencia documental, no como contrato runtime.
+
+## Actualizacion Operativa seguros 2026-05-18
+
+Alcance de esta actualizacion:
+
+- Sin cambios de codigo de aplicacion.
+- `docs/appbuilder/pages/siniestros/README.md` queda alineado con el estado fixture actual, `SDD-2026-008` y el carril read-only minimizado.
+- Se mantienen bloqueados API real, datos reales, detalle, exportacion, intervinientes, importes, EIAC, observaciones, documentos y escrituras.
+
+Evidencia documental esperada:
+
+- UAT confirma columnas/filtros.
+- DBA confirma origen de lectura autorizado y regla por broker.
+- Permisos `siniestros.catalogs` y `siniestros.read` probados en backend antes de datos reales.
+- Revision de seguridad confirma ausencia de PII, importes, textos libres y EIAC en el primer corte.
+
+Prueba ligera de esta ronda:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
+```
+
+Resultado: ver cierre de la tarea integradora de Operativa seguros.

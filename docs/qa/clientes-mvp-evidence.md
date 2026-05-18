@@ -54,3 +54,9 @@ Fecha: 2026-05-16
 - Falta SDD funcional de Clientes para columnas, ficha, permisos y tabs relacionadas definitivas.
 - La pantalla no representa paridad AppBuilder; solo entrega un MVP estatico minimizado y honesto.
 - Las acciones reales deben permanecer bloqueadas hasta API explicita, permisos efectivos, UAT y decision PII.
+
+## Actualizacion operativa 2026-05-18
+
+- Readiness operativo documentado en `docs/appbuilder/pages/clientes/operational-readiness.md`.
+- La SDD draft `SDD-2026-010` limita el primer corte futuro a listado read-only minimizado.
+- Ficha, tabs relacionadas, documento, contacto, direccion, banco, metricas, exportacion y escrituras siguen bloqueados hasta SDD posterior.

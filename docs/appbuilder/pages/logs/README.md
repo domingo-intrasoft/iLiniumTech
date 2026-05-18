@@ -447,3 +447,65 @@ Hasta entonces, mantener `Logs` deshabilitado en el menu iLiniumTech.
 | Desarrollo frontend/backend | Fuera de alcance |
 | Subagentes de componentes | No creados por falta de evidencia |
 | Riesgos de seguridad/PII | Documentados |
+
+## Readiness tecnico/admin actualizado 2026-05-18
+
+Estado actual en iLiniumTech:
+
+- Existe ruta protegida `/logs` como pagina Vue estatica.
+- Existe fixture local read-only con logs demo redactados, filtros locales y paginacion.
+- No existe API backend de logs.
+- No existen permisos iLiniumTech aprobados para logs.
+- No hay detalle real, exportacion, payloads, trazas, identidades, request/response ni consulta a BBDD LOG.
+- La evidencia frontend verifica que no se renderizan marcadores como `IAP_`, `QueryStatic`, `ComponentDataSource`, `connectionString`, `SELECT *`, `Pantalla_`, `appsettings`, endpoints reales, tokens, API keys, emails ni documentos.
+
+Acciones bloqueadas:
+
+- abrir detalle;
+- exportar;
+- ver payload completo;
+- ver stack trace;
+- consultar cuerpo de email/SMS;
+- ver request/response de servicios;
+- borrar logs o modificar retencion.
+
+Permisos candidatos no aprobados:
+
+- `logs.read`;
+- `logs.audit.read`;
+- `logs.errors.read`;
+- `logs.services.read`;
+- `logs.mail.read`;
+- `logs.sms.read`;
+- `logs.detail`;
+- `logs.export`;
+- `logs.payload.read`.
+
+Threat model requerido antes de cualquier dato/API:
+
+- clasificacion de PII, secretos, headers, tokens, payloads y trazas;
+- politica de retencion y rango maximo de consulta;
+- redaccion por permiso y por tipo de log;
+- auditoria de lecturas, detalle y exportacion;
+- aislamiento por broker, aplicacion y usuario;
+- proteccion contra extraccion masiva;
+- errores sanitizados con `correlationId`;
+- validacion de que logs reales no contienen secretos antes de exponerlos.
+
+Tareas futuras pequenas recomendadas:
+
+1. Confirmar si `Logs` sera soporte, auditoria, seguridad u observabilidad.
+2. Crear SDD de listado read-only minimizado si producto lo aprueba.
+3. Definir matriz de redaccion por tipo de log.
+4. Definir permisos candidatos y limites de consulta.
+5. Mantener fixture redactado y tests de no secretos/no payloads.
+
+Criterios de aceptacion para avanzar:
+
+- SDD aprobada;
+- privacy/security review completada;
+- permisos backend y redaccion por permiso probados;
+- rango temporal obligatorio y paginacion estricta;
+- sin secretos, connection strings, tokens, stack traces ni payloads completos en respuestas publicas;
+- auditoria para detalle/exportacion;
+- UAT con datos anonimizados o bloqueo externo documentado.

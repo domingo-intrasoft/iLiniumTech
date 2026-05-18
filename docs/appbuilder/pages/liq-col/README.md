@@ -689,3 +689,67 @@ Bloqueado externo:
 - auth productiva;
 - clasificacion PII/importes/comisiones;
 - reglas de cierre/validacion/recalculo.
+
+## Readiness reporting/liquidaciones 2026-05-18
+
+Actualizacion documental sin cambios de aplicacion. Esta seccion contrasta la evidencia historica anterior con el estado actual de la feature Vue protegida `iLiniumTech.Frontend/src/features/liquidaciones-colaborador`.
+
+### Estado actual detectado
+
+- Existe superficie frontend estatica para `/liq-col` con fixture local, filtros locales, tabla paginada y acciones sensibles deshabilitadas.
+- La pantalla se declara `Solo lectura`, `Fixture local sin API`, `Datos minimizados y sanitizados`, `Detalle y conceptos no operativos` y `Comisiones y liquidos bloqueados`.
+- El listado usa referencias, colaborador anonimizado, oficina, estado, fecha de liquidacion, cierre, resumen de recibos, resultado y alcance; no proyecta comisiones, liquidos, retenciones, documentos ni banco.
+- Los tests de `LiquidacionesColaboradorView` comprueban render read-only, filtros locales, empty state, acciones bloqueadas y ausencia de marcadores AppBuilder, SQL, secretos, documentos, banco o importes reales.
+- No hay API backend, SDD funcional aprobada para datos reales, permisos productivos ni UAT/DBA que autoricen lectura de comisiones.
+
+### Acciones y exportaciones bloqueadas
+
+- Detalle de liquidacion.
+- Conceptos.
+- Exportacion.
+- Guardado de busqueda.
+- Documentos, datos bancarios, comisiones, retenciones, liquidos, exclusiones, validacion, cierre, recalculo o cualquier escritura.
+
+### Riesgos a mantener visibles
+
+- Exposicion de comisiones, retenciones, liquidos, impuestos o acuerdos de reparto.
+- PII de colaborador, mediador, cliente o documento identificativo.
+- Motivos libres de exclusion/validacion con datos personales.
+- Lectura cruzada entre brokers, oficinas o colaboradores.
+- Exportaciones que incluyan importes o documentos aunque la UI los oculte.
+- Reglas de cierre, validacion y reparto no confirmadas por negocio.
+
+### Permisos candidatos
+
+- `liqCol.catalogs`: catalogos de filtros aprobados.
+- `liqCol.read`: listado minimizado read-only.
+- `liqCol.detail`: detalle read-only minimizado.
+- `liqCol.financial`: importes financieros generales.
+- `liqCol.commissions`: comisiones, retenciones y liquidos.
+- `liqCol.concepts`: conceptos de liquidacion.
+- `liqCol.exclusions`: exclusiones y motivos revisados.
+- `liqCol.export`: exportacion/reporting.
+- `liqCol.close`: cierre/reapertura, solo si una SDD futura lo autoriza.
+- `liqCol.write`: permiso paraguas de escritura futura, bloqueado por defecto.
+
+### Dependencias UAT/DBA
+
+- UAT debe confirmar si `Liq.Col` es colaborador, mediador, comercial u otra identidad; columnas minimas; filtros diarios; reglas de cierre; y tratamiento de comisiones.
+- DBA debe validar fuente read-only, claves estables, relacion con `Liq.Cia`, `SESSION_CONTEXT`, aislamiento por broker, indices, whitelists y campos sensibles.
+- Seguridad debe aprobar minimizacion de documentos, motivos libres, importes, exportaciones y logging.
+
+### Tareas futuras pequenas
+
+- Redactar SDD read-only de `Liq.Col` con listado minimizado y sin comisiones/liquidos por defecto.
+- Separar permisos de lectura general y lectura de comisiones.
+- Inventariar filtros candidatos y descartes con UAT.
+- Proponer pruebas 401/403/tenant para `catalogs`, listado y detalle futuro.
+- Mantener fixture Vue como superficie de conversacion, no como contrato de datos reales.
+
+### Criterios de aceptacion para desbloquear
+
+- SDD aprobada que diga expresamente que datos de colaborador, comisiones y liquidos se pueden leer y bajo que permisos.
+- UAT owner y DBA owner asignados.
+- API explicita sin metadata AppBuilder ni SQL heredado libre.
+- Pruebas de 401/403, broker no permitido, filtros whitelist, minimizacion de PII/importes y errores sanitizados.
+- Exportacion, cierre, recalculo, validacion y escrituras siguen bloqueadas salvo SDD especifica posterior.

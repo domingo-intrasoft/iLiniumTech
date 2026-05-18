@@ -530,3 +530,57 @@ Bloqueado externo:
 - matriz de permisos;
 - auth productiva;
 - clasificacion PII/banco/importes.
+
+## Readiness Operativa seguros 2026-05-18
+
+Estado actual:
+
+- Frontend fixture protegido en `/recibos`, con `RecibosView.vue` y `RecibosView.test.ts`.
+- SDD draft relacionada: `SDD-2026-009 Recibos read-only minimizado`.
+- Carril permitido ahora: documentacion, fixture read-only, pruebas de acciones bloqueadas y preparacion de UAT/DBA.
+- Carril bloqueado: API real, importes reales, detalle, cobro, remesas, datos bancarios, EIAC, exportacion y escrituras.
+
+Patrones detectados en el frontend actual:
+
+- `AppShell` compartido.
+- Fixtures locales anonimizados y sin importes reales.
+- Filtros locales por recibo/cliente, poliza, situacion, tipo y vencimiento desde.
+- Tabla con importes demo anonimizados, paginacion, empty state y acciones bloqueadas.
+- Texto accesible `recibos-blocked-actions` enlazado con botones y campos restringidos.
+- Tests que verifican render, filtrado, limpieza, empty state, acciones bloqueadas y ausencia de marcadores runtime/secretos.
+
+Bloqueos de PII, finanzas y workflows:
+
+- No exponer importes reales, primas, comisiones, impuestos, liquidaciones, diferencias ni filtros por importe.
+- No exponer cuenta, IBAN, mandato, remesa, titular bancario ni datos de cobro sensibles.
+- No exponer documento, telefono, email, direccion, observaciones, incidencias ni comunicaciones.
+- No activar cobro, anulacion, conciliacion EIAC, documentos, exportacion ni escritura sin SDD posterior.
+
+Permisos candidatos:
+
+- Primer corte: `recibos.catalogs`, `recibos.read`.
+- Posteriores: `recibos.detail`, `recibos.financial`, `recibos.bank`, `recibos.eiac`, `recibos.export`.
+- Escritura bloqueada: `recibos.write` o permisos especificos por cobro/anulacion/remesa si producto los aprueba.
+
+Dependencias UAT/DBA:
+
+- Confirmar columnas y filtros minimos del listado.
+- Confirmar origen SQL autorizado y regla de broker/tenant.
+- Confirmar que `recibos.read` no devuelve importes reales.
+- Confirmar catalogos de situacion, tipo y canal.
+- Confirmar si `Recibos` es modulo independiente, vista desde Polizas/Clientes o ambas cosas.
+
+Tareas futuras pequenas:
+
+- `producto-recibos-uat-columns`: cerrar columnas/filtros sin importes reales.
+- `security-recibos-finance-review`: clasificar importes, banco, remesas y EIAC.
+- `backend-recibos-readonly-contract`: preparar DTOs, query y validadores whitelisted.
+- `frontend-recibos-fixture-hardening`: mantener acciones financieras bloqueadas y revisar accesibilidad.
+
+Criterios de aceptacion del siguiente incremento:
+
+- SDD revisada y UAT/DBA desbloqueados antes de datos reales.
+- Sin runtime AppBuilder ni SQL heredado.
+- Backend valida sesion, permiso y broker antes de consultar.
+- Listado no proyecta banco, PII ni importes reales.
+- Tests backend/frontend y auditorias aplicables documentados.

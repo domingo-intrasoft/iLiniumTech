@@ -619,3 +619,63 @@ Confirmacion de arquitectura:
 - No se introduce runtime AppBuilder.
 - No se consume metadata AppBuilder en frontend/backend.
 - La propuesta futura es Vue estatico + API explicita.
+
+## Readiness reporting 2026-05-18
+
+Actualizacion documental sin cambios de aplicacion. Esta seccion contrasta la evidencia historica anterior con el estado actual de la feature Vue protegida `iLiniumTech.Frontend/src/features/estadisticas`.
+
+### Estado actual detectado
+
+- Existe superficie frontend estatica para `/estadisticas` con fixture local, filtros locales, tabla paginada y acciones sensibles deshabilitadas.
+- La pantalla se declara `Solo lectura`, `Fixture local sin API`, `KPIs no confirmados`, `Sin drilldown ni exportacion` y `SDD/UAT pendiente`.
+- El listado contiene KPIs candidatos por area, periodo, estado, categoria, resultado, lectura y privacidad; no muestra cifras reales ni datos de negocio.
+- Los tests de `EstadisticasView` comprueban render read-only, filtros locales, empty state, acciones bloqueadas y ausencia de marcadores AppBuilder, SQL, secretos o datos reales.
+- No hay API backend, SDD funcional aprobada, definiciones KPI cerradas, permisos productivos ni UAT/DBA de fuentes/agregados.
+
+### Acciones y exportaciones bloqueadas
+
+- Refrescar metricas reales.
+- Exportar.
+- Drilldown.
+- Cambiar periodo contra datos reales.
+- Guardar preferencias, cachear agregados, navegar a listados filtrados o abrir detalle operativo.
+
+### Riesgos a mantener visibles
+
+- Reidentificacion por agregados con pocos registros o combinacion de filtros.
+- Exposicion indirecta de primas, recibos, siniestros, clientes, polizas o colaboradores mediante drilldown.
+- KPIs inconsistentes por definiciones no aprobadas o fuentes no validadas.
+- Cache compartida entre brokers, usuarios, oficinas o permisos.
+- Consultas pesadas o agregados no indexados sobre datos reales.
+- Exportaciones que conviertan agregados seguros en datos excesivos.
+
+### Permisos candidatos
+
+- `estadisticas.read`: ver KPIs agregados aprobados.
+- `estadisticas.catalogs`: catalogos de filtros aprobados.
+- `estadisticas.refresh`: refrescar consulta de metricas si no se cachea.
+- `estadisticas.drilldown`: navegar a detalle/listado filtrado.
+- `estadisticas.export`: exportar agregados.
+- Permisos por dominio, por ejemplo `estadisticas.polizas`, `estadisticas.recibos` o `estadisticas.siniestros`, si producto decide segmentar.
+
+### Dependencias UAT/DBA
+
+- UAT debe definir cada KPI, formula, periodo, dimensiones, tolerancias, casos de comparacion y criterio de aceptacion.
+- DBA debe validar fuentes, agregaciones, rendimiento, indices, aislamiento por broker, cache y whitelists.
+- Seguridad debe aprobar reglas de privacidad para agregados, supresion de grupos pequenos, drilldown y exportacion.
+
+### Tareas futuras pequenas
+
+- Crear inventario documental de KPIs candidatos sin API ni cifras reales.
+- Redactar SDD de primer incremento read-only con 1-2 KPIs agregados y sin drilldown/exportacion.
+- Definir reglas de supresion o agrupacion para grupos pequenos.
+- Proponer pruebas 401/403/tenant/cache para resumen y series futuras.
+- Mantener fixture Vue como superficie de conversacion, no como definicion KPI aprobada.
+
+### Criterios de aceptacion para desbloquear
+
+- SDD aprobada con KPIs, formulas, fuentes, filtros, permisos, privacidad y UAT.
+- UAT owner y DBA owner asignados.
+- API explicita sin metadata AppBuilder, metricas arbitrarias, nombres de columnas libres ni SQL heredado libre.
+- Pruebas de 401/403, broker no permitido, filtros whitelist, cache aislada, supresion de agregados pequenos y errores sanitizados.
+- Exportacion, drilldown, preferencias y refresco contra datos reales siguen bloqueados salvo SDD especifica posterior.

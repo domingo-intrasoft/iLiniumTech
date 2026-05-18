@@ -440,3 +440,60 @@ Pruebas no ejecutadas:
 - Backend build/test: no aplica, no se ha tocado backend.
 - Frontend format/lint/unit/build: no aplica, no se ha tocado frontend.
 - Smoke local: no aplica, no se ha cambiado runtime visible.
+
+## Readiness tecnico/admin actualizado 2026-05-18
+
+Estado actual en iLiniumTech:
+
+- Existe ruta protegida `/conectividad` como pagina Vue estatica.
+- Existe fixture local read-only con entradas candidatas, filtros locales y paginacion.
+- No existe API backend de conectividad.
+- No existen permisos iLiniumTech aprobados para conectividad.
+- No se ejecutan llamadas externas, pruebas REST/SOAP, previews, importaciones WSDL/OpenAPI ni validaciones reales.
+- La evidencia frontend verifica que no se renderizan marcadores como `IAP_`, `QueryStatic`, `ComponentDataSource`, `connectionString`, `SELECT *`, `appsettings`, endpoints reales, tokens, API keys, emails ni documentos.
+
+Acciones bloqueadas:
+
+- probar integracion;
+- exportar;
+- abrir detalle operativo;
+- usar URL libre;
+- mostrar endpoints, credenciales, headers, request/response o payloads;
+- invocar conectores REST/SOAP heredados.
+
+Permisos candidatos no aprobados:
+
+- `conectividad.read`;
+- `conectividad.test`;
+- `conectividad.manage`;
+- `conectividad.secrets.manage`;
+- `conectividad.audit.read`.
+
+Threat model requerido antes de cualquier dato/API:
+
+- SSRF y allowlist de destinos;
+- gestion de secretos fuera del frontend y fuera de Git;
+- timeouts, cancelacion, rate limit y no retry peligroso;
+- auditoria de pruebas;
+- redaccion de request/response y errores;
+- separacion por entorno y broker;
+- bloqueo de URL libre y metodos no autorizados;
+- politica de logging sin payloads sensibles.
+
+Tareas futuras pequenas recomendadas:
+
+1. Confirmar si `Conectividad` es salud de integraciones, administracion tecnica o modulo nuevo.
+2. Preparar threat model de conectividad antes de cualquier API.
+3. Definir modelo allowlist y secret store.
+4. Crear SDD read-only de inventario sanitizado si producto lo aprueba.
+5. Mantener pruebas que garantizan acciones deshabilitadas y ausencia de secretos.
+
+Criterios de aceptacion para avanzar:
+
+- SDD aprobada;
+- threat model aprobado;
+- permisos backend especificos;
+- endpoints allowlist y sin URL libre;
+- secretos nunca visibles en DOM, respuestas, logs ni capturas;
+- auditoria de pruebas y errores con `correlationId`;
+- pruebas de SSRF, redaccion y no metadata runtime.

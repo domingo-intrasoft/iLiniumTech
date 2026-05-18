@@ -547,3 +547,57 @@ Antes de programar, lanzar un agente de extraccion offline/documental para local
 - propuesta de SDD con UAT owner.
 
 Hasta tener esa salida, el desarrollo de `Suplementos` queda bloqueado de forma honesta.
+
+## Readiness Operativa seguros 2026-05-18
+
+Estado actual:
+
+- Frontend fixture protegido en `/suplementos`, con `SuplementosView.vue` y `SuplementosView.test.ts`.
+- SDD draft relacionada: `SDD-2026-013 Suplementos read-only minimizado`.
+- Carril permitido ahora: documentacion, fixture read-only, pruebas de bloqueo y preparacion de UAT/DBA.
+- Carril bloqueado: API real, detalle, tabs por tipo, alta/edicion/anulacion, workflows, adjuntos, importes, banco, documentos, recibos/declaraciones relacionados y exportacion.
+
+Patrones detectados en el frontend actual:
+
+- `AppShell` compartido.
+- Fixtures locales anonimizados.
+- Filtros locales por referencia/concepto, poliza, tipo, situacion y fecha efecto desde.
+- Tabla paginada, empty state y acciones deshabilitadas.
+- Texto accesible `suplementos-blocked-actions` enlazado con botones bloqueados y campos restringidos.
+- Tests que verifican render, paginacion, filtrado, empty state y ausencia de marcadores runtime/secretos/campos sensibles.
+
+Bloqueos de PII, finanzas y workflows:
+
+- No exponer tomador, beneficiario, documento, email, telefono, direccion, IBAN, titular bancario ni datos de prestamo.
+- No exponer importes, primas, valores anteriores/nuevos, tasas, comisiones, rescates, aportaciones ni calculos.
+- No convertir tablas especializadas por tipo en tabs reales sin evidencia de pantalla/UAT.
+- No activar documentos, comunicaciones, EIAC, recibos/declaraciones relacionados, workflows ni escrituras.
+
+Permisos candidatos:
+
+- Primer corte: `suplementos.catalogs`, `suplementos.read`.
+- Posteriores: `suplementos.detail`, `suplementos.export`, `suplementos.create`, `suplementos.update`, `suplementos.delete`, `suplementos.import`, `suplementos.execute`.
+- La lectura inicial no concede PII, importes, banco, documentos, relacion con recibos/declaraciones ni workflows.
+
+Dependencias UAT/DBA:
+
+- Confirmar si `Suplementos` es pagina independiente, subflujo de Polizas o ambas cosas.
+- Confirmar columnas y filtros minimos del listado.
+- Confirmar origen SQL autorizado y regla de broker/tenant.
+- Confirmar catalogos de tipo/situacion y equivalencia funcional.
+- Confirmar campos prohibidos por rol y politica de detalle futuro.
+
+Tareas futuras pequenas:
+
+- `producto-suplementos-uat-columns`: cerrar columnas/filtros del listado.
+- `security-suplementos-pii-finance-review`: clasificar PII, banco, importes, riesgo y documentos.
+- `backend-suplementos-readonly-contract`: preparar DTOs y validadores sin SQL real.
+- `frontend-suplementos-fixture-hardening`: mantener acciones bloqueadas y revisar accesibilidad.
+
+Criterios de aceptacion del siguiente incremento:
+
+- SDD revisada y UAT/DBA desbloqueados antes de datos reales.
+- Sin runtime AppBuilder ni SQL heredado.
+- Backend valida sesion, permiso y broker antes de consultar.
+- Listado no proyecta PII, banco, importes, documentos, riesgo ni textos libres.
+- Tests backend/frontend y auditorias aplicables documentados.

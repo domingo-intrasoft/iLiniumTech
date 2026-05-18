@@ -534,3 +534,59 @@ Clasificacion:
 Conclusion:
 
 `By Aunna` no esta listo para desarrollo. El siguiente paso correcto es preguntar a producto que significa exactamente esta entrada de menu y obtener metadata sanitizada o validacion funcional antes de planificar frontend/backend.
+
+## Readiness tecnico/admin actualizado 2026-05-18
+
+Estado actual en iLiniumTech:
+
+- Existe ruta protegida `/by-aunna` como pagina Vue estatica.
+- Existe fixture local read-only con contenido candidato, filtros locales y paginacion.
+- No existe API backend de By Aunna.
+- No existen permisos iLiniumTech aprobados para By Aunna.
+- No hay enlaces reales, descargas, publicacion, detalle operativo ni contenido externo.
+- La evidencia frontend verifica que no se renderizan marcadores como `IAP_`, `QueryStatic`, `ComponentDataSource`, `connectionString`, `SELECT *`, `Pantalla_`, `appsettings`, endpoints reales, tokens, API keys, emails ni documentos.
+
+Acciones bloqueadas:
+
+- publicar;
+- abrir enlace;
+- descargar;
+- abrir detalle;
+- administrar contenido;
+- usar branding o tema heredado como contrato funcional.
+
+Permisos candidatos no aprobados:
+
+- `byAunna.read`;
+- `byAunna.detail`;
+- `byAunna.content.read`;
+- `byAunna.content.manage`;
+- `byAunna.export`;
+- `byAunna.audit.read`.
+
+Threat model requerido antes de cualquier dato/API:
+
+- confirmar si es branding, contenido, intranet, enlaces o modulo funcional;
+- validacion de enlaces externos y prevencion de phishing/open redirect;
+- permisos para publicar/despublicar;
+- revision de documentos, descargas y contenido con PII;
+- auditoria de cambios de contenido;
+- separacion por broker/tenant si aplica;
+- redaccion de rutas internas y configuracion de marca.
+
+Tareas futuras pequenas recomendadas:
+
+1. Confirmar significado de `By Aunna` con producto.
+2. Decidir si es pagina real o solo branding.
+3. Preparar SDD de contenido read-only si se aprueba.
+4. Definir politica de enlaces externos autorizados.
+5. Mantener acciones de publicacion/enlaces deshabilitadas.
+
+Criterios de aceptacion para avanzar:
+
+- SDD aprobada y owner UAT;
+- permisos backend definidos;
+- allowlist de enlaces si existen;
+- contenido sanitizado y sin secretos;
+- auditoria para publicacion o administracion;
+- ninguna metadata AppBuilder ni tema heredado como runtime funcional.

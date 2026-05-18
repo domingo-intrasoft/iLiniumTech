@@ -400,3 +400,63 @@ Completado con evidencia:
 - evidencias transversales de reporting documentadas;
 - ausencia de pagina concreta `Informes` documentada;
 - subagentes/component docs no creados por falta de tabs/submenus reales.
+
+## Readiness reporting 2026-05-18
+
+Actualizacion documental sin cambios de aplicacion. Esta seccion contrasta la evidencia historica anterior con el estado actual de la feature Vue protegida `iLiniumTech.Frontend/src/features/informes`.
+
+### Estado actual detectado
+
+- Existe superficie frontend estatica para `/informes` con fixture local, filtros locales, tabla paginada y acciones sensibles deshabilitadas.
+- La pantalla se declara `Solo lectura`, `Fixture local sin API`, `Sin ejecucion ni descarga`, `Sin informes aprobados todavia` y `Evidencia AppBuilder insuficiente`.
+- El listado presenta categorias candidatas y estado/riesgo de readiness; no ejecuta informes, no descarga documentos y no usa URL de launcher.
+- Los tests de `InformesView` comprueban render read-only, filtros locales, empty state, acciones bloqueadas y ausencia de marcadores AppBuilder, SQL, secretos o datos reales.
+- No hay API backend, catalogo funcional aprobado, permisos productivos, SDD de informes ni UAT/DBA por informe.
+
+### Acciones y exportaciones bloqueadas
+
+- Ejecutar informe.
+- Descargar PDF, Excel u otro formato.
+- Historial de ejecuciones.
+- Programacion, envio por email, favoritos, compartir enlaces o administracion de plantillas.
+- Uso directo de launcher externo o de vistas `vw_rpt_*` como contrato.
+
+### Riesgos a mantener visibles
+
+- Exfiltracion masiva de PII, datos financieros, liquidaciones, facturas, remesas o banco mediante descargas.
+- Parametros de informe que permitan saltar broker, oficina, permisos o whitelists.
+- Cache/retencion de documentos generados para otro usuario o broker.
+- Logs con parametros, nombres de cliente, polizas, recibos, documentos o importes.
+- Confundir vistas `vw_rpt_*` con informes de negocio aprobados.
+
+### Permisos candidatos
+
+- `informes.read`: ver catalogo de informes aprobados.
+- `informes.execute`: solicitar ejecucion de un informe.
+- `informes.download`: descargar resultado generado.
+- `informes.history`: consultar historial propio/autorizado.
+- `informes.schedule`: programar informes, si se aprueba.
+- `informes.admin`: administrar definiciones/permisos, fuera de MVP.
+- Permisos por dominio, por ejemplo `informes.polizas`, `informes.recibos` o `informes.liquidaciones`, si producto decide segmentar.
+
+### Dependencias UAT/DBA
+
+- UAT debe validar catalogo real, propietario, finalidad, parametros, formatos, campos y criterio de exito por informe.
+- DBA debe validar fuentes autorizadas, rendimiento, whitelists, broker, indices, retencion y campos sensibles.
+- Seguridad debe aprobar threat model de exportaciones, auditoria de ejecucion/descarga, URLs firmadas si aplica y politica de retencion.
+
+### Tareas futuras pequenas
+
+- Crear inventario documental de informes candidatos sin endpoints ni descargas.
+- Redactar SDD del primer informe o catalogo read-only, con ejecucion/descarga fuera de alcance si no hay threat model.
+- Definir esquema de permisos por catalogo, ejecucion y descarga.
+- Proponer pruebas 401/403/tenant/parametros para catalogo y ejecucion futura.
+- Mantener fixture Vue como inventario de riesgos, no como catalogo real aprobado.
+
+### Criterios de aceptacion para desbloquear
+
+- SDD aprobada con catalogo, campos, parametros, formatos, permisos, auditoria y retencion.
+- UAT owner y DBA owner asignados por informe o familia.
+- API explicita sin metadata AppBuilder, `QueryStatic`, nombres de vistas libres ni URLs externas crudas.
+- Pruebas de 401/403, broker no permitido, parametros whitelist, descarga autorizada, minimizacion de PII/importes y errores sanitizados.
+- Descarga, historial, programacion y administracion siguen bloqueados salvo SDD especifica posterior.
