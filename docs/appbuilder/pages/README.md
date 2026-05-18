@@ -45,7 +45,7 @@ Resumen ejecutivo:
 | Polizas / Flotas | MVP estatico visible; scope bajo Polizas; datos/API pendientes | [`polizas-flotas/README.md`](polizas-flotas/README.md) |
 | Polizas / Colectivas | MVP estatico visible; scope bajo Polizas; datos/API pendientes | [`polizas-colectivas/README.md`](polizas-colectivas/README.md) |
 | Recibos | MVP estatico visible; SDD draft de listado read-only minimizado; datos/API/importes pendientes | [`recibos/README.md`](recibos/README.md), [`SDD-2026-009`](../../sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md) |
-| Suplementos | MVP estatico visible; datos/API pendientes | [`suplementos/README.md`](suplementos/README.md) |
+| Suplementos | MVP estatico visible; SDD draft de listado read-only minimizado; datos/API pendientes | [`suplementos/README.md`](suplementos/README.md), [`SDD-2026-013`](../../sdd/specs/iLiniumTech/SDD-2026-013-suplementos-read-only.md) |
 | Siniestros | MVP estatico visible; SDD draft de listado read-only minimizado; datos/API/PII pendientes | [`siniestros/README.md`](siniestros/README.md), [`SDD-2026-008`](../../sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md) |
 | Liq.Cia | MVP estatico visible; datos/API/importes pendientes | [`liq-cia/README.md`](liq-cia/README.md) |
 | Liq.Col | MVP estatico visible; datos/API/importes pendientes | [`liq-col/README.md`](liq-col/README.md) |

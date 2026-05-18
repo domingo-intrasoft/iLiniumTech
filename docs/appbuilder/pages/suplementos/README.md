@@ -16,6 +16,10 @@ Estado final de esta ronda: `bloqueado externo`.
 
 Motivo: hay evidencia local suficiente para confirmar que `Suplementos` existe como concepto de menu, busqueda y dominio de datos, pero no hay evidencia local suficiente de la metadata concreta de pagina: no se ha encontrado un componente raiz AppBuilder identificado, ni `componentId`, ni ruta, ni datasource concreto, ni tabs/submenus propios de la pantalla. Sin esa metadata o validacion funcional no se debe iniciar desarrollo.
 
+Actualizacion 2026-05-18: iLiniumTech ya contiene ruta protegida `/suplementos` y vista Vue fixture/read-only con datos sanitizados, filtros locales, paginacion y acciones de detalle/exportacion bloqueadas. Esa vista no autoriza API, datos reales, detalle, importes, banco, documentos, workflows, adjuntos ni escritura sin SDD, permisos, DBA/UAT y revision de seguridad.
+
+SDD draft abierta para el primer corte futuro: [`SDD-2026-013 Suplementos read-only minimizado`](../../../sdd/specs/iLiniumTech/SDD-2026-013-suplementos-read-only.md). La SDD limita el primer incremento a listado read-only minimizado y deja detalle, tabs por tipo, PII, importes, banco, documentos, recibos/declaraciones relacionados, exportacion, workflows y escrituras fuera de alcance.
+
 Decision de subagentes de componentes: no se crean subagentes. No se detectaron pestanas, submenus o componentes internos reales y especificos de `Suplementos`; solo se detectaron componentes genericos AppBuilder (`Search`, `SearchDetail`, `DynamicCrudTabla`, `DynamicTabView`, etc.) y tablas de especializacion de datos, que no prueban por si solas que existan tabs/paneles de la pagina.
 
 ## Fuentes revisadas
@@ -82,12 +86,12 @@ En `iLiniumTech.Frontend/src/layout/appNavigation.ts` existe una entrada:
 
 - label: `Suplementos`.
 - icono: `pi pi-link`.
-- estado: `disabled: true`.
-- sin ruta `to`.
+- estado actual iLiniumTech: `fixture`.
+- ruta: `/suplementos`.
 - sin permiso `requiredPermission`.
 - sin hijos.
 
-Interpretacion: iLiniumTech reconoce `Suplementos` como entrada futura del menu, pero aun no hay pantalla propia.
+Interpretacion: iLiniumTech reconoce `Suplementos` como entrada de dominio y ya tiene superficie fixture/read-only para navegacion y pruebas. No existe aun contrato funcional con datos reales, API propia, permiso productivo ni submenu definido.
 
 ### Menu AppBuilder heredado
 
@@ -352,14 +356,15 @@ Acciones historicas genericas observadas en CRUD:
 - ver detalle;
 - eliminar.
 
-Acciones candidatas para iLiniumTech en primera version:
+Acciones candidatas para iLiniumTech en una version posterior:
 
 - listado read-only;
 - filtros;
 - paginacion;
 - ordenacion limitada por whitelist;
-- detalle read-only;
 - vuelta al listado conservando filtros.
+
+El primer corte propuesto por `SDD-2026-013` queda limitado a listado read-only minimizado; el detalle read-only pasa a SDD posterior.
 
 Acciones que deben quedar fuera hasta SDD especifica:
 
@@ -395,7 +400,7 @@ Regla: la visibilidad del menu puede depender de estos permisos iLiniumTech, per
 
 ### Frontend candidato
 
-Ruta futura: `/suplementos`.
+Ruta actual fixture y futura funcional: `/suplementos`.
 
 Feature candidata:
 
@@ -426,7 +431,7 @@ Endpoints futuros:
 
 - `GET /api/suplementos/catalogs`.
 - `GET /api/suplementos`.
-- `GET /api/suplementos/{id}`.
+- `GET /api/suplementos/{id}` solo en SDD posterior de detalle.
 
 Contratos candidatos:
 
@@ -516,7 +521,7 @@ Bloqueos externos:
 
 Pendientes tecnicos:
 
-- Crear SDD de `Suplementos` antes de desarrollar.
+- Revisar y aprobar `SDD-2026-013` antes de conectar API o datos reales.
 - Preparar extractor offline/sanitizado especifico de pagina cuando haya entorno autorizado.
 - Definir contrato API y DTOs minimizados.
 - Definir fixtures anonimizadas si se decide un corte MVP.
