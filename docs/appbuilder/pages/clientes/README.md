@@ -6,6 +6,10 @@ Rol de este documento: informe del jefe de pagina `Clientes` para migracion cont
 
 Estado final de la ronda: `bloqueado externo para desarrollo final`, con evidencia tecnica parcial suficiente para preparar SDD y agentes de componentes, pero sin metadata local completa de la pantalla original.
 
+Actualizacion 2026-05-18: iLiniumTech ya contiene ruta protegida `/clientes` y vista Vue fixture/read-only con datos anonimizados, filtros locales, PII bloqueada y acciones de ficha/exportacion/desglose deshabilitadas. Esa vista no autoriza API, datos reales, ficha, tabs, PII, exportacion ni escritura sin SDD, permisos, DBA/UAT y revision de seguridad.
+
+SDD draft abierta para el primer corte futuro: [`SDD-2026-010 Clientes read-only minimizado`](../../../sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md). La SDD limita el primer incremento a listado read-only minimizado y deja ficha, tabs relacionadas, documento, contacto, direccion, banco, metricas economicas, exportacion y escrituras fuera de alcance.
+
 ## Regla de producto
 
 iLiniumTech no debe replicar AppBuilder como runtime dinamico. La informacion de AppBuilder documentada aqui solo sirve para analisis, trazabilidad, SDD y scaffolding revisado. La futura pantalla de Clientes debe quedar escrita como Vue/TypeScript estatico y consumir una API .NET explicita.
@@ -58,11 +62,11 @@ Fuentes AppBuilder revisadas sin abrir configuracion sensible:
 
 - label: `Clientes`
 - icono: `pi pi-user`
-- estado: `disabled: true`
-- ruta: no definida
+- estado actual iLiniumTech: `fixture`
+- ruta: `/clientes`
 - permiso: no definido todavia
 
-Esta entrada es una decision estatica de iLiniumTech, no un consumo runtime de metadata.
+Esta entrada y la vista fixture son decisiones estaticas de iLiniumTech, no un consumo runtime de metadata. No existe aun contrato funcional con datos reales ni API propia.
 
 ### Menu AppBuilder
 
