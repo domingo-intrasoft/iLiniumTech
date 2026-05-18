@@ -278,7 +278,7 @@ Objetivo: convertir Polizas en una pantalla diaria de trabajo con CRUD controlad
 
 SDD activa: `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`.
 
-Estado 2026-05-18: backend CRUD, baja tecnica MVP, UI de alta/edicion/baja y smoke SQL transaccional estan implementados. El siguiente bloque obligatorio es smoke API/UI real con backend SQL, `Polizas:WritesEnabled`, permisos de escritura y limpieza verificable.
+Estado 2026-05-18: backend CRUD, baja tecnica MVP, UI de alta/edicion/baja, smoke SQL transaccional y smoke API/UI real de lectura con backend SQL estan implementados. El siguiente bloque obligatorio es cerrar create/update/baja tecnica via API/UI sobre la misma BBDD local de lectura, revisando antes el contrato de `primaAnual` porque la vista real usada en smoke no expone `PAnualCartera`.
 
 Pasos y tareas:
 
@@ -295,6 +295,8 @@ Pasos y tareas:
 - Implementar create/update/delete con SQL parametrizado, transacciones y `SESSION_CONTEXT`.
 - Bloquear escrituras si `Polizas:WritesEnabled` no esta activo.
 - No usar delete fisico en el MVP: aplicar baja tecnica solo a registros `ILMVP-`, marcandolos `ILMVP-DELETED-` y ocultandolos del listado/detalle.
+- Mantener lectura SQL compatible con la vista real local: `ClienteId`, `CiaId`, `Riesgo` vacio y `PrimaAnual = 0` cuando no existan columnas enriquecidas.
+- Resolver si `primaAnual` se elimina del formulario inicial o se persiste por otra columna/regla validada por DBA/UAT.
 - Preparar pruebas de regresion para filtros, limpieza, paginacion, detalle, alta, edicion, borrado permitido y borrado bloqueado.
 
 Agentes:
@@ -310,7 +312,7 @@ DoD y evidencia:
 - Pruebas SQL locales con rollback o limpieza verificable.
 - Smoke `/polizas` y `/polizas/:id`.
 - Smoke create -> read -> update -> baja tecnica cuando exista UI CRUD.
-- Smoke API/UI real contra backend SQL local antes de abrir desarrollo del resto de paginas.
+- Smoke API/UI real contra backend SQL local antes de abrir desarrollo del resto de paginas; ya existe para login/listado/permisos/validaciones no mutantes, falta CRUD mutante con limpieza verificable.
 - Sin nombres SQL/AppBuilder/metadata en DOM.
 - Sin secretos ni datos personales reales versionados.
 - UAT o bloqueo funcional documentado.

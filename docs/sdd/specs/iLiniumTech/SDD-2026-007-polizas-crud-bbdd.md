@@ -38,6 +38,7 @@ Analisis de solo lectura ejecutado el 2026-05-18 contra BBDD local de pruebas, s
 - Para CRUD, el identificador recurso debe migrar hacia `dbo.Poliza.Id` como id estable interno; `Poliza` debe tratarse como numero visible.
 - `dbo.Poliza` tiene triggers de auditoria/calculo/ajustes/division/oficina/anulacion. Las escrituras deben pasar por transaccion, pruebas rollback y UAT.
 - `dbo.Poliza` contiene campos sensibles y relaciones con cliente, cuenta bancaria, direccion, gestor, colaborador y riesgo. No deben exponerse ni editarse sin permiso/SDD.
+- En la BBDD local usada para smoke API/UI real, `dbo.Pantalla_Polizas` no expone campos enriquecidos como `NombreCompleto`, `Cia`, `Riesgo` ni `PAnualCartera`; la lectura MVP proyecta `ClienteId`, `CiaId`, `Riesgo` vacio y `PrimaAnual = 0` hasta cerrar contrato de joins/campos persistibles.
 
 ## Objetivo
 
@@ -97,7 +98,7 @@ Campos candidatos para primer CRUD local, pendientes de UAT:
 | `tipoPoliza` | `Poliza.IdTipoPoliza` | Create/Update | Valor catalogado. |
 | `fechaEfecto` | `Poliza.F_Efecto` y `F_EfectoPrimero` | Create/Update | Fecha ISO valida. |
 | `fechaVencimiento` | `Poliza.F_Vencimiento` | Create/Update | Opcional; si existe debe ser mayor o igual a efecto. |
-| `primaAnual` | `Poliza.PAnualCartera` | Create/Update | Decimal no negativo; revisar si tambien actualiza `PAnualProduccion`. |
+| `primaAnual` | Pendiente de confirmar | Create/Update | Decimal no negativo si el modelo autorizado expone columna persistible. En el smoke real de lectura no existe `PAnualCartera`; no ejecutar escritura real de prima hasta decision DBA/UAT. |
 
 Marcador obligatorio para registros creados por el MVP:
 
@@ -202,6 +203,7 @@ Seguridad:
 - `Pantalla_Polizas.Poliza` no es unico; usarlo como id de escritura puede modificar o borrar mas de una fila.
 - Triggers de `dbo.Poliza` pueden ejecutar reglas no documentadas por iLiniumTech.
 - Borrado fisico de polizas reales puede ser funcionalmente incorrecto; el MVP usa baja tecnica sobre registros `ILMVP-` y oculta registros `ILMVP-DELETED-`.
+- Hay variantes locales de BBDD modelo: algunas tienen `dbo.Poliza` sin `dbo.Pantalla_Polizas`; otras tienen la vista de lectura pero no exponen `PAnualCartera`.
 - API key, headers MVP y demo-session no son seguridad productiva.
 - Campos de cliente, banco, direccion y riesgo pueden exponer PII si se incorporan al formulario sin permisos.
 - `SESSION_CONTEXT` y reglas por broker/perfil/oficina/gestor siguen pendientes de validacion funcional completa.

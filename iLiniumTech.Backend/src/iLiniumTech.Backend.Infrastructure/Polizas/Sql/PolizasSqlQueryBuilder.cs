@@ -15,11 +15,11 @@ public sealed class PolizasSqlQueryBuilder
             ["aplicacion"] = "[Aplicacion]",
             ["estado"] = "[IdSituacion]",
             ["ramo"] = "[IdRamo]",
-            ["compania"] = "[Cia]",
-            ["cliente"] = "[NombreCompleto]",
+            ["compania"] = "[CiaId]",
+            ["cliente"] = "[ClienteId]",
             ["fechaEfecto"] = "[F_Efecto]",
             ["fechaVencimiento"] = "[F_Vencimiento]",
-            ["primaAnual"] = "[PAnualCartera]"
+            ["primaAnual"] = "[Id]"
         };
 
     private static readonly string ListSelect = """
@@ -29,12 +29,12 @@ public sealed class PolizasSqlQueryBuilder
             CAST([Aplicacion] AS nvarchar(100)) AS [Aplicacion],
             CAST([IdSituacion] AS nvarchar(100)) AS [Estado],
             CAST([IdRamo] AS nvarchar(100)) AS [Ramo],
-            CAST('' AS nvarchar(100)) AS [ClienteId],
-            CAST([NombreCompleto] AS nvarchar(250)) AS [ClienteNombre],
-            CAST([Cia] AS nvarchar(150)) AS [Compania],
+            CAST([ClienteId] AS nvarchar(100)) AS [ClienteId],
+            CAST([ClienteId] AS nvarchar(250)) AS [ClienteNombre],
+            CAST([CiaId] AS nvarchar(150)) AS [Compania],
             [F_Efecto] AS [FechaEfecto],
             [F_Vencimiento] AS [FechaVencimiento],
-            [PAnualCartera] AS [PrimaAnual],
+            CAST(0 AS decimal(18,2)) AS [PrimaAnual],
             CAST('EUR' AS nvarchar(3)) AS [Moneda]
         """;
 
@@ -47,13 +47,13 @@ public sealed class PolizasSqlQueryBuilder
             CAST([Aplicacion] AS nvarchar(100)) AS [Aplicacion],
             CAST([IdSituacion] AS nvarchar(100)) AS [Estado],
             CAST([IdRamo] AS nvarchar(100)) AS [Ramo],
-            CAST('' AS nvarchar(100)) AS [ClienteId],
-            CAST([NombreCompleto] AS nvarchar(250)) AS [ClienteNombre],
-            CAST([Cia] AS nvarchar(150)) AS [Compania],
-            CAST([Riesgo] AS nvarchar(250)) AS [Riesgo],
+            CAST([ClienteId] AS nvarchar(100)) AS [ClienteId],
+            CAST([ClienteId] AS nvarchar(250)) AS [ClienteNombre],
+            CAST([CiaId] AS nvarchar(150)) AS [Compania],
+            CAST('' AS nvarchar(250)) AS [Riesgo],
             [F_Efecto] AS [FechaEfecto],
             [F_Vencimiento] AS [FechaVencimiento],
-            [PAnualCartera] AS [PrimaAnual],
+            CAST(0 AS decimal(18,2)) AS [PrimaAnual],
             CAST('EUR' AS nvarchar(3)) AS [Moneda],
             CAST('' AS nvarchar(100)) AS [Oficina],
             CAST('' AS nvarchar(100)) AS [Division],
@@ -68,7 +68,7 @@ public sealed class PolizasSqlQueryBuilder
             CAST('' AS nvarchar(100)) AS [Documento],
             CAST('' AS nvarchar(100)) AS [Apellido1],
             CAST('' AS nvarchar(100)) AS [Apellido2],
-            CAST([NombreCompleto] AS nvarchar(250)) AS [Nombre],
+            CAST([ClienteId] AS nvarchar(250)) AS [Nombre],
             CAST('' AS nvarchar(20)) AS [Sexo],
             CAST('19000101' AS date) AS [FechaNacimiento],
             CAST(0 AS int) AS [Edad],
@@ -138,9 +138,9 @@ public sealed class PolizasSqlQueryBuilder
 
         clauses.Add(ExcludeDeletedMvpPolizasClause);
         AddLike(clauses, parameters, "[Poliza]", "@numero", request.Numero);
-        AddLike(clauses, parameters, "[NombreCompleto]", "@cliente", request.Cliente);
+        AddLike(clauses, parameters, "CONVERT(nvarchar(50), [ClienteId])", "@cliente", request.Cliente);
         AddEquals(clauses, parameters, "[IdSituacion]", "@estado", request.Estado);
-        AddEquals(clauses, parameters, "[Cia]", "@compania", request.Compania);
+        AddEquals(clauses, parameters, "CONVERT(nvarchar(50), [CiaId])", "@compania", request.Compania);
         AddEquals(clauses, parameters, "[IdRamo]", "@ramo", request.Ramo);
 
         if (request.FechaEfectoDesde.HasValue)

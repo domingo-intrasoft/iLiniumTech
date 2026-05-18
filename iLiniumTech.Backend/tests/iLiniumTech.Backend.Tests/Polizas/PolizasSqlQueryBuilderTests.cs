@@ -27,9 +27,9 @@ public sealed class PolizasSqlQueryBuilderTests
 
         query.CommandText.Should().Contain("[Poliza] LIKE @numero");
         query.CommandText.Should().Contain("[Poliza] NOT LIKE 'ILMVP-DELETED-%'");
-        query.CommandText.Should().Contain("[NombreCompleto] LIKE @cliente");
+        query.CommandText.Should().Contain("CONVERT(nvarchar(50), [ClienteId]) LIKE @cliente");
         query.CommandText.Should().Contain("[IdSituacion] = @estado");
-        query.CommandText.Should().Contain("[Cia] = @compania");
+        query.CommandText.Should().Contain("CONVERT(nvarchar(50), [CiaId]) = @compania");
         query.CommandText.Should().Contain("[IdRamo] = @ramo");
         query.CommandText.Should().Contain("[F_Efecto] >= @fechaEfectoDesde");
         query.CommandText.Should().Contain("[F_Efecto] < @fechaEfectoHastaExclusiva");
@@ -52,7 +52,7 @@ public sealed class PolizasSqlQueryBuilderTests
             new PolizasSearchRequest(Page: 1, PageSize: 25),
             new PolizasSort("primaAnual", Descending: false));
 
-        query.CommandText.Should().Contain("ORDER BY [PAnualCartera] ASC, [Poliza] ASC");
+        query.CommandText.Should().Contain("ORDER BY [Id] ASC, [Poliza] ASC");
         query.CommandText.Should().Contain("WHERE [Poliza] NOT LIKE 'ILMVP-DELETED-%'");
         query.CommandText.Should().NotContain("primaAnual ASC");
     }
@@ -77,7 +77,10 @@ public sealed class PolizasSqlQueryBuilderTests
 
         query.CommandText.Should().Contain("CAST([Id] AS nvarchar(100)) AS [Id]");
         query.CommandText.Should().Contain("CAST([Poliza] AS nvarchar(100)) AS [Numero]");
-        query.CommandText.Should().Contain("CAST('' AS nvarchar(100)) AS [ClienteId]");
+        query.CommandText.Should().Contain("CAST([ClienteId] AS nvarchar(100)) AS [ClienteId]");
+        query.CommandText.Should().Contain("CAST([ClienteId] AS nvarchar(250)) AS [ClienteNombre]");
+        query.CommandText.Should().Contain("CAST([CiaId] AS nvarchar(150)) AS [Compania]");
+        query.CommandText.Should().Contain("CAST(0 AS decimal(18,2)) AS [PrimaAnual]");
         ShouldNotProjectNumDocumentoAs(query.CommandText, "ClienteId");
     }
 
@@ -149,7 +152,10 @@ public sealed class PolizasSqlQueryBuilderTests
 
         query.CommandText.Should().Contain("CAST([Id] AS nvarchar(100)) AS [Id]");
         query.CommandText.Should().Contain("CAST([Poliza] AS nvarchar(100)) AS [Numero]");
-        query.CommandText.Should().Contain("CAST('' AS nvarchar(100)) AS [ClienteId]");
+        query.CommandText.Should().Contain("CAST([ClienteId] AS nvarchar(100)) AS [ClienteId]");
+        query.CommandText.Should().Contain("CAST([ClienteId] AS nvarchar(250)) AS [ClienteNombre]");
+        query.CommandText.Should().Contain("CAST([CiaId] AS nvarchar(150)) AS [Compania]");
+        query.CommandText.Should().Contain("CAST(0 AS decimal(18,2)) AS [PrimaAnual]");
         query.CommandText.Should().Contain("CAST('' AS nvarchar(100)) AS [Documento]");
         ShouldNotProjectNumDocumentoAs(query.CommandText, "ClienteId");
         ShouldNotProjectNumDocumentoAs(query.CommandText, "Documento");

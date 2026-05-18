@@ -149,6 +149,7 @@ Hallazgos iniciales de BBDD local:
 - `dbo.Pantalla_Polizas.Poliza` no es unico; se detectaron numeros duplicados.
 - El CRUD debe usar `dbo.Poliza.Id` como identificador estable interno y tratar `Poliza` como numero visible.
 - `dbo.Poliza` tiene triggers de auditoria/calculo/division/oficina/anulacion; toda escritura requiere transaccion, pruebas rollback/limpieza y UAT.
+- La vista real usada en smoke API/UI no expone `NombreCompleto`, `Cia`, `Riesgo` ni `PAnualCartera`; la lectura MVP usa columnas disponibles y valores neutros hasta cerrar contrato de campos enriquecidos.
 
 DoD objetivo:
 
@@ -159,10 +160,12 @@ DoD objetivo:
 - `DELETE` MVP aplica baja tecnica con prefijo `ILMVP-DELETED-` sobre registros `ILMVP-`; no hace borrado fisico.
 - Frontend habilita acciones CRUD solo cuando `/api/me` expone permisos y contexto valido.
 - Prueba local transaccional create -> update -> baja tecnica ejecutada sin versionar connection strings, credenciales, dumps ni PII, y verificada sin filas `ILMVP-%` residuales.
+- Smoke API/UI real de login, `/api/me`, catalogos, listado SQL, permisos CRUD y validaciones no mutantes ejecutado contra backend SQL local.
 
 Pendiente tecnico:
 
-- Ejecutar smoke API/UI real contra backend SQL local con `Polizas:WritesEnabled`, permisos de escritura y limpieza verificable.
+- Ejecutar flujo mutante create -> read -> update -> baja tecnica via API/UI sobre la misma BBDD local de lectura, con limpieza verificable.
+- Resolver contrato de `primaAnual`: la BBDD local de smoke no expone `PAnualCartera` en la vista/tabla objetivo de ese broker.
 - Confirmar campos editables definitivos con UAT.
 - Convertir catalogos necesarios para escritura en datos fiables o mantenerlos como valores controlados.
 - Diseñar auditoria de escritura sin datos sensibles.

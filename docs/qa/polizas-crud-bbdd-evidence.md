@@ -293,7 +293,19 @@ Validacion local BBDD autorizada:
 - Prueba transaccional ejecutando el `PolizasSqlCommandBuilder` actual: `BuilderInsert=OK`, `BuilderUpdateRows=1`, `BuilderSoftDeleteRows=1`.
 - La tabla `dbo.Poliza` tiene triggers activos; el intento de borrado fisico genero conflicto de FK con datos dependientes creados por triggers.
 - Conteo posterior en conexion nueva: `0` filas `ILMVP-%` residuales.
-- Queda pendiente smoke API extremo a extremo con configuracion local segura y UI contra backend real.
+
+Smoke API/UI real contra backend SQL local:
+
+- Resolucion local sanitizada del maestro AppBuilder: OK, sin imprimir connection strings ni credenciales.
+- El broker local usado inicialmente resolvia una BBDD modelo con `dbo.Poliza`, pero sin `dbo.Pantalla_Polizas`; se descarta para smoke de lectura real.
+- Se selecciona un broker local de pruebas que resuelve una BBDD modelo con `dbo.Pantalla_Polizas` y `dbo.Poliza`.
+- Hallazgo de esquema: la vista real `dbo.Pantalla_Polizas` disponible para el smoke no expone `NombreCompleto`, `Cia`, `Riesgo` ni `PAnualCartera`.
+- Ajuste aplicado: la lectura SQL proyecta `ClienteId`, `CiaId`, `Riesgo` vacio y `PrimaAnual = 0` para respetar el contrato frontend sin inventar joins ni activar metadata runtime.
+- `dotnet run` temporal de smoke API con backend SQL, `DemoSession`, `Polizas:WritesEnabled=true` y permisos `polizas.create/update/delete`: `ApiSqlSmoke=OK`.
+- Resultado smoke API: `/ready` 200, login 200, `/api/me` con permisos CRUD, catalogos 200, listado SQL 200 con `5` items sobre total `47778`.
+- Las llamadas no mutantes `POST /api/polizas`, `PUT /api/polizas/not-an-id` y `DELETE /api/polizas/not-an-id` devolvieron `400 POLIZAS_VALIDATION_ERROR`; no crean, actualizan ni eliminan datos.
+- Smoke UI con frontend temporal `VITE_USE_BACKEND=true` y `VITE_AUTH_MODE=demo-session`: `UiSqlSmoke=OK`, URL `/polizas?page=1&pageSize=25`, `25` filas renderizadas, badge total `(47778)` y boton `Nueva poliza MVP` habilitado.
+- Captura local no versionada generada en `%TEMP%\iliniumtech-ui-playwright-smoke\polizas-sql-smoke.png`.
 
 ## Riesgos residuales
 
@@ -301,7 +313,8 @@ Validacion local BBDD autorizada:
 - El delete fisico no debe aplicarse a polizas existentes ni a altas MVP mientras no haya regla UAT/DBA; la version actual aplica baja tecnica y oculta el registro.
 - `DemoSession`, API key MVP y headers locales no son seguridad productiva.
 - Los campos sensibles de cliente, direccion, banco, riesgo y contacto siguen fuera de alcance hasta SDD/UAT especifica.
-- Aun falta validar el flujo CRUD completo con limpieza verificable en BBDD local.
+- La BBDD usada para smoke real de lectura no expone `PAnualCartera`; el contrato de `primaAnual` debe revisarse antes de ejecutar un create/update real via API/UI sobre ese modelo.
+- Aun falta validar el flujo CRUD completo via API/UI con limpieza verificable en la misma BBDD local usada para lectura real.
 
 ## Siguiente paso obligatorio
 
@@ -313,4 +326,6 @@ Antes de desarrollar el resto de paginas del menu, continuar Polizas CRUD BBDD e
 4. Hecho: crear builder de comandos SQL parametrizados e integracion transaccional sobre `dbo.Poliza`.
 5. Hecho parcial: probar create/update/baja tecnica contra BBDD local con rollback y sin filas residuales `ILMVP-%`.
 6. Hecho parcial: activar UI CRUD solo cuando `/api/me` indique permisos y contexto valido.
-7. Pendiente: cuando Polizas CRUD este cerrado con evidencia, crear agentes por pagina del menu para evolucionar las siguientes superficies.
+7. Hecho parcial: smoke API/UI real contra backend SQL local con lectura, permisos CRUD y validaciones no mutantes.
+8. Pendiente: resolver contrato de `primaAnual`/columnas persistibles para la BBDD real de smoke y ejecutar create/update/baja tecnica via API/UI con limpieza verificable.
+9. Pendiente: cuando Polizas CRUD este cerrado con evidencia, crear agentes por pagina del menu para evolucionar las siguientes superficies.

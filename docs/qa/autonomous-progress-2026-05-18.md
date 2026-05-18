@@ -95,6 +95,7 @@ Validacion tras descripcion accesible de acciones bloqueadas en Suplementos:
 
 ## Riesgos residuales
 
+- Polizas CRUD BBDD avanza con smoke API/UI real de lectura y permisos CRUD contra backend SQL local, pero el flujo mutante via API/UI sigue pendiente porque la BBDD de lectura usada en smoke no expone `PAnualCartera`.
 - `Clientes` sigue siendo fixture/read-only con PII real bloqueada; no autoriza ficha real, exportacion, desglose, contacto ni datos bancarios sin SDD/API/UAT.
 - `Agenda` sigue siendo fixture/read-only con calendario dinamico, reprogramacion, participantes, workflows y asuntos sensibles bloqueados hasta SDD/API/UAT.
 - `Propuestas` sigue siendo fixture/read-only; crear, convertir a poliza, documentos, detalle, exportacion y emision siguen bloqueados hasta SDD/API/permisos/UAT.
