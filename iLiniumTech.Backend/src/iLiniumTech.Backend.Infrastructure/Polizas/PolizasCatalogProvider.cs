@@ -4,6 +4,17 @@ namespace iLiniumTech.Backend.Infrastructure.Polizas;
 
 internal static class PolizasCatalogProvider
 {
+    public static PolizasCatalogs CreateSqlMvpDefaults() =>
+        CreateDefault() with
+        {
+            TipoPoliza =
+            [
+                new("situacionpoliza-EV", "En vigor"),
+                new("situacionpoliza-PR", "Pendiente de revision"),
+                new("situacionpoliza-AN", "Anulada")
+            ]
+        };
+
     public static PolizasCatalogs CreateDefault() =>
         new(
             TipoPoliza:

@@ -18,11 +18,32 @@ public sealed class SqlPolizasWriteRepository(
 
     public async Task<PolizaCreateResult> CreateAsync(PolizaCreateRequest request, CancellationToken cancellationToken)
     {
-        var result = await ExecuteScalarInTransactionAsync(
-            _commandBuilder.BuildCreateCommand(request),
-            cancellationToken);
+        var connectionString = await connectionStringProvider.GetConnectionStringAsync(cancellationToken);
+        await using var connection = new SqlConnection(connectionString);
+        await connection.OpenAsync(cancellationToken);
+        await SqlServerSessionContext.ApplyAsync(connection, executionContextAccessor?.Current, cancellationToken);
 
-        return new PolizaCreateResult(Convert.ToString(result, CultureInfo.InvariantCulture) ?? string.Empty);
+        await using var transaction = (SqlTransaction)await connection.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            await using var command = CreateCommand(connection, transaction, _commandBuilder.BuildCreateCommand(request));
+            var result = await command.ExecuteScalarAsync(cancellationToken);
+            var id = Convert.ToString(result, CultureInfo.InvariantCulture) ?? string.Empty;
+            if (!int.TryParse(id, CultureInfo.InvariantCulture, out var parsedId))
+            {
+                throw new InvalidOperationException("Polizas SQL create did not return a numeric identifier.");
+            }
+
+            await EnsureCreatedRowIsVisibleAsync(connection, transaction, parsedId, cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+
+            return new PolizaCreateResult(id);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 
     public async Task<bool> UpdateAsync(int id, PolizaUpdateRequest request, CancellationToken cancellationToken)
@@ -64,6 +85,21 @@ public sealed class SqlPolizasWriteRepository(
         {
             await transaction.RollbackAsync(cancellationToken);
             throw;
+        }
+    }
+
+    private async Task EnsureCreatedRowIsVisibleAsync(
+        SqlConnection connection,
+        SqlTransaction transaction,
+        int id,
+        CancellationToken cancellationToken)
+    {
+        await using var command = CreateCommand(connection, transaction, _commandBuilder.BuildCreatedVisibilityQuery(id));
+        var visibleRows = Convert.ToInt64(await command.ExecuteScalarAsync(cancellationToken), CultureInfo.InvariantCulture);
+        if (visibleRows <= 0)
+        {
+            throw new PolizasValidationException(
+                "Created MVP poliza is not visible for the active broker/client context.");
         }
     }
 

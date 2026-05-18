@@ -150,6 +150,8 @@ Hallazgos iniciales de BBDD local:
 - El CRUD debe usar `dbo.Poliza.Id` como identificador estable interno y tratar `Poliza` como numero visible.
 - `dbo.Poliza` tiene triggers de auditoria/calculo/division/oficina/anulacion; toda escritura requiere transaccion, pruebas rollback/limpieza y UAT.
 - La vista real usada en smoke API/UI no expone `NombreCompleto`, `Cia`, `Riesgo` ni `PAnualCartera`; la lectura MVP usa columnas disponibles y valores neutros hasta cerrar contrato de campos enriquecidos.
+- La vista real usada en smoke depende de `dbo.Identidad`; las altas MVP deben usar `ClienteId` existente o el backend debe hacer rollback porque la fila no seria visible.
+- `dbo.Poliza.FCR` es obligatorio en la BBDD local; el alta MVP lo escribe con hora SQL controlada.
 
 DoD objetivo:
 
@@ -162,11 +164,13 @@ DoD objetivo:
 - Prueba local transaccional create -> update -> baja tecnica ejecutada sin versionar connection strings, credenciales, dumps ni PII, y verificada sin filas `ILMVP-%` residuales.
 - Smoke API/UI real de login, `/api/me`, catalogos, listado SQL, permisos CRUD y validaciones no mutantes ejecutado contra backend SQL local.
 - `primaAnual` queda fuera de escritura: la UI no lo envia y la API rechaza valores explicitos hasta decision DBA/UAT.
-- Smoke API CRUD mutante create -> update -> baja tecnica ejecutado con rollback y `ResidualBefore=0` / `ResidualAfterRollback=0`.
+- Smoke API de endpoints/gates CRUD create -> update -> baja tecnica ejecutado con rollback y `ResidualBefore=0` / `ResidualAfterRollback=0`; no se toma como evidencia final del camino SQL mutante.
+- Smoke repositorio SQL create -> detail -> search -> update -> detail -> baja tecnica -> detail 404 ejecutado con rollback y sin filas `ILMVP-%` residuales.
+- El backend SQL no confirma altas que no sean visibles por el contrato de lectura del broker/contexto activo.
 
 Pendiente tecnico:
 
-- Resolver contrato de lectura post-create: la fila sintetica creada en transaccion no aparece en `dbo.Pantalla_Polizas` antes de la baja tecnica.
+- Repetir smoke API/UI real de alta visible usando `CiaId`/`ClienteId` existentes desde el formulario MVP.
 - Confirmar campos editables definitivos con UAT.
 - Convertir catalogos necesarios para escritura en datos fiables o mantenerlos como valores controlados.
 - Diseñar auditoria de escritura sin datos sensibles.

@@ -312,10 +312,21 @@ Smoke API CRUD mutante con rollback:
 
 - Se retira `primaAnual` del camino de escritura real para no depender de `PAnualCartera`.
 - `POST /api/polizas` y `PUT /api/polizas/{id}` rechazan `primaAnual` explicito con `POLIZAS_VALIDATION_ERROR`.
-- Smoke temporal in-process con `WebApplicationFactory`, backend SQL local, `DemoSession`, `Polizas:WritesEnabled=true` y `TransactionScope` rollback: `ApiCrudRollbackSmoke=OK`.
+- Smoke temporal in-process con `WebApplicationFactory`, `DemoSession`, `Polizas:WritesEnabled=true` y `TransactionScope` rollback: `ApiCrudRollbackSmoke=OK`.
 - Resultado smoke CRUD: login 200, create 201, id creado numerico, update 204, delete/baja tecnica 204, detalle posterior 404.
 - Conteo verificable sobre BBDD modelo: `ResidualBefore=0` y `ResidualAfterRollback=0` para filas `ILMVP-%`.
-- Observacion: la fila sintetica creada en transaccion no queda visible por `dbo.Pantalla_Polizas` antes de la baja tecnica; queda pendiente cerrar con DBA/UAT si las altas MVP deben aparecer inmediatamente en la vista heredada o si se requiere otro contrato de lectura post-create.
+- Observacion: este smoke cubre endpoints, permisos y gates, pero no se considera evidencia concluyente del camino SQL mutante porque la configuracion in-process de `WebApplicationFactory` puede no llegar a tiempo para el registro DI. La evidencia SQL mutante queda cubierta por el smoke directo de repositorio de la seccion siguiente.
+
+Smoke repositorio SQL CRUD con visibilidad post-create:
+
+- Se detecta que la visibilidad post-create depende de que el alta cumpla el contrato real de `dbo.Poliza` y de que `ClienteId` exista en la identidad asociada a la vista.
+- `dbo.Poliza.FCR` es obligatorio y no tiene default; el `INSERT` MVP pasa a escribirlo con hora SQL mediante `SYSUTCDATETIME()`.
+- `SqlPolizasWriteRepository.CreateAsync` valida, dentro de la misma transaccion, que la fila `ILMVP-` creada queda visible por el contrato de lectura antes de confirmar. Si no queda visible, hace rollback y devuelve error funcional sanitizado.
+- `SqlPolizasRepository.GetCatalogsAsync` devuelve catalogos MVP compatibles con constraints SQL para situacion de poliza; el modo in-memory conserva fixtures legibles.
+- Smoke temporal directo sobre `SqlPolizasWriteRepository` y `SqlPolizasRepository`, con BBDD local resuelta por AppBuilder y `TransactionScope` rollback: `SqlRepositoryCrudVisibilitySmoke=OK`.
+- Resultado smoke SQL: `CreateIdNumeric=True`, `DetailAfterCreateVisible=True`, `SearchAfterCreateCount=1`, `UpdateResult=True`, `DetailAfterUpdateNumeroMatches=True`, `DeleteResult=True`, `DetailAfterDeleteVisible=False`.
+- Limpieza verificable: `ResidualBefore=0` y `ResidualAfterRollback=0` para filas `ILMVP-%`.
+- Observacion funcional: el formulario requiere `CiaId` y `ClienteId` existentes/visibles en la BBDD de pruebas; si se informa un cliente inexistente, el backend no debe devolver `201`.
 
 Validacion adicional tras retirar `primaAnual` de escritura:
 
@@ -336,6 +347,27 @@ git diff --check
 
 Resultados: backend especifico `109/109` OK, backend completo `147/147` OK, frontend unit `198/198` OK, format/lint/build OK, documentation baseline OK, secret scan sin leaks, dependency audit `0` findings y diff check sin errores.
 
+Validacion tras cerrar visibilidad post-create en repositorio SQL:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "PolizasSqlCommandBuilderTests|PolizasInfrastructureTests|PolizasWriteValidatorTests|PolizasApiTests"
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release
+cd .\iLiniumTech.Frontend
+npm run format
+npm run lint
+npm run test:unit -- PolizasView.test.ts
+npm run test:unit
+npm run build
+cd ..
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-DependencyAudit.ps1 -FailOnFindings
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-CorsAudit.ps1 -FailOnFindings
+git diff --check
+```
+
+Resultados: backend especifico `117/117` OK, backend completo `149/149` OK, frontend `PolizasView.test.ts` `10/10` OK, frontend unit completo `198/198` OK, format/lint/build OK, documentation baseline OK, secret scan sin leaks, dependency audit `0` findings, CORS audit OK y diff check sin errores.
+
 ## Riesgos residuales
 
 - Las escrituras sobre `dbo.Poliza` pueden disparar triggers heredados no cubiertos por tests unitarios.
@@ -343,7 +375,7 @@ Resultados: backend especifico `109/109` OK, backend completo `147/147` OK, fron
 - `DemoSession`, API key MVP y headers locales no son seguridad productiva.
 - Los campos sensibles de cliente, direccion, banco, riesgo y contacto siguen fuera de alcance hasta SDD/UAT especifica.
 - La BBDD usada para smoke real de lectura no expone `PAnualCartera`; `primaAnual` queda read-only hasta decision DBA/UAT.
-- El flujo create/update/baja tecnica via API queda validado con rollback, pero la lectura post-create por `dbo.Pantalla_Polizas` no muestra la fila sintetica; queda pendiente decidir contrato funcional de visibilidad.
+- La visibilidad post-create queda validada a nivel repositorio SQL cuando el alta usa cliente/compania existentes; falta repetir smoke API/UI completo con esos valores desde el formulario.
 
 ## Siguiente paso obligatorio
 
@@ -353,9 +385,10 @@ Antes de desarrollar el resto de paginas del menu, continuar Polizas CRUD BBDD e
 2. Hecho: anadir gate `Polizas:WritesEnabled` para bloquear escrituras por defecto.
 3. Hecho: crear DTOs y validaciones de create/update.
 4. Hecho: crear builder de comandos SQL parametrizados e integracion transaccional sobre `dbo.Poliza`.
-5. Hecho parcial: probar create/update/baja tecnica contra BBDD local con rollback y sin filas residuales `ILMVP-%`.
+5. Hecho: probar create/update/baja tecnica contra BBDD local con rollback y sin filas residuales `ILMVP-%`.
 6. Hecho parcial: activar UI CRUD solo cuando `/api/me` indique permisos y contexto valido.
 7. Hecho: smoke API/UI real contra backend SQL local con lectura, permisos CRUD y validaciones no mutantes.
 8. Hecho: retirar `primaAnual` de escritura y ejecutar create/update/baja tecnica via API SQL con rollback y limpieza verificable.
-9. Pendiente: cerrar contrato de lectura post-create, porque `dbo.Pantalla_Polizas` no muestra la fila sintetica creada en transaccion.
-10. Pendiente: cuando Polizas CRUD este cerrado con evidencia, crear agentes por pagina del menu para evolucionar las siguientes superficies.
+9. Hecho parcial: cerrar contrato de lectura post-create a nivel repositorio SQL; el backend ya no confirma altas invisibles.
+10. Pendiente: repetir smoke API/UI real de alta con `CiaId`/`ClienteId` existentes y documentar el flujo visible extremo a extremo.
+11. Pendiente: cuando Polizas CRUD este cerrado con evidencia, crear agentes por pagina del menu para evolucionar las siguientes superficies.

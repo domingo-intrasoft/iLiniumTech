@@ -39,6 +39,8 @@ Analisis de solo lectura ejecutado el 2026-05-18 contra BBDD local de pruebas, s
 - `dbo.Poliza` tiene triggers de auditoria/calculo/ajustes/division/oficina/anulacion. Las escrituras deben pasar por transaccion, pruebas rollback y UAT.
 - `dbo.Poliza` contiene campos sensibles y relaciones con cliente, cuenta bancaria, direccion, gestor, colaborador y riesgo. No deben exponerse ni editarse sin permiso/SDD.
 - En la BBDD local usada para smoke API/UI real, `dbo.Pantalla_Polizas` no expone campos enriquecidos como `NombreCompleto`, `Cia`, `Riesgo` ni `PAnualCartera`; la lectura MVP proyecta `ClienteId`, `CiaId`, `Riesgo` vacio y `PrimaAnual = 0` hasta cerrar contrato de joins/campos persistibles.
+- La vista local usada en smoke depende de `dbo.Poliza` y `dbo.Identidad`; una poliza creada con `ClienteId` inexistente puede existir en `dbo.Poliza` pero no ser visible en la lectura MVP.
+- `dbo.Poliza.FCR` es obligatorio y no tiene default en la BBDD local; el alta MVP debe escribirlo de forma controlada.
 
 ## Objetivo
 
@@ -108,6 +110,12 @@ Marcador obligatorio para registros creados por el MVP:
 
 La BBDD local no contiene aun un catalogo propio `origen-iLiniumTech-MVP`; por tanto, la defensa operativa inicial para update/delete es el prefijo tecnico. Para registros existentes no `ILMVP-`, `DELETE` debe devolver error funcional seguro hasta que producto defina anulacion/baja.
 
+Regla post-create:
+
+- el alta debe quedar visible por el contrato de lectura antes de confirmar la transaccion;
+- si `ClienteId`, broker/contexto o constraints heredadas impiden que la fila creada aparezca en lectura, el backend debe hacer rollback y devolver error funcional sanitizado;
+- el formulario MVP debe usar valores de situacion/tipo compatibles con catalogos SQL cuando `Polizas:Repository=Sql`.
+
 ## Plan por fases
 
 ### Fase A - Preparacion y seguridad
@@ -124,6 +132,7 @@ La BBDD local no contiene aun un catalogo propio `origen-iLiniumTech-MVP`; por t
 - Implementar SQL parametrizado sobre `dbo.Poliza`, no sobre metadata.
 - Usar transaccion por operacion.
 - Aplicar `SESSION_CONTEXT` antes de escribir.
+- Validar visibilidad post-create dentro de la transaccion antes de devolver `201 Created`.
 - Sanitizar errores y devolver `correlationId`.
 - Tests unitarios de validacion, permisos, query/command builder y errores.
 
@@ -154,6 +163,7 @@ Cuando el CRUD de `Polizas` este cerrado con evidencia, crear agentes por pagina
 - Las escrituras quedan bloqueadas por defecto y solo se habilitan con configuracion local/demo explicita.
 - Las rutas CRUD exigen permisos `polizas.create`, `polizas.update` y `polizas.delete` segun corresponda.
 - Las operaciones SQL usan parametros, transacciones y `SESSION_CONTEXT`.
+- El alta SQL no confirma una fila que no sea visible por el contrato de lectura del broker/contexto activo.
 - El delete MVP no debe ser fisico; debe aplicar baja tecnica solo a registros `ILMVP-`.
 - Frontend muestra acciones CRUD solo con permisos y contexto validos.
 - La evidencia local no contiene connection strings, credenciales, dumps ni PII real.
@@ -180,6 +190,7 @@ Backend:
 - Tests de SQL parametrizado sin concatenar datos del usuario.
 - Tests de borrado bloqueado para registros no MVP.
 - Prueba local BBDD con rollback o limpieza verificable.
+- Prueba local BBDD de `create -> detail -> search -> update -> detail -> baja tecnica -> detail 404`.
 
 Frontend:
 

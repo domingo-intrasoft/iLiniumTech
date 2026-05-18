@@ -21,7 +21,8 @@ public sealed class PolizasSqlCommandBuilder
                 [F_Vencimiento],
                 [IdFraccionPago],
                 [IdGestor],
-                [IdSistemaOrigen]
+                [IdSistemaOrigen],
+                [FCR]
             )
             VALUES (
                 @numero,
@@ -36,7 +37,8 @@ public sealed class PolizasSqlCommandBuilder
                 @fechaVencimiento,
                 @fraccionPago,
                 @gestor,
-                @sistemaOrigen
+                @sistemaOrigen,
+                SYSUTCDATETIME()
             );
             SELECT CAST(SCOPE_IDENTITY() AS int);
             """;
@@ -56,6 +58,25 @@ public sealed class PolizasSqlCommandBuilder
                 Text("@fraccionPago", PolizasMvpWriteDefaults.FraccionPago, 100),
                 Text("@gestor", PolizasMvpWriteDefaults.Gestor, 100),
                 Text("@sistemaOrigen", PolizasMvpWriteDefaults.SistemaOrigen, 100)
+            ]);
+    }
+
+    public PolizasSqlQuery BuildCreatedVisibilityQuery(int id)
+    {
+        const string commandText = """
+            SELECT COUNT_BIG(1)
+            FROM [dbo].[Pantalla_Polizas]
+            WHERE [Id] = @id
+              AND [Poliza] LIKE @mvpNumeroLike
+              AND [Poliza] NOT LIKE @mvpDeletedNumeroLike;
+            """;
+
+        return new PolizasSqlQuery(
+            commandText,
+            [
+                Int("@id", id),
+                Text("@mvpNumeroLike", $"{PolizasMvpWriteDefaults.NumeroPrefix}%", 50),
+                Text("@mvpDeletedNumeroLike", $"{PolizasMvpWriteDefaults.DeletedNumeroPrefix}%", 50)
             ]);
     }
 

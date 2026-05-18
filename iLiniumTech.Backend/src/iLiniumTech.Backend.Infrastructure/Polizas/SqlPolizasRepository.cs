@@ -53,7 +53,7 @@ public sealed class SqlPolizasRepository(
     }
 
     public Task<PolizasCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
-        Task.FromResult(PolizasCatalogProvider.CreateDefault());
+        Task.FromResult(PolizasCatalogProvider.CreateSqlMvpDefaults());
 
     private static async Task<long> ExecuteCountAsync(
         SqlConnection connection,

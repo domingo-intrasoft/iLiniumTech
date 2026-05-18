@@ -69,6 +69,19 @@ public sealed class PolizasInfrastructureTests
     }
 
     [Fact]
+    public async Task Sql_repository_exposes_mvp_catalog_values_compatible_with_model_constraints()
+    {
+        var repository = new SqlPolizasRepository("Server=localhost;Database=Polizas;User Id=user;Password=password;TrustServerCertificate=True");
+
+        var catalogs = await repository.GetCatalogsAsync(CancellationToken.None);
+
+        catalogs.TipoPoliza.Should().Contain(option =>
+            option.Value == "situacionpoliza-EV" &&
+            option.Label == "En vigor");
+        catalogs.TipoPoliza.Should().NotContain(option => option.Value == "Vigor");
+    }
+
+    [Fact]
     public void AddInfrastructure_requires_master_connection_for_appbuilder_master_resolver()
     {
         var services = new ServiceCollection();

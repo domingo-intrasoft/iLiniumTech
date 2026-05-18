@@ -31,7 +31,7 @@ const form = reactive({
   clienteId: '1',
   estado: 'Vigor',
   ramo: 'Autos',
-  tipoPoliza: 'Cartera',
+  tipoPoliza: 'polizaTipo-NU',
   fechaEfecto: '2026-01-01',
   fechaVencimiento: '2026-12-31',
 })
@@ -106,7 +106,7 @@ function resetForm() {
   form.clienteId = '1'
   form.estado = props.catalogs.tipoPoliza[0]?.value ?? 'Vigor'
   form.ramo = props.catalogs.ramo[0]?.value ?? 'Autos'
-  form.tipoPoliza = 'Cartera'
+  form.tipoPoliza = 'polizaTipo-NU'
   form.fechaEfecto = '2026-01-01'
   form.fechaVencimiento = '2026-12-31'
 }

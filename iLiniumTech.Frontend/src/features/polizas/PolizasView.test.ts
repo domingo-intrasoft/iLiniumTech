@@ -274,7 +274,7 @@ describe('PolizasView smoke', () => {
         clienteId: 1,
         estado: 'Vigor',
         ramo: 'Autos',
-        tipoPoliza: 'Cartera',
+        tipoPoliza: 'polizaTipo-NU',
       }),
     )
     expect(mocks.apiPost.mock.calls[0]?.[1]).not.toHaveProperty('primaAnual')

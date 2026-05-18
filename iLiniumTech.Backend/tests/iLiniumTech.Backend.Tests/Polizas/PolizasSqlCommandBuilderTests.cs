@@ -24,10 +24,13 @@ public sealed class PolizasSqlCommandBuilderTests
         query.CommandText.Should().Contain("[IdSistemaOrigen]");
         query.CommandText.Should().Contain("[IdFraccionPago]");
         query.CommandText.Should().Contain("[IdGestor]");
+        query.CommandText.Should().Contain("[FCR]");
+        query.CommandText.Should().Contain("SYSUTCDATETIME()");
         query.CommandText.Should().NotContain("[PAnualCartera]");
         query.CommandText.Should().Contain("@fraccionPago");
         query.CommandText.Should().Contain("@gestor");
         query.CommandText.Should().Contain("@sistemaOrigen");
+        query.CommandText.Should().NotContain("@fcr");
         query.CommandText.Should().NotContain("@primaAnual");
         query.CommandText.Should().NotContain("DELETE FROM [dbo].[Poliza] --");
         query.Parameters.Should().Contain(parameter =>
@@ -42,6 +45,27 @@ public sealed class PolizasSqlCommandBuilderTests
         query.Parameters.Should().Contain(parameter =>
             parameter.Name == "@gestor" &&
             (string)parameter.Value == PolizasMvpWriteDefaults.Gestor);
+    }
+
+    [Fact]
+    public void BuildCreatedVisibilityQuery_checks_created_mvp_row_through_read_view()
+    {
+        var query = _builder.BuildCreatedVisibilityQuery(1001);
+
+        query.CommandText.Should().Contain("FROM [dbo].[Pantalla_Polizas]");
+        query.CommandText.Should().Contain("WHERE [Id] = @id");
+        query.CommandText.Should().Contain("AND [Poliza] LIKE @mvpNumeroLike");
+        query.CommandText.Should().Contain("AND [Poliza] NOT LIKE @mvpDeletedNumeroLike");
+        query.CommandText.Should().NotContain("1001");
+        query.Parameters.Should().Contain(parameter =>
+            parameter.Name == "@id" &&
+            (int)parameter.Value == 1001);
+        query.Parameters.Should().Contain(parameter =>
+            parameter.Name == "@mvpNumeroLike" &&
+            (string)parameter.Value == $"{PolizasMvpWriteDefaults.NumeroPrefix}%");
+        query.Parameters.Should().Contain(parameter =>
+            parameter.Name == "@mvpDeletedNumeroLike" &&
+            (string)parameter.Value == $"{PolizasMvpWriteDefaults.DeletedNumeroPrefix}%");
     }
 
     [Fact]

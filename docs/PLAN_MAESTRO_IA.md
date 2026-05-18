@@ -34,7 +34,7 @@ Puntos aparcados o no cerrados:
 - Las paginas estaticas del menu son visibles para orientar navegacion y pruebas, pero estan bloqueadas para datos reales, filtros funcionales, escrituras, exportaciones, permisos finos o APIs propias hasta SDD/API/UAT.
 - La autenticacion productiva no esta decidida.
 - Falta matriz real de permisos por broker, perfil, oficina, gestor y usuario.
-- SQL de Polizas CRUD ya tiene smoke transaccional con rollback contra BBDD local autorizada; falta smoke API/UI real con backend SQL y confirmar claves de `SESSION_CONTEXT` con DBA.
+- SQL de Polizas CRUD ya tiene smoke transaccional con rollback, lectura SQL real y visibilidad post-create validada a nivel repositorio contra BBDD local autorizada; falta repetir smoke API/UI de alta visible con valores existentes de cliente/compania y confirmar claves de `SESSION_CONTEXT` con DBA.
 - Falta destino preview real, environments, secrets y branch protection final.
 - Falta UAT funcional con responsable humano y datos autorizados.
 
@@ -278,7 +278,7 @@ Objetivo: convertir Polizas en una pantalla diaria de trabajo con CRUD controlad
 
 SDD activa: `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`.
 
-Estado 2026-05-18: backend CRUD, baja tecnica MVP, UI de alta/edicion/baja, smoke SQL transaccional, smoke API/UI real de lectura y smoke API CRUD mutante con rollback estan implementados. El siguiente bloque obligatorio es cerrar el contrato de lectura post-create, porque la vista heredada `dbo.Pantalla_Polizas` no muestra la fila sintetica creada en transaccion.
+Estado 2026-05-18: backend CRUD, baja tecnica MVP, UI de alta/edicion/baja, smoke SQL transaccional, smoke API/UI real de lectura, smoke API de endpoints/gates CRUD con rollback y visibilidad post-create a nivel repositorio SQL estan implementados. El siguiente bloque obligatorio es repetir el flujo API/UI de alta visible usando `CiaId`/`ClienteId` existentes en la BBDD de pruebas.
 
 Pasos y tareas:
 
@@ -297,7 +297,8 @@ Pasos y tareas:
 - No usar delete fisico en el MVP: aplicar baja tecnica solo a registros `ILMVP-`, marcandolos `ILMVP-DELETED-` y ocultandolos del listado/detalle.
 - Mantener lectura SQL compatible con la vista real local: `ClienteId`, `CiaId`, `Riesgo` vacio y `PrimaAnual = 0` cuando no existan columnas enriquecidas.
 - Mantener `primaAnual` como read-only: no se envia desde UI y el backend rechaza valores explicitos en create/update hasta columna/regla DBA/UAT.
-- Resolver si las altas MVP deben aparecer inmediatamente por `dbo.Pantalla_Polizas` o si la lectura post-create necesita otro contrato.
+- Mantener la regla de que el backend no confirma altas MVP que no sean visibles por el contrato de lectura del broker/contexto activo.
+- Repetir smoke API/UI de alta usando valores existentes de cliente/compania, porque un `ClienteId` inexistente no aparece por la vista heredada.
 - Preparar pruebas de regresion para filtros, limpieza, paginacion, detalle, alta, edicion, borrado permitido y borrado bloqueado.
 
 Agentes:
@@ -313,7 +314,7 @@ DoD y evidencia:
 - Pruebas SQL locales con rollback o limpieza verificable.
 - Smoke `/polizas` y `/polizas/:id`.
 - Smoke create -> read -> update -> baja tecnica cuando exista UI CRUD.
-- Smoke API/UI real contra backend SQL local antes de abrir desarrollo del resto de paginas; ya existe para login/listado/permisos/validaciones no mutantes y CRUD mutante API con rollback, falta cerrar visibilidad post-create por la vista.
+- Smoke API/UI real contra backend SQL local antes de abrir desarrollo del resto de paginas; ya existe para login/listado/permisos/validaciones no mutantes y endpoints/gates CRUD con rollback, y la visibilidad post-create esta cerrada a nivel repositorio SQL. Falta smoke API/UI visible extremo a extremo.
 - Sin nombres SQL/AppBuilder/metadata en DOM.
 - Sin secretos ni datos personales reales versionados.
 - UAT o bloqueo funcional documentado.

@@ -1,6 +1,6 @@
 # Avance autonomo IA - 2026-05-18
 
-Rama: `codex/static-polizas-data-api`
+Rama: `codex/polizas-crud-bbdd`
 Ventana: continuacion autonoma nocturna del MVP tras el cambio de dia local en Atlantic/Canary.
 
 ## Objetivo operativo
@@ -95,7 +95,7 @@ Validacion tras descripcion accesible de acciones bloqueadas en Suplementos:
 
 ## Riesgos residuales
 
-- Polizas CRUD BBDD avanza con smoke API/UI real de lectura y smoke API CRUD mutante con rollback contra backend SQL local; queda pendiente cerrar visibilidad post-create por `dbo.Pantalla_Polizas`.
+- Polizas CRUD BBDD avanza con smoke API/UI real de lectura, smoke API de endpoints/gates CRUD con rollback y smoke repositorio SQL de visibilidad post-create; queda pendiente repetir alta visible desde API/UI con `CiaId`/`ClienteId` existentes.
 - `Clientes` sigue siendo fixture/read-only con PII real bloqueada; no autoriza ficha real, exportacion, desglose, contacto ni datos bancarios sin SDD/API/UAT.
 - `Agenda` sigue siendo fixture/read-only con calendario dinamico, reprogramacion, participantes, workflows y asuntos sensibles bloqueados hasta SDD/API/UAT.
 - `Propuestas` sigue siendo fixture/read-only; crear, convertir a poliza, documentos, detalle, exportacion y emision siguen bloqueados hasta SDD/API/permisos/UAT.
@@ -108,4 +108,4 @@ Validacion tras descripcion accesible de acciones bloqueadas en Suplementos:
 
 ## Siguiente paso sugerido
 
-Continuar con incrementos pequenos de accesibilidad/consistencia en paginas estaticas restantes o reforzar documentacion de evidencias E2E, siempre evitando activar integraciones reales sin SDD aprobada.
+Continuar Polizas CRUD BBDD: repetir el flujo API/UI de alta visible con valores existentes de cliente/compania, documentar evidencia y solo despues abrir agentes por pagina del menu.
