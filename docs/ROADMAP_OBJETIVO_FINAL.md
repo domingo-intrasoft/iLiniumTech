@@ -14,6 +14,7 @@ Este documento es la guia canonica de calidad para llevar iLiniumTech desde el M
 - [sdd/specs/iLiniumTech](sdd/specs/iLiniumTech)
 - [sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md](sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md)
 - [sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md](sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md)
+- [sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md](sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md)
 
 Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadata heredada sirve para extraccion, trazabilidad, comparativa y scaffolding revisado; el producto final debe quedar como frontend Vue estatico y backend API explicita.
 
@@ -392,6 +393,7 @@ DoD:
 Bloqueos actuales:
 
 - La prioridad activa pasa a agentes por pagina del menu; `Polizas CRUD BBDD` queda como vertical local de referencia y el rollout operativo queda documentado en [appbuilder/pages/page-agent-rollout.md](appbuilder/pages/page-agent-rollout.md).
+- Primera SDD posterior a Polizas abierta: [SDD-2026-008 Siniestros read-only minimizado](sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md). Estado: draft; no autoriza aun API real hasta UAT/DBA/permisos/security review. El primer corte excluye detalle, importes, intervinientes, EIAC, observaciones, exportacion y escrituras.
 - Falta confirmar reglas funcionales reales y responsables UAT.
 
 ### Fase 7 - Preview profesional y operacion controlada

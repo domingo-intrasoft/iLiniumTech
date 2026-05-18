@@ -19,6 +19,7 @@ Avanzar el MVP con incrementos pequenos, seguros y validados, sin activar datos 
 | `cae0866` | Frontend accesibilidad | Acciones bloqueadas de Suplementos comparten descripcion accesible sobre SDD/API/permisos/UAT y workflows/adjuntos/datos restringidos. |
 | Este bloque | Polizas CRUD BBDD | Smoke API/UI visible contra backend SQL local: alta, busqueda, edicion, baja tecnica y limpieza exacta sin residuales. |
 | Bloque 06:31 | Gobierno IA | Paquete activo de agentes por pagina creado y enlazado desde roadmap, plan maestro, readiness y task pack. |
+| Bloque 07:01 | SDD Siniestros | `SDD-2026-008` abierta como draft de listado read-only minimizado, sin detalle ni datos sensibles. |
 
 ## Validaciones ejecutadas
 
@@ -112,6 +113,13 @@ Validacion tras paquete de agentes por pagina:
 - `git diff --check`: OK.
 - No se ejecutaron tests frontend/backend porque el cambio es exclusivamente documental y no modifica runtime.
 
+Validacion tras SDD draft de Siniestros:
+
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+- No se ejecutan tests frontend/backend salvo que se detecte cambio runtime; este bloque solo crea/actualiza documentacion.
+
 ## Riesgos residuales
 
 - Polizas CRUD BBDD queda cerrado como MVP local con evidencia API/UI visible; quedan UAT funcional, auth productiva, permisos finales y confirmacion DBA de triggers/campos para escrituras no sinteticas.
@@ -125,7 +133,8 @@ Validacion tras paquete de agentes por pagina:
 - Datos reales SQL, DBA/UAT, permisos finales y proveedor auth siguen bloqueados externamente.
 - `Autos Particulares` sigue aparcado por decision de producto.
 - El rollout por pagina no autoriza por si mismo datos reales, APIs, escrituras, exportaciones ni permisos nuevos; cada pagina debe abrir SDD propia antes de salir del carril fixture/bloqueado.
+- `SDD-2026-008` deja `Siniestros` en draft: el primer corte propuesto es solo listado read-only minimizado y sigue bloqueado hasta UAT/DBA, permisos, origen de lectura autorizado y security review.
 
 ## Siguiente paso sugerido
 
-Ejecutar la primera ronda sobre paginas de mayor valor: preparar SDD read-only de `Siniestros`, `Recibos` o `Clientes`, o hacer hardening fixture de una pagina concreta sin backend ni datos reales.
+Preparar `SDD Recibos read-only` o revisar preguntas UAT/DBA de `Siniestros` antes de programar API.

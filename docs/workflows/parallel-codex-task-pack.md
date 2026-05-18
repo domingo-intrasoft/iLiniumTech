@@ -50,7 +50,7 @@ Estado de coordinacion 2026-05-18: el carril de paginas del menu vuelve a ser el
 - **Archivos que puede tocar:** docs de esas paginas, `docs/qa/**`; solo con encargo frontend, sus carpetas `src/features/**` correspondientes.
 - **Archivos que NO debe tocar:** backend/API, servicios, SQL, router, navegacion y metadata runtime sin SDD.
 - **Dependencias:** SDD, permisos, DBA/UAT y privacy review para datos reales o PII.
-- **Criterios de aceptacion:** no se infieren reglas funcionales desde nombres de menu; cada API futura queda separada por contrato.
+- **Criterios de aceptacion:** no se infieren reglas funcionales desde nombres de menu; cada API futura queda separada por contrato. Para `Siniestros`, el primer contrato documental es [`SDD-2026-008`](../sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md), limitado a listado read-only minimizado.
 - **Pruebas obligatorias:** frontend completo si UI; security/privacy review antes de API real.
 - **Documentacion a actualizar:** SDD candidates y README de pagina.
 - **Riesgo de conflicto:** medio con Polizas si se intenta compartir contratos o scopes.

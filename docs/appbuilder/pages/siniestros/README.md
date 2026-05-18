@@ -12,6 +12,10 @@ Ronda: solo documentacion. No se programa frontend, backend, extractor `Live` ni
 
 Hay evidencia local suficiente para afirmar que `Siniestros` existe como entrada de menu, clave de busqueda/gestion y dominio de datos amplio en AppBuilder. Tambien hay evidencia de tablas, vistas y areas de negocio relacionadas con siniestros, indemnizaciones, franquicias, intervinientes, EIAC, aduana, agenda, cliente y poliza.
 
+Actualizacion 2026-05-18: iLiniumTech ya contiene ruta protegida `/siniestros` y vista Vue fixture/read-only con datos sanitizados, filtros locales y acciones de detalle/exportacion bloqueadas. Esa vista no cambia la clasificacion funcional de este documento: sigue sin autorizar API, datos reales, detalle, exportacion ni escritura sin SDD, permisos, DBA/UAT y revision de seguridad.
+
+SDD draft abierta para el primer corte futuro: [`SDD-2026-008 Siniestros read-only minimizado`](../../../sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md). La SDD limita el primer incremento a listado read-only minimizado y deja detalle, intervinientes, importes, EIAC, observaciones y exportacion fuera de alcance.
+
 No hay evidencia local suficiente para afirmar una pantalla AppBuilder completa de `Siniestros` con:
 
 - `componentId` raiz;
@@ -82,12 +86,12 @@ En `iLiniumTech.Frontend/src/layout/appNavigation.ts`, `Siniestros` aparece como
 
 - etiqueta: `Siniestros`;
 - icono: `pi pi-exclamation-triangle`;
-- estado: `disabled: true`;
-- ruta: no definida;
+- estado actual iLiniumTech: `fixture`;
+- ruta: `/siniestros`;
 - permiso iLiniumTech: no definido;
 - hijos: no definidos.
 
-Esto confirma que iLiniumTech reserva el hueco de navegacion, pero aun no existe una pantalla estatica ni un contrato funcional propio.
+Esto confirma que iLiniumTech ya tiene una superficie visible fixture/read-only para navegacion y pruebas. No existe aun contrato funcional con datos reales ni API propia.
 
 ### Localizacion y busqueda AppBuilder
 
