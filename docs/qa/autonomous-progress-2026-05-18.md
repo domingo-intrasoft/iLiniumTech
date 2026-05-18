@@ -22,6 +22,7 @@ Avanzar el MVP con incrementos pequenos, seguros y validados, sin activar datos 
 | Bloque 07:01 | SDD Siniestros | `SDD-2026-008` abierta como draft de listado read-only minimizado, sin detalle ni datos sensibles. |
 | Bloque 07:31 | SDD Recibos | `SDD-2026-009` abierta como draft de listado read-only minimizado, sin importes reales ni datos bancarios. |
 | Bloque 08:04 | SDD Clientes | `SDD-2026-010` abierta como draft de listado read-only minimizado, sin ficha ni PII ampliada. |
+| Bloque 08:34 | SDD Agenda | `SDD-2026-011` abierta como draft de listado read-only por rango, sin calendario interactivo ni escrituras. |
 
 ## Validaciones ejecutadas
 
@@ -136,6 +137,13 @@ Validacion tras SDD draft de Clientes:
 - `git diff --check`: OK.
 - No se ejecutan tests frontend/backend salvo que se detecte cambio runtime; este bloque solo crea/actualiza documentacion.
 
+Validacion tras SDD draft de Agenda:
+
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+- No se ejecutan tests frontend/backend salvo que se detecte cambio runtime; este bloque solo crea/actualiza documentacion.
+
 ## Riesgos residuales
 
 - Polizas CRUD BBDD queda cerrado como MVP local con evidencia API/UI visible; quedan UAT funcional, auth productiva, permisos finales y confirmacion DBA de triggers/campos para escrituras no sinteticas.
@@ -152,7 +160,8 @@ Validacion tras SDD draft de Clientes:
 - `SDD-2026-008` deja `Siniestros` en draft: el primer corte propuesto es solo listado read-only minimizado y sigue bloqueado hasta UAT/DBA, permisos, origen de lectura autorizado y security review.
 - `SDD-2026-009` deja `Recibos` en draft: el primer corte propuesto es solo listado read-only minimizado sin importes reales y sigue bloqueado hasta UAT/DBA, permisos, origen de lectura autorizado y security review.
 - `SDD-2026-010` deja `Clientes` en draft: el primer corte propuesto es solo listado read-only minimizado y sigue bloqueado hasta UAT/DBA, permisos, origen de lectura autorizado y security review.
+- `SDD-2026-011` deja `Agenda` en draft: el primer corte propuesto es solo listado read-only por rango y sigue bloqueado hasta UAT/DBA, permisos, origen de lectura autorizado y security review.
 
 ## Siguiente paso sugerido
 
-Revisar preguntas UAT/DBA de `Siniestros`, `Recibos` y `Clientes`, o preparar la siguiente SDD read-only para `Agenda`.
+Revisar preguntas UAT/DBA de `Siniestros`, `Recibos`, `Clientes` y `Agenda`, o preparar la siguiente SDD read-only para `Propuestas`.

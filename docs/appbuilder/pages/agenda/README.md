@@ -4,6 +4,10 @@ Fecha: 2026-05-16
 
 Estado: documentacion de evidencia parcial. Desarrollo bloqueado hasta localizar metadata completa o validacion funcional autorizada.
 
+Actualizacion 2026-05-18: iLiniumTech ya contiene ruta protegida `/agenda` y vista Vue fixture/read-only con datos sanitizados, filtros locales, sin calendario dinamico y acciones de crear/reprogramar/exportar bloqueadas. Esa vista no autoriza API, datos reales, calendario interactivo, detalle, reprogramacion ni escritura sin SDD, permisos, DBA/UAT y revision de seguridad.
+
+SDD draft abierta para el primer corte futuro: [`SDD-2026-011 Agenda read-only por rango`](../../../sdd/specs/iLiniumTech/SDD-2026-011-agenda-read-only.md). La SDD limita el primer incremento a listado read-only por rango de fechas y deja calendario visual, FullCalendar, detalle, descripcion larga, participantes, objeto relacionado, drag/drop, reprogramacion, exportacion y escrituras fuera de alcance.
+
 ## Rol de esta ronda
 
 Este documento recoge el analisis como jefe de pagina para `Agenda`. La ronda es solo documental: no se ha programado frontend, backend, extractor Live ni SQL.
@@ -52,12 +56,12 @@ Fuentes evitadas expresamente:
 
 - label: `Agenda`
 - icono: `pi pi-calendar`
-- estado: `disabled: true`
-- ruta: ausente
+- estado actual iLiniumTech: `fixture`
+- ruta: `/agenda`
 - permiso iLiniumTech: ausente
 - hijos: ausentes
 
-Esto confirma que Agenda existe en la taxonomia inicial del menu, pero no existe pagina implementada ni contrato funcional iLiniumTech.
+Esto confirma que Agenda existe en la taxonomia inicial del menu y que ya hay una superficie fixture/read-only para navegacion y pruebas. No existe aun contrato funcional con datos reales ni API propia.
 
 ### Localizacion AppBuilder
 

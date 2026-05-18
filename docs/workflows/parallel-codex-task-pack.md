@@ -38,7 +38,7 @@ Estado de coordinacion 2026-05-18: el carril de paginas del menu vuelve a ser el
 - **Archivos que puede tocar:** `docs/appbuilder/pages/agenda/**`, `docs/appbuilder/pages/clientes/**`, `docs/appbuilder/pages/propuestas/**`, `docs/qa/**`; solo si se aprueba UI, `iLiniumTech.Frontend/src/features/agenda/**`, `clientes/**`, `propuestas/**`.
 - **Archivos que NO debe tocar:** backend, servicios API, router, navegacion, package files, extractor y datos reales.
 - **Dependencias:** UAT/producto para campos, permisos y origenes de datos.
-- **Criterios de aceptacion:** PII y workflows quedan bloqueados; las tareas futuras distinguen placeholder de API real. Para `Clientes`, el primer contrato documental es [`SDD-2026-010`](../sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md), limitado a listado read-only minimizado sin ficha ni PII ampliada.
+- **Criterios de aceptacion:** PII y workflows quedan bloqueados; las tareas futuras distinguen placeholder de API real. Para `Clientes`, el primer contrato documental es [`SDD-2026-010`](../sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md), limitado a listado read-only minimizado sin ficha ni PII ampliada. Para `Agenda`, el primer contrato documental es [`SDD-2026-011`](../sdd/specs/iLiniumTech/SDD-2026-011-agenda-read-only.md), limitado a listado read-only por rango sin calendario interactivo.
 - **Pruebas obligatorias:** frontend format/lint/unit/build si toca UI; validacion documental si toca docs.
 - **Documentacion a actualizar:** README de pagina, evidencia QA y SDD futura si procede.
 - **Riesgo de conflicto:** medio si varios agentes tocan componentes fixture al mismo tiempo.

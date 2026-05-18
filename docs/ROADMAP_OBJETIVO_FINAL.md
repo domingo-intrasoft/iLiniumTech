@@ -17,6 +17,7 @@ Este documento es la guia canonica de calidad para llevar iLiniumTech desde el M
 - [sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md](sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md)
 - [sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md](sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md)
 - [sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md](sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md)
+- [sdd/specs/iLiniumTech/SDD-2026-011-agenda-read-only.md](sdd/specs/iLiniumTech/SDD-2026-011-agenda-read-only.md)
 
 Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadata heredada sirve para extraccion, trazabilidad, comparativa y scaffolding revisado; el producto final debe quedar como frontend Vue estatico y backend API explicita.
 
@@ -398,6 +399,7 @@ Bloqueos actuales:
 - Primera SDD posterior a Polizas abierta: [SDD-2026-008 Siniestros read-only minimizado](sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md). Estado: draft; no autoriza aun API real hasta UAT/DBA/permisos/security review. El primer corte excluye detalle, importes, intervinientes, EIAC, observaciones, exportacion y escrituras.
 - Segunda SDD posterior a Polizas abierta: [SDD-2026-009 Recibos read-only minimizado](sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md). Estado: draft; no autoriza aun API real hasta UAT/DBA/permisos/security review. El primer corte excluye importes reales, banco, remesas, detalle, EIAC, cobro, exportacion y escrituras.
 - Tercera SDD posterior a Polizas abierta: [SDD-2026-010 Clientes read-only minimizado](sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md). Estado: draft; no autoriza aun API real hasta UAT/DBA/permisos/security review. El primer corte excluye ficha, tabs relacionadas, documento, contacto, direccion, banco, metricas, exportacion y escrituras.
+- Cuarta SDD posterior a Polizas abierta: [SDD-2026-011 Agenda read-only por rango](sdd/specs/iLiniumTech/SDD-2026-011-agenda-read-only.md). Estado: draft; no autoriza aun API real hasta UAT/DBA/permisos/security review. El primer corte excluye calendario interactivo, detalle, descripcion larga, participantes, drag/drop, reprogramacion, exportacion y escrituras.
 - Falta confirmar reglas funcionales reales y responsables UAT.
 
 ### Fase 7 - Preview profesional y operacion controlada
