@@ -39,7 +39,7 @@ Resumen ejecutivo:
 | --- | --- | --- |
 | Agenda | MVP estatico visible; SDD draft de listado read-only por rango; datos/API pendientes | [`agenda/README.md`](agenda/README.md), [`SDD-2026-011`](../../sdd/specs/iLiniumTech/SDD-2026-011-agenda-read-only.md) |
 | Clientes | MVP estatico visible; SDD draft de listado read-only minimizado; datos/API/PII pendientes | [`clientes/README.md`](clientes/README.md), [`SDD-2026-010`](../../sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md) |
-| Propuestas | MVP estatico visible; datos/API pendientes | [`propuestas/README.md`](propuestas/README.md) |
+| Propuestas | MVP estatico visible; SDD draft de listado read-only minimizado; datos/API pendientes | [`propuestas/README.md`](propuestas/README.md), [`SDD-2026-012`](../../sdd/specs/iLiniumTech/SDD-2026-012-propuestas-read-only.md) |
 | Polizas | Lista para desarrollo inicial | [`polizas/README.md`](polizas/README.md) |
 | Polizas / Autos Particulares | Aparcada; ruta tecnica deshabilitada, no reactivada | Sin documento de pagina en esta carpeta; ver [`SDD-2026-006`](../../sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md) |
 | Polizas / Flotas | MVP estatico visible; scope bajo Polizas; datos/API pendientes | [`polizas-flotas/README.md`](polizas-flotas/README.md) |

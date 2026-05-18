@@ -8,6 +8,10 @@ Estado final: `bloqueado externo`.
 
 Motivo del estado: existe la entrada `Propuestas` en el menu objetivo de iLiniumTech, pero no se ha encontrado metadata local suficiente que permita identificar de forma verificable su menu AppBuilder real, su `componentId`, su arbol de componentes, sus tabs, sus submenus, sus datasources, sus filtros o sus acciones. No debe iniciarse desarrollo funcional de la pagina hasta obtener una extraccion sanitizada o una consulta autorizada de metadata AppBuilder.
 
+Actualizacion 2026-05-18: iLiniumTech ya contiene ruta protegida `/propuestas` y vista Vue fixture/read-only con datos demo sanitizados, filtros locales y acciones de crear, convertir a poliza, documentos y exportar bloqueadas. Esa vista no autoriza API, datos reales, detalle, importes, documentos, emision, conversion ni escritura sin SDD, permisos, DBA/UAT y revision de seguridad.
+
+SDD draft abierta para el primer corte futuro: [`SDD-2026-012 Propuestas read-only minimizado`](../../../sdd/specs/iLiniumTech/SDD-2026-012-propuestas-read-only.md). La SDD limita el primer incremento a listado read-only minimizado y deja detalle, cliente real, importes, documentos, tarificacion, emision, conversion, exportacion, workflows e integraciones fuera de alcance.
+
 ## Regla base
 
 iLiniumTech no debe reconstruir AppBuilder como runtime dinamico. Este documento es evidencia de analisis y guia para una futura SDD/scaffolding revisado. La pagina final, si se aprueba, debe quedar como Vue/TypeScript estatico y backend .NET con API explicita. Ningun frontend/backend productivo debe consultar `IAP_Menu`, `IAP_Component`, `IAP_DataSource` o metadata heredada para pintar la pantalla en runtime.
@@ -91,15 +95,16 @@ En `iLiniumTech.Frontend/src/layout/appNavigation.ts` existe una entrada:
 
 - `label`: `Propuestas`
 - `icon`: `pi pi-folder-open`
-- `disabled`: `true`
-- `to`: ausente
+- estado actual iLiniumTech: `fixture`
+- `to`: `/propuestas`
 - `requiredPermission`: ausente
 - `children`: ausente
 
 Interpretacion:
 
-- iLiniumTech reconoce `Propuestas` como item de navegacion futuro.
-- Actualmente no existe pagina Vue, ruta, permiso, contrato API ni submenu definido.
+- iLiniumTech reconoce `Propuestas` como item de navegacion de dominio.
+- Actualmente existe superficie fixture/read-only para navegacion y pruebas.
+- No existe aun contrato funcional con datos reales, API propia, permiso productivo ni submenu definido.
 - No hay evidencia de tabs o hijos dentro de nuestra navegacion estatica actual.
 
 ## Evidencia AppBuilder generica
@@ -140,7 +145,7 @@ La operacion `Component_GET_COMPONENT_TREE_ALLOBJCETS_BY_ID.graphql` puede devol
 - workflows;
 - `objectGroups` con flags `add`, `edit`, `list`, `delete`, `view`, `import`, `export`, `execute`.
 
-Pero no se ha podido ejecutar contra metadata real de `Propuestas`, y no hay fixture local sanitizado equivalente. Por tanto, no hay componentes hijos reales de `Propuestas` que documentar en ficheros `components/*.md`.
+Pero no se ha podido ejecutar contra metadata real de `Propuestas`, y no hay fixture AppBuilder sanitizado equivalente. Por tanto, no hay componentes hijos reales de `Propuestas` que documentar en ficheros `components/*.md`.
 
 ## Tabs, submenus y componentes internos
 
@@ -260,7 +265,7 @@ No deben activarse permisos de escritura sin auth productiva, broker validado, m
 
 ## Propuesta Vue estatica futura
 
-Solo si producto confirma alcance y existe SDD, la primera version recomendable seria read-only:
+Solo si producto confirma alcance y existe SDD aprobada, la primera version recomendable seria read-only:
 
 - Ruta: `/propuestas`.
 - Entrada de menu estatica: `Propuestas`, con `requiredPermission: 'propuestas.read'`.
@@ -290,7 +295,7 @@ Esta propuesta no implica que se programe ahora. Es una guia para una SDD poster
 
 ## Propuesta API estatica futura
 
-Solo si hay SDD y origen de datos autorizado:
+Solo si hay SDD aprobada y origen de datos autorizado:
 
 - `GET /api/propuestas/catalogs`
 - `GET /api/propuestas`
@@ -359,10 +364,10 @@ Bloqueos externos:
 
 Bloqueos tecnicos:
 
-- No existe ruta Vue de Propuestas.
+- Existe ruta Vue fixture/read-only de Propuestas, pero no contrato funcional con datos reales.
 - No existe contrato API de Propuestas.
-- No existe fixture anonimizadora de Propuestas.
-- No existe SDD de Propuestas.
+- No existe origen de datos autorizado ni fixture derivado de BBDD.
+- Existe SDD draft `SDD-2026-012`, pero no esta aprobada por producto/DBA/seguridad.
 
 ## Pruebas necesarias para desarrollo futuro
 
@@ -410,9 +415,9 @@ Condicion para crear subagentes/documentos de componentes en la siguiente ronda:
 
 ## Recomendacion siguiente
 
-Antes de programar:
+Antes de programar API o datos reales:
 
-1. Crear SDD `Propuestas` con alcance funcional minimo.
+1. Revisar y aprobar `SDD-2026-012` con producto, DBA y seguridad.
 2. Ejecutar extractor offline en modo autorizado/sanitizado o aportar un JSON revisado que contenga menu y componentes de `Propuestas`.
 3. Revisar ese artefacto para separar:
    - evidencia historica;
