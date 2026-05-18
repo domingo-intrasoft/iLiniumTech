@@ -13,6 +13,7 @@ Avanzar el MVP con incrementos pequenos, seguros y validados, sin activar datos 
 | --- | --- | --- |
 | `19b6a85` | Frontend accesibilidad | Tablas de superficies tecnicas bloqueadas incorporan captions accesibles con rango, total y alcance read-only/sensible. |
 | `c127cb8` | Frontend accesibilidad | Acciones bloqueadas de Clientes comparten descripcion accesible sobre SDD/API/permisos/UAT y minimizacion PII. |
+| `d6b09c4` | Frontend accesibilidad | Acciones bloqueadas de Agenda comparten descripcion accesible sobre SDD/API/permisos/UAT y minimizacion de PII/asuntos sensibles. |
 
 ## Validaciones ejecutadas
 
@@ -41,9 +42,22 @@ Validacion tras descripcion accesible de acciones bloqueadas en Clientes:
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
 
+Validacion tras descripcion accesible de acciones bloqueadas en Agenda:
+
+- `npx vitest run src/features/agenda/AgendaView.test.ts`: `4/4` tests OK.
+- `npm run format`: OK.
+- `npm run lint`: OK.
+- `npm run test:unit`: `195/195` tests OK.
+- `npm run build`: OK.
+- `npm run test:e2e -- domain-fixtures`: `1` smoke OK con `CI=1`, incluyendo `/agenda`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+
 ## Riesgos residuales
 
 - `Clientes` sigue siendo fixture/read-only con PII real bloqueada; no autoriza ficha real, exportacion, desglose, contacto ni datos bancarios sin SDD/API/UAT.
+- `Agenda` sigue siendo fixture/read-only con calendario dinamico, reprogramacion, participantes, workflows y asuntos sensibles bloqueados hasta SDD/API/UAT.
 - Las paginas tecnicas siguen siendo fixture/read-only o superficies bloqueadas; no autorizan API, datos reales, escrituras, exportaciones ni permisos nuevos sin SDD/API/UAT.
 - `DemoSession`, API key MVP y headers MVP siguen siendo compatibilidad local/demo, no autenticacion productiva.
 - Datos reales SQL, DBA/UAT, permisos finales y proveedor auth siguen bloqueados externamente.
