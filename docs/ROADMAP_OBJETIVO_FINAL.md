@@ -13,16 +13,17 @@ Este documento es la guia canonica de calidad para llevar iLiniumTech desde el M
 - [PLAN_CICD_GITHUB_ONLY.md](PLAN_CICD_GITHUB_ONLY.md)
 - [sdd/specs/iLiniumTech](sdd/specs/iLiniumTech)
 - [sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md](sdd/specs/iLiniumTech/SDD-2026-006-autos-particulares-mvp-read-only.md)
+- [sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md](sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md)
 
 Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadata heredada sirve para extraccion, trazabilidad, comparativa y scaffolding revisado; el producto final debe quedar como frontend Vue estatico y backend API explicita.
 
 ## Estado de partida
 
 - Fase documental y decision de arquitectura: completada.
-- MVP read-only de polizas: implementado con frontend Vue, backend API, fixtures anonimizados, API key temporal y pruebas base.
+- MVP read-only de polizas: implementado con frontend Vue, backend API, fixtures anonimizados, API key temporal y pruebas base. Desde el 2026-05-18 el objetivo MVP activo cambia a `Polizas CRUD BBDD`, con `SDD-2026-007` como guia.
 - Menu lateral y paginas estaticas protegidas: rutas Vue bajo `src/features/*` para las entradas principales del menu, con contenido read-only/fixture local o superficies bloqueadas. No equivalen a datos reales, APIs nuevas ni paridad AppBuilder.
 - Autos Particulares existe como incremento tecnico anterior documentado en `SDD-2026-006`, pero queda aparcado y no es el objetivo MVP vigente. No debe ampliarse ni presentarse como objetivo principal sin nueva confirmacion funcional, SDD actualizada y UAT.
-- Repositorio SQL read-only: implementado como backend configurable, parametrizado y con whitelist; pendiente de validar contra entorno real autorizado y auth real.
+- Repositorio SQL read-only: implementado como backend configurable, parametrizado y con whitelist; ahora debe evolucionar a escritura controlada contra BBDD local de pruebas, con permisos, transacciones, validaciones y sin versionar secretos.
 - Extractor offline de metadata: implementado en `tools/extractor/polizas-metadata` con modos `Fixture`, `DryRun` y `Live`; pendiente de validar modo `Live` contra entorno autorizado y politica final de artefactos.
 - Frontend polizas: protegido por configuracion runtime y contexto `/api/me`; no consulta backend si falta API key temporal, sesion demo o contexto de broker requerido.
 - Broker activo MVP: `POST /api/auth/broker` y selector frontend entregados para `DemoSession`, con validacion contra `allowedBrokerIds`, relectura de `/api/me` e invalidacion/refresco de Polizas.
@@ -134,6 +135,43 @@ DoD:
 - Build, lint, tests y auditorias base ejecutados.
 
 Estado: implementada; mantener regresion en CI.
+
+### Fase 1C - MVP Polizas CRUD BBDD activo
+
+SDD activa: [SDD-2026-007 Polizas CRUD BBDD MVP](sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md).
+
+Estado de producto actual: objetivo MVP vigente desde 2026-05-18. La pantalla de `Polizas` debe contemplar CRUD desde y hacia BBDD local de pruebas. El resto de paginas del menu se abordara despues mediante agentes por pagina, con SDD propia y sin activar datos reales ni escrituras hasta que `Polizas` quede cerrado con evidencia o bloqueo tecnico explicito.
+
+Hallazgos iniciales de BBDD local:
+
+- `IL_Maestro.dbo.IAPM_Connection` permite resolver BBDD modelo `tipobd-MO` por broker, sin versionar credenciales.
+- `dbo.Pantalla_Polizas` es una vista, no tabla.
+- `dbo.Pantalla_Polizas.Poliza` no es unico; se detectaron numeros duplicados.
+- El CRUD debe usar `dbo.Poliza.Id` como identificador estable interno y tratar `Poliza` como numero visible.
+- `dbo.Poliza` tiene triggers de auditoria/calculo/division/oficina/anulacion; toda escritura requiere transaccion, pruebas rollback/limpieza y UAT.
+
+DoD objetivo:
+
+- `GET /api/polizas` y `GET /api/polizas/{id}` usan identificador estable compatible con CRUD.
+- Permisos nuevos: `polizas.create`, `polizas.update`, `polizas.delete`.
+- Escrituras bloqueadas por defecto salvo `Polizas:WritesEnabled=true` en entorno local/demo autorizado.
+- `POST /api/polizas`, `PUT/PATCH /api/polizas/{id}` y `DELETE /api/polizas/{id}` implementados con DTOs explicitos, validacion y SQL parametrizado.
+- Delete fisico inicial solo sobre registros creados por iLiniumTech MVP, marcados con `IdSistemaOrigen = 'origen-iLiniumTech-MVP'`.
+- Frontend habilita acciones CRUD solo cuando `/api/me` expone permisos y contexto valido.
+- Prueba local create -> read -> update -> delete ejecutada sin versionar connection strings, credenciales, dumps ni PII.
+
+Pendiente tecnico:
+
+- Implementar contrato backend CRUD y adaptar frontend.
+- Confirmar campos editables definitivos con UAT.
+- Convertir catalogos necesarios para escritura en datos fiables o mantenerlos como valores controlados.
+- Diseñar auditoria de escritura sin datos sensibles.
+
+Bloqueado externo:
+
+- Auth productiva y matriz final de permisos siguen pendientes.
+- UAT funcional debe confirmar si `delete` es borrado fisico, anulacion o baja logica para registros no MVP.
+- DBA/producto deben confirmar impacto de triggers y campos obligatorios para escrituras no sintenticas.
 
 ### Fase 1B - Incremento Autos Particulares aparcado
 
@@ -329,12 +367,14 @@ Siguientes pasos recomendados:
 - Implementar primero contrato de contexto y pruebas 401/403; despues retirar headers MVP de preview/produccion.
 - En el siguiente PR tecnico, documentar en evidencia QA que la API key y `demo-session` son compatibilidad temporal y completar los resultados reales de gates antes de marcar Done.
 
-### Fase 6 - Funcionalidad explicita posterior al MVP
+### Fase 6 - Funcionalidad explicita posterior al MVP y resto de paginas
 
 Objetivo: anadir detalle ampliado, acciones, escrituras o workflows solo como casos de uso propios.
 
 DoD:
 
+- `Polizas CRUD BBDD` cerrado con evidencia o bloqueo tecnico documentado antes de abrir desarrollo del resto de paginas.
+- Agentes por pagina creados para analizar, documentar y evolucionar cada pantalla despues de Polizas.
 - Cada accion nueva tiene SDD propia.
 - Se declaran datos afectados, permisos, auditoria, rollback y UAT.
 - No se ejecutan workflows, expresiones o REST/SOAP heredados de forma generica.
@@ -343,7 +383,7 @@ DoD:
 
 Bloqueos actuales:
 
-- Falta priorizacion de acciones fuera del read-only.
+- La prioridad activa es `Polizas CRUD BBDD`; el resto de paginas queda despues.
 - Falta confirmar reglas funcionales reales y responsables UAT.
 
 ### Fase 7 - Preview profesional y operacion controlada

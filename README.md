@@ -18,6 +18,7 @@ Documento principal:
 - [docs/sdd/specs/iLiniumTech/SDD-2026-002-extractor-metadata-polizas.md](docs/sdd/specs/iLiniumTech/SDD-2026-002-extractor-metadata-polizas.md)
 - [docs/sdd/specs/iLiniumTech/SDD-2026-003-repositorio-sql-polizas.md](docs/sdd/specs/iLiniumTech/SDD-2026-003-repositorio-sql-polizas.md)
 - [docs/sdd/specs/iLiniumTech/SDD-2026-004-github-ci-baseline.md](docs/sdd/specs/iLiniumTech/SDD-2026-004-github-ci-baseline.md)
+- [docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md](docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md)
 - [docs/ai/github-ai-policy.md](docs/ai/github-ai-policy.md)
 
 ## Principios de trabajo
@@ -36,7 +37,7 @@ Fase documental completada, decision de arquitectura fijada y primer corte MVP c
 - backend y frontend creados;
 - UI local de polizas disponible;
 - pruebas, build, formato y gates de seguridad ejecutados.
-- siguiente orientacion: extractor offline/local, repositorio SQL read-only y evolucion frontend/backend por SDD, sin runtime dinamico.
+- objetivo MVP activo desde 2026-05-18: evolucionar `Polizas` a CRUD controlado contra BBDD local autorizada, siguiendo `SDD-2026-007`, sin runtime dinamico ni secretos en Git.
 
 ## Proyectos creados
 
@@ -53,7 +54,7 @@ Por defecto el backend usa fixtures anonimizados:
 }
 ```
 
-Para activar lectura SQL read-only en un entorno local autorizado:
+Para activar lectura SQL en un entorno local autorizado:
 
 ```powershell
 $env:Polizas__Repository = "Sql"
@@ -62,7 +63,7 @@ $env:ConnectionStrings__PolizasReadOnly = "<connection-string-local>"
 $env:ILINIUMTECH__POLIZAS_CONNECTION = "<connection-string-local>"
 ```
 
-No guardar esas cadenas en Git. El repositorio SQL usa whitelist de columnas y parametros para valores; no interpreta metadata AppBuilder en runtime.
+No guardar esas cadenas en Git. El repositorio SQL usa whitelist de columnas y parametros para valores; no interpreta metadata AppBuilder en runtime. Las escrituras de `Polizas` deben permanecer bloqueadas por defecto hasta activar explicitamente `Polizas__WritesEnabled=true` en local/demo y contar con permisos `polizas.create`, `polizas.update` o `polizas.delete`.
 
 Para resolver la conexion de modelo desde Master al estilo AppBuilder en el MVP:
 

@@ -21,9 +21,9 @@ Base entregada:
 
 - Gobierno inicial: `AGENTS.md`, `PLANS.md`, DoD, workflow IA, roadmap, SDD y gates locales.
 - Frontend: Vue 3 + Vite + TypeScript con `/login`, shell estatico, menu lateral, `/polizas`, detalle de poliza y paginas protegidas estaticas del menu. `Autos Particulares` existe como ruta tecnica aparcada/deshabilitada.
-- Backend: API .NET con `/health`, `/ready`, `/api/auth/login`, `/api/auth/logout`, `/api/me`, `/api/polizas/catalogs`, `/api/polizas`, `/api/polizas/{id}` y politicas iniciales `polizas.catalogs`, `polizas.read`, `polizas.detail`.
+- Backend: API .NET con `/health`, `/ready`, `/api/auth/login`, `/api/auth/logout`, `/api/me`, `/api/polizas/catalogs`, `/api/polizas`, `/api/polizas/{id}` y politicas iniciales `polizas.catalogs`, `polizas.read`, `polizas.detail`. El nuevo objetivo MVP activo es evolucionar `Polizas` a CRUD contra BBDD local autorizada, segun `SDD-2026-007`.
 - Broker activo: selector frontend y `POST /api/auth/broker` entregados para `DemoSession`, validando contra `allowedBrokerIds`, releyendo `/api/me` y refrescando Polizas.
-- Datos: repositorio `InMemory` por defecto, repositorio SQL read-only activable por configuracion, resolver `AppBuilderMaster`, whitelists, parametros y `SESSION_CONTEXT` parametrizado.
+- Datos: repositorio `InMemory` por defecto, repositorio SQL read-only activable por configuracion, resolver `AppBuilderMaster`, whitelists, parametros y `SESSION_CONTEXT` parametrizado. Para el objetivo CRUD, las escrituras deben usar contratos iLiniumTech explicitos, transacciones, permisos propios y BBDD local de pruebas sin versionar secretos.
 - Seguridad MVP: API key temporal, `DemoSession` y headers MVP clasificados como compatibilidad local/demo, no como auth productiva.
 - QA/CI: gate local, validacion documental, auditorias de secretos/dependencias/CORS, CI baseline, CodeQL y preview dry-run.
 - Extractor offline: `tools/extractor/polizas-metadata` con modos `Fixture`, `DryRun` y `Live`, sin uso runtime productivo.
@@ -42,14 +42,15 @@ Puntos aparcados o no cerrados:
 
 El objetivo final es una aplicacion profesional Frontend -> Backend, evolucionable como cualquier producto de software, no dependiente de metadata heredada.
 
-El MVP vigente debe centrarse en:
+El MVP vigente queda actualizado el 2026-05-18 y debe centrarse en:
 
 1. login y sesion controlada;
 2. menu lateral y shell estatico profesional;
-3. pantalla de polizas read-only con listado, filtros, busqueda, paginacion y detalle;
-4. permisos backend efectivos para polizas;
-5. preparacion de multi-tenant/broker para datos reales;
-6. calidad, seguridad, documentacion y evidencia de cierre.
+3. pantalla de polizas con CRUD controlado contra BBDD local autorizada;
+4. permisos backend efectivos para lectura y escritura de polizas;
+5. multi-tenant/broker validado antes de resolver conexion o escribir datos;
+6. calidad, seguridad, documentacion y evidencia de cierre;
+7. una vez cerrado Polizas CRUD, crear agentes por pagina del menu para analizar, documentar y evolucionar el resto de paginas con SDD propia.
 
 Todo lo que exceda ese MVP debe entrar como SDD propia.
 
@@ -271,9 +272,11 @@ DoD y evidencia:
 - No hay fuga entre brokers.
 - No se versionan capturas o muestras sensibles.
 
-## Fase 6 - Polizas profesional read-only
+## Fase 6 - Polizas CRUD BBDD profesional
 
-Objetivo: convertir polizas en una pantalla diaria de trabajo, no solo una demo tecnica.
+Objetivo: convertir Polizas en una pantalla diaria de trabajo con CRUD controlado contra BBDD local de pruebas, no solo una demo read-only.
+
+SDD activa: `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`.
 
 Pasos y tareas:
 
@@ -284,7 +287,13 @@ Pasos y tareas:
 - Normalizar estados loading, empty, error, no permission y no broker.
 - Mejorar detalle con breadcrumb, vuelta conservando filtros y secciones revisables.
 - Evitar revelar existencia de poliza en 403/404 cruzados.
-- Preparar pruebas de regresion para filtros, limpieza, paginacion y abrir detalle.
+- Migrar el identificador SQL de recurso hacia `dbo.Poliza.Id`; el numero visible vive en `Poliza`.
+- Anadir permisos `polizas.create`, `polizas.update` y `polizas.delete`.
+- Crear DTOs de escritura separados de lectura.
+- Implementar create/update/delete con SQL parametrizado, transacciones y `SESSION_CONTEXT`.
+- Bloquear escrituras si `Polizas:WritesEnabled` no esta activo.
+- Limitar el delete fisico inicial a registros creados por iLiniumTech MVP, marcados como `IdSistemaOrigen = 'origen-iLiniumTech-MVP'`.
+- Preparar pruebas de regresion para filtros, limpieza, paginacion, detalle, alta, edicion, borrado permitido y borrado bloqueado.
 
 Agentes:
 
@@ -295,9 +304,12 @@ Agentes:
 
 DoD y evidencia:
 
-- Unit tests frontend y backend de filtros/contratos.
+- Unit tests frontend y backend de filtros, contratos, validaciones y permisos CRUD.
+- Pruebas SQL locales con rollback o limpieza verificable.
 - Smoke `/polizas` y `/polizas/:id`.
+- Smoke create -> read -> update -> delete cuando exista UI CRUD.
 - Sin nombres SQL/AppBuilder/metadata en DOM.
+- Sin secretos ni datos personales reales versionados.
 - UAT o bloqueo funcional documentado.
 
 ## Fase 7 - Menu lateral, navegacion y sistema UX
@@ -415,12 +427,15 @@ DoD y evidencia:
 - Ningun runtime productivo lee metadata heredada.
 - Todo scaffold aceptado queda como codigo revisado.
 
-## Fase 11 - Expansiones funcionales posteriores
+## Fase 11 - Expansiones funcionales posteriores y resto de paginas
 
 Objetivo: anadir capacidades nuevas solo como producto explicito.
 
 Pasos y tareas:
 
+- No iniciar desarrollo real de otras paginas hasta cerrar el MVP de Polizas CRUD BBDD con evidencia o documentar un bloqueo tecnico explicito.
+- Cuando Polizas CRUD este cerrado, crear agentes por pagina del menu.
+- Cada agente de pagina debe analizar componentes AppBuilder originales, documentar SDD/alcance y proponer implementacion estatica Vue/API explicita.
 - Priorizar con producto: detalle ampliado, exportacion, documentos, recibos, siniestros, acciones o escrituras.
 - Crear SDD por cada caso de uso.
 - Definir datos afectados, permisos, auditoria, rollback y UAT.
@@ -477,16 +492,16 @@ DoD y evidencia:
 
 ## Orden recomendado de proximos incrementos
 
-1. Cerrar documentalmente el plan maestro y actualizar roadmap.
-2. Endurecer login/sesion demo: expiracion, 401/403, logout, refresh y tests.
-3. Mejorar menu lateral y shell con permisos y estados claros.
-4. Subir pantalla de polizas: filtros, query params, detalle, estados y pruebas.
-5. Abrir decision de auth productiva y matriz de permisos.
-6. Cambio de broker activo validado por backend entregado con evidencia en `docs/qa/active-broker-change-checklist.md`.
-7. Preparar prueba SQL real read-only con DBA y cuenta minima.
-8. Ejecutar UAT de polizas con muestras sanitizadas.
-9. Consolidar CI/preview dry-run y branch protection.
-10. Planificar el primer flujo posterior al read-only solo con SDD propia.
+1. Mantener como objetivo activo `SDD-2026-007 Polizas CRUD BBDD MVP`.
+2. Migrar identificador SQL de Polizas a `dbo.Poliza.Id` para evitar escrituras por numero duplicado.
+3. Anadir permisos `polizas.create`, `polizas.update`, `polizas.delete` y pruebas 401/403.
+4. Implementar backend CRUD local con `Polizas:WritesEnabled`, transacciones, SQL parametrizado y delete limitado a registros MVP.
+5. Ejecutar create -> read -> update -> delete contra BBDD local autorizada sin versionar credenciales.
+6. Implementar UI CRUD en `/polizas` solo cuando backend y permisos esten listos.
+7. Ejecutar regresion backend/frontend, E2E y auditorias.
+8. Documentar evidencia QA y riesgos residuales.
+9. Solo despues, crear agentes por pagina del menu para planificar y desarrollar el resto con SDD propia.
+10. Consolidar CI/preview dry-run y branch protection.
 
 ## Riesgos principales
 

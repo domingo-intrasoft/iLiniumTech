@@ -41,6 +41,10 @@ Frontend:
 
 - Proyecto en `iLiniumTech.Frontend`.
 - Feature funcional principal actual: `src/features/polizas`.
+- Objetivo MVP activo desde 2026-05-18: `Polizas CRUD BBDD`, documentado en `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`.
+- Antes de avanzar en otras paginas del menu, prioriza cerrar `Polizas` con CRUD contra BBDD local autorizada o documentar bloqueo tecnico explicito.
+- Para CRUD de `Polizas`, no uses `Pantalla_Polizas.Poliza` como identificador de escritura; la BBDD local muestra duplicados. El recurso SQL debe evolucionar a `dbo.Poliza.Id` y `Poliza` queda como numero visible.
+- Las escrituras de `Polizas` requieren permisos explicitos (`polizas.create`, `polizas.update`, `polizas.delete`), `Polizas:WritesEnabled`, transacciones, SQL parametrizado y evidencia local sin secretos.
 - Paginas estaticas protegidas del menu en `src/features/*`; son superficies MVP read-only y no autorizan datos reales, APIs nuevas ni acciones sin SDD.
 - `src/features/autos-particulares` existe como incremento tecnico aparcado; no ampliarlo sin decision de producto, SDD actualizada y UAT/DBA.
 - Servicios compartidos en `src/services`.
