@@ -95,6 +95,8 @@ const moduleActions = [
   { label: 'Documentos pendientes', icon: 'pi pi-folder' },
   { label: 'Exportacion pendiente', icon: 'pi pi-download' },
 ]
+const blockedActionsDescription =
+  'Acciones de propuestas bloqueadas en el MVP read-only hasta SDD, contrato API, permisos, UAT y decision de emision/conversion/documentos.'
 
 const filters = reactive<PropuestasFilters>({
   referencia: '',
@@ -217,6 +219,8 @@ async function signOut() {
     show-sign-out
     @sign-out="signOut"
   >
+    <p id="propuestas-blocked-actions" class="sr-only" v-text="blockedActionsDescription"></p>
+
     <div id="propuestas-content" class="polizas-toolbar">
       <div>
         <p class="section-kicker">MVP read-only</p>
@@ -232,6 +236,7 @@ async function signOut() {
             :class="{ active: action.active }"
             type="button"
             :aria-label="action.label"
+            aria-describedby="propuestas-blocked-actions"
             disabled
           >
             <i :class="action.icon" aria-hidden="true"></i>
@@ -269,19 +274,19 @@ async function signOut() {
             <i class="pi pi-trash" aria-hidden="true"></i>
             Limpiar Filtros
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="propuestas-blocked-actions" disabled>
             <i class="pi pi-plus" aria-hidden="true"></i>
             Crear
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="propuestas-blocked-actions" disabled>
             <i class="pi pi-send" aria-hidden="true"></i>
             Convertir
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="propuestas-blocked-actions" disabled>
             <i class="pi pi-folder" aria-hidden="true"></i>
             Documentos
           </button>
-          <button type="button" disabled>
+          <button type="button" aria-describedby="propuestas-blocked-actions" disabled>
             <i class="pi pi-download" aria-hidden="true"></i>
             Exportar
           </button>
@@ -310,7 +315,12 @@ async function signOut() {
                   type="search"
                   aria-label="Referencia o solicitante"
                 />
-                <button type="button" aria-label="Opciones de referencia" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de referencia"
+                  aria-describedby="propuestas-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -327,7 +337,12 @@ async function signOut() {
                   <option value=""></option>
                   <option v-for="estado in estados" :key="estado">{{ estado }}</option>
                 </select>
-                <button type="button" aria-label="Opciones de estado" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de estado"
+                  aria-describedby="propuestas-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -340,7 +355,12 @@ async function signOut() {
                   <option value=""></option>
                   <option v-for="ramo in ramos" :key="ramo">{{ ramo }}</option>
                 </select>
-                <button type="button" aria-label="Opciones de ramo" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de ramo"
+                  aria-describedby="propuestas-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -355,7 +375,12 @@ async function signOut() {
                   type="date"
                   aria-label="Fecha desde"
                 />
-                <button type="button" aria-label="Opciones de fecha" disabled>
+                <button
+                  type="button"
+                  aria-label="Opciones de fecha"
+                  aria-describedby="propuestas-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-filter" aria-hidden="true"></i>
                 </button>
               </span>
@@ -375,8 +400,14 @@ async function signOut() {
                   value="Fuera del MVP read-only: requiere SDD, API y UAT"
                   disabled
                   aria-label="Funciones de propuesta bloqueadas"
+                  aria-describedby="propuestas-blocked-actions"
                 />
-                <button type="button" aria-label="Funciones de propuesta bloqueadas" disabled>
+                <button
+                  type="button"
+                  aria-label="Funciones de propuesta bloqueadas"
+                  aria-describedby="propuestas-blocked-actions"
+                  disabled
+                >
                   <i class="pi pi-lock" aria-hidden="true"></i>
                 </button>
               </span>
@@ -427,6 +458,7 @@ async function signOut() {
                   class="table-icon-action"
                   type="button"
                   :aria-label="`Detalle pendiente para propuesta ${item.referencia}`"
+                  aria-describedby="propuestas-blocked-actions"
                   title="Detalle pendiente de SDD/API"
                   disabled
                 >

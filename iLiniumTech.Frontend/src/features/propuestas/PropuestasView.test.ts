@@ -92,6 +92,38 @@ describe('PropuestasView smoke', () => {
     expect(wrapper.text()).toContain('Convertir')
     expect(wrapper.text()).toContain('Documentos')
     expect(wrapper.text()).toContain('Exportar')
+    expect(wrapper.get('#propuestas-blocked-actions').text()).toContain(
+      'Acciones de propuestas bloqueadas en el MVP read-only',
+    )
+    expect(
+      wrapper
+        .findAll('button')
+        .find((button) => button.text().includes('Crear'))
+        ?.attributes('aria-describedby'),
+    ).toBe('propuestas-blocked-actions')
+    expect(
+      wrapper
+        .findAll('button')
+        .find((button) => button.text().includes('Convertir'))
+        ?.attributes('aria-describedby'),
+    ).toBe('propuestas-blocked-actions')
+    expect(
+      wrapper
+        .findAll('button')
+        .find((button) => button.text().includes('Documentos'))
+        ?.attributes('aria-describedby'),
+    ).toBe('propuestas-blocked-actions')
+    expect(
+      wrapper.get('button[aria-label="Opciones de referencia"]').attributes('aria-describedby'),
+    ).toBe('propuestas-blocked-actions')
+    expect(
+      wrapper
+        .get('input[aria-label="Funciones de propuesta bloqueadas"]')
+        .attributes('aria-describedby'),
+    ).toBe('propuestas-blocked-actions')
+    expect(
+      wrapper.findAll('button.table-icon-action[disabled]')[0]?.attributes('aria-describedby'),
+    ).toBe('propuestas-blocked-actions')
   })
 
   it('filters locally by reference, state, branch/type, and date from', async () => {
