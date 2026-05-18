@@ -56,6 +56,27 @@ Archivos modificados:
 - `iLiniumTech.Backend/src/iLiniumTech.Backend.Api/Program.cs`
 - `iLiniumTech.Backend/tests/iLiniumTech.Backend.Tests/Polizas/PolizasApiTests.cs`
 
+## Contrato y validacion de escritura
+
+Incremento aplicado despues del gate:
+
+- Se crean requests explicitos `PolizaCreateRequest` y `PolizaUpdateRequest`.
+- Se crea `PolizasWriteValidator` en Application para validar sin depender de ASP.NET ni SQL.
+- `POST /api/polizas` valida payload minimo antes del placeholder.
+- `PUT /api/polizas/{id}` valida id tecnico numerico y payload parcial.
+- `DELETE /api/polizas/{id}` valida id tecnico numerico.
+- Los ids de escritura deben ser enteros positivos, alineados con `dbo.Poliza.Id`; `Poliza.Poliza` no vale como id de escritura.
+- La validacion inicial solo contempla campos aprobados por SDD: numero, aplicacion, ciaId, clienteId, estado, ramo, tipoPoliza, fechaEfecto, fechaVencimiento y primaAnual.
+- No se incorporan documento, telefono, email, direccion, banco, riesgo completo, matricula, bastidor ni campos de cobro/gestores.
+
+Archivos modificados:
+
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Domain/Polizas/PolizasWriteRequests.cs`
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Application/Polizas/PolizasWriteValidator.cs`
+- `iLiniumTech.Backend/src/iLiniumTech.Backend.Api/Program.cs`
+- `iLiniumTech.Backend/tests/iLiniumTech.Backend.Tests/Polizas/PolizasApiTests.cs`
+- `iLiniumTech.Backend/tests/iLiniumTech.Backend.Tests/Polizas/PolizasWriteValidatorTests.cs`
+
 ## Validaciones ejecutadas
 
 Backend:
@@ -88,11 +109,26 @@ dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Relea
 
 Resultado: `115/115` tests OK.
 
+Contrato y validacion de escritura:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "PolizasApiTests|PolizasWriteValidatorTests"
+```
+
+Resultado: `98/98` tests OK.
+
+Suite backend completa tras contrato/validacion:
+
+```powershell
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release
+```
+
+Resultado: `134/134` tests OK.
+
 Pendiente aun para fases CRUD:
 
 - Prueba local create -> read -> update -> read -> delete con registro marcado `IdSistemaOrigen = 'origen-iLiniumTech-MVP'`.
 - Implementacion real de comandos SQL create/update/delete tras los endpoints placeholder.
-- Tests de validacion de DTOs de escritura.
 - Tests SQL/transaccionales de create/update/delete y borrado bloqueado para registros no MVP.
 
 ## Riesgos residuales
@@ -109,7 +145,7 @@ Antes de desarrollar el resto de paginas del menu, continuar Polizas CRUD BBDD e
 
 1. Hecho: anadir permisos backend `polizas.create`, `polizas.update` y `polizas.delete`, sin concederlos por defecto.
 2. Hecho: anadir gate `Polizas:WritesEnabled` para bloquear escrituras por defecto.
-3. Pendiente: crear DTOs y validaciones de create/update.
+3. Hecho: crear DTOs y validaciones de create/update.
 4. Pendiente: implementar comandos SQL parametrizados y transaccionales sobre `dbo.Poliza`.
 5. Pendiente: probar create/read/update/delete contra BBDD local sin dejar datos residuales sensibles.
 6. Pendiente: activar UI CRUD solo cuando `/api/me` indique permisos y contexto valido.

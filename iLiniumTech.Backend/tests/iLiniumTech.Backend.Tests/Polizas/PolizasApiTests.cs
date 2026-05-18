@@ -829,8 +829,8 @@ public sealed class PolizasApiTests
 
     [Theory]
     [InlineData("POST", "/api/polizas", PolizasPermissions.Create)]
-    [InlineData("PUT", "/api/polizas/POL-1001", PolizasPermissions.Update)]
-    [InlineData("DELETE", "/api/polizas/POL-1001", PolizasPermissions.Delete)]
+    [InlineData("PUT", "/api/polizas/1001", PolizasPermissions.Update)]
+    [InlineData("DELETE", "/api/polizas/1001", PolizasPermissions.Delete)]
     public async Task Demo_session_with_write_permission_and_gate_enabled_reaches_placeholder_only(
         string method,
         string url,
@@ -853,6 +853,56 @@ public sealed class PolizasApiTests
         body.Should().Contain("POLIZAS_CRUD_NOT_IMPLEMENTED");
         body.Should().Contain("\"correlationId\":\"crud-placeholder\"");
         body.Should().NotContain("POL-MVP-0001");
+    }
+
+    [Fact]
+    public async Task Create_poliza_validates_payload_before_placeholder()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Create,
+            ["Polizas:WritesEnabled"] = "true"
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "create-validation");
+
+        var response = await client.PostAsJsonAsync("/api/polizas", new
+        {
+            numero = "POL-MVP-0001"
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("create-validation");
+        body.Should().Contain("POLIZAS_VALIDATION_ERROR");
+        body.Should().Contain("Aplicacion is required.");
+        body.Should().NotContain("POLIZAS_CRUD_NOT_IMPLEMENTED");
+    }
+
+    [Fact]
+    public async Task Update_poliza_validates_stable_numeric_id_before_placeholder()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = PolizasPermissions.Update,
+            ["Polizas:WritesEnabled"] = "true"
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+        client.DefaultRequestHeaders.Add("X-Correlation-Id", "update-id-validation");
+
+        var response = await client.PutAsJsonAsync("/api/polizas/POL-1001", new
+        {
+            numero = "POL-MVP-0001"
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.Headers.GetValues("X-Correlation-Id").Should().Contain("update-id-validation");
+        body.Should().Contain("POLIZAS_VALIDATION_ERROR");
+        body.Should().Contain("Poliza id must be a positive integer.");
+        body.Should().NotContain("POLIZAS_CRUD_NOT_IMPLEMENTED");
     }
 
     [Fact]
@@ -1664,7 +1714,23 @@ public sealed class PolizasApiTests
     private static HttpRequestMessage CreateWriteRequest(string method, string url)
     {
         var request = new HttpRequestMessage(new HttpMethod(method), url);
-        if (!string.Equals(method, "DELETE", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(method, "POST", StringComparison.OrdinalIgnoreCase))
+        {
+            request.Content = JsonContent.Create(new
+            {
+                numero = "POL-MVP-0001",
+                aplicacion = "MVP",
+                ciaId = 1,
+                clienteId = 1,
+                estado = "Vigor",
+                ramo = "Autos",
+                tipoPoliza = "Cartera",
+                fechaEfecto = new DateOnly(2026, 1, 1),
+                fechaVencimiento = new DateOnly(2026, 12, 31),
+                primaAnual = 123.45m
+            });
+        }
+        else if (string.Equals(method, "PUT", StringComparison.OrdinalIgnoreCase))
         {
             request.Content = JsonContent.Create(new
             {

@@ -424,16 +424,35 @@ polizas.MapGet("/{id}", async (HttpContext httpContext, [FromServices] IPolizasS
 .RequireAuthorization(PolizasAuthorizationPolicies.Detail)
 .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
-polizas.MapPost("/", (HttpContext httpContext) => PolizasCrudNotImplementedResult(httpContext))
+polizas.MapPost("/", (HttpContext httpContext, [FromBody] PolizaCreateRequest? request) =>
+{
+    try
+    {
+        PolizasWriteValidator.ValidateCreate(request);
+        return PolizasCrudNotImplementedResult(httpContext);
+    }
+    catch (PolizasValidationException exception)
+    {
+        return PolizasValidationErrorResult(httpContext, exception);
+    }
+})
     .WithName("CreatePoliza")
     .RequireAuthorization(PolizasAuthorizationPolicies.Create)
     .AddEndpointFilter(RequirePolizasWritesEnabledAsync)
     .AddEndpointFilter(RequirePolizasExecutionContextAsync);
 
-polizas.MapPut("/{id}", (HttpContext httpContext, string id) =>
+polizas.MapPut("/{id}", (HttpContext httpContext, string id, [FromBody] PolizaUpdateRequest? request) =>
 {
-    _ = id;
-    return PolizasCrudNotImplementedResult(httpContext);
+    try
+    {
+        PolizasWriteValidator.ValidateId(id);
+        PolizasWriteValidator.ValidateUpdate(request);
+        return PolizasCrudNotImplementedResult(httpContext);
+    }
+    catch (PolizasValidationException exception)
+    {
+        return PolizasValidationErrorResult(httpContext, exception);
+    }
 })
     .WithName("UpdatePoliza")
     .RequireAuthorization(PolizasAuthorizationPolicies.Update)
@@ -442,8 +461,15 @@ polizas.MapPut("/{id}", (HttpContext httpContext, string id) =>
 
 polizas.MapDelete("/{id}", (HttpContext httpContext, string id) =>
 {
-    _ = id;
-    return PolizasCrudNotImplementedResult(httpContext);
+    try
+    {
+        PolizasWriteValidator.ValidateId(id);
+        return PolizasCrudNotImplementedResult(httpContext);
+    }
+    catch (PolizasValidationException exception)
+    {
+        return PolizasValidationErrorResult(httpContext, exception);
+    }
 })
     .WithName("DeletePoliza")
     .RequireAuthorization(PolizasAuthorizationPolicies.Delete)
@@ -671,6 +697,12 @@ static IResult PolizasCrudNotImplementedResult(HttpContext context) =>
         StatusCodes.Status501NotImplemented,
         "POLIZAS_CRUD_NOT_IMPLEMENTED",
         "Polizas CRUD commands are not implemented yet.");
+
+static IResult PolizasValidationErrorResult(HttpContext context, PolizasValidationException exception) =>
+    Results.BadRequest(new ErrorResponse(new ErrorBody(
+        Code: "POLIZAS_VALIDATION_ERROR",
+        Message: exception.Message,
+        CorrelationId: EnsureCorrelationId(context))));
 
 static bool RequiresPolizasExecutionContext(IConfiguration configuration)
 {
