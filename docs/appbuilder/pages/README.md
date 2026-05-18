@@ -21,7 +21,10 @@ La regla de arquitectura que gobierna esta carpeta esta en:
 
 ## Readiness consolidada
 
-Detalle operativo para futuras IA: [`development-readiness.md`](development-readiness.md).
+Detalle operativo para futuras IA:
+
+- [`development-readiness.md`](development-readiness.md): readiness consolidada por pagina.
+- [`page-agent-rollout.md`](page-agent-rollout.md): paquete activo de coordinacion de agentes por pagina tras el cierre local de `Polizas CRUD BBDD`.
 
 Resumen ejecutivo:
 

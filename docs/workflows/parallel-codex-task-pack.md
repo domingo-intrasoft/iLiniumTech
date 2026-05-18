@@ -2,11 +2,11 @@
 
 Este documento convierte el objetivo vigente en tareas pequenas e independientes para agentes Codex. El paquete anterior orientado a `Autos Particulares` queda aparcado: no debe ejecutarse como objetivo activo salvo nueva confirmacion funcional, SDD actualizada y UAT.
 
-Objetivo grande activo: consolidar el MVP actual con login, shell/menu lateral y pantalla de Polizas read-only, preparando auth productiva, multi-tenant/broker, datos reales controlados y QA/preview profesional, sin convertir iLiniumTech en un runtime dinamico tipo AppBuilder.
+Objetivo grande activo: con `Polizas CRUD BBDD` cerrado como MVP local de referencia, crear y coordinar agentes por pagina del menu para evolucionar el resto de superficies con SDD propia, sin activar datos reales, APIs nuevas, escrituras, exportaciones ni permisos nuevos hasta contrato equivalente.
 
 Este paquete no autoriza por si solo cambios de codigo de aplicacion. Cada tarea funcional debe estar respaldada por SDD, issue o decision documentada antes de implementarse.
 
-Estado de coordinacion 2026-05-16: el carril de paginas estaticas del menu ya tiene evidencias QA versionadas para las pantallas trabajadas. No debe relanzarse como paquete activo salvo regresion, ajuste de evidencia o nueva decision de producto. El incremento activo de gobierno es Fase 2 login/sesion robusto.
+Estado de coordinacion 2026-05-18: el carril de paginas del menu vuelve a ser el paquete activo, pero en modo controlado por SDD. Las paginas fixture pueden recibir hardening estatico y pruebas; cualquier dato real o API pasa antes por SDD, permisos, UAT/DBA y revision de seguridad si aplica. El detalle operativo esta en [`../appbuilder/pages/page-agent-rollout.md`](../appbuilder/pages/page-agent-rollout.md).
 
 ## Reglas de coordinacion
 
@@ -17,7 +17,71 @@ Estado de coordinacion 2026-05-16: el carril de paginas estaticas del menu ya ti
 - Cada agente debe reportar comandos ejecutados, resultado, rutas tocadas, riesgos residuales y bloqueos.
 - El coordinador integra resultados, ejecuta gates y prepara el cierre.
 
-## Paquete vigente - MVP login, menu y Polizas
+## Paquete vigente - agentes por pagina del menu
+
+### Tarea M0 - Coordinacion de rollout por pagina
+
+- **Nombre:** `producto-page-agent-rollout`
+- **Alcance exacto:** mantener el mapa de agentes por pagina, grupos de coordinacion, orden recomendado, carriles permitidos y bloqueos por SDD.
+- **Archivos que puede tocar:** `docs/appbuilder/pages/page-agent-rollout.md`, `docs/appbuilder/pages/development-readiness.md`, `docs/appbuilder/pages/README.md`, `docs/workflows/parallel-codex-task-pack.md`.
+- **Archivos que NO debe tocar:** `iLiniumTech.Frontend/**`, `iLiniumTech.Backend/**`, `.github/**`, `tools/**`.
+- **Dependencias:** estado real de `appNavigation.ts`, `router/index.ts` y evidencias QA existentes.
+- **Criterios de aceptacion:** cada pagina queda asignada a un jefe, con alcance permitido, SDD requerida, archivos permitidos/prohibidos, pruebas y riesgos.
+- **Pruebas obligatorias:** validacion documental, `git diff --check`, secret scan si se mencionan entornos o configuracion.
+- **Documentacion a actualizar:** rollout por pagina y readiness.
+- **Riesgo de conflicto:** bajo; coordinar si otro agente edita docs canonicos.
+
+### Tarea M1 - Negocio diario
+
+- **Nombre:** `page-agents-business-daily`
+- **Alcance exacto:** analizar y preparar tareas para `Agenda`, `Clientes` y `Propuestas`, manteniendo fixtures seguros y proponiendo SDD para datos/API.
+- **Archivos que puede tocar:** `docs/appbuilder/pages/agenda/**`, `docs/appbuilder/pages/clientes/**`, `docs/appbuilder/pages/propuestas/**`, `docs/qa/**`; solo si se aprueba UI, `iLiniumTech.Frontend/src/features/agenda/**`, `clientes/**`, `propuestas/**`.
+- **Archivos que NO debe tocar:** backend, servicios API, router, navegacion, package files, extractor y datos reales.
+- **Dependencias:** UAT/producto para campos, permisos y origenes de datos.
+- **Criterios de aceptacion:** PII y workflows quedan bloqueados; las tareas futuras distinguen placeholder de API real.
+- **Pruebas obligatorias:** frontend format/lint/unit/build si toca UI; validacion documental si toca docs.
+- **Documentacion a actualizar:** README de pagina, evidencia QA y SDD futura si procede.
+- **Riesgo de conflicto:** medio si varios agentes tocan componentes fixture al mismo tiempo.
+
+### Tarea M2 - Operativa seguros
+
+- **Nombre:** `page-agents-insurance-operations`
+- **Alcance exacto:** analizar y preparar tareas para `Recibos`, `Suplementos`, `Siniestros`, `Polizas / Flotas` y `Polizas / Colectivas`.
+- **Archivos que puede tocar:** docs de esas paginas, `docs/qa/**`; solo con encargo frontend, sus carpetas `src/features/**` correspondientes.
+- **Archivos que NO debe tocar:** backend/API, servicios, SQL, router, navegacion y metadata runtime sin SDD.
+- **Dependencias:** SDD, permisos, DBA/UAT y privacy review para datos reales o PII.
+- **Criterios de aceptacion:** no se infieren reglas funcionales desde nombres de menu; cada API futura queda separada por contrato.
+- **Pruebas obligatorias:** frontend completo si UI; security/privacy review antes de API real.
+- **Documentacion a actualizar:** SDD candidates y README de pagina.
+- **Riesgo de conflicto:** medio con Polizas si se intenta compartir contratos o scopes.
+
+### Tarea M3 - Reporting y liquidaciones
+
+- **Nombre:** `page-agents-reporting-finance`
+- **Alcance exacto:** analizar y preparar tareas para `Liq.Cia`, `Liq.Col`, `Informes` y `Estadisticas`.
+- **Archivos que puede tocar:** docs de esas paginas, `docs/qa/**`; carpetas frontend correspondientes solo para hardening fixture.
+- **Archivos que NO debe tocar:** backend, SQL financiero, servicios de descarga/exportacion, cache real, router/navegacion.
+- **Dependencias:** owner UAT, permisos, minimizacion financiera/PII y definicion de exportaciones.
+- **Criterios de aceptacion:** importes, comisiones, agregados y exportaciones siguen bloqueados hasta SDD/API.
+- **Pruebas obligatorias:** frontend completo si UI; threat/privacy review para descargas, reporting o agregados.
+- **Documentacion a actualizar:** inventario funcional, SDD futura y evidencia QA.
+- **Riesgo de conflicto:** bajo-medio; alto si se conectan datos o exportaciones sin contrato.
+
+### Tarea M4 - Superficies tecnicas y admin
+
+- **Nombre:** `page-agents-technical-admin-blocked`
+- **Alcance exacto:** analizar y mantener bloqueadas `Administracion`, `Configuracion`, `Conectividad`, `Controles`, `By Aunna` y `Logs`.
+- **Archivos que puede tocar:** docs de esas paginas, `docs/qa/**`; carpetas frontend correspondientes solo para copy/tests de bloqueo.
+- **Archivos que NO debe tocar:** backend, configuracion real, conectores, logs reales, workflows, router/navegacion, package files.
+- **Dependencias:** SDD, threat model, security review y decision de arquitectura.
+- **Criterios de aceptacion:** no se reintroduce Builder, no se muestran secretos/logs/payloads, no hay acciones operativas.
+- **Pruebas obligatorias:** frontend completo si UI; secret scan siempre que se documente configuracion, logs, conectividad o entornos.
+- **Documentacion a actualizar:** SDD/security backlog y evidencias de bloqueo.
+- **Riesgo de conflicto:** bajo si permanece fixture; critico si se habilitan acciones reales sin SDD.
+
+## Paquete de referencia - MVP login, menu y Polizas
+
+Este paquete se conserva como referencia tecnica. No desplaza la prioridad activa de agentes por pagina.
 
 ### Tarea A - Producto, SDD y plan maestro
 

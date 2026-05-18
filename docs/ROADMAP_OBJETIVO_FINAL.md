@@ -21,7 +21,7 @@ Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. L
 
 - Fase documental y decision de arquitectura: completada.
 - MVP read-only de polizas: implementado con frontend Vue, backend API, fixtures anonimizados, API key temporal y pruebas base. Desde el 2026-05-18 el objetivo MVP activo cambia a `Polizas CRUD BBDD`, con `SDD-2026-007` como guia.
-- Menu lateral y paginas estaticas protegidas: rutas Vue bajo `src/features/*` para las entradas principales del menu, con contenido read-only/fixture local o superficies bloqueadas. No equivalen a datos reales, APIs nuevas ni paridad AppBuilder.
+- Menu lateral y paginas estaticas protegidas: rutas Vue bajo `src/features/*` para las entradas principales del menu, con contenido read-only/fixture local o superficies bloqueadas. No equivalen a datos reales, APIs nuevas ni paridad AppBuilder. La coordinacion activa de agentes por pagina esta en [appbuilder/pages/page-agent-rollout.md](appbuilder/pages/page-agent-rollout.md).
 - Autos Particulares existe como incremento tecnico anterior documentado en `SDD-2026-006`, pero queda aparcado y no es el objetivo MVP vigente. No debe ampliarse ni presentarse como objetivo principal sin nueva confirmacion funcional, SDD actualizada y UAT.
 - Repositorio SQL read-only: implementado como backend configurable, parametrizado y con whitelist; ahora debe evolucionar a escritura controlada contra BBDD local de pruebas, con permisos, transacciones, validaciones y sin versionar secretos.
 - Extractor offline de metadata: implementado en `tools/extractor/polizas-metadata` con modos `Fixture`, `DryRun` y `Live`; pendiente de validar modo `Live` contra entorno autorizado y politica final de artefactos.
@@ -382,7 +382,7 @@ Objetivo: anadir detalle ampliado, acciones, escrituras o workflows solo como ca
 DoD:
 
 - `Polizas CRUD BBDD` cerrado como MVP local con evidencia antes de abrir desarrollo del resto de paginas.
-- Agentes por pagina creados para analizar, documentar y evolucionar cada pantalla despues de Polizas.
+- Agentes por pagina creados para analizar, documentar y evolucionar cada pantalla despues de Polizas, siguiendo [appbuilder/pages/page-agent-rollout.md](appbuilder/pages/page-agent-rollout.md).
 - Cada accion nueva tiene SDD propia.
 - Se declaran datos afectados, permisos, auditoria, rollback y UAT.
 - No se ejecutan workflows, expresiones o REST/SOAP heredados de forma generica.
@@ -391,7 +391,7 @@ DoD:
 
 Bloqueos actuales:
 
-- La prioridad activa pasa a agentes por pagina del menu; `Polizas CRUD BBDD` queda como vertical local de referencia.
+- La prioridad activa pasa a agentes por pagina del menu; `Polizas CRUD BBDD` queda como vertical local de referencia y el rollout operativo queda documentado en [appbuilder/pages/page-agent-rollout.md](appbuilder/pages/page-agent-rollout.md).
 - Falta confirmar reglas funcionales reales y responsables UAT.
 
 ### Fase 7 - Preview profesional y operacion controlada

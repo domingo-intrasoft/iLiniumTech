@@ -18,6 +18,7 @@ Avanzar el MVP con incrementos pequenos, seguros y validados, sin activar datos 
 | `fd98387` | Frontend accesibilidad | Acciones bloqueadas de Recibos comparten descripcion accesible sobre SDD/API/permisos/UAT y cobros/remesas/datos bancarios. |
 | `cae0866` | Frontend accesibilidad | Acciones bloqueadas de Suplementos comparten descripcion accesible sobre SDD/API/permisos/UAT y workflows/adjuntos/datos restringidos. |
 | Este bloque | Polizas CRUD BBDD | Smoke API/UI visible contra backend SQL local: alta, busqueda, edicion, baja tecnica y limpieza exacta sin residuales. |
+| Bloque 06:31 | Gobierno IA | Paquete activo de agentes por pagina creado y enlazado desde roadmap, plan maestro, readiness y task pack. |
 
 ## Validaciones ejecutadas
 
@@ -104,6 +105,13 @@ Validacion smoke API/UI visible de Polizas CRUD BBDD:
 - `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
 - `git diff --check`: OK.
 
+Validacion tras paquete de agentes por pagina:
+
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1`: OK.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1 -NoReport`: sin leaks.
+- `git diff --check`: OK.
+- No se ejecutaron tests frontend/backend porque el cambio es exclusivamente documental y no modifica runtime.
+
 ## Riesgos residuales
 
 - Polizas CRUD BBDD queda cerrado como MVP local con evidencia API/UI visible; quedan UAT funcional, auth productiva, permisos finales y confirmacion DBA de triggers/campos para escrituras no sinteticas.
@@ -116,7 +124,8 @@ Validacion smoke API/UI visible de Polizas CRUD BBDD:
 - `DemoSession`, API key MVP y headers MVP siguen siendo compatibilidad local/demo, no autenticacion productiva.
 - Datos reales SQL, DBA/UAT, permisos finales y proveedor auth siguen bloqueados externamente.
 - `Autos Particulares` sigue aparcado por decision de producto.
+- El rollout por pagina no autoriza por si mismo datos reales, APIs, escrituras, exportaciones ni permisos nuevos; cada pagina debe abrir SDD propia antes de salir del carril fixture/bloqueado.
 
 ## Siguiente paso sugerido
 
-Crear agentes por pagina del menu para planificar y desarrollar el resto con SDD propia, empezando por superficies de mayor valor y menor riesgo sin activar datos reales ni escrituras hasta contrato equivalente.
+Ejecutar la primera ronda sobre paginas de mayor valor: preparar SDD read-only de `Siniestros`, `Recibos` o `Clientes`, o hacer hardening fixture de una pagina concreta sin backend ni datos reales.

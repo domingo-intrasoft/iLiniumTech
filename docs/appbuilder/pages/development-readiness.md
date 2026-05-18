@@ -4,6 +4,8 @@ Fecha: 2026-05-16
 
 Este documento consolida el estado de readiness de las paginas del menu actual de iLiniumTech. Complementa el inventario principal en [`README.md`](README.md) y debe usarse para orientar futuras IA antes de abrir SDD o programar.
 
+Paquete activo 2026-05-18: la coordinacion concreta de agentes por pagina queda en [`page-agent-rollout.md`](page-agent-rollout.md). Ese documento convierte esta readiness en tareas pequenas por jefe/pagina y mantiene la regla de no activar datos reales, APIs, escrituras, exportaciones ni permisos nuevos sin SDD/API/UAT.
+
 ## Regla de interpretacion
 
 `Lista para desarrollo inicial` no significa cierre funcional final ni paridad total con AppBuilder. Significa que hay evidencia local suficiente para iniciar un incremento iLiniumTech revisado: pagina Vue estatica, API explicita, permisos de producto y pruebas.

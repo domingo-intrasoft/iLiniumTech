@@ -31,7 +31,7 @@ Base entregada:
 Puntos aparcados o no cerrados:
 
 - `Autos Particulares` existe como incremento tecnico anterior, pero no es el objetivo MVP actual. No debe ampliarse ni presentarse como objetivo principal sin nueva confirmacion funcional, SDD y UAT.
-- Las paginas estaticas del menu son visibles para orientar navegacion y pruebas, pero estan bloqueadas para datos reales, filtros funcionales, escrituras, exportaciones, permisos finos o APIs propias hasta SDD/API/UAT.
+- Las paginas estaticas del menu son visibles para orientar navegacion y pruebas, pero estan bloqueadas para datos reales, filtros funcionales, escrituras, exportaciones, permisos finos o APIs propias hasta SDD/API/UAT. El paquete activo de coordinacion por pagina esta en `docs/appbuilder/pages/page-agent-rollout.md`.
 - La autenticacion productiva no esta decidida.
 - Falta matriz real de permisos por broker, perfil, oficina, gestor y usuario.
 - SQL de Polizas CRUD ya tiene smoke transaccional con rollback, lectura SQL real, visibilidad post-create a nivel repositorio y smoke API/UI visible con alta, busqueda, edicion, baja tecnica y limpieza exacta contra BBDD local autorizada; quedan UAT funcional, auth productiva, permisos finales y confirmacion DBA de triggers/campos para escrituras no sinteticas.
@@ -441,7 +441,7 @@ Objetivo: anadir capacidades nuevas solo como producto explicito.
 Pasos y tareas:
 
 - Polizas CRUD BBDD ya queda cerrado como MVP local con evidencia; no iniciar desarrollo real de otras paginas sin SDD/API/UAT propia.
-- Crear agentes por pagina del menu como siguiente bloque de trabajo.
+- Crear agentes por pagina del menu como siguiente bloque de trabajo, siguiendo `docs/appbuilder/pages/page-agent-rollout.md`.
 - Cada agente de pagina debe analizar componentes AppBuilder originales, documentar SDD/alcance y proponer implementacion estatica Vue/API explicita.
 - Priorizar con producto: detalle ampliado, exportacion, documentos, recibos, siniestros, acciones o escrituras.
 - Crear SDD por cada caso de uso.
@@ -501,7 +501,7 @@ DoD y evidencia:
 
 1. Mantener `SDD-2026-007 Polizas CRUD BBDD MVP` como referencia cerrada para el vertical local de Polizas.
 2. No ampliar Polizas hacia campos sensibles, escrituras no MVP, delete real ni datos enriquecidos sin UAT/DBA y SDD nueva.
-3. Crear agentes por pagina del menu para planificar y desarrollar el resto con SDD propia.
+3. Crear agentes por pagina del menu para planificar y desarrollar el resto con SDD propia, usando `docs/appbuilder/pages/page-agent-rollout.md` como paquete operativo.
 4. Cada pagina nueva debe empezar por analisis AppBuilder, contrato iLiniumTech explicito, permisos, datos afectados, rollback y UAT.
 5. Priorizar las siguientes superficies por valor demostrable y bajo riesgo: detalle ampliado de Polizas, Siniestros, Recibos, Clientes, Agenda y Propuestas.
 6. Ejecutar regresion backend/frontend, E2E y auditorias en cada incremento.
