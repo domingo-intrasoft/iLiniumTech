@@ -73,6 +73,8 @@ public sealed class PolizasSqlQueryBuilderTests
             new PolizasSearchRequest(Page: 1, PageSize: 25),
             new PolizasSort("numero", Descending: false));
 
+        query.CommandText.Should().Contain("CAST([Id] AS nvarchar(100)) AS [Id]");
+        query.CommandText.Should().Contain("CAST([Poliza] AS nvarchar(100)) AS [Numero]");
         query.CommandText.Should().Contain("CAST('' AS nvarchar(100)) AS [ClienteId]");
         ShouldNotProjectNumDocumentoAs(query.CommandText, "ClienteId");
     }
@@ -122,7 +124,7 @@ public sealed class PolizasSqlQueryBuilderTests
     {
         var query = _builder.BuildDetailQuery("POL-1001'; SELECT 1 --");
 
-        query.CommandText.Should().Contain("WHERE [Poliza] = @id");
+        query.CommandText.Should().Contain("WHERE [Id] = TRY_CONVERT(int, @id)");
         query.CommandText.Should().NotContain("SELECT 1 --");
         query.Parameters.Should().ContainSingle(parameter =>
             parameter.Name == "@id" && (string)parameter.Value == "POL-1001'; SELECT 1 --");
@@ -131,10 +133,10 @@ public sealed class PolizasSqlQueryBuilderTests
     [Fact]
     public void BuildDetailQuery_can_scope_detail_by_ramo()
     {
-        var query = _builder.BuildDetailQuery("POL-1001", "Autos");
+        var query = _builder.BuildDetailQuery("1001", "Autos");
 
-        query.CommandText.Should().Contain("WHERE [Poliza] = @id AND [IdRamo] = @ramo");
-        query.Parameters.Should().Contain(parameter => parameter.Name == "@id" && (string)parameter.Value == "POL-1001");
+        query.CommandText.Should().Contain("WHERE [Id] = TRY_CONVERT(int, @id) AND [IdRamo] = @ramo");
+        query.Parameters.Should().Contain(parameter => parameter.Name == "@id" && (string)parameter.Value == "1001");
         query.Parameters.Should().Contain(parameter => parameter.Name == "@ramo" && (string)parameter.Value == "Autos");
     }
 
@@ -143,6 +145,8 @@ public sealed class PolizasSqlQueryBuilderTests
     {
         var query = _builder.BuildDetailQuery("POL-1001");
 
+        query.CommandText.Should().Contain("CAST([Id] AS nvarchar(100)) AS [Id]");
+        query.CommandText.Should().Contain("CAST([Poliza] AS nvarchar(100)) AS [Numero]");
         query.CommandText.Should().Contain("CAST('' AS nvarchar(100)) AS [ClienteId]");
         query.CommandText.Should().Contain("CAST('' AS nvarchar(100)) AS [Documento]");
         ShouldNotProjectNumDocumentoAs(query.CommandText, "ClienteId");

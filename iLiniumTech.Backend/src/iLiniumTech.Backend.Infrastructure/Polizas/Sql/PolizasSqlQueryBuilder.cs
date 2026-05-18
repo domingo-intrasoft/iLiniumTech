@@ -23,7 +23,7 @@ public sealed class PolizasSqlQueryBuilder
 
     private static readonly string ListSelect = """
         SELECT
-            CAST([Poliza] AS nvarchar(100)) AS [Id],
+            CAST([Id] AS nvarchar(100)) AS [Id],
             CAST([Poliza] AS nvarchar(100)) AS [Numero],
             CAST([Aplicacion] AS nvarchar(100)) AS [Aplicacion],
             CAST([IdSituacion] AS nvarchar(100)) AS [Estado],
@@ -39,7 +39,7 @@ public sealed class PolizasSqlQueryBuilder
 
     private static readonly string DetailSelect = """
         SELECT TOP (1)
-            CAST([Poliza] AS nvarchar(100)) AS [Id],
+            CAST([Id] AS nvarchar(100)) AS [Id],
             CAST([Poliza] AS nvarchar(100)) AS [Numero],
             CAST([Poliza] AS nvarchar(100)) AS [Certificado],
             CAST([IdTipoPoliza] AS nvarchar(100)) AS [TipoPoliza],
@@ -116,7 +116,7 @@ public sealed class PolizasSqlQueryBuilder
 
     public PolizasSqlQuery BuildDetailQuery(string id, string? ramo = null)
     {
-        var clauses = new List<string> { "[Poliza] = @id" };
+        var clauses = new List<string> { "[Id] = TRY_CONVERT(int, @id)" };
         var parameters = new List<PolizasSqlParameter> { new("@id", id) };
 
         AddEquals(clauses, parameters, "[IdRamo]", "@ramo", ramo);
