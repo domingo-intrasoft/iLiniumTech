@@ -60,10 +60,45 @@ git diff --check
 
 Resultados: baseline documental OK, secret scan sin leaks y `git diff --check` sin errores. Git mostro avisos de finales de linea CRLF habituales en Windows, sin fallar el comando.
 
-Smoke visual local:
+Smoke visual local T-043:
 
 - URL verificada en navegador: `http://127.0.0.1:5175/polizas?page=1&pageSize=25`.
 - Resultado: toolbar de polizas visible, buscador `Buscar...` visible, tabla `appbuilder-table` visible, columnas objetivo visibles, badge de situacion visible, scopes de flota/colectivas/externas visibles y `25` filas renderizadas.
+
+## Smoke visual T-044
+
+Fecha: 2026-05-18.
+
+Smoke en navegador embebido local:
+
+- URL verificada: `http://127.0.0.1:5175/polizas?page=1&pageSize=25`.
+- Resultado: toolbar, buscador, tabla y columnas objetivo visibles.
+- Observacion: el contexto backend local activo devolvia `0` polizas y no permitia validar visualmente el badge de situacion.
+
+Smoke controlado de escritorio con Vite temporal en modo fixture:
+
+```powershell
+cd .\iLiniumTech.Frontend
+$env:VITE_USE_BACKEND = "false"
+npm run dev -- --host 127.0.0.1 --port 5180
+# Playwright headless: viewport 1440x900, sesion demo local, /polizas?page=1&pageSize=25
+```
+
+Resultado:
+
+- URL verificada: `http://127.0.0.1:5180/polizas?page=1&pageSize=25`.
+- `hasToolbar=true`
+- `hasSearch=true`
+- `hasGrid=true`
+- `hasStatusBadge=true`
+- `statusBadgeText=En Vigor`
+- `hasColumns=true`
+- `missingColumns=[]`
+- `hasScopes=true`
+- `rowCount=2`
+- `viewportWidth=1440`
+
+Conclusion T-044: el corte visual queda aceptado para escritorio y documentado. No se aplicaron cambios de codigo adicionales en T-044.
 
 ## Diferencias pendientes frente a AppBuilder
 

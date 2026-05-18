@@ -30,47 +30,38 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-044-POL-APPBUILDER-VISUAL-SMOKE`
+ID: `T-041-POL-AUDIT-WRITES`
 
 Estado: `READY`
 
-Nombre: ejecutar smoke visual y cerrar diferencias pendientes de `/polizas` frente a AppBuilder.
+Nombre: disenar auditoria de escritura de Polizas sin datos sensibles.
 
 Objetivo:
 
-- Abrir `/polizas` en navegador local/demo y revisar visualmente el primer corte AppBuilder-like.
-- Confirmar que toolbar, buscador, tabla densa, columnas objetivo, badges y scopes bloqueados se ven correctamente.
-- Ajustar solo CSS/Vue menor si el smoke muestra solapes, texto cortado o rotura clara.
-- Documentar diferencias pendientes sin inventar datos, logos ni acciones.
+- Documentar un diseno inicial de auditoria para altas, actualizaciones y bajas tecnicas de Polizas.
+- No implementar runtime, tablas, endpoints ni migraciones en este paso.
+- Evitar datos personales, documentos, telefonos, direcciones, matriculas completas, connection strings o SQL sensible en logs/auditoria.
+- Definir eventos, campos permitidos, campos prohibidos, correlacion, permisos y riesgos para una SDD posterior si se implementa.
 
 Fuentes a leer, sin buscar mas salvo bloqueo:
 
 - `AGENTS.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/sdd/specs/iLiniumTech/SDD-2026-014-polizas-appbuilder-visual-parity.md`
-- `docs/appbuilder/pages/polizas/visual-parity-mvp.md`
+- `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`
+- `docs/qa/polizas-crud-bbdd-evidence.md`
 - `docs/qa/polizas-visual-parity-evidence.md`
-- `iLiniumTech.Frontend/src/features/polizas/PolizasView.vue`
-- `iLiniumTech.Frontend/src/features/polizas/PolizasTable.vue`
-- `iLiniumTech.Frontend/src/features/polizas/PolizasFilters.vue`
-- `iLiniumTech.Frontend/src/assets/styles/main.scss`
+- `docs/engineering/README.md`
 
 Archivos que puede tocar:
 
-- `iLiniumTech.Frontend/src/features/polizas/PolizasView.vue`
-- `iLiniumTech.Frontend/src/features/polizas/PolizasTable.vue`
-- `iLiniumTech.Frontend/src/features/polizas/PolizasFilters.vue`
-- `iLiniumTech.Frontend/src/features/polizas/PolizasView.test.ts`
-- `iLiniumTech.Frontend/src/features/polizas/PolizasTable.test.ts`
-- `iLiniumTech.Frontend/src/assets/styles/main.scss`
-- `docs/qa/polizas-visual-parity-evidence.md`
+- `docs/engineering/polizas-write-audit-design.md`
+- `docs/qa/polizas-crud-bbdd-evidence.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 
 Archivos que NO debe tocar:
 
 - `iLiniumTech.Backend/**`
-- `iLiniumTech.Frontend/src/services/**`
-- `iLiniumTech.Frontend/src/router/**`
+- `iLiniumTech.Frontend/**`
 - `docs/sdd/**`
 - `docs/appbuilder/pages/page-agent-rollout.md`
 - `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`
@@ -78,24 +69,15 @@ Archivos que NO debe tocar:
 
 Pasos de implementacion:
 
-1. Revisar `docs/qa/polizas-visual-parity-evidence.md` y abrir `/polizas` en navegador local/demo.
-2. Validar checklist visual: toolbar compacta, scopes a la derecha, buscador `Buscar...`, tabla densa, columnas objetivo, badge `En Vigor`, acciones bloqueadas accesibles.
-3. Si hay defectos menores de layout, corregirlos solo en archivos permitidos y actualizar tests afectados.
-4. Si el defecto implica contrato API, datos sensibles, logos, PII o backend, no programar: documentar diferencia pendiente.
-5. Actualizar evidencia QA con resultado del smoke y diferencias pendientes.
-6. Ejecutar validacion frontend/documental minima.
-7. Si todo pasa, marcar esta tarea `DONE` y promover la siguiente tarea segura no bloqueada.
+1. Crear `docs/engineering/polizas-write-audit-design.md` con proposito, no objetivos, eventos, campos permitidos, campos prohibidos, retencion, correlacion, seguridad y preguntas UAT/DBA.
+2. Enlazar el documento desde `docs/qa/polizas-crud-bbdd-evidence.md` como pendiente tecnico de auditoria.
+3. No tocar codigo ni proponer tablas concretas como implementadas.
+4. Ejecutar validacion documental, secret scan y `git diff --check`.
+5. Si todo pasa, marcar esta tarea `DONE` y mover el cursor a `T-042-POL-CRUD-REGRESSION-SMOKE`.
 
 Pruebas obligatorias:
 
 ```powershell
-cd .\iLiniumTech.Frontend
-npx vitest run src/features/polizas/PolizasView.test.ts src/features/polizas/PolizasTable.test.ts
-npm run format
-npm run lint
-npm run test:unit
-npm run build
-cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
@@ -103,14 +85,11 @@ git diff --check
 
 Criterios de aceptacion:
 
-- Smoke visual de `/polizas` documentado.
-- No hay solapes, texto claramente cortado ni tabla rota en escritorio.
-- Diferencias por datos ausentes quedan documentadas como pendientes, no simuladas.
-- CRUD real y lectura backend/fixture existentes no se rompen.
-- Los scopes sin SDD/API/UAT siguen bloqueados.
-- Tests unitarios, lint y build pasan.
-- Evidencia QA visual queda actualizada.
-- Commit pequeno y explicable.
+- Documento de auditoria claro, accionable y sin secretos.
+- Campos sensibles quedan explicitamente prohibidos o minimizados.
+- Eventos CRUD MVP quedan definidos a nivel conceptual.
+- Preguntas UAT/DBA quedan separadas de decisiones ya tomadas.
+- Commit pequeno y documental.
 
 Riesgo de conflicto: bajo si se respetan los archivos permitidos.
 
@@ -175,10 +154,10 @@ Objetivo: endurecer lo ya conseguido en Polizas sin ampliar reglas no aprobadas.
 | ID | Estado | Tarea | Precondicion |
 | --- | --- | --- |
 | `T-040-POL-UAT-FIELDS` | `BLOCKED_HUMAN` | Confirmar campos editables definitivos y semantica de baja. | UAT/DBA |
-| `T-041-POL-AUDIT-WRITES` | `TODO` | Disenar auditoria de escritura sin datos sensibles. | puede ser documental |
+| `T-041-POL-AUDIT-WRITES` | `READY` | Disenar auditoria de escritura sin datos sensibles. | puede ser documental |
 | `T-042-POL-CRUD-REGRESSION-SMOKE` | `TODO` | Mantener smoke local API/UI de CRUD real sin secretos. | BBDD local disponible |
 | `T-043-POL-APPBUILDER-VISUAL-SHELL` | `DONE` | Aproximar `/polizas` al shell/grid visual de AppBuilder publicado sin simular datos. | captura usuario y SDD-2026-014 |
-| `T-044-POL-APPBUILDER-VISUAL-SMOKE` | `READY` | Ejecutar smoke visual y documentar diferencias pendientes frente a AppBuilder. | `T-043` |
+| `T-044-POL-APPBUILDER-VISUAL-SMOKE` | `DONE` | Ejecutar smoke visual y documentar diferencias pendientes frente a AppBuilder. | `T-043` |
 
 ### Fase 6 - Reporting, liquidaciones y superficies tecnicas
 
@@ -246,3 +225,4 @@ Gate completo:
 - 2026-05-18: `T-001-SIN-FE-CONTRACT-FIXTURE` cerrada. Se separaron tipos, fixture y composable de `Siniestros`; validacion OK con test dirigido, format, lint, unit, build, baseline documental, secret scan y `git diff --check`. El cursor queda en `T-002-REC-FE-CONTRACT-FIXTURE`.
 - 2026-05-18: el usuario redefine el siguiente MVP: `/polizas` debe parecerse a la pantalla AppBuilder publicada, pero manteniendo CRUD real y sin atajos/simulaciones. `T-002` queda pospuesta y el cursor pasa a `T-043-POL-APPBUILDER-VISUAL-SHELL`.
 - 2026-05-18: `T-043-POL-APPBUILDER-VISUAL-SHELL` cerrada. Se compactaron toolbar/buscador/tabla de `Polizas`, se agregaron columnas objetivo con valores neutros para datos no entregados por API, badge `En Vigor`, tests visuales de tabla y evidencia en `docs/qa/polizas-visual-parity-evidence.md`. Validacion OK con targeted tests `23/23`, format, lint, unit completo `198/198`, build, baseline documental, secret scan y `git diff --check`. El cursor queda en `T-044-POL-APPBUILDER-VISUAL-SMOKE`.
+- 2026-05-18: `T-044-POL-APPBUILDER-VISUAL-SMOKE` cerrada. Se ejecuto smoke en navegador local y smoke controlado de escritorio con Vite fixture temporal: toolbar, buscador, grid, columnas, scopes y badge `En Vigor` OK. Evidencia actualizada en `docs/qa/polizas-visual-parity-evidence.md`. El cursor queda en `T-041-POL-AUDIT-WRITES`.
