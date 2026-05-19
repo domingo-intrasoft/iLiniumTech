@@ -11,8 +11,8 @@ export interface SiniestroListItem {
   cliente: string
   compania: string
   situacion: string
-  estado: SiniestroEstado
-  prioridad: SiniestroPrioridad
+  estado: string
+  prioridad: string
   fechaSiniestro: string
   fechaParte: string
   tramitador: string
@@ -21,7 +21,7 @@ export interface SiniestroListItem {
 export interface SiniestrosFilters {
   referencia: string
   poliza: string
-  estado: '' | SiniestroEstado
-  prioridad: '' | SiniestroPrioridad
+  estado: string
+  prioridad: string
   fechaDesde: string
 }

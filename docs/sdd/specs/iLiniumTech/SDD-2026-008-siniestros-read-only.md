@@ -22,6 +22,8 @@ Decision de arquitectura: iLiniumTech no debe reconstruir AppBuilder como runtim
 
 Actualizacion 2026-05-18: se implementa el primer contrato backend in-memory/read-only para `Siniestros` con `GET /api/siniestros/catalogs` y `GET /api/siniestros`. Este avance no activa SQL real, datos reales, detalle, exportacion ni escrituras; sirve como base tecnica para adaptar el frontend y validar permisos propios.
 
+Actualizacion 2026-05-19: por decision humana posterior, documentada en `docs/DECISION_DATOS_REALES_LOCALES.md`, se habilita el siguiente corte tecnico read-only SQL local para todas las pantallas funcionales. `Siniestros` queda implementado como lectura real local minimizada y activable por configuracion (`Siniestros:Repository=Sql`), sin detalle, exportacion ni escrituras. El contrato no proyecta descripcion, danos, intervinientes, salud, contacto, direccion, matricula, importes, EIAC ni observaciones libres. La evidencia de cierre esta en `docs/qa/siniestros-sql-readonly-local-evidence.md`.
+
 ## Objetivo
 
 Preparar el primer incremento funcional de `Siniestros` como listado read-only minimizado, sin detalle y sin exportacion:
@@ -107,15 +109,16 @@ Campos prohibidos en el primer corte:
 ## Criterios de aceptacion
 
 - [ ] La SDD queda enlazada desde roadmap, plan maestro o paquete de agentes.
-- [ ] Antes de implementar API real, producto confirma columnas y filtros del listado.
-- [ ] Antes de implementar API real, DBA confirma origen de lectura autorizado y regla por broker.
+- [ ] Producto confirma columnas y filtros definitivos del listado.
+- [ ] DBA confirma origen de lectura definitivo y regla por broker para UAT/productivo.
 - [ ] `GET /api/siniestros/catalogs` exige `siniestros.catalogs`.
 - [ ] `GET /api/siniestros` exige `siniestros.read`.
 - [x] Primer backend in-memory/read-only implementado sin SQL real.
-- [ ] El backend no consulta datos si falta broker o el broker no esta permitido.
-- [ ] Filtros y sort fuera de whitelist devuelven error sanitizado.
-- [ ] El listado no devuelve campos sensibles prohibidos.
-- [ ] El frontend mantiene detalle/exportacion bloqueados en el primer corte.
+- [x] Repositorio SQL local read-only implementado, activable por configuracion.
+- [x] El backend no consulta datos si falta broker requerido o el broker no esta permitido.
+- [x] Filtros y sort fuera de whitelist devuelven error sanitizado.
+- [x] El listado no devuelve campos sensibles prohibidos por esta SDD.
+- [x] El frontend mantiene detalle/exportacion bloqueados en el primer corte.
 - [ ] No se guardan secretos ni datos sensibles en Git.
 - [ ] No se introduce runtime AppBuilder.
 

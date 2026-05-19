@@ -144,3 +144,31 @@ Riesgos residuales:
 
 - El backend de `Siniestros` es todavia in-memory/read-only.
 - La conexion a SQL real sigue bloqueada por UAT, DBA, permisos, minimizacion PII y revision de seguridad.
+
+## Actualizacion T-304-SINIESTROS-SQL-READONLY-LOCAL - 2026-05-19
+
+Alcance de esta actualizacion:
+
+- Se anade repositorio SQL read-only activable con `Siniestros:Repository=Sql`.
+- La lectura real local usa `dbo.Siniestro` como origen principal y joins minimizados a `RiesgoPoliza`, `Poliza` y `Catalogo`.
+- Se aplica filtro `BrokerIntegracionId`, SQL parametrizado, whitelists de sort y `SESSION_CONTEXT`.
+- El frontend `/siniestros` consume API cuando `VITE_USE_BACKEND=true`; el fixture queda solo para backend desactivado/tests offline.
+- Siguen bloqueados detalle, exportacion, escrituras, intervinientes, observaciones, documentos, salud, contacto, direccion, matriculas, importes y EIAC.
+
+Evidencia de validacion:
+
+| Comando | Resultado |
+| --- | --- |
+| `dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Siniestros` | OK, 19 tests |
+| `npm run test:unit -- Siniestros` | OK, 2 tests |
+| `npm run format` | OK |
+| `npm run lint` | OK |
+| `npm run build` | OK |
+
+Smoke SQL local:
+
+- `SKIPPED_ENV_MISSING`: no hay configuracion `Siniestros__*`, `ConnectionStrings__Siniestros*` ni `ConnectionStrings__AppBuilderMaster` visible por nombres de entorno sin imprimir secretos.
+
+Evidencia detallada:
+
+- `docs/qa/siniestros-sql-readonly-local-evidence.md`.

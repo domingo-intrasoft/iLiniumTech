@@ -23,8 +23,6 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<InMemorySiniestrosRepository>();
-        services.AddScoped<ISiniestrosRepository>(provider => provider.GetRequiredService<InMemorySiniestrosRepository>());
         services.AddSingleton<InMemoryRecibosRepository>();
         services.AddScoped<IRecibosRepository>(provider => provider.GetRequiredService<InMemoryRecibosRepository>());
         services.AddSingleton<InMemoryAgendaRepository>();
@@ -34,6 +32,23 @@ public static class DependencyInjection
         services.AddScoped<IPropuestasRepository>(provider => provider.GetRequiredService<InMemoryPropuestasRepository>());
         services.AddSingleton<InMemorySuplementosRepository>();
         services.AddScoped<ISuplementosRepository>(provider => provider.GetRequiredService<InMemorySuplementosRepository>());
+
+        var siniestrosRepositoryMode = configuration["Siniestros:Repository"];
+        if (string.Equals(siniestrosRepositoryMode, "Sql", StringComparison.OrdinalIgnoreCase))
+        {
+            services.TryAddScoped<IPolizasExecutionContextAccessor>(_ => new ConfiguredPolizasExecutionContextAccessor(configuration));
+            services.AddScoped<ISiniestrosRepository>(provider => new SqlSiniestrosRepository(
+                CreateConnectionStringProvider(
+                    configuration,
+                    provider.GetRequiredService<IPolizasExecutionContextAccessor>(),
+                    "Siniestros"),
+                provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
+        }
+        else
+        {
+            services.AddSingleton<InMemorySiniestrosRepository>();
+            services.AddScoped<ISiniestrosRepository>(provider => provider.GetRequiredService<InMemorySiniestrosRepository>());
+        }
 
         var repositoryMode = configuration["Polizas:Repository"];
         if (string.Equals(repositoryMode, "Sql", StringComparison.OrdinalIgnoreCase))

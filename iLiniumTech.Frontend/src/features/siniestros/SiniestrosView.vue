@@ -5,10 +5,8 @@ import { useRouter } from 'vue-router'
 import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
 
-import { siniestroEstados, siniestroPrioridades } from './siniestrosTypes'
-import { useSiniestrosFixture } from './useSiniestrosFixture'
+import { useSiniestros } from './useSiniestros'
 
-const topBadges = ['Read-only', 'Fixture']
 const moduleActions = [
   { label: 'Buscar siniestros', icon: 'pi pi-search', active: true },
   { label: 'Ver detalle pendiente', icon: 'pi pi-eye' },
@@ -24,33 +22,42 @@ const {
   changePageSize,
   clearFilters,
   draftFilters,
+  error,
+  estadoOptions,
   firstVisible,
+  formatDate,
+  isBackendMode,
   lastVisible,
+  loading,
   pageSizeOptions,
   pagedItems,
   pagination,
+  prioridadOptions,
   resultLabel,
   searchSiniestros,
   tableCaption,
   total,
   totalPages,
-} = useSiniestrosFixture()
+} = useSiniestros()
 
 const router = useRouter()
 const { session, userLabel, logout } = useAuthSession()
 
+const topBadges = computed(() =>
+  isBackendMode ? ['Read-only', 'BBDD local'] : ['Read-only', 'Fixture'],
+)
 const sessionLabel = computed(() => {
-  return session.value?.currentBrokerId ? `Broker ${session.value.currentBrokerId}` : 'Modo fixture'
+  if (session.value?.currentBrokerId) {
+    return `Broker ${session.value.currentBrokerId}`
+  }
+
+  return isBackendMode ? 'BBDD local/API' : 'Modo fixture'
 })
 
 const sessionNeedsAttention = computed(() => false)
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('es-ES').format(new Date(`${value}T00:00:00`))
-}
-
-function changePageSizeFromEvent(event: Event) {
-  changePageSize(Number((event.target as HTMLSelectElement).value))
+async function changePageSizeFromEvent(event: Event) {
+  await changePageSize(Number((event.target as HTMLSelectElement).value))
 }
 
 async function signOut() {
@@ -100,7 +107,10 @@ async function signOut() {
 
     <section class="runtime-strip" aria-label="Contexto de siniestros">
       <span><i class="pi pi-lock" aria-hidden="true"></i> Solo lectura</span>
-      <span><i class="pi pi-database" aria-hidden="true"></i> Fixture local sin API</span>
+      <span>
+        <i class="pi pi-database" aria-hidden="true"></i>
+        {{ isBackendMode ? 'BBDD local/API' : 'Fixture local sin API' }}
+      </span>
       <span><i class="pi pi-shield" aria-hidden="true"></i> Datos sanitizados</span>
       <span><i class="pi pi-ban" aria-hidden="true"></i> Detalle y exportacion pendientes</span>
     </section>
@@ -199,7 +209,7 @@ async function signOut() {
                   aria-label="Estado"
                 >
                   <option value=""></option>
-                  <option v-for="estado in siniestroEstados" :key="estado" :value="estado">
+                  <option v-for="estado in estadoOptions" :key="estado" :value="estado">
                     {{ estado }}
                   </option>
                 </select>
@@ -229,11 +239,7 @@ async function signOut() {
                   aria-label="Prioridad"
                 >
                   <option value=""></option>
-                  <option
-                    v-for="prioridad in siniestroPrioridades"
-                    :key="prioridad"
-                    :value="prioridad"
-                  >
+                  <option v-for="prioridad in prioridadOptions" :key="prioridad" :value="prioridad">
                     {{ prioridad }}
                   </option>
                 </select>
@@ -306,11 +312,33 @@ async function signOut() {
         <span>{{ firstVisible }}-{{ lastVisible }} visibles</span>
       </div>
 
-      <div v-if="pagedItems.length === 0" class="state state-box empty" role="status">
+      <div v-if="error" class="state state-box error" role="alert">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        <div>
+          <strong>Error</strong>
+          <p>{{ error }}</p>
+        </div>
+      </div>
+
+      <div v-else-if="loading" class="state state-box" role="status">
+        <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+        <div>
+          <strong>Cargando</strong>
+          <p>Consultando Siniestros.</p>
+        </div>
+      </div>
+
+      <div v-else-if="pagedItems.length === 0" class="state state-box empty" role="status">
         <i class="pi pi-inbox" aria-hidden="true"></i>
         <div>
           <strong>Sin resultados</strong>
-          <p>No hay siniestros fixture para los filtros actuales.</p>
+          <p>
+            {{
+              isBackendMode
+                ? 'No hay siniestros para los filtros actuales.'
+                : 'No hay siniestros fixture para los filtros actuales.'
+            }}
+          </p>
         </div>
       </div>
 

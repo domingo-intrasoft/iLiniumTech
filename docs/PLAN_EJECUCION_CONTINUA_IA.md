@@ -38,17 +38,17 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-304-SINIESTROS-SQL-READONLY-LOCAL`
+ID: `T-305-RECIBOS-SQL-READONLY-LOCAL`
 
 Estado: `READY_GUARDED`
 
-Nombre: Siniestros SQL read-only local.
+Nombre: Recibos SQL read-only local.
 
 Objetivo:
 
-- Implementar lectura SQL local real minimizada para Siniestros.
+- Implementar lectura SQL local real minimizada para Recibos.
 - Mantener escrituras totalmente bloqueadas.
-- No exponer documentos, contacto, direccion, salud, observaciones libres, intervinientes sensibles ni datos personales reales en evidencia.
+- No exponer importes reales, banco, remesas, documentos, contacto, direccion, observaciones libres ni datos personales reales en evidencia.
 - Si falta configuracion local, dejar `SKIPPED_ENV_MISSING` sin pedir ni imprimir secretos.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
@@ -57,37 +57,37 @@ Fuentes a leer, sin buscar mas salvo bloqueo real:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/DECISION_DATOS_REALES_LOCALES.md`
-- `docs/sdd/specs/iLiniumTech/SDD-2026-008-siniestros-read-only.md`
-- `docs/appbuilder/pages/siniestros/README.md`
-- `docs/qa/siniestros-mvp-evidence.md`
+- `docs/sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md`
+- `docs/appbuilder/pages/recibos/README.md`
+- `docs/qa/recibos-mvp-evidence.md`
 
 Archivos que puede tocar:
 
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
-- `docs/sdd/specs/iLiniumTech/*siniestros*`
+- `docs/sdd/specs/iLiniumTech/*recibos*`
 - `docs/qa/*`
-- `iLiniumTech.Backend/src/**/Siniestros/**`
+- `iLiniumTech.Backend/src/**/Recibos/**`
 - `iLiniumTech.Backend/src/**/Program.cs`
 - `iLiniumTech.Backend/src/**/DependencyInjection*.cs`
-- `iLiniumTech.Backend/tests/**/Siniestros*`
-- `iLiniumTech.Frontend/src/features/siniestros/**`
+- `iLiniumTech.Backend/tests/**/Recibos*`
+- `iLiniumTech.Frontend/src/features/recibos/**`
 - `iLiniumTech.Frontend/src/services/**`
 
 Archivos que NO debe tocar:
 
-- codigo de aplicacion fuera de Siniestros y servicios compartidos necesarios;
 - cualquier `.env*`, config con secretos, dumps o capturas sensibles.
-- escrituras reales de Siniestros.
-- triggers/workflows heredados, agenda automatica o intervinientes.
-- documentos, contacto, direccion, salud, observaciones libres o datos sensibles en contrato publico.
+- codigo de aplicacion fuera de Recibos y servicios compartidos necesarios;
+- escrituras reales de Recibos.
+- triggers/workflows heredados, liquidaciones, remesas, cobros, EIAC o banco.
+- importes reales, documentos, contacto, direccion, banco, observaciones libres o datos sensibles en contrato publico.
 - pantallas no relacionadas.
 
 Pasos de implementacion:
 
 1. Revisar `git status --short --branch`.
-2. Leer SDD y documentacion AppBuilder de Siniestros ya generada.
-3. Implementar repositorio SQL read-only activable con `Siniestros:Repository=Sql`.
+2. Leer SDD y documentacion AppBuilder de Recibos ya generada.
+3. Implementar repositorio SQL read-only activable con `Recibos:Repository=Sql`.
 4. Aplicar filtro broker/tenant, SQL parametrizado y whitelists.
 5. Conectar frontend a API cuando `VITE_USE_BACKEND=true` si falta.
 6. Ejecutar smoke local si existe configuracion fuera de Git; si falta, documentar `SKIPPED_ENV_MISSING`.
@@ -96,9 +96,9 @@ Pasos de implementacion:
 Pruebas obligatorias:
 
 ```powershell
-dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Siniestros
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Recibos
 cd .\iLiniumTech.Frontend
-npm run test:unit -- Siniestros
+npm run test:unit -- Recibos
 cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
@@ -107,12 +107,12 @@ git diff --check
 
 Criterios de aceptacion:
 
-- Backend Siniestros puede leer desde SQL local real cuando se configure.
+- Backend Recibos puede leer desde SQL local real cuando se configure.
 - El contrato sigue minimizado y sin datos sensibles.
-- No hay escrituras ni workflows.
+- No hay escrituras, cobros, liquidaciones, banco ni workflows.
 - Smoke SQL local queda OK o `SKIPPED_ENV_MISSING`.
 
-Riesgo de conflicto: medio; tocar solo vertical Siniestros.
+Riesgo de conflicto: medio; tocar solo vertical Recibos.
 
 ## Cola de tareas pequenas
 
@@ -176,8 +176,8 @@ Objetivo: activar lectura SQL minimizada solo cuando haya SDD, UAT/DBA, permisos
 | `T-301-CLIENTES-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Implementar SQL local real minimizado para Clientes. | BBDD local disponible, no secretos en Git |
 | `T-302-CLIENTES-CRUD-SDD` | `DONE` | Definir SDD de escritura para `Identidad` + `IdentidadCliente` antes de CRUD real. | documentacion, sin codigo app |
 | `T-303-CLIENTES-CRUD-BBDD-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Implementar CRUD real local de Clientes segun `SDD-2026-016`; update/delete solo MVP-owned. | SDD-2026-016 |
-| `T-304-SINIESTROS-SQL-READONLY-LOCAL` | `READY_GUARDED` | Implementar SQL local real minimizado para Siniestros. | BBDD local disponible, minimizacion |
-| `T-305-RECIBOS-SQL-READONLY-LOCAL` | `TODO` | Implementar SQL local real minimizado para Recibos. | BBDD local disponible, cuidado financiero |
+| `T-304-SINIESTROS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Implementar SQL local real minimizado para Siniestros. | BBDD local disponible, minimizacion |
+| `T-305-RECIBOS-SQL-READONLY-LOCAL` | `READY_GUARDED` | Implementar SQL local real minimizado para Recibos. | BBDD local disponible, cuidado financiero |
 | `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `TODO` | Implementar SQL local real minimizado para Suplementos. | BBDD local disponible, workflows bloqueados |
 | `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` | `TODO` | Confirmar origen real local de Propuestas y crear SQL read-only. | no asumir `Solicitudes` sin evidencia |
 
@@ -286,3 +286,4 @@ Gate completo:
 - 2026-05-19: `T-302-CLIENTES-CRUD-SDD` cerrada. Se creo `docs/sdd/specs/iLiniumTech/SDD-2026-016-clientes-crud-bbdd.md` con contrato CRUD, permisos, flag, transacciones, auditoria sin PII, matriz de campos, smoke y regla MVP-owned `ILMVP-CLI-*`. Validacion documental y seguridad OK. Cursor pasa a `T-303-CLIENTES-CRUD-BBDD-LOCAL`.
 - 2026-05-19: `T-303-CLIENTES-CRUD-BBDD-LOCAL` cerrada como `DONE_WITH_SKIPPED_SQL_SMOKE`. Se implemento API/frontend CRUD Clientes con permisos `clientes.create/update/delete`, `Clientes:WritesEnabled`, SQL transaccional parametrizado y update/delete limitado a `ILMVP-CLI-*`; tests dirigidos backend/frontend OK. Smoke SQL real local queda `SKIPPED_ENV_MISSING` por ausencia de configuracion local visible sin secretos. Evidencia en `docs/qa/clientes-crud-bbdd-local-evidence.md`. Cursor pasa a `T-200B-AGENDA-SMOKE-SQL-LOCAL`.
 - 2026-05-19: `T-200B-AGENDA-SMOKE-SQL-LOCAL` cerrada como `DONE_WITH_SKIPPED_SQL_SMOKE`. Se revisaron solo nombres de variables en `Process`, `User` y `Machine`; no hay configuracion `Agenda__*`, `ConnectionStrings__Agenda*` ni `ConnectionStrings__AppBuilderMaster` visible sin secretos. Evidencia actualizada en `docs/qa/agenda-crud-bbdd-evidence.md`. Cursor pasa a `T-304-SINIESTROS-SQL-READONLY-LOCAL`.
+- 2026-05-19: `T-304-SINIESTROS-SQL-READONLY-LOCAL` cerrada como `DONE_WITH_SKIPPED_SQL_SMOKE`. Se implemento repositorio SQL read-only de Siniestros sobre `dbo.Siniestro` con filtro `BrokerIntegracionId`, joins minimizados a `RiesgoPoliza`/`Poliza`/`Catalogo`, frontend API en `VITE_USE_BACKEND=true` y acciones de detalle/exportacion bloqueadas. Smoke SQL real local queda `SKIPPED_ENV_MISSING` por ausencia de configuracion `Siniestros__*`, `ConnectionStrings__Siniestros*` o `ConnectionStrings__AppBuilderMaster` visible sin secretos. Evidencia en `docs/qa/siniestros-sql-readonly-local-evidence.md`. Cursor pasa a `T-305-RECIBOS-SQL-READONLY-LOCAL`.
