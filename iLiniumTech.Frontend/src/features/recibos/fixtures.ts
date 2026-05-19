@@ -9,11 +9,10 @@ export const recibosFixture: readonly ReciboListItem[] = [
     compania: 'Compania demo norte',
     tipo: 'Prima',
     situacion: 'Pendiente',
-    efecto: '2026-01-01',
-    vencimiento: '2026-02-01',
-    cobro: 'No operativo',
+    fechaEfecto: '2026-01-01',
+    fechaVencimiento: '2026-02-01',
+    estadoCobro: 'No operativo',
     canal: 'Canal demo',
-    importeDemo: 'Importe demo A',
   },
   {
     id: 'REC-MVP-1002',
@@ -23,11 +22,10 @@ export const recibosFixture: readonly ReciboListItem[] = [
     compania: 'Compania demo sur',
     tipo: 'Regularizacion',
     situacion: 'Cobrado',
-    efecto: '2026-02-15',
-    vencimiento: '2026-03-15',
-    cobro: 'Cobro demo confirmado',
+    fechaEfecto: '2026-02-15',
+    fechaVencimiento: '2026-03-15',
+    estadoCobro: 'Cobro demo confirmado',
     canal: 'Canal demo mediador',
-    importeDemo: 'Importe demo B',
   },
   {
     id: 'REC-MVP-1003',
@@ -37,16 +35,17 @@ export const recibosFixture: readonly ReciboListItem[] = [
     compania: 'Compania demo este',
     tipo: 'Extorno',
     situacion: 'Anulado',
-    efecto: '2026-04-01',
-    vencimiento: '2026-05-01',
-    cobro: 'No operativo',
+    fechaEfecto: '2026-04-01',
+    fechaVencimiento: '2026-05-01',
+    estadoCobro: 'No operativo',
     canal: 'Canal demo compania',
-    importeDemo: 'Importe demo C',
   },
 ]
 
+export const reciboSituaciones = ['Pendiente', 'Cobrado', 'Anulado']
+export const reciboTipos = ['Prima', 'Extorno', 'Regularizacion']
+export const reciboCanales = ['Canal demo', 'Canal demo mediador', 'Canal demo compania']
 export const pageSizeOptions = [10, 25, 50]
-export const topBadges = ['Read-only', 'Fixture']
 export const moduleActions = [
   { label: 'Buscar recibos', icon: 'pi pi-search', active: true },
   { label: 'Detalle pendiente', icon: 'pi pi-eye' },

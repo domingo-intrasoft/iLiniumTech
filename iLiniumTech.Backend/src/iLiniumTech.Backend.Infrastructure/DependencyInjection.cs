@@ -23,8 +23,6 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<InMemoryRecibosRepository>();
-        services.AddScoped<IRecibosRepository>(provider => provider.GetRequiredService<InMemoryRecibosRepository>());
         services.AddSingleton<InMemoryAgendaRepository>();
         services.AddScoped<IAgendaRepository>(provider => provider.GetRequiredService<InMemoryAgendaRepository>());
         services.AddScoped<IAgendaWriteRepository>(provider => provider.GetRequiredService<InMemoryAgendaRepository>());
@@ -32,6 +30,23 @@ public static class DependencyInjection
         services.AddScoped<IPropuestasRepository>(provider => provider.GetRequiredService<InMemoryPropuestasRepository>());
         services.AddSingleton<InMemorySuplementosRepository>();
         services.AddScoped<ISuplementosRepository>(provider => provider.GetRequiredService<InMemorySuplementosRepository>());
+
+        var recibosRepositoryMode = configuration["Recibos:Repository"];
+        if (string.Equals(recibosRepositoryMode, "Sql", StringComparison.OrdinalIgnoreCase))
+        {
+            services.TryAddScoped<IPolizasExecutionContextAccessor>(_ => new ConfiguredPolizasExecutionContextAccessor(configuration));
+            services.AddScoped<IRecibosRepository>(provider => new SqlRecibosRepository(
+                CreateConnectionStringProvider(
+                    configuration,
+                    provider.GetRequiredService<IPolizasExecutionContextAccessor>(),
+                    "Recibos"),
+                provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
+        }
+        else
+        {
+            services.AddSingleton<InMemoryRecibosRepository>();
+            services.AddScoped<IRecibosRepository>(provider => provider.GetRequiredService<InMemoryRecibosRepository>());
+        }
 
         var siniestrosRepositoryMode = configuration["Siniestros:Repository"];
         if (string.Equals(siniestrosRepositoryMode, "Sql", StringComparison.OrdinalIgnoreCase))

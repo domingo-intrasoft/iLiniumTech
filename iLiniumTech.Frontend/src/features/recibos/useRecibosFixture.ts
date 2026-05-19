@@ -51,7 +51,7 @@ export function useRecibosFixture() {
       const matchesSituacion = !filters.situacion || item.situacion === filters.situacion
       const matchesTipo = !filters.tipo || item.tipo === filters.tipo
       const matchesVencimiento =
-        !filters.vencimientoDesde || item.vencimiento >= filters.vencimientoDesde
+        !filters.vencimientoDesde || item.fechaVencimiento >= filters.vencimientoDesde
 
       return matchesRecibo && matchesPoliza && matchesSituacion && matchesTipo && matchesVencimiento
     })
@@ -70,7 +70,7 @@ export function useRecibosFixture() {
   const resultLabel = computed(() => (total.value === 1 ? 'recibo' : 'recibos'))
   const tableCaption = computed(
     () =>
-      `Recibos fixture read-only: ${firstVisible.value}-${lastVisible.value} de ${total.value} ${resultLabel.value}. Datos sanitizados con importes demo anonimizados y sin API backend.`,
+      `Recibos fixture read-only: ${firstVisible.value}-${lastVisible.value} de ${total.value} ${resultLabel.value}. Datos sanitizados sin API backend ni datos reales.`,
   )
   const canGoPrevious = computed(() => pagination.page > 1)
   const canGoNext = computed(() => pagination.page < totalPages.value)

@@ -22,6 +22,8 @@ Decision de arquitectura: iLiniumTech no es un runtime dinamico tipo AppBuilder.
 
 Actualizacion 2026-05-18: se implementa el primer contrato backend in-memory/read-only para `Recibos` con `GET /api/recibos/catalogs` y `GET /api/recibos`. Este avance no activa SQL real, datos reales, importes reales, banco, remesas, cobro, detalle, exportacion ni escrituras; sirve como base tecnica para adaptar el frontend y validar permisos propios.
 
+Actualizacion 2026-05-20: por decision humana posterior, el MVP debe avanzar con datos reales en BBDD local. Se implementa lectura SQL local real minimizada para `Recibos`, activable con `Recibos:Repository=Sql`, usando SQL parametrizado, whitelist de ordenacion, filtro `BrokerIntegracionId` y contrato sin importes reales, banco ni PII. El smoke SQL real queda `SKIPPED_ENV_MISSING` hasta que exista configuracion local fuera de Git.
+
 ## Objetivo
 
 Preparar el primer incremento funcional de `Recibos` como listado read-only minimizado, sin importes reales, sin detalle, sin cobro y sin exportacion:
@@ -32,7 +34,7 @@ Preparar el primer incremento funcional de `Recibos` como listado read-only mini
 - Permisos iniciales `recibos.catalogs` y `recibos.read`.
 - Mantener importes reales, datos bancarios, remesas, detalle, EIAC, exportacion y escrituras fuera del primer corte.
 
-Esta SDD no autoriza aun implementacion con datos reales. Antes de programar API real deben resolverse UAT, DBA, permisos, origen de lectura, minimizacion financiera/PII y revision de seguridad.
+Esta SDD autoriza solo lectura real minimizada local para el MVP. No autoriza escrituras, detalle, cobro, remesas, exportacion, importes reales ni datos bancarios. Antes de ampliar el contrato deben resolverse UAT, DBA, permisos, origen de lectura, minimizacion financiera/PII y revision de seguridad.
 
 ## Fuera de alcance
 
@@ -115,15 +117,16 @@ Regla explicita: `recibos.read` no concede importes reales. Los importes requier
 - [ ] Antes de implementar API real, producto confirma columnas y filtros del listado.
 - [ ] Antes de implementar API real, DBA confirma origen de lectura autorizado y regla por broker.
 - [ ] Seguridad confirma que el primer corte no devuelve importes reales, banco ni PII no aprobada.
-- [ ] `GET /api/recibos/catalogs` exige `recibos.catalogs`.
-- [ ] `GET /api/recibos` exige `recibos.read`.
+- [x] `GET /api/recibos/catalogs` exige `recibos.catalogs`.
+- [x] `GET /api/recibos` exige `recibos.read`.
 - [x] Primer backend in-memory/read-only implementado sin SQL real, sin importes reales y sin banco.
-- [ ] `recibos.read` no devuelve importes reales.
+- [x] Lectura SQL local real minimizada implementada como opt-in `Recibos:Repository=Sql`.
+- [x] `recibos.read` no devuelve importes reales.
+- [x] Filtros y sort fuera de whitelist devuelven error sanitizado.
+- [x] El frontend mantiene detalle, exportacion, cobro, remesas y datos bancarios bloqueados en el primer corte.
+- [x] No se guardan secretos ni datos sensibles en Git.
+- [x] No se introduce runtime AppBuilder.
 - [ ] El backend no consulta datos si falta broker o el broker no esta permitido.
-- [ ] Filtros y sort fuera de whitelist devuelven error sanitizado.
-- [ ] El frontend mantiene detalle, exportacion, cobro, remesas y datos bancarios bloqueados en el primer corte.
-- [ ] No se guardan secretos ni datos sensibles en Git.
-- [ ] No se introduce runtime AppBuilder.
 
 ## Impacto tecnico
 

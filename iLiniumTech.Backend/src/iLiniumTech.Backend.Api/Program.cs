@@ -707,7 +707,8 @@ recibos.MapGet("/catalogs", async (
     CancellationToken cancellationToken) =>
         Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
     .WithName("GetRecibosCatalogs")
-    .RequireAuthorization(RecibosAuthorizationPolicies.Catalogs);
+    .RequireAuthorization(RecibosAuthorizationPolicies.Catalogs)
+    .AddEndpointFilter(RequireRecibosExecutionContextAsync);
 
 recibos.MapGet("/", async (
     HttpContext httpContext,
@@ -747,7 +748,8 @@ recibos.MapGet("/", async (
     }
 })
 .WithName("SearchRecibos")
-.RequireAuthorization(RecibosAuthorizationPolicies.Read);
+.RequireAuthorization(RecibosAuthorizationPolicies.Read)
+.AddEndpointFilter(RequireRecibosExecutionContextAsync);
 
 clientes.MapGet("/catalogs", async (
     [FromServices] IClientesService service,
@@ -1341,6 +1343,49 @@ static async ValueTask<object?> RequireSiniestrosExecutionContextAsync(
     return await next(context);
 }
 
+static async ValueTask<object?> RequireRecibosExecutionContextAsync(
+    EndpointFilterInvocationContext context,
+    EndpointFilterDelegate next)
+{
+    var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+    var requiresExecutionContext = RequiresRecibosExecutionContext(configuration);
+    var executionContextAccessor = context.HttpContext.RequestServices
+        .GetRequiredService<IPolizasExecutionContextAccessor>();
+    PolizasExecutionContext? executionContext;
+    try
+    {
+        executionContext = executionContextAccessor.Current;
+    }
+    catch (PolizasExecutionContextException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "RECIBOS_CONTEXT_INVALID",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(context.HttpContext))));
+    }
+
+    if (executionContext is null)
+    {
+        return requiresExecutionContext
+            ? Results.BadRequest(new ErrorResponse(new ErrorBody(
+                Code: "RECIBOS_CONTEXT_REQUIRED",
+                Message: "Broker context is required for SQL recibos requests.",
+                CorrelationId: EnsureCorrelationId(context.HttpContext))))
+            : await next(context);
+    }
+
+    if (!IsBrokerAllowedForAuthenticatedContext(context.HttpContext.User, executionContext.BrokerId))
+    {
+        return ErrorResult(
+            context.HttpContext,
+            StatusCodes.Status403Forbidden,
+            "RECIBOS_BROKER_FORBIDDEN",
+            "The active broker is not available for this session.");
+    }
+
+    return await next(context);
+}
+
 static bool IsBrokerAllowedForAuthenticatedContext(ClaimsPrincipal user, int brokerId)
 {
     if (string.Equals(
@@ -1382,6 +1427,7 @@ static bool IsKnownConfigurationException(InvalidOperationException exception) =
     exception.Message.Contains("AppBuilderMaster", StringComparison.OrdinalIgnoreCase) ||
     exception.Message.Contains("Polizas SQL repository", StringComparison.OrdinalIgnoreCase) ||
     exception.Message.Contains("Clientes SQL repository", StringComparison.OrdinalIgnoreCase) ||
+    exception.Message.Contains("Recibos SQL repository", StringComparison.OrdinalIgnoreCase) ||
     exception.Message.Contains("Siniestros SQL repository", StringComparison.OrdinalIgnoreCase) ||
     exception.Message.Contains("Agenda SQL repository", StringComparison.OrdinalIgnoreCase);
 
@@ -1531,6 +1577,26 @@ static bool RequiresSiniestrosExecutionContext(IConfiguration configuration)
     return bool.TryParse(
             configuration["Siniestros:RequireExecutionContext"]
             ?? configuration["ILINIUMTECH:REQUIRE_SINIESTROS_EXECUTION_CONTEXT"],
+            out var requireExecutionContext)
+        && requireExecutionContext;
+}
+
+static bool RequiresRecibosExecutionContext(IConfiguration configuration)
+{
+    if (!string.Equals(configuration["Recibos:Repository"], "Sql", StringComparison.OrdinalIgnoreCase))
+    {
+        return false;
+    }
+
+    if (string.Equals(configuration["Recibos:ConnectionResolver"], "AppBuilderMaster", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(configuration["Polizas:ConnectionResolver"], "AppBuilderMaster", StringComparison.OrdinalIgnoreCase))
+    {
+        return true;
+    }
+
+    return bool.TryParse(
+            configuration["Recibos:RequireExecutionContext"]
+            ?? configuration["ILINIUMTECH:REQUIRE_RECIBOS_EXECUTION_CONTEXT"],
             out var requireExecutionContext)
         && requireExecutionContext;
 }

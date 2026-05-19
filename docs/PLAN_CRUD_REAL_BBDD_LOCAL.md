@@ -31,31 +31,31 @@ Cada pagina se convierte en vertical propia:
 
 ## Siguiente tarea activa
 
-ID: `T-305-RECIBOS-SQL-READONLY-LOCAL`
+ID: `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL`
 
 Estado: `READY_GUARDED`
 
-Objetivo: implementar lectura SQL local real minimizada para Recibos, sin escrituras, sin importes reales/banco/datos sensibles y con filtro broker/tenant.
+Objetivo: implementar lectura SQL local real minimizada para Suplementos, sin escrituras, sin workflows/adjuntos/importes reales/banco/datos sensibles y con filtro broker/tenant.
 
 Archivos permitidos:
 
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/sdd/specs/iLiniumTech/*recibos*`
+- `docs/sdd/specs/iLiniumTech/*suplementos*`
 - `docs/qa/*`
-- `iLiniumTech.Backend/src/**/Recibos/**`
+- `iLiniumTech.Backend/src/**/Suplementos/**`
 - `iLiniumTech.Backend/src/**/Program.cs`
 - `iLiniumTech.Backend/src/**/DependencyInjection*.cs`
-- `iLiniumTech.Backend/tests/**/Recibos*`
-- `iLiniumTech.Frontend/src/features/recibos/**`
+- `iLiniumTech.Backend/tests/**/Suplementos*`
+- `iLiniumTech.Frontend/src/features/suplementos/**`
 - `iLiniumTech.Frontend/src/services/**`
 
 Archivos prohibidos:
 
 - `.env*`, dumps, connection strings o capturas con datos reales;
 - pantallas no relacionadas;
-- escrituras reales de Recibos;
-- triggers/workflows heredados, liquidaciones, remesas, cobros, EIAC o banco;
+- escrituras reales de Suplementos;
+- triggers/workflows heredados, cambios de poliza, adjuntos, liquidaciones, remesas, cobros, EIAC o banco;
 - importes reales, documentos, contacto, direccion, banco, observaciones libres o datos sensibles en contrato publico;
 - datos personales reales en evidencias.
 
@@ -63,19 +63,19 @@ Pasos:
 
 1. Revisar `git status --short --branch`.
 2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`.
-3. Leer `docs/sdd/specs/iLiniumTech/SDD-2026-009-recibos-read-only.md`.
+3. Leer `docs/sdd/specs/iLiniumTech/SDD-2026-013-suplementos-read-only.md`.
 4. Confirmar origen SQL minimizado desde documentacion AppBuilder ya existente.
-5. Implementar repositorio SQL read-only activable con `Recibos:Repository=Sql`.
-6. Aplicar broker/tenant, parametros y whitelists; sin escrituras, importes reales, banco ni datos sensibles.
+5. Implementar repositorio SQL read-only activable con `Suplementos:Repository=Sql`.
+6. Aplicar broker/tenant, parametros y whitelists; sin escrituras, workflows, adjuntos, importes reales, banco ni datos sensibles.
 7. Conectar frontend a API si todavia usa fixture en modo backend.
 8. Ejecutar tests dirigidos y smoke SQL local si hay configuracion; si falta, documentar `SKIPPED_ENV_MISSING`.
 
 Validacion minima:
 
 ```powershell
-dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Recibos
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Suplementos
 cd .\iLiniumTech.Frontend
-npm run test:unit -- Recibos
+npm run test:unit -- Suplementos
 cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
@@ -93,8 +93,8 @@ git diff --check
 | `T-302-CLIENTES-CRUD-SDD` | `DONE` | Clientes | SDD escritura `Identidad` + `IdentidadCliente`, PII minimizada | alto |
 | `T-303-CLIENTES-CRUD-BBDD-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Clientes | API/frontend CRUD segun SDD-2026-016; update/delete solo MVP-owned | alto |
 | `T-304-SINIESTROS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Siniestros | SQL local real minimizado; escritura bloqueada por triggers/intervinientes | alto |
-| `T-305-RECIBOS-SQL-READONLY-LOCAL` | `READY_GUARDED` | Recibos | SQL local real minimizado; sin banco y sin importes reales en primer corte | alto |
-| `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `TODO` | Suplementos | SQL local real minimizado; escritura bloqueada por workflows/banco/PII | alto |
+| `T-305-RECIBOS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Recibos | SQL local real minimizado; sin banco y sin importes reales en primer corte | alto |
+| `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `READY_GUARDED` | Suplementos | SQL local real minimizado; escritura bloqueada por workflows/banco/PII | alto |
 | `T-206-PROPUESTAS-DISCOVERY` | `TODO` | Propuestas | Confirmar origen real; no usar `Solicitudes` sin UAT/DBA | alto |
 | `T-207-LIQUIDACIONES-SDD` | `TODO` | Liq.Cia/Liq.Col | SDD financiera antes de API real | critico |
 

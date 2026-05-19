@@ -1,25 +1,21 @@
-export type ReciboSituacion = 'Pendiente' | 'Cobrado' | 'Anulado'
-export type ReciboTipo = 'Prima' | 'Extorno' | 'Regularizacion'
-
 export interface ReciboListItem {
   id: string
   recibo: string
   poliza: string
   cliente: string
   compania: string
-  tipo: ReciboTipo
-  situacion: ReciboSituacion
-  efecto: string
-  vencimiento: string
-  cobro: string
+  tipo: string
+  situacion: string
+  fechaEfecto: string
+  fechaVencimiento: string
+  estadoCobro: string
   canal: string
-  importeDemo: string
 }
 
 export interface RecibosFilters {
   recibo: string
   poliza: string
-  situacion: '' | ReciboSituacion
-  tipo: '' | ReciboTipo
+  situacion: string
+  tipo: string
   vencimientoDesde: string
 }
