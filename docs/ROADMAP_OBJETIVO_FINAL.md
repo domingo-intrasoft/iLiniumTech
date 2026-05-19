@@ -20,6 +20,7 @@ Este documento es la guia canonica de calidad para llevar iLiniumTech desde el M
 - [sdd/specs/iLiniumTech/SDD-2026-011-agenda-read-only.md](sdd/specs/iLiniumTech/SDD-2026-011-agenda-read-only.md)
 - [sdd/specs/iLiniumTech/SDD-2026-012-propuestas-read-only.md](sdd/specs/iLiniumTech/SDD-2026-012-propuestas-read-only.md)
 - [sdd/specs/iLiniumTech/SDD-2026-013-suplementos-read-only.md](sdd/specs/iLiniumTech/SDD-2026-013-suplementos-read-only.md)
+- [DECISION_DATOS_REALES_LOCALES.md](DECISION_DATOS_REALES_LOCALES.md)
 
 Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadata heredada sirve para extraccion, trazabilidad, comparativa y scaffolding revisado; el producto final debe quedar como frontend Vue estatico y backend API explicita.
 
@@ -27,7 +28,7 @@ Decision no negociable: iLiniumTech no es un runtime dinamico tipo AppBuilder. L
 
 - Fase documental y decision de arquitectura: completada.
 - MVP read-only de polizas: implementado con frontend Vue, backend API, fixtures anonimizados, API key temporal y pruebas base. Desde el 2026-05-18 el objetivo MVP activo cambia a `Polizas CRUD BBDD`, con `SDD-2026-007` como guia.
-- Menu lateral y paginas estaticas protegidas: rutas Vue bajo `src/features/*` para las entradas principales del menu, con contenido read-only/fixture local o superficies bloqueadas. No equivalen a datos reales, APIs nuevas ni paridad AppBuilder. La coordinacion activa de agentes por pagina esta en [appbuilder/pages/page-agent-rollout.md](appbuilder/pages/page-agent-rollout.md).
+- Menu lateral y paginas estaticas protegidas: rutas Vue bajo `src/features/*` para las entradas principales del menu. Desde el 2026-05-19 el objetivo operativo es sustituir fixture/in-memory por datos reales locales en todas las pantallas funcionales, sin versionar secretos ni PII.
 - Autos Particulares existe como incremento tecnico anterior documentado en `SDD-2026-006`, pero queda aparcado y no es el objetivo MVP vigente. No debe ampliarse ni presentarse como objetivo principal sin nueva confirmacion funcional, SDD actualizada y UAT.
 - Repositorio SQL read-only: implementado como backend configurable, parametrizado y con whitelist; ahora debe evolucionar a escritura controlada contra BBDD local de pruebas, con permisos, transacciones, validaciones y sin versionar secretos.
 - Extractor offline de metadata: implementado en `tools/extractor/polizas-metadata` con modos `Fixture`, `DryRun` y `Live`; pendiente de validar modo `Live` contra entorno autorizado y politica final de artefactos.
@@ -146,7 +147,7 @@ Estado: implementada; mantener regresion en CI.
 
 SDD activa: [SDD-2026-007 Polizas CRUD BBDD MVP](sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md).
 
-Estado de producto actual: objetivo MVP vigente desde 2026-05-18. La pantalla de `Polizas` ya contempla CRUD controlado desde y hacia BBDD local de pruebas con evidencia API/UI. El resto de paginas del menu se abordara mediante agentes por pagina, con SDD propia y sin activar datos reales ni escrituras hasta contrato equivalente.
+Estado de producto actual: objetivo MVP vigente desde 2026-05-18. La pantalla de `Polizas` ya contempla CRUD controlado desde y hacia BBDD local de pruebas con evidencia API/UI. El resto de paginas del menu se abordara mediante agentes por pagina, con datos reales locales como objetivo por defecto. Las escrituras siguen requiriendo SDD propia, permisos, flags, transacciones, auditoria y smoke de limpieza.
 
 Hallazgos iniciales de BBDD local:
 
@@ -381,13 +382,14 @@ Siguientes pasos recomendados:
 - Implementar primero contrato de contexto y pruebas 401/403; despues retirar headers MVP de preview/produccion.
 - En el siguiente PR tecnico, documentar en evidencia QA que la API key y `demo-session` son compatibilidad temporal y completar los resultados reales de gates antes de marcar Done.
 
-### Fase 6 - Funcionalidad explicita posterior al MVP y resto de paginas
+### Fase 6 - Datos reales locales y funcionalidad explicita del resto de paginas
 
-Objetivo: anadir detalle ampliado, acciones, escrituras o workflows solo como casos de uso propios.
+Objetivo: trabajar con datos reales locales en todas las pantallas funcionales y anadir detalle ampliado, acciones, escrituras o workflows solo como casos de uso propios.
 
 DoD:
 
-- `Polizas CRUD BBDD` cerrado como MVP local con evidencia antes de abrir desarrollo del resto de paginas.
+- `Polizas CRUD BBDD` cerrado como MVP local con evidencia y usado como patron.
+- `docs/DECISION_DATOS_REALES_LOCALES.md` aplicada: no mantener fixtures como objetivo de producto.
 - Agentes por pagina creados para analizar, documentar y evolucionar cada pantalla despues de Polizas, siguiendo [appbuilder/pages/page-agent-rollout.md](appbuilder/pages/page-agent-rollout.md).
 - Cada accion nueva tiene SDD propia.
 - Se declaran datos afectados, permisos, auditoria, rollback y UAT.

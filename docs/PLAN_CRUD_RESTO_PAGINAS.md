@@ -10,20 +10,22 @@ Ultima actualizacion: 2026-05-19.
 
 El objetivo de producto desde 2026-05-19 es pasar el resto de paginas a verticales CRUD reales contra BBDD local. No se autoriza un CRUD generico ni una replica de AppBuilder runtime.
 
+Decision reforzada 2026-05-19: a partir de ahora todas las pantallas funcionales deben trabajarse con datos reales locales como objetivo por defecto. Ver [`DECISION_DATOS_REALES_LOCALES.md`](DECISION_DATOS_REALES_LOCALES.md).
+
 El plan operativo principal para este cambio es [`PLAN_CRUD_REAL_BBDD_LOCAL.md`](PLAN_CRUD_REAL_BBDD_LOCAL.md).
 
 Cada pagina debe avanzar por estos hitos:
 
 1. Analisis AppBuilder/documental suficiente.
-2. Contrato frontend mantenible: tipos, fixture sanitizado y composable local.
+2. Contrato frontend mantenible: tipos, fixture sanitizado y composable local solo como soporte de tests/offline.
 3. SDD de datos/API con campos permitidos, campos prohibidos, permisos, origen SQL y UAT.
-4. API read-only explicita con repositorio in-memory o fixture de backend.
-5. SQL read-only con whitelists, parametros, broker validado y `SESSION_CONTEXT` si aplica.
+4. API explicita con repositorio in-memory solo como transicion tecnica.
+5. SQL local real con whitelists, parametros, broker validado y `SESSION_CONTEXT` si aplica.
 6. CRUD real solo si hay decision funcional, DBA, permisos de escritura, transacciones, rollback/limpieza, auditoria y smoke local.
 
 ## Decision de alcance para esta ronda
 
-El usuario ha pedido "CRUD al resto de paginas". El analisis de jefes concluye que ninguna pagina distinta de Polizas esta lista hoy para escritura real segura:
+El usuario ha pedido "CRUD al resto de paginas" y despues ha reforzado que quiere trabajar con datos reales en local para todas las pantallas. El analisis de jefes concluye que la lectura real local debe ser prioritaria, pero ninguna pagina distinta de Polizas/Agenda esta lista hoy para escritura real segura:
 
 - `Recibos`: alto riesgo financiero/bancario; empezar por contrato fixture y despues read-only minimizado.
 - `Clientes`: PII directa; empezar por read-only minimizado sin documento/contacto/banco.
@@ -31,7 +33,7 @@ El usuario ha pedido "CRUD al resto de paginas". El analisis de jefes concluye q
 - `Agenda`: posible PII en asunto/descripcion; empezar por read-only por rango.
 - `Propuestas`: origen funcional no confirmado; no asumir que equivale a `Solicitudes`.
 - `Suplementos`: workflows, PII, banco, adjuntos e importes; empezar por read-only.
-- `Liquidaciones`, `Informes`, `Logs`, `Conectividad`, `Configuracion` y `Administracion`: requieren threat model o SDD especifica antes de datos reales.
+- `Liquidaciones`, `Informes`, `Logs`, `Conectividad`, `Configuracion` y `Administracion`: requieren threat model o SDD especifica antes de escritura o exposicion sensible.
 
 Cambio 2026-05-19: `Agenda` se selecciona como primera vertical real fuera de Polizas porque tiene tabla candidata clara (`dbo.Agenda`) y bajo acoplamiento financiero. El resto avanza por verticales acotadas, no por CRUD masivo.
 
@@ -39,7 +41,7 @@ Cambio 2026-05-19: `Agenda` se selecciona como primera vertical real fuera de Po
 
 ### Fase A - Preparacion frontend/API por pagina
 
-Objetivo: que cada pagina tenga contrato local mantenible y lista para adaptador API futuro.
+Objetivo: que cada pagina tenga contrato local mantenible y lista para adaptador API real local.
 
 1. `Recibos`: `DONE` - tipos, fixture y composable separados; sin importes reales ni banco.
 2. `Clientes`: `DONE` - tipos, fixture y composable separados; PII bloqueada.
@@ -62,9 +64,9 @@ Orden recomendado:
 5. `Propuestas`: `DONE` - `GET /api/propuestas/catalogs` y `GET /api/propuestas`, contrato recortado sin solicitante, importes, documentos ni conversion.
 6. `Suplementos`: `DONE` - `GET /api/suplementos/catalogs` y `GET /api/suplementos`, sin workflows, adjuntos, importes, banco ni escrituras.
 
-### Fase C - SQL read-only autorizado
+### Fase C - SQL real local autorizado
 
-Objetivo: conectar datos locales o UAT solo con origen confirmado, whitelists y pruebas.
+Objetivo: conectar datos locales reales con origen confirmado, whitelists y pruebas.
 
 Cada pagina debe tener:
 
@@ -94,9 +96,9 @@ Precondiciones obligatorias:
 
 La fuente de verdad pasa a [`PLAN_CRUD_REAL_BBDD_LOCAL.md`](PLAN_CRUD_REAL_BBDD_LOCAL.md).
 
-ID actual: `T-200B-AGENDA-SMOKE-SQL-LOCAL`.
+ID actual: `T-300-REALDATA-LOCAL-BASELINE`.
 
-Objetivo: ejecutar o dejar documentado como `SKIPPED_ENV_MISSING` el smoke real de Agenda contra BBDD local con secretos fuera de Git.
+Objetivo: dejar fijado el modo operativo de datos reales locales y promover el siguiente vertical real.
 
 ## Regla de avance
 

@@ -17,11 +17,13 @@ iLiniumTech no es un runtime dinamico tipo AppBuilder. La metadata heredada se u
 ## Reglas para todos los agentes
 
 - Lee `README.md`, `docs/PLAN_EJECUCION_CONTINUA_IA.md`, `docs/PLAN_MAESTRO_IA.md`, `docs/ROADMAP_OBJETIVO_FINAL.md`, `docs/DECISION_PRODUCTO_ARQUITECTURA.md` y la SDD relacionada antes de cambiar comportamiento.
+- Decision humana 2026-05-19: el desarrollo funcional debe orientarse a datos reales en BBDD local para todas las pantallas del menu. Lee `docs/DECISION_DATOS_REALES_LOCALES.md` antes de trabajar en cualquier pagina de datos.
 - No guardes secretos, connection strings reales, dumps, capturas sensibles ni datos personales reales.
 - No borres archivos ni reviertas cambios ajenos sin orden explicita.
 - No refactorices fuera del alcance de la tarea.
 - No conviertas metadata AppBuilder en contrato runtime.
 - No ejecutes SQL heredado libre ni construyas SQL estructural desde strings no revisados.
+- No uses fixtures o repositorios in-memory como objetivo funcional final; son soporte de tests, desarrollo offline o fallback temporal documentado.
 - Manten cambios pequenos, revisables y ligados a una SDD, decision o issue.
 - Documenta pruebas ejecutadas, pruebas omitidas, riesgos residuales y bloqueos externos.
 - Si hay cambios concurrentes, trabaja con ellos y no los deshagas.
@@ -43,12 +45,13 @@ Frontend:
 - Feature funcional principal actual: `src/features/polizas`.
 - `Polizas CRUD BBDD` queda como vertical MVP local de referencia, documentado en `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`.
 - Objetivo activo desde 2026-05-19: pasar paginas del menu a verticales CRUD reales contra BBDD local, una pagina cada vez, segun `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`.
-- `Siniestros`, `Recibos`, `Clientes`, `Propuestas` y `Suplementos` tienen primer backend read-only in-memory con permisos propios y contratos minimizados. No se consideran CRUD real ni datos reales.
+- Objetivo reforzado desde 2026-05-19: todas las pantallas funcionales deben trabajar con datos reales locales en cuanto se toque su vertical. Ver `docs/DECISION_DATOS_REALES_LOCALES.md`.
+- `Siniestros`, `Recibos`, `Clientes`, `Propuestas` y `Suplementos` tienen primer backend read-only in-memory con permisos propios y contratos minimizados. Es una base tecnica transitoria: la siguiente evolucion debe reemplazarla por SQL local real minimizado.
 - `Agenda CRUD BBDD` es la primera vertical fuera de Polizas. Esta documentada en `docs/sdd/specs/iLiniumTech/SDD-2026-015-agenda-crud-bbdd.md`: API + frontend CRUD MVP, permisos propios, flag `Agenda:WritesEnabled`, SQL parametrizado y filtro broker. Sigue pendiente smoke SQL local con secretos fuera de Git.
-- No activar CRUD real en paginas distintas de `Polizas` y `Agenda` sin SDD propia de escritura, origen SQL/UAT/DBA confirmado, permisos, transacciones, auditoria y smoke local.
+- No activar escrituras reales en paginas distintas de `Polizas` y `Agenda` sin SDD propia de escritura, origen SQL/UAT/DBA confirmado, permisos, transacciones, auditoria y smoke local. La lectura real local si es objetivo prioritario.
 - Para CRUD de `Polizas`, no uses `Pantalla_Polizas.Poliza` como identificador de escritura; la BBDD local muestra duplicados. El recurso SQL debe evolucionar a `dbo.Poliza.Id` y `Poliza` queda como numero visible.
 - Las escrituras de `Polizas` requieren permisos explicitos (`polizas.create`, `polizas.update`, `polizas.delete`), `Polizas:WritesEnabled`, transacciones, SQL parametrizado y evidencia local sin secretos.
-- Paginas estaticas protegidas del menu en `src/features/*`; son superficies MVP read-only y no autorizan datos reales, APIs nuevas ni acciones sin SDD.
+- Paginas estaticas protegidas del menu en `src/features/*`; son superficies MVP iniciales pendientes de migracion a datos reales locales mediante API explicita. No autorizan acciones mutantes sin SDD.
 - `src/features/autos-particulares` existe como incremento tecnico aparcado; no ampliarlo sin decision de producto, SDD actualizada y UAT/DBA.
 - Servicios compartidos en `src/services`.
 - La UI de pantallas es Vue/TypeScript mantenido como codigo fuente, no metadata runtime.
@@ -129,7 +132,7 @@ Cada PR debe incluir:
 - comandos ejecutados y resultado;
 - pruebas no ejecutadas y motivo;
 - impacto de seguridad/configuracion;
-- evidencia de que no se introducen secretos ni datos reales;
+- evidencia de que no se introducen secretos ni se versionan/exponen datos reales sensibles;
 - riesgos residuales;
 - capturas o smoke visual si cambia UI.
 

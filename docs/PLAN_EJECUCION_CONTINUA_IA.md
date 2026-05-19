@@ -25,70 +25,81 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 - Paridad visual de `/polizas` con AppBuilder publicado refinada en segundo corte: chrome demo, menu lateral compacto, buscador iconificado, grid plano y menor ruido visual.
 - Paridad de datos del grid de `Polizas` cerrada como MVP local/demo: `N. Documento`, cliente descriptivo, `Ramo` y `Riesgo/Matric.` salen del contrato API real y la logica AppBuilder queda documentada para el resto de paginas.
 - Nueva prioridad humana 2026-05-19: pasar paginas del menu a verticales CRUD reales contra BBDD local. La fuente operativa queda en `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`.
+- Nueva decision humana 2026-05-19: trabajar con datos reales locales para todas las pantallas funcionales a partir de ahora. Ver `docs/DECISION_DATOS_REALES_LOCALES.md`.
 - `Agenda CRUD BBDD` queda como primera vertical fuera de Polizas: API + frontend CRUD MVP, permisos `agenda.create/update/delete`, `Agenda:WritesEnabled`, SQL parametrizado, filtro broker y SDD propia `SDD-2026-015`. Pendiente smoke SQL local con secretos fuera de Git.
-- Paginas del menu distintas de Polizas y Agenda siguen en carril fixture/read-only o bloqueadas hasta superar sus precondiciones de SDD/API/UAT/DBA.
+- Paginas del menu distintas de Polizas y Agenda conservan base fixture/in-memory transitoria, pero la siguiente evolucion debe ir a BBDD real local minimizada.
 - `Recibos`, `Clientes`, `Agenda`, `Propuestas` y `Suplementos` ya tienen contrato frontend fixture separado en tipos/fixture/composable.
 - `Siniestros` ya tiene primer backend read-only explicito in-memory: `GET /api/siniestros/catalogs` y `GET /api/siniestros`, con permisos propios y sin SQL real.
 - `Recibos` ya tiene primer backend read-only explicito in-memory: `GET /api/recibos/catalogs` y `GET /api/recibos`, con permisos propios, sin importes reales ni banco.
 - `Clientes`, `Agenda`, `Propuestas` y `Suplementos` ya tienen backend read-only explicito in-memory con permisos propios, contratos minimizados y tests dirigidos.
 - Ronda documental por pagina completada en `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`.
 - SDD drafts existentes para `Siniestros`, `Recibos`, `Clientes`, `Agenda`, `Propuestas` y `Suplementos`.
-- No activar datos reales, APIs nuevas, escrituras, exportaciones ni permisos nuevos para paginas fixture sin SDD aprobada, contrato API, UAT/DBA y seguridad.
+- No versionar ni exponer secretos/datos reales. Activar lectura real local por vertical; activar escrituras solo con SDD, permisos, flags, transacciones, auditoria y smoke de limpieza.
 
 ## Siguiente tarea activa
 
-ID: `T-200B-AGENDA-SMOKE-SQL-LOCAL`
+ID: `T-301-CLIENTES-SQL-READONLY-LOCAL`
 
 Estado: `READY`
 
-Nombre: ejecutar smoke SQL local de Agenda CRUD o documentar entorno pendiente.
+Nombre: lectura SQL local real minimizada para Clientes.
 
 Objetivo:
 
-- Validar create-read-update-delete logico de Agenda contra BBDD local de modelo usando secretos fuera de Git.
-- Confirmar que la fila `ILMVP-AGE-*` se ve, se actualiza y desaparece tras delete logico.
-- Si no hay connection string local configurada, documentar `SKIPPED_ENV_MISSING` y promover `T-201-CLIENTES-CRUD-SDD` en `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`.
+- Implementar el primer vertical real local posterior al baseline: Clientes SQL read-only minimizado.
+- Usar BBDD local real y discovery de esquema sin imprimir datos personales ni secretos.
+- Mantener escritura de Clientes bloqueada hasta SDD de CRUD propia.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
 
 - `AGENTS.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
-- `docs/sdd/specs/iLiniumTech/SDD-2026-015-agenda-crud-bbdd.md`
-- `docs/qa/agenda-crud-bbdd-evidence.md`
+- `docs/DECISION_DATOS_REALES_LOCALES.md`
+- `docs/sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md`
 
 Archivos que puede tocar:
 
-- `docs/qa/agenda-crud-bbdd-evidence.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
+- `docs/qa/*`
+- `iLiniumTech.Backend/src/**/Clientes/**`
+- `iLiniumTech.Backend/tests/**/Clientes/**`
+- `iLiniumTech.Frontend/src/features/clientes/**`
 
 Archivos que NO debe tocar:
 
-- codigo de aplicacion salvo bug evidente bloqueante del smoke;
+- codigo de aplicacion fuera de los archivos permitidos;
 - cualquier `.env*`, config con secretos, dumps o capturas sensibles.
+- escrituras reales de Clientes.
+- pantallas no relacionadas.
 
 Pasos de implementacion:
 
 1. Revisar `git status --short --branch`.
-2. Confirmar si el proceso tiene `ConnectionStrings__AgendaModel` o `ConnectionStrings__AppBuilderMaster` y `Agenda__Repository=Sql`.
-3. Si faltan, no pedir secretos: documentar `SKIPPED_ENV_MISSING` y promover `T-201-CLIENTES-CRUD-SDD`.
-4. Si existen, arrancar backend local con `Agenda__WritesEnabled=true`.
-5. Crear evento `ILMVP-AGE-SMOKE-<timestamp>`, buscarlo, actualizarlo y borrarlo logicamente por API.
-6. Documentar evidencia sin imprimir connection strings ni datos reales.
-7. Ejecutar pruebas y auditorias indicadas.
+2. Hacer discovery local de origen Clientes sin imprimir filas reales ni connection strings.
+3. Identificar campos permitidos para listado minimizado.
+4. Implementar repositorio SQL read-only de Clientes con parametros, whitelists y filtro broker/tenant si existe.
+5. Mantener in-memory como fallback de tests/offline.
+6. Conectar frontend Clientes a API en `VITE_USE_BACKEND=true`.
+7. Documentar evidencia sanitaria.
+8. Ejecutar pruebas y auditorias indicadas.
 
 Pruebas obligatorias:
 
 ```powershell
-dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter AgendaApiTests
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Clientes
+cd .\iLiniumTech.Frontend
+npm run test:unit -- Clientes
+cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
 ```
 
 Criterios de aceptacion:
 
-- Smoke SQL Agenda completado o marcado como `SKIPPED_ENV_MISSING` sin secretos.
+- Clientes tiene lectura real local o `SKIPPED_ENV_MISSING` documentado sin secretos.
+- La siguiente IA sabe exactamente que tarea real local ejecutar.
 - La siguiente IA puede continuar sin reanalizar todo el repositorio.
 - Validaciones pasan.
 
@@ -152,12 +163,12 @@ Objetivo: activar lectura SQL minimizada solo cuando haya SDD, UAT/DBA, permisos
 
 | ID | Estado | Tarea | Precondicion |
 | --- | --- | --- |
-| `T-020-SIN-SQL-READONLY` | `BLOCKED_EXTERNAL` | Implementar SQL read-only Siniestros. | UAT columnas/filtros, DBA origen, broker/tenant, security review |
-| `T-021-REC-SQL-READONLY` | `BLOCKED_EXTERNAL` | Implementar SQL read-only Recibos. | UAT/DBA, minimizacion financiera, permisos |
-| `T-022-CLI-SQL-READONLY` | `BLOCKED_EXTERNAL` | Implementar SQL read-only Clientes. | UAT/DBA, PII, permisos |
-| `T-023-AGE-SQL-READONLY` | `BLOCKED_EXTERNAL` | Implementar SQL read-only Agenda por rango. | UAT/DBA, PII en asunto/descripcion |
-| `T-024-PRO-SQL-READONLY` | `BLOCKED_EXTERNAL` | Implementar SQL read-only Propuestas. | UAT/DBA, origen funcional, minimizacion PII/importes/documentos |
-| `T-025-SUP-SQL-READONLY` | `BLOCKED_EXTERNAL` | Implementar SQL read-only Suplementos. | UAT/DBA, PII, banco, importes, documentos, workflows |
+| `T-300-REALDATA-LOCAL-BASELINE` | `DONE` | Preparar modo operativo de datos reales locales para todas las pantallas. | decision humana 2026-05-19 |
+| `T-301-CLIENTES-SQL-READONLY-LOCAL` | `READY` | Implementar SQL local real minimizado para Clientes. | BBDD local disponible, no secretos en Git |
+| `T-304-SINIESTROS-SQL-READONLY-LOCAL` | `TODO` | Implementar SQL local real minimizado para Siniestros. | BBDD local disponible, minimizacion |
+| `T-305-RECIBOS-SQL-READONLY-LOCAL` | `TODO` | Implementar SQL local real minimizado para Recibos. | BBDD local disponible, cuidado financiero |
+| `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `TODO` | Implementar SQL local real minimizado para Suplementos. | BBDD local disponible, workflows bloqueados |
+| `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` | `TODO` | Confirmar origen real local de Propuestas y crear SQL read-only. | no asumir `Solicitudes` sin evidencia |
 
 ### Fase 4 - Auth, permisos y multi-tenant productivo
 
@@ -258,3 +269,5 @@ Gate completo:
 - 2026-05-18: `T-100`, `T-101`, `T-102`, `T-103` y `T-104` cerradas por agentes frontend con write scopes disjuntos. Recibos, Clientes, Agenda, Propuestas y Suplementos quedan separados en tipos, fixtures y composables locales; tests dirigidos OK. Se creo tambien `T-110-SINIESTROS-BE-READONLY-CONTRACT` y queda cerrado con API in-memory minimizada y tests `SiniestrosApiTests` OK. Cursor pasa a `T-120-RECIBOS-BE-READONLY-CONTRACT`.
 - 2026-05-18: `T-120-RECIBOS-BE-READONLY-CONTRACT` cerrada. Se creo API in-memory read-only de Recibos con permisos `recibos.catalogs` y `recibos.read`, sin importes reales ni banco; tests `RecibosApiTests` OK. Cursor pasa a `T-121-CLIENTES-BE-READONLY-CONTRACT`.
 - 2026-05-18: `T-121`, `T-122`, `T-123` y `T-124` cerradas. Se crearon APIs in-memory read-only de Clientes, Agenda, Propuestas y Suplementos con permisos propios y contratos minimizados; tests dirigidos `Clientes|Agenda|Propuestas|Suplementos` OK, 21 tests. Cursor pasa a `T-130-LIQCIA-SDD-READONLY`.
+- 2026-05-19: el usuario decide trabajar con datos reales locales para todas las pantallas. Se crea `docs/DECISION_DATOS_REALES_LOCALES.md`, se refuerzan `AGENTS.md`, `PLAN_CRUD_REAL_BBDD_LOCAL.md`, `PLAN_CRUD_RESTO_PAGINAS.md` y este plan. El cursor pasa a `T-300-REALDATA-LOCAL-BASELINE`.
+- 2026-05-19: `T-300-REALDATA-LOCAL-BASELINE` ejecutada como `PARTIAL`. Se detectan solo nombres de entorno `ConnectionStrings__DefaultConnection` en `Process`/`Machine`; no se imprimen valores. No se confirma configuracion SQL por vertical. Evidencia en `docs/qa/real-data-local-baseline.md`. Cursor pasa a `T-301-CLIENTES-SQL-READONLY-LOCAL`.
