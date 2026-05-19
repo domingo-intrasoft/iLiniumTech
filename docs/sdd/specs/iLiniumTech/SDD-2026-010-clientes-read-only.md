@@ -230,7 +230,7 @@ Manual/UAT:
 - La proyeccion no devuelve `NumDocumento`, email, telefono, direccion, IBAN ni datos bancarios.
 - `NombreCompleto`/`RazonSocial` se usan como alias visible solo para el MVP local de datos reales; revisar matriz PII antes de cualquier entorno no local.
 - El frontend `/clientes` consume API cuando `VITE_USE_BACKEND=true` y mantiene fixture solo en modo backend deshabilitado.
-- Las escrituras siguen fuera de alcance hasta SDD CRUD propia.
+- Las escrituras siguen fuera de alcance para esta SDD read-only. El diseno de escritura local queda separado en `SDD-2026-016-clientes-crud-bbdd.md`.
 - Evidencia: `docs/qa/clientes-sql-readonly-local-evidence.md`.
 
 ## Definicion de hecho

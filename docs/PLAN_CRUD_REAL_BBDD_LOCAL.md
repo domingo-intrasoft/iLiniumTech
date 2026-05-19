@@ -31,11 +31,11 @@ Cada pagina se convierte en vertical propia:
 
 ## Siguiente tarea activa
 
-ID: `T-302-CLIENTES-CRUD-SDD`
+ID: `T-303-CLIENTES-CRUD-BBDD-LOCAL`
 
-Estado: `READY`
+Estado: `READY_GUARDED`
 
-Objetivo: redactar SDD de CRUD real para Clientes antes de permitir escrituras sobre `Identidad` + `IdentidadCliente`, con reglas de PII, transacciones, permisos, auditoria y limpieza verificable.
+Objetivo: implementar CRUD real local de Clientes segun `SDD-2026-016`, manteniendo escrituras desactivadas por defecto y limitando update/delete a filas MVP `ILMVP-CLI-*`.
 
 Archivos permitidos:
 
@@ -43,29 +43,42 @@ Archivos permitidos:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/sdd/specs/iLiniumTech/*clientes*`
 - `docs/qa/*`
+- `iLiniumTech.Backend/src/**/Clientes/**`
+- `iLiniumTech.Backend/src/**/Program.cs`
+- `iLiniumTech.Backend/src/**/DependencyInjection*.cs`
+- `iLiniumTech.Backend/tests/**/Clientes*`
+- `iLiniumTech.Frontend/src/features/clientes/**`
+- `iLiniumTech.Frontend/src/services/**`
+- tests frontend de Clientes
 - documentacion de seguridad/ingenieria necesaria
 
 Archivos prohibidos:
 
-- escrituras reales;
 - `.env*`, dumps, connection strings o capturas con datos reales;
 - pantallas no relacionadas;
-- codigo de escritura/CRUD mutante.
+- escrituras sobre clientes historicos no `ILMVP-CLI-*`;
+- `NumDocumento`, email, telefono, direccion, banco o PII ampliada en contrato publico;
+- borrado fisico de `Identidad` o `IdentidadCliente`.
 
 Pasos:
 
 1. Revisar `git status --short --branch`.
 2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`.
-3. Leer `docs/sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md`.
-4. Crear/actualizar SDD `clientes-crud-bbdd` sin implementar codigo.
-5. Definir permisos `clientes.create`, `clientes.update`, `clientes.delete`.
-6. Definir flag `Clientes:WritesEnabled=false` por defecto.
-7. Definir transacciones y rollback/limpieza para `Identidad` + `IdentidadCliente`.
-8. Definir campos permitidos/prohibidos, minimizacion PII, auditoria y smoke local.
+3. Leer `docs/sdd/specs/iLiniumTech/SDD-2026-016-clientes-crud-bbdd.md`.
+4. Implementar permisos `clientes.create`, `clientes.update`, `clientes.delete`.
+5. Implementar flag `Clientes:WritesEnabled=false` por defecto.
+6. Implementar comandos SQL parametrizados para create/update/delete en transaccion.
+7. Asegurar que update/delete solo afectan `Identidad.IdOld LIKE 'ILMVP-CLI-%'` y no filas `ILMVP-CLI-DELETED-%`.
+8. Implementar frontend CRUD minimo con campos permitidos.
+9. Ejecutar smoke local si existe configuracion fuera de Git; si falta, dejar `SKIPPED_ENV_MISSING` sin pedir ni imprimir secretos.
 
 Validacion minima:
 
 ```powershell
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Clientes
+cd .\iLiniumTech.Frontend
+npm run test:unit -- Clientes
+cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
@@ -79,8 +92,8 @@ git diff --check
 | `T-200B-AGENDA-SMOKE-SQL-LOCAL` | `READY` | Agenda | Smoke real con BBDD local y limpieza | medio |
 | `T-300-REALDATA-LOCAL-BASELINE` | `DONE` | Todas | Baseline operativo para trabajar con BBDD real local sin secretos | medio |
 | `T-301-CLIENTES-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Clientes | SQL local real minimizado; sin banco/direccion/contacto completos | alto |
-| `T-302-CLIENTES-CRUD-SDD` | `READY` | Clientes | SDD escritura `Identidad` + `IdentidadCliente`, PII minimizada | alto |
-| `T-303-CLIENTES-CRUD-BBDD-LOCAL` | `BLOCKED` | Clientes | API/frontend CRUD tras SDD y smoke | alto |
+| `T-302-CLIENTES-CRUD-SDD` | `DONE` | Clientes | SDD escritura `Identidad` + `IdentidadCliente`, PII minimizada | alto |
+| `T-303-CLIENTES-CRUD-BBDD-LOCAL` | `READY_GUARDED` | Clientes | API/frontend CRUD segun SDD-2026-016; update/delete solo MVP-owned | alto |
 | `T-304-SINIESTROS-SQL-READONLY-LOCAL` | `TODO` | Siniestros | SQL local real minimizado; escritura bloqueada por triggers/intervinientes | alto |
 | `T-305-RECIBOS-SQL-READONLY-LOCAL` | `TODO` | Recibos | SQL local real minimizado; sin banco y con importes segun permisos | alto |
 | `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `TODO` | Suplementos | SQL local real minimizado; escritura bloqueada por workflows/banco/PII | alto |

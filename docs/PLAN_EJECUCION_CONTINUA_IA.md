@@ -38,17 +38,18 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-302-CLIENTES-CRUD-SDD`
+ID: `T-303-CLIENTES-CRUD-BBDD-LOCAL`
 
-Estado: `READY`
+Estado: `READY_GUARDED`
 
-Nombre: SDD de CRUD real para Clientes.
+Nombre: CRUD real local para Clientes.
 
 Objetivo:
 
-- Preparar la SDD que desbloquee, en una tarea posterior, CRUD real de Clientes contra BBDD local.
-- No programar todavia escrituras de Clientes.
-- Definir permisos, flags, transacciones, auditoria, minimizacion PII, rollback y smoke de limpieza.
+- Implementar API y frontend CRUD real local de Clientes segun `SDD-2026-016-clientes-crud-bbdd.md`.
+- Mantener escrituras desactivadas por defecto con `Clientes:WritesEnabled=false`.
+- Limitar update/delete a filas creadas por iLiniumTech con marcador `ILMVP-CLI-*`.
+- No tocar clientes historicos, no borrar fisicamente y no exponer documento/contacto/direccion/banco.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
 
@@ -57,6 +58,7 @@ Fuentes a leer, sin buscar mas salvo bloqueo real:
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/DECISION_DATOS_REALES_LOCALES.md`
 - `docs/sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md`
+- `docs/sdd/specs/iLiniumTech/SDD-2026-016-clientes-crud-bbdd.md`
 - `docs/qa/clientes-sql-readonly-local-evidence.md`
 
 Archivos que puede tocar:
@@ -65,28 +67,41 @@ Archivos que puede tocar:
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/sdd/specs/iLiniumTech/*clientes*`
 - `docs/qa/*`
+- `iLiniumTech.Backend/src/**/Clientes/**`
+- `iLiniumTech.Backend/src/**/Program.cs`
+- `iLiniumTech.Backend/src/**/DependencyInjection*.cs`
+- `iLiniumTech.Backend/tests/**/Clientes*`
+- `iLiniumTech.Frontend/src/features/clientes/**`
+- `iLiniumTech.Frontend/src/services/**`
 - docs de ingenieria/seguridad necesarios para CRUD Clientes
 
 Archivos que NO debe tocar:
 
 - codigo de aplicacion fuera de los archivos permitidos;
 - cualquier `.env*`, config con secretos, dumps o capturas sensibles.
-- escrituras reales de Clientes.
+- escrituras sobre clientes historicos no `ILMVP-CLI-*`.
+- `NumDocumento`, email, telefono, direccion, banco o PII ampliada en contrato publico.
+- borrado fisico de `Identidad` o `IdentidadCliente`.
 - pantallas no relacionadas.
 
 Pasos de implementacion:
 
 1. Revisar `git status --short --branch`.
-2. Crear/actualizar SDD `clientes-crud-bbdd`.
-3. Definir contrato minimo de create/update/delete para `Identidad` + `IdentidadCliente`.
-4. Definir permisos `clientes.create/update/delete` y flag `Clientes:WritesEnabled=false`.
-5. Definir transacciones, rollback, auditoria y limpieza verificable.
-6. Definir matriz de campos permitidos/prohibidos sin guardar datos reales.
-7. Actualizar evidencias/planes y dejar la siguiente tarea preparada.
+2. Implementar permisos `clientes.create`, `clientes.update`, `clientes.delete`.
+3. Implementar flag `Clientes:WritesEnabled=false` por defecto.
+4. Implementar comandos SQL parametrizados para create/update/delete en transaccion.
+5. Asegurar que update/delete solo afectan `Identidad.IdOld LIKE 'ILMVP-CLI-%'` y no filas `ILMVP-CLI-DELETED-%`.
+6. Implementar frontend CRUD minimo con campos permitidos.
+7. Ejecutar smoke local si existe configuracion fuera de Git; si falta, dejar `SKIPPED_ENV_MISSING` sin pedir ni imprimir secretos.
+8. Actualizar evidencias/planes y mover cursor si queda cerrado.
 
 Pruebas obligatorias:
 
 ```powershell
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Clientes
+cd .\iLiniumTech.Frontend
+npm run test:unit -- Clientes
+cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
@@ -94,12 +109,15 @@ git diff --check
 
 Criterios de aceptacion:
 
-- Existe SDD CRUD Clientes lista para implementacion posterior.
-- La SDD no autoriza escrituras sin flag, permisos, transacciones, auditoria y smoke local.
-- La siguiente IA sabe si pasar a implementacion CRUD Clientes o a otro vertical.
-- Validaciones documentales pasan.
+- API CRUD Clientes respeta `SDD-2026-016`.
+- `Clientes:WritesEnabled=false` bloquea create/update/delete.
+- Permisos `clientes.create/update/delete` estan probados.
+- Create/update/delete usan transacciones, SQL parametrizado y filtro broker.
+- Update/delete solo afectan filas `ILMVP-CLI-*`.
+- No hay borrado fisico ni exposicion de PII prohibida.
+- Frontend ofrece CRUD minimo solo con capacidades concedidas.
 
-Riesgo de conflicto: bajo si se respetan los archivos permitidos.
+Riesgo de conflicto: medio, porque toca backend y frontend de Clientes; no mezclar con otras paginas.
 
 ## Cola de tareas pequenas
 
@@ -161,7 +179,8 @@ Objetivo: activar lectura SQL minimizada solo cuando haya SDD, UAT/DBA, permisos
 | --- | --- | --- |
 | `T-300-REALDATA-LOCAL-BASELINE` | `DONE` | Preparar modo operativo de datos reales locales para todas las pantallas. | decision humana 2026-05-19 |
 | `T-301-CLIENTES-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Implementar SQL local real minimizado para Clientes. | BBDD local disponible, no secretos en Git |
-| `T-302-CLIENTES-CRUD-SDD` | `READY` | Definir SDD de escritura para `Identidad` + `IdentidadCliente` antes de CRUD real. | documentacion, sin codigo app |
+| `T-302-CLIENTES-CRUD-SDD` | `DONE` | Definir SDD de escritura para `Identidad` + `IdentidadCliente` antes de CRUD real. | documentacion, sin codigo app |
+| `T-303-CLIENTES-CRUD-BBDD-LOCAL` | `READY_GUARDED` | Implementar CRUD real local de Clientes segun `SDD-2026-016`; update/delete solo MVP-owned. | SDD-2026-016 |
 | `T-304-SINIESTROS-SQL-READONLY-LOCAL` | `TODO` | Implementar SQL local real minimizado para Siniestros. | BBDD local disponible, minimizacion |
 | `T-305-RECIBOS-SQL-READONLY-LOCAL` | `TODO` | Implementar SQL local real minimizado para Recibos. | BBDD local disponible, cuidado financiero |
 | `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `TODO` | Implementar SQL local real minimizado para Suplementos. | BBDD local disponible, workflows bloqueados |
@@ -269,3 +288,4 @@ Gate completo:
 - 2026-05-19: el usuario decide trabajar con datos reales locales para todas las pantallas. Se crea `docs/DECISION_DATOS_REALES_LOCALES.md`, se refuerzan `AGENTS.md`, `PLAN_CRUD_REAL_BBDD_LOCAL.md`, `PLAN_CRUD_RESTO_PAGINAS.md` y este plan. El cursor pasa a `T-300-REALDATA-LOCAL-BASELINE`.
 - 2026-05-19: `T-300-REALDATA-LOCAL-BASELINE` ejecutada como `PARTIAL`. Se detectan solo nombres de entorno `ConnectionStrings__DefaultConnection` en `Process`/`Machine`; no se imprimen valores. No se confirma configuracion SQL por vertical. Evidencia en `docs/qa/real-data-local-baseline.md`. Cursor pasa a `T-301-CLIENTES-SQL-READONLY-LOCAL`.
 - 2026-05-19: `T-301-CLIENTES-SQL-READONLY-LOCAL` cerrada como `DONE_WITH_SKIPPED_SQL_SMOKE`. Se implemento repositorio SQL read-only de Clientes sobre `IdentidadCliente` + `Identidad`, filtro por `BrokerIntegracionId`, frontend API en `VITE_USE_BACKEND=true` y tests dirigidos OK. Smoke SQL real local queda `SKIPPED_ENV_MISSING` porque no hay configuracion por vertical confirmada sin secretos en el entorno. Evidencia en `docs/qa/clientes-sql-readonly-local-evidence.md`. Cursor pasa a `T-302-CLIENTES-CRUD-SDD`.
+- 2026-05-19: `T-302-CLIENTES-CRUD-SDD` cerrada. Se creo `docs/sdd/specs/iLiniumTech/SDD-2026-016-clientes-crud-bbdd.md` con contrato CRUD, permisos, flag, transacciones, auditoria sin PII, matriz de campos, smoke y regla MVP-owned `ILMVP-CLI-*`. Validacion documental y seguridad OK. Cursor pasa a `T-303-CLIENTES-CRUD-BBDD-LOCAL`.
