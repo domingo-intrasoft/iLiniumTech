@@ -51,8 +51,25 @@ $env:Agenda__WritesEnabled = "true"
 # configurar ConnectionStrings__AgendaModel o ConnectionStrings__AppBuilderMaster fuera de Git
 ```
 
+## Actualizacion T-200B 2026-05-19
+
+Estado: `SKIPPED_ENV_MISSING`.
+
+Se revisaron solo nombres de variables, nunca valores, en ambitos `Process`, `User` y `Machine`.
+
+No se detectaron nombres compatibles con:
+
+- `Agenda__*`
+- `ConnectionStrings__Agenda*`
+- `ConnectionStrings__AppBuilderMaster`
+- `ILINIUMTECH__AGENDA*`
+- `ILINIUMTECH__APPBUILDER_MASTER*`
+- `AppBuilder__EncryptionKey`
+
+Por tanto no se ejecuta smoke real para evitar pedir, imprimir o versionar secretos. La API y frontend Agenda siguen code-ready segun esta evidencia; el smoke real debe repetirse cuando exista configuracion local fuera de Git.
+
 ## Riesgos residuales
 
 - Agenda permite delete logico solo para filas `ILMVP-AGE-*`; no hay borrado funcional historico.
 - UAT/DBA deben confirmar si `IdPrioridad` debe usar catalogos reales.
-- Clientes queda como siguiente vertical, pero requiere transaccion `Identidad` + `IdentidadCliente` y reglas PII.
+- El smoke SQL real sigue pendiente hasta configurar secretos locales.
