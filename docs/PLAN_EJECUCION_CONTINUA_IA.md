@@ -38,17 +38,17 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-301-CLIENTES-SQL-READONLY-LOCAL`
+ID: `T-302-CLIENTES-CRUD-SDD`
 
 Estado: `READY`
 
-Nombre: lectura SQL local real minimizada para Clientes.
+Nombre: SDD de CRUD real para Clientes.
 
 Objetivo:
 
-- Implementar el primer vertical real local posterior al baseline: Clientes SQL read-only minimizado.
-- Usar BBDD local real y discovery de esquema sin imprimir datos personales ni secretos.
-- Mantener escritura de Clientes bloqueada hasta SDD de CRUD propia.
+- Preparar la SDD que desbloquee, en una tarea posterior, CRUD real de Clientes contra BBDD local.
+- No programar todavia escrituras de Clientes.
+- Definir permisos, flags, transacciones, auditoria, minimizacion PII, rollback y smoke de limpieza.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
 
@@ -57,15 +57,15 @@ Fuentes a leer, sin buscar mas salvo bloqueo real:
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/DECISION_DATOS_REALES_LOCALES.md`
 - `docs/sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md`
+- `docs/qa/clientes-sql-readonly-local-evidence.md`
 
 Archivos que puede tocar:
 
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
+- `docs/sdd/specs/iLiniumTech/*clientes*`
 - `docs/qa/*`
-- `iLiniumTech.Backend/src/**/Clientes/**`
-- `iLiniumTech.Backend/tests/**/Clientes/**`
-- `iLiniumTech.Frontend/src/features/clientes/**`
+- docs de ingenieria/seguridad necesarios para CRUD Clientes
 
 Archivos que NO debe tocar:
 
@@ -77,31 +77,27 @@ Archivos que NO debe tocar:
 Pasos de implementacion:
 
 1. Revisar `git status --short --branch`.
-2. Hacer discovery local de origen Clientes sin imprimir filas reales ni connection strings.
-3. Identificar campos permitidos para listado minimizado.
-4. Implementar repositorio SQL read-only de Clientes con parametros, whitelists y filtro broker/tenant si existe.
-5. Mantener in-memory como fallback de tests/offline.
-6. Conectar frontend Clientes a API en `VITE_USE_BACKEND=true`.
-7. Documentar evidencia sanitaria.
-8. Ejecutar pruebas y auditorias indicadas.
+2. Crear/actualizar SDD `clientes-crud-bbdd`.
+3. Definir contrato minimo de create/update/delete para `Identidad` + `IdentidadCliente`.
+4. Definir permisos `clientes.create/update/delete` y flag `Clientes:WritesEnabled=false`.
+5. Definir transacciones, rollback, auditoria y limpieza verificable.
+6. Definir matriz de campos permitidos/prohibidos sin guardar datos reales.
+7. Actualizar evidencias/planes y dejar la siguiente tarea preparada.
 
 Pruebas obligatorias:
 
 ```powershell
-dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Clientes
-cd .\iLiniumTech.Frontend
-npm run test:unit -- Clientes
-cd ..
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
 ```
 
 Criterios de aceptacion:
 
-- Clientes tiene lectura real local o `SKIPPED_ENV_MISSING` documentado sin secretos.
-- La siguiente IA sabe exactamente que tarea real local ejecutar.
-- La siguiente IA puede continuar sin reanalizar todo el repositorio.
-- Validaciones pasan.
+- Existe SDD CRUD Clientes lista para implementacion posterior.
+- La SDD no autoriza escrituras sin flag, permisos, transacciones, auditoria y smoke local.
+- La siguiente IA sabe si pasar a implementacion CRUD Clientes o a otro vertical.
+- Validaciones documentales pasan.
 
 Riesgo de conflicto: bajo si se respetan los archivos permitidos.
 
@@ -164,7 +160,8 @@ Objetivo: activar lectura SQL minimizada solo cuando haya SDD, UAT/DBA, permisos
 | ID | Estado | Tarea | Precondicion |
 | --- | --- | --- |
 | `T-300-REALDATA-LOCAL-BASELINE` | `DONE` | Preparar modo operativo de datos reales locales para todas las pantallas. | decision humana 2026-05-19 |
-| `T-301-CLIENTES-SQL-READONLY-LOCAL` | `READY` | Implementar SQL local real minimizado para Clientes. | BBDD local disponible, no secretos en Git |
+| `T-301-CLIENTES-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Implementar SQL local real minimizado para Clientes. | BBDD local disponible, no secretos en Git |
+| `T-302-CLIENTES-CRUD-SDD` | `READY` | Definir SDD de escritura para `Identidad` + `IdentidadCliente` antes de CRUD real. | documentacion, sin codigo app |
 | `T-304-SINIESTROS-SQL-READONLY-LOCAL` | `TODO` | Implementar SQL local real minimizado para Siniestros. | BBDD local disponible, minimizacion |
 | `T-305-RECIBOS-SQL-READONLY-LOCAL` | `TODO` | Implementar SQL local real minimizado para Recibos. | BBDD local disponible, cuidado financiero |
 | `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `TODO` | Implementar SQL local real minimizado para Suplementos. | BBDD local disponible, workflows bloqueados |
@@ -271,3 +268,4 @@ Gate completo:
 - 2026-05-18: `T-121`, `T-122`, `T-123` y `T-124` cerradas. Se crearon APIs in-memory read-only de Clientes, Agenda, Propuestas y Suplementos con permisos propios y contratos minimizados; tests dirigidos `Clientes|Agenda|Propuestas|Suplementos` OK, 21 tests. Cursor pasa a `T-130-LIQCIA-SDD-READONLY`.
 - 2026-05-19: el usuario decide trabajar con datos reales locales para todas las pantallas. Se crea `docs/DECISION_DATOS_REALES_LOCALES.md`, se refuerzan `AGENTS.md`, `PLAN_CRUD_REAL_BBDD_LOCAL.md`, `PLAN_CRUD_RESTO_PAGINAS.md` y este plan. El cursor pasa a `T-300-REALDATA-LOCAL-BASELINE`.
 - 2026-05-19: `T-300-REALDATA-LOCAL-BASELINE` ejecutada como `PARTIAL`. Se detectan solo nombres de entorno `ConnectionStrings__DefaultConnection` en `Process`/`Machine`; no se imprimen valores. No se confirma configuracion SQL por vertical. Evidencia en `docs/qa/real-data-local-baseline.md`. Cursor pasa a `T-301-CLIENTES-SQL-READONLY-LOCAL`.
+- 2026-05-19: `T-301-CLIENTES-SQL-READONLY-LOCAL` cerrada como `DONE_WITH_SKIPPED_SQL_SMOKE`. Se implemento repositorio SQL read-only de Clientes sobre `IdentidadCliente` + `Identidad`, filtro por `BrokerIntegracionId`, frontend API en `VITE_USE_BACKEND=true` y tests dirigidos OK. Smoke SQL real local queda `SKIPPED_ENV_MISSING` porque no hay configuracion por vertical confirmada sin secretos en el entorno. Evidencia en `docs/qa/clientes-sql-readonly-local-evidence.md`. Cursor pasa a `T-302-CLIENTES-CRUD-SDD`.

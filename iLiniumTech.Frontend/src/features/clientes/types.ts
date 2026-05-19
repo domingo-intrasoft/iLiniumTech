@@ -1,6 +1,6 @@
-export type ClienteEstado = 'Activo demo' | 'En revision' | 'Bloqueado PII'
+export type ClienteEstado = string
 
-export type ClienteSegmento = 'Particular demo' | 'Empresa demo' | 'Colectivo demo'
+export type ClienteSegmento = string
 
 export interface ClienteListItem {
   id: string

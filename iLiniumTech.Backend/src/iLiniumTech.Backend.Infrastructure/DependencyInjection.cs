@@ -27,8 +27,6 @@ public static class DependencyInjection
         services.AddScoped<ISiniestrosRepository>(provider => provider.GetRequiredService<InMemorySiniestrosRepository>());
         services.AddSingleton<InMemoryRecibosRepository>();
         services.AddScoped<IRecibosRepository>(provider => provider.GetRequiredService<InMemoryRecibosRepository>());
-        services.AddSingleton<InMemoryClientesRepository>();
-        services.AddScoped<IClientesRepository>(provider => provider.GetRequiredService<InMemoryClientesRepository>());
         services.AddSingleton<InMemoryAgendaRepository>();
         services.AddScoped<IAgendaRepository>(provider => provider.GetRequiredService<InMemoryAgendaRepository>());
         services.AddScoped<IAgendaWriteRepository>(provider => provider.GetRequiredService<InMemoryAgendaRepository>());
@@ -58,6 +56,23 @@ public static class DependencyInjection
             services.AddSingleton<InMemoryPolizasRepository>();
             services.AddScoped<IPolizasRepository>(provider => provider.GetRequiredService<InMemoryPolizasRepository>());
             services.AddScoped<IPolizasWriteRepository>(provider => provider.GetRequiredService<InMemoryPolizasRepository>());
+        }
+
+        var clientesRepositoryMode = configuration["Clientes:Repository"];
+        if (string.Equals(clientesRepositoryMode, "Sql", StringComparison.OrdinalIgnoreCase))
+        {
+            services.TryAddScoped<IPolizasExecutionContextAccessor>(_ => new ConfiguredPolizasExecutionContextAccessor(configuration));
+            services.AddScoped<IClientesRepository>(provider => new SqlClientesRepository(
+                CreateConnectionStringProvider(
+                    configuration,
+                    provider.GetRequiredService<IPolizasExecutionContextAccessor>(),
+                    "Clientes"),
+                provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
+        }
+        else
+        {
+            services.AddSingleton<InMemoryClientesRepository>();
+            services.AddScoped<IClientesRepository>(provider => provider.GetRequiredService<InMemoryClientesRepository>());
         }
 
         var agendaRepositoryMode = configuration["Agenda:Repository"];

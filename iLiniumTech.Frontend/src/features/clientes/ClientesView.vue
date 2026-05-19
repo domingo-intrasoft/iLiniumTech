@@ -6,14 +6,12 @@ import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
 
 import {
-  clienteEstadoOptions,
-  clienteSegmentoOptions,
   clientesBlockedActionsDescription,
   clientesModuleActions,
   clientesPageSizeOptions,
   clientesTopBadges,
 } from './fixtures'
-import { useClientesFixture } from './useClientesFixture'
+import { useClientes } from './useClientes'
 
 const router = useRouter()
 const { session, userLabel, logout } = useAuthSession()
@@ -29,18 +27,26 @@ const {
   tableCaption,
   canGoPrevious,
   canGoNext,
+  error,
+  estadoOptions,
+  isBackendMode,
+  loading,
   searchClientes,
   clearFilters,
   changePage,
   changePageSize,
   formatDate,
-} = useClientesFixture()
+  segmentoOptions,
+} = useClientes()
 
 const sessionLabel = computed(() => {
   return session.value?.currentBrokerId ? `Broker ${session.value.currentBrokerId}` : 'Modo fixture'
 })
 
 const sessionNeedsAttention = computed(() => false)
+const topBadges = computed(() =>
+  isBackendMode ? ['Read-only', 'BBDD local', 'PII minimizada'] : clientesTopBadges,
+)
 
 async function signOut() {
   await logout()
@@ -54,7 +60,7 @@ async function signOut() {
     section-title="Clientes"
     :session-label="sessionLabel"
     :session-needs-attention="sessionNeedsAttention"
-    :top-badges="clientesTopBadges"
+    :top-badges="topBadges"
     :user-label="userLabel"
     show-sign-out
     @sign-out="signOut"
@@ -87,7 +93,10 @@ async function signOut() {
 
     <section class="runtime-strip" aria-label="Contexto de clientes">
       <span><i class="pi pi-lock" aria-hidden="true"></i> Solo lectura</span>
-      <span><i class="pi pi-database" aria-hidden="true"></i> Fixture local sin API</span>
+      <span>
+        <i class="pi pi-database" aria-hidden="true"></i>
+        {{ isBackendMode ? 'BBDD local/API' : 'Fixture local sin API' }}
+      </span>
       <span><i class="pi pi-shield" aria-hidden="true"></i> Datos minimizados</span>
       <span><i class="pi pi-ban" aria-hidden="true"></i> PII bloqueada</span>
       <span><i class="pi pi-sitemap" aria-hidden="true"></i> Tabs relacionadas pendientes</span>
@@ -133,7 +142,7 @@ async function signOut() {
       <div class="criteria-card">
         <section class="filter-section">
           <div class="filter-section-title">
-            <h2>Busqueda local minimizada</h2>
+            <h2>Busqueda minimizada</h2>
             <i class="pi pi-minus" aria-hidden="true"></i>
           </div>
 
@@ -167,7 +176,7 @@ async function signOut() {
                   aria-label="Estado"
                 >
                   <option value=""></option>
-                  <option v-for="estado in clienteEstadoOptions" :key="estado">
+                  <option v-for="estado in estadoOptions" :key="estado">
                     {{ estado }}
                   </option>
                 </select>
@@ -191,7 +200,7 @@ async function signOut() {
                   aria-label="Segmento"
                 >
                   <option value=""></option>
-                  <option v-for="segmento in clienteSegmentoOptions" :key="segmento">
+                  <option v-for="segmento in segmentoOptions" :key="segmento">
                     {{ segmento }}
                   </option>
                 </select>
@@ -266,11 +275,33 @@ async function signOut() {
         <span>{{ firstVisible }}-{{ lastVisible }} visibles</span>
       </div>
 
-      <div v-if="pagedItems.length === 0" class="state state-box empty" role="status">
+      <div v-if="loading" class="state state-box empty" role="status">
+        <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+        <div>
+          <strong>Cargando</strong>
+          <p>Consultando clientes.</p>
+        </div>
+      </div>
+
+      <div v-else-if="error" class="state state-box empty" role="alert">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        <div>
+          <strong>Error</strong>
+          <p>{{ error }}</p>
+        </div>
+      </div>
+
+      <div v-else-if="pagedItems.length === 0" class="state state-box empty" role="status">
         <i class="pi pi-inbox" aria-hidden="true"></i>
         <div>
           <strong>Sin resultados</strong>
-          <p>No hay clientes fixture para los filtros actuales.</p>
+          <p>
+            {{
+              isBackendMode
+                ? 'No hay clientes para los filtros actuales.'
+                : 'No hay clientes fixture para los filtros actuales.'
+            }}
+          </p>
         </div>
       </div>
 

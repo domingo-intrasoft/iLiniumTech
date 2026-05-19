@@ -222,6 +222,17 @@ Manual/UAT:
 - Este corte no desbloquea datos reales; SQL y CRUD siguen bloqueados hasta UAT/DBA/security review y SDD de escritura si aplica.
 - Tests dirigidos `ClientesApiTests`: OK.
 
+## Actualizacion de implementacion 2026-05-19
+
+- Por decision humana posterior, el desarrollo funcional debe orientarse a datos reales en BBDD local.
+- Implementado repositorio SQL read-only activable con `Clientes:Repository=Sql`.
+- Origen SQL del listado: `IdentidadCliente` + `Identidad`, con `Identidad.BrokerIntegracionId` como filtro de broker.
+- La proyeccion no devuelve `NumDocumento`, email, telefono, direccion, IBAN ni datos bancarios.
+- `NombreCompleto`/`RazonSocial` se usan como alias visible solo para el MVP local de datos reales; revisar matriz PII antes de cualquier entorno no local.
+- El frontend `/clientes` consume API cuando `VITE_USE_BACKEND=true` y mantiene fixture solo en modo backend deshabilitado.
+- Las escrituras siguen fuera de alcance hasta SDD CRUD propia.
+- Evidencia: `docs/qa/clientes-sql-readonly-local-evidence.md`.
+
 ## Definicion de hecho
 
 - [ ] SDD revisada por producto, backend/datos, frontend y seguridad.

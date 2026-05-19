@@ -31,20 +31,19 @@ Cada pagina se convierte en vertical propia:
 
 ## Siguiente tarea activa
 
-ID: `T-301-CLIENTES-SQL-READONLY-LOCAL`
+ID: `T-302-CLIENTES-CRUD-SDD`
 
 Estado: `READY`
 
-Objetivo: implementar lectura SQL local real minimizada para Clientes, usando `Identidad` + `IdentidadCliente` u origen real confirmado por discovery local, sin versionar secretos ni exponer PII.
+Objetivo: redactar SDD de CRUD real para Clientes antes de permitir escrituras sobre `Identidad` + `IdentidadCliente`, con reglas de PII, transacciones, permisos, auditoria y limpieza verificable.
 
 Archivos permitidos:
 
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
+- `docs/sdd/specs/iLiniumTech/*clientes*`
 - `docs/qa/*`
-- documentacion SDD necesaria
-- backend/clientes si se implementa vertical
-- frontend/clientes si se conecta el adaptador API
+- documentacion de seguridad/ingenieria necesaria
 
 Archivos prohibidos:
 
@@ -58,19 +57,16 @@ Pasos:
 1. Revisar `git status --short --branch`.
 2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`.
 3. Leer `docs/sdd/specs/iLiniumTech/SDD-2026-010-clientes-read-only.md`.
-4. Hacer discovery local de tablas/vistas de Clientes sin imprimir datos personales ni valores de connection string.
-5. Definir DTO/API SQL minimizado con campos permitidos para listado.
-6. Implementar repositorio SQL read-only parametrizado y whitelisted para Clientes.
-7. Conectar frontend Clientes al API cuando `VITE_USE_BACKEND=true`.
-8. Documentar evidencia sin datos personales.
+4. Crear/actualizar SDD `clientes-crud-bbdd` sin implementar codigo.
+5. Definir permisos `clientes.create`, `clientes.update`, `clientes.delete`.
+6. Definir flag `Clientes:WritesEnabled=false` por defecto.
+7. Definir transacciones y rollback/limpieza para `Identidad` + `IdentidadCliente`.
+8. Definir campos permitidos/prohibidos, minimizacion PII, auditoria y smoke local.
 
 Validacion minima:
 
 ```powershell
-dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Clientes
-cd .\iLiniumTech.Frontend
-npm run test:unit -- Clientes
-cd ..
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
 ```
@@ -82,8 +78,8 @@ git diff --check
 | `T-200-AGENDA-CRUD-BBDD-LOCAL` | `CODE_READY` | Agenda | API + frontend CRUD MVP; pendiente smoke SQL local | medio por PII en asunto |
 | `T-200B-AGENDA-SMOKE-SQL-LOCAL` | `READY` | Agenda | Smoke real con BBDD local y limpieza | medio |
 | `T-300-REALDATA-LOCAL-BASELINE` | `DONE` | Todas | Baseline operativo para trabajar con BBDD real local sin secretos | medio |
-| `T-301-CLIENTES-SQL-READONLY-LOCAL` | `READY` | Clientes | SQL local real minimizado; sin banco/direccion/contacto completos | alto |
-| `T-302-CLIENTES-CRUD-SDD` | `TODO` | Clientes | SDD escritura `Identidad` + `IdentidadCliente`, PII minimizada | alto |
+| `T-301-CLIENTES-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Clientes | SQL local real minimizado; sin banco/direccion/contacto completos | alto |
+| `T-302-CLIENTES-CRUD-SDD` | `READY` | Clientes | SDD escritura `Identidad` + `IdentidadCliente`, PII minimizada | alto |
 | `T-303-CLIENTES-CRUD-BBDD-LOCAL` | `BLOCKED` | Clientes | API/frontend CRUD tras SDD y smoke | alto |
 | `T-304-SINIESTROS-SQL-READONLY-LOCAL` | `TODO` | Siniestros | SQL local real minimizado; escritura bloqueada por triggers/intervinientes | alto |
 | `T-305-RECIBOS-SQL-READONLY-LOCAL` | `TODO` | Recibos | SQL local real minimizado; sin banco y con importes segun permisos | alto |

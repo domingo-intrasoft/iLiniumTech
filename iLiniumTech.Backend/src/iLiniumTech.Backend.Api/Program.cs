@@ -746,7 +746,8 @@ clientes.MapGet("/catalogs", async (
     CancellationToken cancellationToken) =>
         Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
     .WithName("GetClientesCatalogs")
-    .RequireAuthorization(ClientesAuthorizationPolicies.Catalogs);
+    .RequireAuthorization(ClientesAuthorizationPolicies.Catalogs)
+    .AddEndpointFilter(RequireClientesExecutionContextAsync);
 
 clientes.MapGet("/", async (
     HttpContext httpContext,
@@ -784,7 +785,8 @@ clientes.MapGet("/", async (
     }
 })
 .WithName("SearchClientes")
-.RequireAuthorization(ClientesAuthorizationPolicies.Read);
+.RequireAuthorization(ClientesAuthorizationPolicies.Read)
+.AddEndpointFilter(RequireClientesExecutionContextAsync);
 
 agenda.MapGet("/catalogs", async (
     [FromServices] IAgendaService service,
@@ -1158,6 +1160,49 @@ static async ValueTask<object?> RequireAgendaExecutionContextAsync(
     return await next(context);
 }
 
+static async ValueTask<object?> RequireClientesExecutionContextAsync(
+    EndpointFilterInvocationContext context,
+    EndpointFilterDelegate next)
+{
+    var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+    var requiresExecutionContext = RequiresClientesExecutionContext(configuration);
+    var executionContextAccessor = context.HttpContext.RequestServices
+        .GetRequiredService<IPolizasExecutionContextAccessor>();
+    PolizasExecutionContext? executionContext;
+    try
+    {
+        executionContext = executionContextAccessor.Current;
+    }
+    catch (PolizasExecutionContextException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "CLIENTES_CONTEXT_INVALID",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(context.HttpContext))));
+    }
+
+    if (executionContext is null)
+    {
+        return requiresExecutionContext
+            ? Results.BadRequest(new ErrorResponse(new ErrorBody(
+                Code: "CLIENTES_CONTEXT_REQUIRED",
+                Message: "Broker context is required for SQL clientes requests.",
+                CorrelationId: EnsureCorrelationId(context.HttpContext))))
+            : await next(context);
+    }
+
+    if (!IsBrokerAllowedForAuthenticatedContext(context.HttpContext.User, executionContext.BrokerId))
+    {
+        return ErrorResult(
+            context.HttpContext,
+            StatusCodes.Status403Forbidden,
+            "CLIENTES_BROKER_FORBIDDEN",
+            "The active broker is not available for this session.");
+    }
+
+    return await next(context);
+}
+
 static bool IsBrokerAllowedForAuthenticatedContext(ClaimsPrincipal user, int brokerId)
 {
     if (string.Equals(
@@ -1292,6 +1337,26 @@ static bool RequiresAgendaExecutionContext(IConfiguration configuration)
     return bool.TryParse(
             configuration["Agenda:RequireExecutionContext"]
             ?? configuration["ILINIUMTECH:REQUIRE_AGENDA_EXECUTION_CONTEXT"],
+            out var requireExecutionContext)
+        && requireExecutionContext;
+}
+
+static bool RequiresClientesExecutionContext(IConfiguration configuration)
+{
+    if (!string.Equals(configuration["Clientes:Repository"], "Sql", StringComparison.OrdinalIgnoreCase))
+    {
+        return false;
+    }
+
+    if (string.Equals(configuration["Clientes:ConnectionResolver"], "AppBuilderMaster", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(configuration["Polizas:ConnectionResolver"], "AppBuilderMaster", StringComparison.OrdinalIgnoreCase))
+    {
+        return true;
+    }
+
+    return bool.TryParse(
+            configuration["Clientes:RequireExecutionContext"]
+            ?? configuration["ILINIUMTECH:REQUIRE_CLIENTES_EXECUTION_CONTEXT"],
             out var requireExecutionContext)
         && requireExecutionContext;
 }
