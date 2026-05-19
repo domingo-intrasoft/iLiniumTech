@@ -1,15 +1,17 @@
+using System.Globalization;
 using iLiniumTech.Backend.Application.Agenda;
 using iLiniumTech.Backend.Domain.Agenda;
 using iLiniumTech.Backend.Domain.Polizas;
 
 namespace iLiniumTech.Backend.Infrastructure.Agenda;
 
-public sealed class InMemoryAgendaRepository : IAgendaRepository
+public sealed class InMemoryAgendaRepository : IAgendaRepository, IAgendaWriteRepository
 {
-    private static readonly IReadOnlyList<AgendaEventListItem> Items =
+    private readonly object _lock = new();
+    private readonly List<AgendaEventListItem> _items =
     [
         new(
-            Id: "AGE-MVP-1001",
+            Id: "1001",
             Referencia: "AGE-2026-0001",
             Titulo: "Revision demo de documentacion",
             Inicio: new DateTime(2026, 5, 18, 9, 30, 0),
@@ -19,7 +21,7 @@ public sealed class InMemoryAgendaRepository : IAgendaRepository
             Origen: "Fixture local",
             ObjetoRelacionadoTipo: "Poliza demo"),
         new(
-            Id: "AGE-MVP-1002",
+            Id: "1002",
             Referencia: "AGE-2026-0002",
             Titulo: "Seguimiento demo de tramite",
             Inicio: new DateTime(2026, 5, 21, 12, 0, 0),
@@ -29,7 +31,7 @@ public sealed class InMemoryAgendaRepository : IAgendaRepository
             Origen: "Fixture local",
             ObjetoRelacionadoTipo: "Siniestro demo"),
         new(
-            Id: "AGE-MVP-1003",
+            Id: "1003",
             Referencia: "AGE-2026-0003",
             Titulo: "Cierre demo de tarea interna",
             Inicio: new DateTime(2026, 5, 24, 16, 0, 0),
@@ -39,7 +41,7 @@ public sealed class InMemoryAgendaRepository : IAgendaRepository
             Origen: "Fixture local",
             ObjetoRelacionadoTipo: "Recibo demo"),
         new(
-            Id: "AGE-MVP-1004",
+            Id: "1004",
             Referencia: "AGE-2026-0004",
             Titulo: "Control demo de agenda semanal",
             Inicio: new DateTime(2026, 6, 2, 11, 15, 0),
@@ -60,7 +62,17 @@ public sealed class InMemoryAgendaRepository : IAgendaRepository
         AgendaSort sort,
         CancellationToken cancellationToken)
     {
-        var query = Items.AsEnumerable();
+        AgendaEventListItem[] snapshot;
+        lock (_lock)
+        {
+            snapshot = [.. _items];
+        }
+
+        var query = snapshot
+            .Where(item => !item.Referencia.StartsWith(
+                AgendaMvpWriteDefaults.DeletedReferenciaPrefix,
+                StringComparison.OrdinalIgnoreCase))
+            .AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(request.Texto))
         {
@@ -107,6 +119,77 @@ public sealed class InMemoryAgendaRepository : IAgendaRepository
 
     public Task<AgendaCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
         Task.FromResult(Catalogs);
+
+    public Task<AgendaCreateResult> CreateAsync(AgendaCreateRequest request, CancellationToken cancellationToken)
+    {
+        lock (_lock)
+        {
+            var nextId = _items.Count == 0
+                ? 1001
+                : _items
+                    .Select(item => int.TryParse(item.Id, out var id) ? id : 0)
+                    .DefaultIfEmpty(1000)
+                    .Max() + 1;
+            var id = nextId.ToString(CultureInfo.InvariantCulture);
+            _items.Add(new AgendaEventListItem(
+                Id: id,
+                Referencia: request.Referencia!.Trim(),
+                Titulo: request.Titulo!.Trim(),
+                Inicio: request.Inicio!.Value,
+                Fin: request.Fin,
+                Estado: "Programado",
+                Prioridad: request.Prioridad?.Trim() ?? "Media",
+                Origen: "Fixture local",
+                ObjetoRelacionadoTipo: request.ObjetoRelacionadoTipo?.Trim() ?? "Generico demo"));
+
+            return Task.FromResult(new AgendaCreateResult(id));
+        }
+    }
+
+    public Task<bool> UpdateAsync(string id, AgendaUpdateRequest request, CancellationToken cancellationToken)
+    {
+        lock (_lock)
+        {
+            var index = _items.FindIndex(item => string.Equals(item.Id, id, StringComparison.OrdinalIgnoreCase));
+            if (index < 0)
+            {
+                return Task.FromResult(false);
+            }
+
+            var current = _items[index];
+            _items[index] = current with
+            {
+                Titulo = request.Titulo?.Trim() ?? current.Titulo,
+                Inicio = request.Inicio ?? current.Inicio,
+                Fin = request.Fin ?? current.Fin,
+                Prioridad = request.Prioridad?.Trim() ?? current.Prioridad,
+                ObjetoRelacionadoTipo = request.ObjetoRelacionadoTipo?.Trim() ?? current.ObjetoRelacionadoTipo
+            };
+
+            return Task.FromResult(true);
+        }
+    }
+
+    public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken)
+    {
+        lock (_lock)
+        {
+            var index = _items.FindIndex(item => string.Equals(item.Id, id, StringComparison.OrdinalIgnoreCase));
+            if (index < 0)
+            {
+                return Task.FromResult(false);
+            }
+
+            var current = _items[index];
+            _items[index] = current with
+            {
+                Referencia = $"{AgendaMvpWriteDefaults.DeletedReferenciaPrefix}{current.Id}",
+                Estado = "Cerrado"
+            };
+
+            return Task.FromResult(true);
+        }
+    }
 
     private static IEnumerable<AgendaEventListItem> ApplySort(IEnumerable<AgendaEventListItem> query, AgendaSort sort)
     {

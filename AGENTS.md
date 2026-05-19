@@ -42,9 +42,10 @@ Frontend:
 - Proyecto en `iLiniumTech.Frontend`.
 - Feature funcional principal actual: `src/features/polizas`.
 - `Polizas CRUD BBDD` queda como vertical MVP local de referencia, documentado en `docs/sdd/specs/iLiniumTech/SDD-2026-007-polizas-crud-bbdd.md`.
-- Objetivo activo posterior desde 2026-05-18: evolucionar el resto de paginas del menu hacia API explicita y CRUD por fases segun `docs/PLAN_CRUD_RESTO_PAGINAS.md`.
-- `Siniestros`, `Recibos`, `Clientes`, `Agenda`, `Propuestas` y `Suplementos` tienen primer backend read-only in-memory con permisos propios y contratos minimizados. No se consideran CRUD real ni datos reales.
-- No activar CRUD real en paginas distintas de `Polizas` sin SDD propia de escritura, origen SQL/UAT/DBA confirmado, permisos, transacciones, auditoria y smoke local. La primera fase prepara contratos frontend/API read-only pagina por pagina.
+- Objetivo activo desde 2026-05-19: pasar paginas del menu a verticales CRUD reales contra BBDD local, una pagina cada vez, segun `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`.
+- `Siniestros`, `Recibos`, `Clientes`, `Propuestas` y `Suplementos` tienen primer backend read-only in-memory con permisos propios y contratos minimizados. No se consideran CRUD real ni datos reales.
+- `Agenda CRUD BBDD` es la primera vertical fuera de Polizas. Esta documentada en `docs/sdd/specs/iLiniumTech/SDD-2026-015-agenda-crud-bbdd.md`: API + frontend CRUD MVP, permisos propios, flag `Agenda:WritesEnabled`, SQL parametrizado y filtro broker. Sigue pendiente smoke SQL local con secretos fuera de Git.
+- No activar CRUD real en paginas distintas de `Polizas` y `Agenda` sin SDD propia de escritura, origen SQL/UAT/DBA confirmado, permisos, transacciones, auditoria y smoke local.
 - Para CRUD de `Polizas`, no uses `Pantalla_Polizas.Poliza` como identificador de escritura; la BBDD local muestra duplicados. El recurso SQL debe evolucionar a `dbo.Poliza.Id` y `Poliza` queda como numero visible.
 - Las escrituras de `Polizas` requieren permisos explicitos (`polizas.create`, `polizas.update`, `polizas.delete`), `Polizas:WritesEnabled`, transacciones, SQL parametrizado y evidencia local sin secretos.
 - Paginas estaticas protegidas del menu en `src/features/*`; son superficies MVP read-only y no autorizan datos reales, APIs nuevas ni acciones sin SDD.

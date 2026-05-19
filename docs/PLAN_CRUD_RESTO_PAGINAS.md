@@ -4,11 +4,13 @@ Fecha base: 2026-05-18
 
 Estado: plan de rollout para evolucionar las paginas del menu despues de `Polizas CRUD BBDD`.
 
-Ultima actualizacion: 2026-05-18.
+Ultima actualizacion: 2026-05-19.
 
 ## Regla principal
 
-El objetivo de producto es que el resto de paginas evolucionen hacia API explicita y, cuando proceda, CRUD real. No se autoriza un CRUD generico ni una replica de AppBuilder runtime.
+El objetivo de producto desde 2026-05-19 es pasar el resto de paginas a verticales CRUD reales contra BBDD local. No se autoriza un CRUD generico ni una replica de AppBuilder runtime.
+
+El plan operativo principal para este cambio es [`PLAN_CRUD_REAL_BBDD_LOCAL.md`](PLAN_CRUD_REAL_BBDD_LOCAL.md).
 
 Cada pagina debe avanzar por estos hitos:
 
@@ -31,7 +33,7 @@ El usuario ha pedido "CRUD al resto de paginas". El analisis de jefes concluye q
 - `Suplementos`: workflows, PII, banco, adjuntos e importes; empezar por read-only.
 - `Liquidaciones`, `Informes`, `Logs`, `Conectividad`, `Configuracion` y `Administracion`: requieren threat model o SDD especifica antes de datos reales.
 
-Por tanto, la primera fase del objetivo CRUD es preparar cada pagina para API explicita sin activar escrituras. La escritura se desbloquea por pagina cuando supere los criterios anteriores.
+Cambio 2026-05-19: `Agenda` se selecciona como primera vertical real fuera de Polizas porque tiene tabla candidata clara (`dbo.Agenda`) y bajo acoplamiento financiero. El resto avanza por verticales acotadas, no por CRUD masivo.
 
 ## Orden de trabajo
 
@@ -90,40 +92,11 @@ Precondiciones obligatorias:
 
 ## Siguiente tarea activa
 
-ID: `T-130-LIQCIA-SDD-READONLY`
+La fuente de verdad pasa a [`PLAN_CRUD_REAL_BBDD_LOCAL.md`](PLAN_CRUD_REAL_BBDD_LOCAL.md).
 
-Nombre: preparar SDD/readiness de `Liq.Cia` antes de cualquier API o dato real.
+ID actual: `T-200B-AGENDA-SMOKE-SQL-LOCAL`.
 
-Alcance:
-
-- Analizar solo documentacion existente y menu para `Liq.Cia`.
-- Definir alcance read-only, campos prohibidos financieros, permisos candidatos y bloqueos UAT/DBA/security.
-- No crear backend, frontend, SQL, exportaciones, importes reales ni escrituras.
-
-Archivos permitidos:
-
-- `docs/sdd/specs/iLiniumTech/**`
-- `docs/appbuilder/pages/**`
-- `docs/qa/**`
-- `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/PLAN_CRUD_RESTO_PAGINAS.md`
-
-Archivos prohibidos:
-
-- `iLiniumTech.Backend/**`
-- `iLiniumTech.Frontend/**`
-- `iLiniumTech.Frontend/src/services/**`
-- `iLiniumTech.Frontend/src/router/**`
-- `iLiniumTech.Frontend/src/layout/**`
-- cualquier `.env*`, secreto, dump o captura sensible.
-
-Pruebas:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
-git diff --check
-```
+Objetivo: ejecutar o dejar documentado como `SKIPPED_ENV_MISSING` el smoke real de Agenda contra BBDD local con secretos fuera de Git.
 
 ## Regla de avance
 
@@ -132,4 +105,4 @@ Cuando una tarea se cierre:
 1. Actualizar evidencia QA.
 2. Actualizar `docs/PLAN_EJECUCION_CONTINUA_IA.md`.
 3. Promover la siguiente tarea pequena.
-4. No saltar a SQL o escritura si faltan SDD/UAT/DBA/security review.
+4. No saltar a escritura masiva en paginas de alto riesgo; cada vertical necesita SDD y evidencia.

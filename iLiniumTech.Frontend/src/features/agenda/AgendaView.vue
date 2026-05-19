@@ -6,7 +6,7 @@ import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
 
 import { blockedActionsDescription, moduleActions, pageSizeOptions, topBadges } from './fixtures'
-import { useAgendaFixture } from './useAgendaFixture'
+import { useAgenda } from './useAgenda'
 
 const router = useRouter()
 const { session, userLabel, logout } = useAuthSession()
@@ -16,10 +16,15 @@ const {
   changePage,
   changePageSize,
   clearFilters,
+  createMvpEvent,
+  deleteMvpEvent,
   draftFilters,
+  error,
   firstVisible,
   formatDate,
+  isBackendMode,
   lastVisible,
+  loading,
   pagedItems,
   pagination,
   resultLabel,
@@ -27,7 +32,8 @@ const {
   tableCaption,
   total,
   totalPages,
-} = useAgendaFixture()
+  updateMvpEvent,
+} = useAgenda()
 
 const sessionLabel = computed(() => {
   return session.value?.currentBrokerId ? `Broker ${session.value.currentBrokerId}` : 'Modo fixture'
@@ -79,12 +85,23 @@ async function signOut() {
     </div>
 
     <section class="runtime-strip" aria-label="Contexto de agenda">
-      <span><i class="pi pi-lock" aria-hidden="true"></i> Solo lectura</span>
-      <span><i class="pi pi-database" aria-hidden="true"></i> Fixture local sin API</span>
+      <span
+        ><i :class="isBackendMode ? 'pi pi-unlock' : 'pi pi-lock'" aria-hidden="true"></i>
+        {{ isBackendMode ? 'CRUD local' : 'Solo lectura' }}</span
+      >
+      <span
+        ><i class="pi pi-database" aria-hidden="true"></i>
+        {{ isBackendMode ? 'API/BBDD local' : 'Fixture local sin API' }}</span
+      >
       <span><i class="pi pi-calendar" aria-hidden="true"></i> Sin calendario dinamico</span>
       <span><i class="pi pi-shield" aria-hidden="true"></i> PII/asuntos sensibles bloqueados</span>
       <span
-        ><i class="pi pi-ban" aria-hidden="true"></i> Crear, reprogramar y exportar bloqueados</span
+        ><i class="pi pi-ban" aria-hidden="true"></i>
+        {{
+          isBackendMode
+            ? 'Detalle, exportar y workflows bloqueados'
+            : 'Crear, reprogramar y exportar bloqueados'
+        }}</span
       >
     </section>
 
@@ -109,7 +126,12 @@ async function signOut() {
             <i class="pi pi-trash" aria-hidden="true"></i>
             Limpiar Filtros
           </button>
-          <button type="button" aria-describedby="agenda-blocked-actions" disabled>
+          <button
+            type="button"
+            :aria-describedby="isBackendMode ? undefined : 'agenda-blocked-actions'"
+            :disabled="!isBackendMode || loading"
+            @click="createMvpEvent"
+          >
             <i class="pi pi-plus" aria-hidden="true"></i>
             Crear
           </button>
@@ -257,7 +279,23 @@ async function signOut() {
         <span>{{ firstVisible }}-{{ lastVisible }} visibles</span>
       </div>
 
-      <div v-if="pagedItems.length === 0" class="state state-box empty" role="status">
+      <div v-if="error" class="state state-box empty" role="alert">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        <div>
+          <strong>No disponible</strong>
+          <p>{{ error }}</p>
+        </div>
+      </div>
+
+      <div v-else-if="loading" class="state state-box empty" role="status">
+        <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+        <div>
+          <strong>Cargando</strong>
+          <p>Consultando Agenda.</p>
+        </div>
+      </div>
+
+      <div v-else-if="pagedItems.length === 0" class="state state-box empty" role="status">
         <i class="pi pi-inbox" aria-hidden="true"></i>
         <div>
           <strong>Sin resultados</strong>
@@ -284,16 +322,32 @@ async function signOut() {
           <tbody>
             <tr v-for="item in pagedItems" :key="item.id">
               <td>
-                <button
-                  class="table-icon-action"
-                  type="button"
-                  :aria-label="`Desglose bloqueado para agenda ${item.referencia}`"
-                  aria-describedby="agenda-blocked-actions"
-                  title="Desglose pendiente de SDD/API"
-                  disabled
-                >
-                  <i class="pi pi-eye-slash" aria-hidden="true"></i>
-                </button>
+                <div class="row-actions">
+                  <button
+                    class="table-icon-action"
+                    type="button"
+                    :aria-label="`Editar agenda ${item.referencia}`"
+                    :aria-describedby="isBackendMode ? undefined : 'agenda-blocked-actions'"
+                    :title="
+                      isBackendMode ? 'Actualizar evento MVP' : 'Edicion pendiente de backend'
+                    "
+                    :disabled="!isBackendMode || loading"
+                    @click="updateMvpEvent(item)"
+                  >
+                    <i class="pi pi-pencil" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    class="table-icon-action"
+                    type="button"
+                    :aria-label="`Eliminar agenda ${item.referencia}`"
+                    :aria-describedby="isBackendMode ? undefined : 'agenda-blocked-actions'"
+                    :title="isBackendMode ? 'Eliminar evento MVP' : 'Baja pendiente de backend'"
+                    :disabled="!isBackendMode || loading"
+                    @click="deleteMvpEvent(item)"
+                  >
+                    <i class="pi pi-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
               </td>
               <td>
                 <strong class="table-strong">{{ item.referencia }}</strong>

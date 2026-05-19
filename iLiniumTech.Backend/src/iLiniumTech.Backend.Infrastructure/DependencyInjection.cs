@@ -31,6 +31,7 @@ public static class DependencyInjection
         services.AddScoped<IClientesRepository>(provider => provider.GetRequiredService<InMemoryClientesRepository>());
         services.AddSingleton<InMemoryAgendaRepository>();
         services.AddScoped<IAgendaRepository>(provider => provider.GetRequiredService<InMemoryAgendaRepository>());
+        services.AddScoped<IAgendaWriteRepository>(provider => provider.GetRequiredService<InMemoryAgendaRepository>());
         services.AddSingleton<InMemoryPropuestasRepository>();
         services.AddScoped<IPropuestasRepository>(provider => provider.GetRequiredService<InMemoryPropuestasRepository>());
         services.AddSingleton<InMemorySuplementosRepository>();
@@ -41,27 +42,52 @@ public static class DependencyInjection
         {
             services.TryAddScoped<IPolizasExecutionContextAccessor>(_ => new ConfiguredPolizasExecutionContextAccessor(configuration));
             services.AddScoped<IPolizasConnectionStringProvider>(provider =>
-                CreateConnectionStringProvider(configuration, provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
+                CreateConnectionStringProvider(
+                    configuration,
+                    provider.GetRequiredService<IPolizasExecutionContextAccessor>(),
+                    "Polizas"));
             services.AddScoped<IPolizasRepository>(provider => new SqlPolizasRepository(
                 provider.GetRequiredService<IPolizasConnectionStringProvider>(),
                 provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
             services.AddScoped<IPolizasWriteRepository>(provider => new SqlPolizasWriteRepository(
                 provider.GetRequiredService<IPolizasConnectionStringProvider>(),
                 provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
-            return services;
+        }
+        else
+        {
+            services.AddSingleton<InMemoryPolizasRepository>();
+            services.AddScoped<IPolizasRepository>(provider => provider.GetRequiredService<InMemoryPolizasRepository>());
+            services.AddScoped<IPolizasWriteRepository>(provider => provider.GetRequiredService<InMemoryPolizasRepository>());
         }
 
-        services.AddSingleton<InMemoryPolizasRepository>();
-        services.AddScoped<IPolizasRepository>(provider => provider.GetRequiredService<InMemoryPolizasRepository>());
-        services.AddScoped<IPolizasWriteRepository>(provider => provider.GetRequiredService<InMemoryPolizasRepository>());
+        var agendaRepositoryMode = configuration["Agenda:Repository"];
+        if (string.Equals(agendaRepositoryMode, "Sql", StringComparison.OrdinalIgnoreCase))
+        {
+            services.TryAddScoped<IPolizasExecutionContextAccessor>(_ => new ConfiguredPolizasExecutionContextAccessor(configuration));
+            services.AddScoped<IAgendaRepository>(provider => new SqlAgendaRepository(
+                CreateConnectionStringProvider(
+                    configuration,
+                    provider.GetRequiredService<IPolizasExecutionContextAccessor>(),
+                    "Agenda"),
+                provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
+            services.AddScoped<IAgendaWriteRepository>(provider => new SqlAgendaWriteRepository(
+                CreateConnectionStringProvider(
+                    configuration,
+                    provider.GetRequiredService<IPolizasExecutionContextAccessor>(),
+                    "Agenda"),
+                provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
+        }
+
         return services;
     }
 
     private static IPolizasConnectionStringProvider CreateConnectionStringProvider(
         IConfiguration configuration,
-        IPolizasExecutionContextAccessor executionContextAccessor)
+        IPolizasExecutionContextAccessor executionContextAccessor,
+        string sectionName)
     {
-        var resolverMode = configuration["Polizas:ConnectionResolver"];
+        var resolverMode = configuration[$"{sectionName}:ConnectionResolver"]
+            ?? configuration["Polizas:ConnectionResolver"];
         if (string.Equals(resolverMode, "AppBuilderMaster", StringComparison.OrdinalIgnoreCase))
         {
             var masterConnectionString = configuration.GetConnectionString("AppBuilderMaster")
@@ -75,10 +101,12 @@ public static class DependencyInjection
 
             var encryptionKey = configuration["AppBuilder:EncryptionKey"]
                 ?? configuration["ILINIUMTECH:APPBUILDER_ENCRYPTION_KEY"];
-            var databaseTypeId = configuration["Polizas:ModelDatabaseTypeId"]
+            var databaseTypeId = configuration[$"{sectionName}:ModelDatabaseTypeId"]
+                ?? configuration["Polizas:ModelDatabaseTypeId"]
                 ?? AppBuilderMasterPolizasConnectionStringProvider.DefaultModelDatabaseTypeId;
             var trustServerCertificate = bool.TryParse(
-                    configuration["Polizas:AppBuilderMaster:TrustServerCertificate"]
+                    configuration[$"{sectionName}:AppBuilderMaster:TrustServerCertificate"]
+                    ?? configuration["Polizas:AppBuilderMaster:TrustServerCertificate"]
                     ?? configuration["ILINIUMTECH:APPBUILDER_MASTER_TRUST_SERVER_CERTIFICATE"],
                     out var configuredTrustServerCertificate)
                 && configuredTrustServerCertificate;
@@ -91,13 +119,19 @@ public static class DependencyInjection
                 trustServerCertificate);
         }
 
-        var connectionString = configuration.GetConnectionString("PolizasReadOnly")
+        var connectionString = configuration.GetConnectionString($"{sectionName}Model")
+            ?? configuration.GetConnectionString($"{sectionName}ReadWrite")
+            ?? configuration.GetConnectionString($"{sectionName}ReadOnly")
+            ?? configuration[$"ILINIUMTECH:{sectionName.ToUpperInvariant()}_CONNECTION"]
+            ?? configuration.GetConnectionString("PolizasReadOnly")
             ?? configuration["ILINIUMTECH:POLIZAS_CONNECTION"];
         if (string.IsNullOrWhiteSpace(connectionString) ||
             string.Equals(connectionString, "__SET_IN_ENVIRONMENT__", StringComparison.Ordinal))
         {
-            throw new InvalidOperationException(
-                "Polizas SQL repository requires ConnectionStrings:PolizasReadOnly or ILINIUMTECH__POLIZAS_CONNECTION.");
+            var message = string.Equals(sectionName, "Polizas", StringComparison.OrdinalIgnoreCase)
+                ? "Polizas SQL repository requires ConnectionStrings:PolizasReadOnly or ILINIUMTECH__POLIZAS_CONNECTION."
+                : $"{sectionName} SQL repository requires a model database connection string.";
+            throw new InvalidOperationException(message);
         }
 
         return new StaticPolizasConnectionStringProvider(connectionString);

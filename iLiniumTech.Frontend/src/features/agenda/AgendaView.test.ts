@@ -155,7 +155,7 @@ describe('AgendaView smoke', () => {
         .attributes('aria-describedby'),
     ).toBe('agenda-blocked-actions')
     const tableActions = wrapper.findAll('button.table-icon-action[disabled]')
-    expect(tableActions).toHaveLength(2)
+    expect(tableActions).toHaveLength(4)
     expect(tableActions[0]?.attributes('aria-describedby')).toBe('agenda-blocked-actions')
     expect(
       (

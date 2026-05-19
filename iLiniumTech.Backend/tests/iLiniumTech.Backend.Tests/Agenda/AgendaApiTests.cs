@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using iLiniumTech.Backend.Api.Security;
+using iLiniumTech.Backend.Domain.Agenda;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -131,6 +132,116 @@ public sealed class AgendaApiTests
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         body.Should().Contain("AGENDA_VALIDATION_ERROR");
         body.Contains("SELECT", StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Agenda_writes_are_disabled_by_default()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Auth:Demo:Permissions:0"] = AgendaPermissions.Create
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var response = await client.PostAsJsonAsync("/api/agenda", new
+        {
+            referencia = "ILMVP-AGE-DISABLED",
+            titulo = "Alta bloqueada",
+            inicio = new DateTime(2026, 6, 1, 10, 0, 0),
+            fin = new DateTime(2026, 6, 1, 10, 30, 0),
+            prioridad = "Media",
+            objetoRelacionadoTipo = "Generico demo"
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        body.Should().Contain("AGENDA_WRITES_DISABLED");
+        body.Should().NotContain("ILMVP-AGE-DISABLED");
+    }
+
+    [Fact]
+    public async Task Agenda_crud_requires_write_flag_and_explicit_permissions()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Agenda:WritesEnabled"] = "true",
+            ["Auth:Demo:Permissions:0"] = AgendaPermissions.Read,
+            ["Auth:Demo:Permissions:1"] = AgendaPermissions.Create,
+            ["Auth:Demo:Permissions:2"] = AgendaPermissions.Update,
+            ["Auth:Demo:Permissions:3"] = AgendaPermissions.Delete
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var createResponse = await client.PostAsJsonAsync("/api/agenda", new
+        {
+            referencia = "ILMVP-AGE-CRUD-001",
+            titulo = "Evento CRUD local",
+            inicio = new DateTime(2026, 6, 1, 10, 0, 0),
+            fin = new DateTime(2026, 6, 1, 10, 30, 0),
+            prioridad = "Alta",
+            objetoRelacionadoTipo = "Generico demo"
+        });
+
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+        var created = await createResponse.Content.ReadFromJsonAsync<AgendaCreateResult>();
+        created.Should().NotBeNull();
+        created!.Id.Should().NotBeNullOrWhiteSpace();
+
+        var searchAfterCreate = await client.GetAsync("/api/agenda?texto=CRUD%20local");
+        var searchAfterCreateBody = await searchAfterCreate.Content.ReadAsStringAsync();
+        searchAfterCreate.StatusCode.Should().Be(HttpStatusCode.OK);
+        searchAfterCreateBody.Should().Contain("ILMVP-AGE-CRUD-001");
+        searchAfterCreateBody.Should().Contain("Evento CRUD local");
+
+        var updateResponse = await client.PutAsJsonAsync($"/api/agenda/{created.Id}", new
+        {
+            titulo = "Evento CRUD local actualizado",
+            inicio = new DateTime(2026, 6, 1, 11, 0, 0),
+            fin = new DateTime(2026, 6, 1, 11, 30, 0),
+            prioridad = "Media",
+            objetoRelacionadoTipo = "Generico demo"
+        });
+
+        updateResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var searchAfterUpdate = await client.GetAsync("/api/agenda?texto=actualizado");
+        var searchAfterUpdateBody = await searchAfterUpdate.Content.ReadAsStringAsync();
+        searchAfterUpdate.StatusCode.Should().Be(HttpStatusCode.OK);
+        searchAfterUpdateBody.Should().Contain("Evento CRUD local actualizado");
+
+        var deleteResponse = await client.DeleteAsync($"/api/agenda/{created.Id}");
+        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var searchAfterDelete = await client.GetAsync("/api/agenda?texto=actualizado");
+        var searchAfterDeleteBody = await searchAfterDelete.Content.ReadAsStringAsync();
+        searchAfterDelete.StatusCode.Should().Be(HttpStatusCode.OK);
+        searchAfterDeleteBody.Should().NotContain("Evento CRUD local actualizado");
+    }
+
+    [Fact]
+    public async Task Agenda_create_rejects_non_mvp_reference()
+    {
+        await using var factory = new TestApiFactory(new Dictionary<string, string?>
+        {
+            ["Agenda:WritesEnabled"] = "true",
+            ["Auth:Demo:Permissions:0"] = AgendaPermissions.Create
+        });
+        using var client = factory.CreateClient();
+        await LoginDemoAsync(client);
+
+        var response = await client.PostAsJsonAsync("/api/agenda", new
+        {
+            referencia = "AGE-NO-PREFIX",
+            titulo = "No permitido",
+            inicio = new DateTime(2026, 6, 1, 10, 0, 0)
+        });
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        body.Should().Contain("AGENDA_VALIDATION_ERROR");
+        body.Should().Contain("ILMVP-AGE-");
     }
 
     private static async Task LoginDemoAsync(HttpClient client)

@@ -101,6 +101,12 @@ builder.Services.AddAuthorization(options =>
         policy.Requirements.Add(new PolizasPermissionRequirement(AgendaPermissions.Catalogs)));
     options.AddPolicy(AgendaAuthorizationPolicies.Read, policy =>
         policy.Requirements.Add(new PolizasPermissionRequirement(AgendaPermissions.Read)));
+    options.AddPolicy(AgendaAuthorizationPolicies.Create, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(AgendaPermissions.Create)));
+    options.AddPolicy(AgendaAuthorizationPolicies.Update, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(AgendaPermissions.Update)));
+    options.AddPolicy(AgendaAuthorizationPolicies.Delete, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(AgendaPermissions.Delete)));
     options.AddPolicy(PropuestasAuthorizationPolicies.Catalogs, policy =>
         policy.Requirements.Add(new PolizasPermissionRequirement(PropuestasPermissions.Catalogs)));
     options.AddPolicy(PropuestasAuthorizationPolicies.Read, policy =>
@@ -785,7 +791,8 @@ agenda.MapGet("/catalogs", async (
     CancellationToken cancellationToken) =>
         Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
     .WithName("GetAgendaCatalogs")
-    .RequireAuthorization(AgendaAuthorizationPolicies.Catalogs);
+    .RequireAuthorization(AgendaAuthorizationPolicies.Catalogs)
+    .AddEndpointFilter(RequireAgendaExecutionContextAsync);
 
 agenda.MapGet("/events", async (
     HttpContext httpContext,
@@ -825,7 +832,8 @@ agenda.MapGet("/events", async (
     }
 })
 .WithName("SearchAgendaEvents")
-.RequireAuthorization(AgendaAuthorizationPolicies.Read);
+.RequireAuthorization(AgendaAuthorizationPolicies.Read)
+.AddEndpointFilter(RequireAgendaExecutionContextAsync);
 
 agenda.MapGet("/", async (
     HttpContext httpContext,
@@ -865,7 +873,76 @@ agenda.MapGet("/", async (
     }
 })
 .WithName("SearchAgenda")
-.RequireAuthorization(AgendaAuthorizationPolicies.Read);
+.RequireAuthorization(AgendaAuthorizationPolicies.Read)
+.AddEndpointFilter(RequireAgendaExecutionContextAsync);
+
+agenda.MapPost("/", async (
+    HttpContext httpContext,
+    [FromServices] IAgendaService service,
+    [FromBody] AgendaCreateRequest? request,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var result = await service.CreateAsync(request!, cancellationToken);
+        return Results.Created($"/api/agenda/{result.Id}", result);
+    }
+    catch (AgendaValidationException exception)
+    {
+        return AgendaValidationErrorResult(httpContext, exception);
+    }
+})
+    .WithName("CreateAgendaEvent")
+    .RequireAuthorization(AgendaAuthorizationPolicies.Create)
+    .AddEndpointFilter(RequireAgendaWritesEnabledAsync)
+    .AddEndpointFilter(RequireAgendaExecutionContextAsync);
+
+agenda.MapPut("/{id}", async (
+    HttpContext httpContext,
+    [FromServices] IAgendaService service,
+    string id,
+    [FromBody] AgendaUpdateRequest? request,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var updated = await service.UpdateAsync(id, request!, cancellationToken);
+        return updated
+            ? Results.NoContent()
+            : AgendaNotFoundOrNotWritableResult(httpContext);
+    }
+    catch (AgendaValidationException exception)
+    {
+        return AgendaValidationErrorResult(httpContext, exception);
+    }
+})
+    .WithName("UpdateAgendaEvent")
+    .RequireAuthorization(AgendaAuthorizationPolicies.Update)
+    .AddEndpointFilter(RequireAgendaWritesEnabledAsync)
+    .AddEndpointFilter(RequireAgendaExecutionContextAsync);
+
+agenda.MapDelete("/{id}", async (
+    HttpContext httpContext,
+    [FromServices] IAgendaService service,
+    string id,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var deleted = await service.DeleteAsync(id, cancellationToken);
+        return deleted
+            ? Results.NoContent()
+            : AgendaNotFoundOrNotWritableResult(httpContext);
+    }
+    catch (AgendaValidationException exception)
+    {
+        return AgendaValidationErrorResult(httpContext, exception);
+    }
+})
+    .WithName("DeleteAgendaEvent")
+    .RequireAuthorization(AgendaAuthorizationPolicies.Delete)
+    .AddEndpointFilter(RequireAgendaWritesEnabledAsync)
+    .AddEndpointFilter(RequireAgendaExecutionContextAsync);
 
 propuestas.MapGet("/catalogs", async (
     [FromServices] IPropuestasService service,
@@ -979,6 +1056,22 @@ static ValueTask<object?> RequirePolizasWritesEnabledAsync(
             "Polizas write operations are disabled for this environment."));
 }
 
+static ValueTask<object?> RequireAgendaWritesEnabledAsync(
+    EndpointFilterInvocationContext context,
+    EndpointFilterDelegate next)
+{
+    var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+    var environment = context.HttpContext.RequestServices.GetRequiredService<IHostEnvironment>();
+
+    return IsAgendaWritesEnabled(configuration, environment)
+        ? next(context)
+        : ValueTask.FromResult<object?>(ErrorResult(
+            context.HttpContext,
+            StatusCodes.Status403Forbidden,
+            "AGENDA_WRITES_DISABLED",
+            "Agenda write operations are disabled for this environment."));
+}
+
 static async ValueTask<object?> RequirePolizasExecutionContextAsync(
     EndpointFilterInvocationContext context,
     EndpointFilterDelegate next)
@@ -1016,6 +1109,49 @@ static async ValueTask<object?> RequirePolizasExecutionContextAsync(
             context.HttpContext,
             StatusCodes.Status403Forbidden,
             "POLIZAS_BROKER_FORBIDDEN",
+            "The active broker is not available for this session.");
+    }
+
+    return await next(context);
+}
+
+static async ValueTask<object?> RequireAgendaExecutionContextAsync(
+    EndpointFilterInvocationContext context,
+    EndpointFilterDelegate next)
+{
+    var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+    var requiresExecutionContext = RequiresAgendaExecutionContext(configuration);
+    var executionContextAccessor = context.HttpContext.RequestServices
+        .GetRequiredService<IPolizasExecutionContextAccessor>();
+    PolizasExecutionContext? executionContext;
+    try
+    {
+        executionContext = executionContextAccessor.Current;
+    }
+    catch (PolizasExecutionContextException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "AGENDA_CONTEXT_INVALID",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(context.HttpContext))));
+    }
+
+    if (executionContext is null)
+    {
+        return requiresExecutionContext
+            ? Results.BadRequest(new ErrorResponse(new ErrorBody(
+                Code: "AGENDA_CONTEXT_REQUIRED",
+                Message: "Broker context is required for SQL agenda requests.",
+                CorrelationId: EnsureCorrelationId(context.HttpContext))))
+            : await next(context);
+    }
+
+    if (!IsBrokerAllowedForAuthenticatedContext(context.HttpContext.User, executionContext.BrokerId))
+    {
+        return ErrorResult(
+            context.HttpContext,
+            StatusCodes.Status403Forbidden,
+            "AGENDA_BROKER_FORBIDDEN",
             "The active broker is not available for this session.");
     }
 
@@ -1108,6 +1244,19 @@ static IResult PolizasValidationErrorResult(HttpContext context, PolizasValidati
         Message: exception.Message,
         CorrelationId: EnsureCorrelationId(context))));
 
+static IResult AgendaNotFoundOrNotWritableResult(HttpContext context) =>
+    ErrorResult(
+        context,
+        StatusCodes.Status404NotFound,
+        "AGENDA_NOT_FOUND_OR_NOT_WRITABLE",
+        "Evento de agenda no encontrado o no modificable.");
+
+static IResult AgendaValidationErrorResult(HttpContext context, AgendaValidationException exception) =>
+    Results.BadRequest(new ErrorResponse(new ErrorBody(
+        Code: "AGENDA_VALIDATION_ERROR",
+        Message: exception.Message,
+        CorrelationId: EnsureCorrelationId(context))));
+
 static bool RequiresPolizasExecutionContext(IConfiguration configuration)
 {
     if (!string.Equals(configuration["Polizas:Repository"], "Sql", StringComparison.OrdinalIgnoreCase))
@@ -1127,6 +1276,26 @@ static bool RequiresPolizasExecutionContext(IConfiguration configuration)
         && requireExecutionContext;
 }
 
+static bool RequiresAgendaExecutionContext(IConfiguration configuration)
+{
+    if (!string.Equals(configuration["Agenda:Repository"], "Sql", StringComparison.OrdinalIgnoreCase))
+    {
+        return false;
+    }
+
+    if (string.Equals(configuration["Agenda:ConnectionResolver"], "AppBuilderMaster", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(configuration["Polizas:ConnectionResolver"], "AppBuilderMaster", StringComparison.OrdinalIgnoreCase))
+    {
+        return true;
+    }
+
+    return bool.TryParse(
+            configuration["Agenda:RequireExecutionContext"]
+            ?? configuration["ILINIUMTECH:REQUIRE_AGENDA_EXECUTION_CONTEXT"],
+            out var requireExecutionContext)
+        && requireExecutionContext;
+}
+
 static bool IsPolizasWritesEnabled(IConfiguration configuration, IHostEnvironment environment)
 {
     var configured = bool.TryParse(
@@ -1142,6 +1311,25 @@ static bool IsPolizasWritesEnabled(IConfiguration configuration, IHostEnvironmen
     return environment.IsDevelopment() ||
         string.Equals(
             configuration["Polizas:WritesEnabledDemoOptIn"],
+            HeaderExecutionContextPolicy.DemoOptInRequiredValue,
+            StringComparison.Ordinal);
+}
+
+static bool IsAgendaWritesEnabled(IConfiguration configuration, IHostEnvironment environment)
+{
+    var configured = bool.TryParse(
+            configuration["Agenda:WritesEnabled"]
+            ?? configuration["ILINIUMTECH:AGENDA_WRITES_ENABLED"],
+            out var enabled)
+        && enabled;
+    if (!configured)
+    {
+        return false;
+    }
+
+    return environment.IsDevelopment() ||
+        string.Equals(
+            configuration["Agenda:WritesEnabledDemoOptIn"],
             HeaderExecutionContextPolicy.DemoOptInRequiredValue,
             StringComparison.Ordinal);
 }

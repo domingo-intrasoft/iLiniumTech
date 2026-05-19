@@ -1,16 +1,9 @@
 using iLiniumTech.Backend.Domain.Agenda;
-using iLiniumTech.Backend.Domain.Polizas;
 
 namespace iLiniumTech.Backend.Application.Agenda;
 
-public interface IAgendaService
+public interface IAgendaWriteRepository
 {
-    Task<PagedResult<AgendaEventListItem>> SearchAsync(
-        AgendaSearchRequest request,
-        CancellationToken cancellationToken);
-
-    Task<AgendaCatalogs> GetCatalogsAsync(CancellationToken cancellationToken);
-
     Task<AgendaCreateResult> CreateAsync(AgendaCreateRequest request, CancellationToken cancellationToken);
 
     Task<bool> UpdateAsync(string id, AgendaUpdateRequest request, CancellationToken cancellationToken);

@@ -24,8 +24,9 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 - `Autos Particulares` queda aparcado; no ampliarlo.
 - Paridad visual de `/polizas` con AppBuilder publicado refinada en segundo corte: chrome demo, menu lateral compacto, buscador iconificado, grid plano y menor ruido visual.
 - Paridad de datos del grid de `Polizas` cerrada como MVP local/demo: `N. Documento`, cliente descriptivo, `Ramo` y `Riesgo/Matric.` salen del contrato API real y la logica AppBuilder queda documentada para el resto de paginas.
-- Nueva prioridad humana 2026-05-18: evolucionar el resto de paginas hacia CRUD. La regla operativa queda en `docs/PLAN_CRUD_RESTO_PAGINAS.md`: no hay CRUD generico ni escrituras reales sin SDD propia, origen SQL/UAT/DBA, permisos, transacciones y smoke. La primera fase prepara contratos frontend/API pagina por pagina.
-- Paginas del menu distintas de Polizas siguen en carril fixture/read-only o bloqueadas hasta superar sus precondiciones de SDD/API/UAT/DBA.
+- Nueva prioridad humana 2026-05-19: pasar paginas del menu a verticales CRUD reales contra BBDD local. La fuente operativa queda en `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`.
+- `Agenda CRUD BBDD` queda como primera vertical fuera de Polizas: API + frontend CRUD MVP, permisos `agenda.create/update/delete`, `Agenda:WritesEnabled`, SQL parametrizado, filtro broker y SDD propia `SDD-2026-015`. Pendiente smoke SQL local con secretos fuera de Git.
+- Paginas del menu distintas de Polizas y Agenda siguen en carril fixture/read-only o bloqueadas hasta superar sus precondiciones de SDD/API/UAT/DBA.
 - `Recibos`, `Clientes`, `Agenda`, `Propuestas` y `Suplementos` ya tienen contrato frontend fixture separado en tipos/fixture/composable.
 - `Siniestros` ya tiene primer backend read-only explicito in-memory: `GET /api/siniestros/catalogs` y `GET /api/siniestros`, con permisos propios y sin SQL real.
 - `Recibos` ya tiene primer backend read-only explicito in-memory: `GET /api/recibos/catalogs` y `GET /api/recibos`, con permisos propios, sin importes reales ni banco.
@@ -36,71 +37,60 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-130-LIQCIA-SDD-READONLY`
+ID: `T-200B-AGENDA-SMOKE-SQL-LOCAL`
 
 Estado: `READY`
 
-Nombre: preparar SDD/readiness de `Liq.Cia` antes de cualquier API o dato real.
+Nombre: ejecutar smoke SQL local de Agenda CRUD o documentar entorno pendiente.
 
 Objetivo:
 
-- Documentar el alcance read-only seguro de `Liq.Cia` como siguiente superficie financiera del menu.
-- Identificar campos financieros/personales prohibidos, permisos candidatos, bloqueos UAT/DBA/security y pruebas necesarias.
-- No crear backend, frontend, SQL, exportaciones, importes reales ni escrituras.
+- Validar create-read-update-delete logico de Agenda contra BBDD local de modelo usando secretos fuera de Git.
+- Confirmar que la fila `ILMVP-AGE-*` se ve, se actualiza y desaparece tras delete logico.
+- Si no hay connection string local configurada, documentar `SKIPPED_ENV_MISSING` y promover `T-201-CLIENTES-CRUD-SDD` en `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
 
 - `AGENTS.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/PLAN_CRUD_RESTO_PAGINAS.md`
-- `docs/ROADMAP_OBJETIVO_FINAL.md`
-- `docs/PLAN_MAESTRO_IA.md`
-- `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`
-- `docs/appbuilder/pages/**/README.md`
+- `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
+- `docs/sdd/specs/iLiniumTech/SDD-2026-015-agenda-crud-bbdd.md`
+- `docs/qa/agenda-crud-bbdd-evidence.md`
 
 Archivos que puede tocar:
 
-- `docs/sdd/specs/iLiniumTech/**`
-- `docs/appbuilder/pages/**`
-- `docs/qa/**`
+- `docs/qa/agenda-crud-bbdd-evidence.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/PLAN_CRUD_RESTO_PAGINAS.md`
+- `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 
 Archivos que NO debe tocar:
 
-- `iLiniumTech.Backend/**`
-- `iLiniumTech.Frontend/**`
-- `iLiniumTech.Frontend/src/services/**`
-- `iLiniumTech.Frontend/src/router/**`
-- `iLiniumTech.Frontend/src/layout/**`
-- `docs/engineering/**`
-- `docs/sdd/**`
-- `docs/appbuilder/pages/page-agent-rollout.md`
-- `docs/appbuilder/pages/page-agent-coordination-2026-05-18.md`
+- codigo de aplicacion salvo bug evidente bloqueante del smoke;
 - cualquier `.env*`, config con secretos, dumps o capturas sensibles.
 
 Pasos de implementacion:
 
-1. Localizar la evidencia existente de `Liq.Cia` en docs/menu/readiness sin abrir secretos ni datos reales.
-2. Crear o actualizar SDD read-only financiera con campos permitidos/prohibidos y bloqueos.
-3. Documentar QA/readiness de la superficie como bloqueada para API hasta UAT/DBA/security.
-4. Actualizar este cursor con la siguiente tarea tecnica segura.
-5. Ejecutar baseline documental, secret scan y `git diff --check`.
+1. Revisar `git status --short --branch`.
+2. Confirmar si el proceso tiene `ConnectionStrings__AgendaModel` o `ConnectionStrings__AppBuilderMaster` y `Agenda__Repository=Sql`.
+3. Si faltan, no pedir secretos: documentar `SKIPPED_ENV_MISSING` y promover `T-201-CLIENTES-CRUD-SDD`.
+4. Si existen, arrancar backend local con `Agenda__WritesEnabled=true`.
+5. Crear evento `ILMVP-AGE-SMOKE-<timestamp>`, buscarlo, actualizarlo y borrarlo logicamente por API.
+6. Documentar evidencia sin imprimir connection strings ni datos reales.
+7. Ejecutar pruebas y auditorias indicadas.
 
 Pruebas obligatorias:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter AgendaApiTests
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
 ```
 
 Criterios de aceptacion:
 
-- `Liq.Cia` queda documentada como financiera/read-only pendiente de UAT/DBA/security.
-- No se activan APIs, SQL, importes reales, exportaciones ni escrituras.
+- Smoke SQL Agenda completado o marcado como `SKIPPED_ENV_MISSING` sin secretos.
 - La siguiente IA puede continuar sin reanalizar todo el repositorio.
-- Validaciones documentales pasan.
+- Validaciones pasan.
 
 Riesgo de conflicto: bajo si se respetan los archivos permitidos.
 

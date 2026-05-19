@@ -81,11 +81,17 @@ public static class AgendaPermissions
 {
     public const string Catalogs = "agenda.catalogs";
     public const string Read = "agenda.read";
+    public const string Create = "agenda.create";
+    public const string Update = "agenda.update";
+    public const string Delete = "agenda.delete";
 
     private static readonly HashSet<string> ActivePermissions = new(StringComparer.Ordinal)
     {
         Catalogs,
-        Read
+        Read,
+        Create,
+        Update,
+        Delete
     };
 
     public static bool IsActive(string permission) => ActivePermissions.Contains(permission);
@@ -163,6 +169,9 @@ public static class AgendaAuthorizationPolicies
 {
     public const string Catalogs = AgendaPermissions.Catalogs;
     public const string Read = AgendaPermissions.Read;
+    public const string Create = AgendaPermissions.Create;
+    public const string Update = AgendaPermissions.Update;
+    public const string Delete = AgendaPermissions.Delete;
 }
 
 public static class PropuestasAuthorizationPolicies
