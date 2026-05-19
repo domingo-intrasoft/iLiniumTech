@@ -97,6 +97,12 @@ builder.Services.AddAuthorization(options =>
         policy.Requirements.Add(new PolizasPermissionRequirement(ClientesPermissions.Catalogs)));
     options.AddPolicy(ClientesAuthorizationPolicies.Read, policy =>
         policy.Requirements.Add(new PolizasPermissionRequirement(ClientesPermissions.Read)));
+    options.AddPolicy(ClientesAuthorizationPolicies.Create, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(ClientesPermissions.Create)));
+    options.AddPolicy(ClientesAuthorizationPolicies.Update, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(ClientesPermissions.Update)));
+    options.AddPolicy(ClientesAuthorizationPolicies.Delete, policy =>
+        policy.Requirements.Add(new PolizasPermissionRequirement(ClientesPermissions.Delete)));
     options.AddPolicy(AgendaAuthorizationPolicies.Catalogs, policy =>
         policy.Requirements.Add(new PolizasPermissionRequirement(AgendaPermissions.Catalogs)));
     options.AddPolicy(AgendaAuthorizationPolicies.Read, policy =>
@@ -788,6 +794,77 @@ clientes.MapGet("/", async (
 .RequireAuthorization(ClientesAuthorizationPolicies.Read)
 .AddEndpointFilter(RequireClientesExecutionContextAsync);
 
+clientes.MapPost("/", async (
+    HttpContext httpContext,
+    [FromServices] IClientesService service,
+    [FromBody] ClienteCreateRequest? request,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var result = await service.CreateAsync(request!, cancellationToken);
+        return Results.Created($"/api/clientes/{result.Id}", result);
+    }
+    catch (ClientesValidationException exception)
+    {
+        return ClientesValidationErrorResult(httpContext, exception);
+    }
+})
+    .WithName("CreateCliente")
+    .RequireAuthorization(ClientesAuthorizationPolicies.Read)
+    .RequireAuthorization(ClientesAuthorizationPolicies.Create)
+    .AddEndpointFilter(RequireClientesWritesEnabledAsync)
+    .AddEndpointFilter(RequireClientesExecutionContextAsync);
+
+clientes.MapPut("/{id}", async (
+    HttpContext httpContext,
+    [FromServices] IClientesService service,
+    string id,
+    [FromBody] ClienteUpdateRequest? request,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var updated = await service.UpdateAsync(id, request!, cancellationToken);
+        return updated
+            ? Results.NoContent()
+            : ClientesNotFoundOrNotWritableResult(httpContext);
+    }
+    catch (ClientesValidationException exception)
+    {
+        return ClientesValidationErrorResult(httpContext, exception);
+    }
+})
+    .WithName("UpdateCliente")
+    .RequireAuthorization(ClientesAuthorizationPolicies.Read)
+    .RequireAuthorization(ClientesAuthorizationPolicies.Update)
+    .AddEndpointFilter(RequireClientesWritesEnabledAsync)
+    .AddEndpointFilter(RequireClientesExecutionContextAsync);
+
+clientes.MapDelete("/{id}", async (
+    HttpContext httpContext,
+    [FromServices] IClientesService service,
+    string id,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var deleted = await service.DeleteAsync(id, cancellationToken);
+        return deleted
+            ? Results.NoContent()
+            : ClientesNotFoundOrNotWritableResult(httpContext);
+    }
+    catch (ClientesValidationException exception)
+    {
+        return ClientesValidationErrorResult(httpContext, exception);
+    }
+})
+    .WithName("DeleteCliente")
+    .RequireAuthorization(ClientesAuthorizationPolicies.Read)
+    .RequireAuthorization(ClientesAuthorizationPolicies.Delete)
+    .AddEndpointFilter(RequireClientesWritesEnabledAsync)
+    .AddEndpointFilter(RequireClientesExecutionContextAsync);
+
 agenda.MapGet("/catalogs", async (
     [FromServices] IAgendaService service,
     CancellationToken cancellationToken) =>
@@ -1074,6 +1151,22 @@ static ValueTask<object?> RequireAgendaWritesEnabledAsync(
             "Agenda write operations are disabled for this environment."));
 }
 
+static ValueTask<object?> RequireClientesWritesEnabledAsync(
+    EndpointFilterInvocationContext context,
+    EndpointFilterDelegate next)
+{
+    var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+    var environment = context.HttpContext.RequestServices.GetRequiredService<IHostEnvironment>();
+
+    return IsClientesWritesEnabled(configuration, environment)
+        ? next(context)
+        : ValueTask.FromResult<object?>(ErrorResult(
+            context.HttpContext,
+            StatusCodes.Status403Forbidden,
+            "CLIENTES_WRITES_DISABLED",
+            "Clientes write operations are disabled for this environment."));
+}
+
 static async ValueTask<object?> RequirePolizasExecutionContextAsync(
     EndpointFilterInvocationContext context,
     EndpointFilterDelegate next)
@@ -1242,7 +1335,9 @@ static string EnsureCorrelationId(HttpContext context)
 static bool IsKnownConfigurationException(InvalidOperationException exception) =>
     exception.Message.Contains("connection", StringComparison.OrdinalIgnoreCase) ||
     exception.Message.Contains("AppBuilderMaster", StringComparison.OrdinalIgnoreCase) ||
-    exception.Message.Contains("Polizas SQL repository", StringComparison.OrdinalIgnoreCase);
+    exception.Message.Contains("Polizas SQL repository", StringComparison.OrdinalIgnoreCase) ||
+    exception.Message.Contains("Clientes SQL repository", StringComparison.OrdinalIgnoreCase) ||
+    exception.Message.Contains("Agenda SQL repository", StringComparison.OrdinalIgnoreCase);
 
 static PolizaDetail SanitizeAutosParticularesDetail(PolizaDetail detail) =>
     detail with
@@ -1299,6 +1394,19 @@ static IResult AgendaNotFoundOrNotWritableResult(HttpContext context) =>
 static IResult AgendaValidationErrorResult(HttpContext context, AgendaValidationException exception) =>
     Results.BadRequest(new ErrorResponse(new ErrorBody(
         Code: "AGENDA_VALIDATION_ERROR",
+        Message: exception.Message,
+        CorrelationId: EnsureCorrelationId(context))));
+
+static IResult ClientesNotFoundOrNotWritableResult(HttpContext context) =>
+    ErrorResult(
+        context,
+        StatusCodes.Status404NotFound,
+        "CLIENTES_NOT_FOUND_OR_NOT_WRITABLE",
+        "Cliente no encontrado o no modificable.");
+
+static IResult ClientesValidationErrorResult(HttpContext context, ClientesValidationException exception) =>
+    Results.BadRequest(new ErrorResponse(new ErrorBody(
+        Code: "CLIENTES_VALIDATION_ERROR",
         Message: exception.Message,
         CorrelationId: EnsureCorrelationId(context))));
 
@@ -1395,6 +1503,25 @@ static bool IsAgendaWritesEnabled(IConfiguration configuration, IHostEnvironment
     return environment.IsDevelopment() ||
         string.Equals(
             configuration["Agenda:WritesEnabledDemoOptIn"],
+            HeaderExecutionContextPolicy.DemoOptInRequiredValue,
+            StringComparison.Ordinal);
+}
+
+static bool IsClientesWritesEnabled(IConfiguration configuration, IHostEnvironment environment)
+{
+    var configured = bool.TryParse(
+            configuration["Clientes:WritesEnabled"]
+            ?? configuration["ILINIUMTECH:CLIENTES_WRITES_ENABLED"],
+            out var enabled)
+        && enabled;
+    if (!configured)
+    {
+        return false;
+    }
+
+    return environment.IsDevelopment() ||
+        string.Equals(
+            configuration["Clientes:WritesEnabledDemoOptIn"],
             HeaderExecutionContextPolicy.DemoOptInRequiredValue,
             StringComparison.Ordinal);
 }

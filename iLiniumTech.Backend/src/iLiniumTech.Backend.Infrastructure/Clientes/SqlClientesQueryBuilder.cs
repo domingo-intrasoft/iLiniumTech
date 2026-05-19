@@ -43,7 +43,9 @@ public sealed class SqlClientesQueryBuilder
             WITH [cliente_rows] AS (
                 SELECT
                     CONVERT(nvarchar(100), [cliente].[ClienteId]) AS [Id],
-                    CONCAT(N'CLI-', CONVERT(nvarchar(50), [cliente].[ClienteId])) AS [Referencia],
+                    COALESCE(
+                        NULLIF(LTRIM(RTRIM(CAST([identidad].[IdOld] AS nvarchar(50)))), ''),
+                        CONCAT(N'CLI-', CONVERT(nvarchar(50), [cliente].[ClienteId]))) AS [Referencia],
                     COALESCE(
                         NULLIF(LTRIM(RTRIM(CAST([identidad].[RazonSocial] AS nvarchar(250)))), ''),
                         NULLIF(LTRIM(RTRIM(CAST([identidad].[NombreCompleto] AS nvarchar(250)))), ''),
@@ -55,7 +57,7 @@ public sealed class SqlClientesQueryBuilder
                         ELSE N'Empresa'
                     END AS [Segmento],
                     {FechaAltaExpression} AS [FechaAlta],
-                    N'BBDD local read-only' AS [Resultado],
+                    N'BBDD local' AS [Resultado],
                     N'PII minimizada' AS [Datos],
                     N'Tabs relacionadas bloqueadas' AS [Relacionadas]
                 FROM [dbo].[IdentidadCliente] AS [cliente]
@@ -81,7 +83,11 @@ public sealed class SqlClientesQueryBuilder
 
     private static string BuildWhereClause(ClientesSearchRequest request)
     {
-        var conditions = new List<string> { "[identidad].[BrokerIntegracionId] = @brokerId" };
+        var conditions = new List<string>
+        {
+            "[identidad].[BrokerIntegracionId] = @brokerId",
+            "([identidad].[IdOld] IS NULL OR [identidad].[IdOld] NOT LIKE @mvpDeletedReferenciaLike)"
+        };
 
         if (!string.IsNullOrWhiteSpace(request.Texto))
         {
@@ -125,7 +131,11 @@ public sealed class SqlClientesQueryBuilder
 
     private static List<PolizasSqlParameter> BuildParameters(ClientesSearchRequest request, int brokerId)
     {
-        var parameters = new List<PolizasSqlParameter> { Int("@brokerId", brokerId) };
+        var parameters = new List<PolizasSqlParameter>
+        {
+            Int("@brokerId", brokerId),
+            Text("@mvpDeletedReferenciaLike", $"{ClientesMvpWriteDefaults.DeletedReferenciaPrefix}%", 50)
+        };
 
         if (!string.IsNullOrWhiteSpace(request.Texto))
         {

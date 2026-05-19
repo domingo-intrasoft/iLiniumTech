@@ -2,7 +2,13 @@ import { apiClient } from '@/services/apiClient'
 import { assertRuntimeConfigReady } from '@/services/runtimeConfig'
 
 import { clienteEstadoOptions, clienteSegmentoOptions, clientesFixture } from './fixtures'
-import type { ClienteListItem, ClientesFilters } from './types'
+import type {
+  ClienteCreatePayload,
+  ClienteCreateResult,
+  ClienteListItem,
+  ClienteUpdatePayload,
+  ClientesFilters,
+} from './types'
 
 export interface PagedResult<T> {
   items: T[]
@@ -85,4 +91,28 @@ export async function searchClientes(
   }
 
   return searchFixture(params)
+}
+
+function assertBackendWritesReady() {
+  if (import.meta.env.VITE_USE_BACKEND !== 'true') {
+    throw new Error('Las escrituras de clientes requieren backend BBDD habilitado.')
+  }
+
+  assertRuntimeConfigReady()
+}
+
+export async function createCliente(payload: ClienteCreatePayload): Promise<ClienteCreateResult> {
+  assertBackendWritesReady()
+  const response = await apiClient.post<ClienteCreateResult>('/api/clientes', payload)
+  return response.data
+}
+
+export async function updateCliente(id: string, payload: ClienteUpdatePayload): Promise<void> {
+  assertBackendWritesReady()
+  await apiClient.put(`/api/clientes/${encodeURIComponent(id)}`, payload)
+}
+
+export async function deleteCliente(id: string): Promise<void> {
+  assertBackendWritesReady()
+  await apiClient.delete(`/api/clientes/${encodeURIComponent(id)}`)
 }

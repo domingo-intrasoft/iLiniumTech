@@ -158,7 +158,7 @@ describe('ClientesView smoke', () => {
       wrapper.get('button[aria-label="Opciones de referencia"]').attributes('aria-describedby'),
     ).toBe('clientes-blocked-actions')
     const tableActions = wrapper.findAll('button.table-icon-action[disabled]')
-    expect(tableActions).toHaveLength(2)
+    expect(tableActions).toHaveLength(4)
     expect(tableActions[0]?.attributes('aria-describedby')).toBe('clientes-blocked-actions')
     expect(
       (wrapper.get('input[aria-label="Campos PII bloqueados"]').element as HTMLInputElement).value,

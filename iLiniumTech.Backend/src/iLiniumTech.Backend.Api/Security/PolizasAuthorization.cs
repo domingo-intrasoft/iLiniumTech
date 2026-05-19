@@ -67,11 +67,17 @@ public static class ClientesPermissions
 {
     public const string Catalogs = "clientes.catalogs";
     public const string Read = "clientes.read";
+    public const string Create = "clientes.create";
+    public const string Update = "clientes.update";
+    public const string Delete = "clientes.delete";
 
     private static readonly HashSet<string> ActivePermissions = new(StringComparer.Ordinal)
     {
         Catalogs,
-        Read
+        Read,
+        Create,
+        Update,
+        Delete
     };
 
     public static bool IsActive(string permission) => ActivePermissions.Contains(permission);
@@ -163,6 +169,9 @@ public static class ClientesAuthorizationPolicies
 {
     public const string Catalogs = ClientesPermissions.Catalogs;
     public const string Read = ClientesPermissions.Read;
+    public const string Create = ClientesPermissions.Create;
+    public const string Update = ClientesPermissions.Update;
+    public const string Delete = ClientesPermissions.Delete;
 }
 
 public static class AgendaAuthorizationPolicies

@@ -11,6 +11,7 @@ import {
   clientesPageSizeOptions,
   clientesTopBadges,
 } from './fixtures'
+import type { ClienteListItem } from './types'
 import { useClientes } from './useClientes'
 
 const router = useRouter()
@@ -35,7 +36,11 @@ const {
   clearFilters,
   changePage,
   changePageSize,
+  createMvpCliente,
+  updateMvpCliente,
+  deleteMvpCliente,
   formatDate,
+  isMvpOwned,
   segmentoOptions,
 } = useClientes()
 
@@ -45,8 +50,38 @@ const sessionLabel = computed(() => {
 
 const sessionNeedsAttention = computed(() => false)
 const topBadges = computed(() =>
-  isBackendMode ? ['Read-only', 'BBDD local', 'PII minimizada'] : clientesTopBadges,
+  isBackendMode ? ['CRUD local', 'BBDD local', 'PII minimizada'] : clientesTopBadges,
 )
+const permissionSet = computed(() => new Set(session.value?.permissions ?? []))
+const canCreateClientes = computed(
+  () =>
+    isBackendMode &&
+    permissionSet.value.has('clientes.read') &&
+    permissionSet.value.has('clientes.create') &&
+    !loading.value,
+)
+const canUpdateClientes = computed(
+  () =>
+    isBackendMode &&
+    permissionSet.value.has('clientes.read') &&
+    permissionSet.value.has('clientes.update') &&
+    !loading.value,
+)
+const canDeleteClientes = computed(
+  () =>
+    isBackendMode &&
+    permissionSet.value.has('clientes.read') &&
+    permissionSet.value.has('clientes.delete') &&
+    !loading.value,
+)
+
+function canUpdateCliente(item: ClienteListItem) {
+  return canUpdateClientes.value && isMvpOwned(item)
+}
+
+function canDeleteCliente(item: ClienteListItem) {
+  return canDeleteClientes.value && isMvpOwned(item)
+}
 
 async function signOut() {
   await logout()
@@ -69,7 +104,7 @@ async function signOut() {
 
     <div id="clientes-content" class="polizas-toolbar">
       <div>
-        <p class="section-kicker">MVP read-only</p>
+        <p class="section-kicker">{{ isBackendMode ? 'MVP CRUD local' : 'MVP read-only' }}</p>
         <h1>Clientes</h1>
       </div>
 
@@ -92,7 +127,10 @@ async function signOut() {
     </div>
 
     <section class="runtime-strip" aria-label="Contexto de clientes">
-      <span><i class="pi pi-lock" aria-hidden="true"></i> Solo lectura</span>
+      <span
+        ><i :class="isBackendMode ? 'pi pi-unlock' : 'pi pi-lock'" aria-hidden="true"></i>
+        {{ isBackendMode ? 'CRUD local guardado' : 'Solo lectura' }}</span
+      >
       <span>
         <i class="pi pi-database" aria-hidden="true"></i>
         {{ isBackendMode ? 'BBDD local/API' : 'Fixture local sin API' }}
@@ -122,6 +160,15 @@ async function signOut() {
           <button type="button" @click="clearFilters">
             <i class="pi pi-trash" aria-hidden="true"></i>
             Limpiar Filtros
+          </button>
+          <button
+            type="button"
+            :aria-describedby="canCreateClientes ? undefined : 'clientes-blocked-actions'"
+            :disabled="!canCreateClientes"
+            @click="createMvpCliente"
+          >
+            <i class="pi pi-plus" aria-hidden="true"></i>
+            Crear
           </button>
           <button type="button" aria-describedby="clientes-blocked-actions" disabled>
             <i class="pi pi-id-card" aria-hidden="true"></i>
@@ -324,16 +371,42 @@ async function signOut() {
           <tbody>
             <tr v-for="item in pagedItems" :key="item.id">
               <td>
-                <button
-                  class="table-icon-action"
-                  type="button"
-                  :aria-label="`Ficha, exportacion y desglose bloqueados para ${item.referencia}`"
-                  aria-describedby="clientes-blocked-actions"
-                  title="Sin API, sin permisos efectivos y sin SDD de ficha"
-                  disabled
-                >
-                  <i class="pi pi-eye-slash" aria-hidden="true"></i>
-                </button>
+                <div class="row-actions">
+                  <button
+                    class="table-icon-action"
+                    type="button"
+                    :aria-label="`Editar cliente ${item.referencia}`"
+                    :aria-describedby="
+                      canUpdateCliente(item) ? undefined : 'clientes-blocked-actions'
+                    "
+                    :title="
+                      canUpdateCliente(item)
+                        ? 'Actualizar cliente MVP'
+                        : 'Solo clientes creados por iLiniumTech MVP con permiso clientes.update'
+                    "
+                    :disabled="!canUpdateCliente(item)"
+                    @click="updateMvpCliente(item)"
+                  >
+                    <i class="pi pi-pencil" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    class="table-icon-action"
+                    type="button"
+                    :aria-label="`Eliminar cliente ${item.referencia}`"
+                    :aria-describedby="
+                      canDeleteCliente(item) ? undefined : 'clientes-blocked-actions'
+                    "
+                    :title="
+                      canDeleteCliente(item)
+                        ? 'Baja logica de cliente MVP'
+                        : 'Solo clientes creados por iLiniumTech MVP con permiso clientes.delete'
+                    "
+                    :disabled="!canDeleteCliente(item)"
+                    @click="deleteMvpCliente(item)"
+                  >
+                    <i class="pi pi-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
               </td>
               <td>
                 <strong class="table-strong">{{ item.referencia }}</strong>

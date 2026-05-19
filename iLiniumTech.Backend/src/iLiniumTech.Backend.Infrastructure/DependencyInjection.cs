@@ -68,11 +68,18 @@ public static class DependencyInjection
                     provider.GetRequiredService<IPolizasExecutionContextAccessor>(),
                     "Clientes"),
                 provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
+            services.AddScoped<IClientesWriteRepository>(provider => new SqlClientesWriteRepository(
+                CreateConnectionStringProvider(
+                    configuration,
+                    provider.GetRequiredService<IPolizasExecutionContextAccessor>(),
+                    "Clientes"),
+                provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
         }
         else
         {
             services.AddSingleton<InMemoryClientesRepository>();
             services.AddScoped<IClientesRepository>(provider => provider.GetRequiredService<InMemoryClientesRepository>());
+            services.AddScoped<IClientesWriteRepository>(provider => provider.GetRequiredService<InMemoryClientesRepository>());
         }
 
         var agendaRepositoryMode = configuration["Agenda:Repository"];

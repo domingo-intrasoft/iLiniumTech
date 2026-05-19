@@ -1,16 +1,9 @@
 using iLiniumTech.Backend.Domain.Clientes;
-using iLiniumTech.Backend.Domain.Polizas;
 
 namespace iLiniumTech.Backend.Application.Clientes;
 
-public interface IClientesService
+public interface IClientesWriteRepository
 {
-    Task<PagedResult<ClienteListItem>> SearchAsync(
-        ClientesSearchRequest request,
-        CancellationToken cancellationToken);
-
-    Task<ClientesCatalogs> GetCatalogsAsync(CancellationToken cancellationToken);
-
     Task<ClienteCreateResult> CreateAsync(ClienteCreateRequest request, CancellationToken cancellationToken);
 
     Task<bool> UpdateAsync(string id, ClienteUpdateRequest request, CancellationToken cancellationToken);

@@ -4,9 +4,10 @@ using iLiniumTech.Backend.Domain.Polizas;
 
 namespace iLiniumTech.Backend.Infrastructure.Clientes;
 
-public sealed class InMemoryClientesRepository : IClientesRepository
+public sealed class InMemoryClientesRepository : IClientesRepository, IClientesWriteRepository
 {
-    private static readonly IReadOnlyList<ClienteListItem> Items =
+    private readonly object _lock = new();
+    private readonly List<ClienteListItem> _items =
     [
         new(
             Id: "CLI-MVP-1001",
@@ -59,7 +60,17 @@ public sealed class InMemoryClientesRepository : IClientesRepository
         ClientesSort sort,
         CancellationToken cancellationToken)
     {
-        var query = Items.AsEnumerable();
+        ClienteListItem[] snapshot;
+        lock (_lock)
+        {
+            snapshot = [.. _items];
+        }
+
+        var query = snapshot
+            .Where(item => !item.Referencia.StartsWith(
+                ClientesMvpWriteDefaults.DeletedReferenciaPrefix,
+                StringComparison.OrdinalIgnoreCase))
+            .AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(request.Texto))
         {
@@ -101,6 +112,94 @@ public sealed class InMemoryClientesRepository : IClientesRepository
 
     public Task<ClientesCatalogs> GetCatalogsAsync(CancellationToken cancellationToken) =>
         Task.FromResult(Catalogs);
+
+    public Task<ClienteCreateResult> CreateAsync(ClienteCreateRequest request, CancellationToken cancellationToken)
+    {
+        lock (_lock)
+        {
+            var nextId = _items
+                .Select(item => int.TryParse(item.Id, out var id) ? id : 0)
+                .DefaultIfEmpty(1000)
+                .Max() + 1;
+            var id = nextId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            var tipoCliente = ClientesWriteValidator.NormalizeTipoCliente(request.TipoCliente);
+            var segmento = tipoCliente.Equals("empresa", StringComparison.Ordinal)
+                ? "Empresa"
+                : "Particular";
+
+            _items.Add(new ClienteListItem(
+                Id: id,
+                Referencia: $"{ClientesMvpWriteDefaults.ReferenciaPrefix}{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}",
+                Alias: request.NombreMostrable!.Trim(),
+                Estado: "Activo",
+                Segmento: segmento,
+                FechaAlta: DateOnly.FromDateTime(DateTime.UtcNow),
+                Resultado: ClientesMvpWriteDefaults.Resultado,
+                Datos: ClientesMvpWriteDefaults.Datos,
+                Relacionadas: ClientesMvpWriteDefaults.Relacionadas));
+
+            return Task.FromResult(new ClienteCreateResult(id));
+        }
+    }
+
+    public Task<bool> UpdateAsync(string id, ClienteUpdateRequest request, CancellationToken cancellationToken)
+    {
+        lock (_lock)
+        {
+            var index = _items.FindIndex(item => string.Equals(item.Id, id, StringComparison.OrdinalIgnoreCase));
+            if (index < 0)
+            {
+                return Task.FromResult(false);
+            }
+
+            var current = _items[index];
+            if (!current.Referencia.StartsWith(ClientesMvpWriteDefaults.ReferenciaPrefix, StringComparison.OrdinalIgnoreCase) ||
+                current.Referencia.StartsWith(ClientesMvpWriteDefaults.DeletedReferenciaPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return Task.FromResult(false);
+            }
+
+            var tipoCliente = request.TipoCliente is null
+                ? current.Segmento.Equals("Empresa", StringComparison.OrdinalIgnoreCase) ? "empresa" : "particular"
+                : ClientesWriteValidator.NormalizeTipoCliente(request.TipoCliente);
+            _items[index] = current with
+            {
+                Alias = request.NombreMostrable?.Trim() ?? current.Alias,
+                Segmento = tipoCliente.Equals("empresa", StringComparison.Ordinal) ? "Empresa" : "Particular",
+                Resultado = ClientesMvpWriteDefaults.Resultado,
+                Datos = ClientesMvpWriteDefaults.Datos
+            };
+
+            return Task.FromResult(true);
+        }
+    }
+
+    public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken)
+    {
+        lock (_lock)
+        {
+            var index = _items.FindIndex(item => string.Equals(item.Id, id, StringComparison.OrdinalIgnoreCase));
+            if (index < 0)
+            {
+                return Task.FromResult(false);
+            }
+
+            var current = _items[index];
+            if (!current.Referencia.StartsWith(ClientesMvpWriteDefaults.ReferenciaPrefix, StringComparison.OrdinalIgnoreCase) ||
+                current.Referencia.StartsWith(ClientesMvpWriteDefaults.DeletedReferenciaPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return Task.FromResult(false);
+            }
+
+            _items[index] = current with
+            {
+                Referencia = $"{ClientesMvpWriteDefaults.DeletedReferenciaPrefix}{current.Id}",
+                Estado = "Baja MVP"
+            };
+
+            return Task.FromResult(true);
+        }
+    }
 
     private static IEnumerable<ClienteListItem> ApplySort(IEnumerable<ClienteListItem> query, ClientesSort sort)
     {

@@ -1,6 +1,12 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 
-import { getClientesCatalogs, searchClientes as searchClientesApi } from './clientesApi'
+import {
+  createCliente,
+  deleteCliente,
+  getClientesCatalogs,
+  searchClientes as searchClientesApi,
+  updateCliente,
+} from './clientesApi'
 import type { ClienteListItem, ClientesFilters } from './types'
 
 function createEmptyClientesFilters(): ClientesFilters {
@@ -25,6 +31,12 @@ export function formatClienteDate(value: string) {
   }
 
   return new Intl.DateTimeFormat('es-ES').format(new Date(`${value.slice(0, 10)}T00:00:00`))
+}
+
+export function isClienteMvpOwned(item: ClienteListItem) {
+  return (
+    item.referencia.startsWith('ILMVP-CLI-') && !item.referencia.startsWith('ILMVP-CLI-DELETED-')
+  )
 }
 
 export function useClientes() {
@@ -125,6 +137,41 @@ export function useClientes() {
     await refresh()
   }
 
+  async function createMvpCliente() {
+    try {
+      await createCliente({
+        nombreMostrable: 'Cliente creado desde iLiniumTech',
+        tipoCliente: 'particular',
+      })
+      await refresh()
+    } catch {
+      error.value = 'No se pudo crear el cliente.'
+    }
+  }
+
+  async function updateMvpCliente(item: ClienteListItem) {
+    try {
+      await updateCliente(item.id, {
+        nombreMostrable: 'Cliente actualizado desde iLiniumTech',
+        tipoCliente: item.segmento.toLocaleLowerCase('es-ES').includes('empresa')
+          ? 'particular'
+          : 'empresa',
+      })
+      await refresh()
+    } catch {
+      error.value = 'No se pudo actualizar el cliente.'
+    }
+  }
+
+  async function deleteMvpCliente(item: ClienteListItem) {
+    try {
+      await deleteCliente(item.id)
+      await refresh()
+    } catch {
+      error.value = 'No se pudo eliminar el cliente.'
+    }
+  }
+
   onMounted(async () => {
     try {
       await loadCatalogs()
@@ -141,12 +188,15 @@ export function useClientes() {
     changePage,
     changePageSize,
     clearFilters,
+    createMvpCliente,
+    deleteMvpCliente,
     draftFilters,
     error,
     estadoOptions,
     filters,
     firstVisible,
     formatDate: formatClienteDate,
+    isMvpOwned: isClienteMvpOwned,
     isBackendMode,
     lastVisible,
     loading,
@@ -158,5 +208,6 @@ export function useClientes() {
     tableCaption,
     total,
     totalPages,
+    updateMvpCliente,
   }
 }

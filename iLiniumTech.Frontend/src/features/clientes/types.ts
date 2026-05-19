@@ -14,6 +14,20 @@ export interface ClienteListItem {
   relacionadas: string
 }
 
+export interface ClienteCreatePayload {
+  nombreMostrable: string
+  tipoCliente?: 'particular' | 'empresa'
+}
+
+export interface ClienteUpdatePayload {
+  nombreMostrable?: string
+  tipoCliente?: 'particular' | 'empresa'
+}
+
+export interface ClienteCreateResult {
+  id: string
+}
+
 export interface ClientesFilters {
   texto: string
   estado: '' | ClienteEstado
