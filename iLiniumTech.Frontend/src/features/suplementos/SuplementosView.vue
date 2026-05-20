@@ -5,8 +5,8 @@ import { useRouter } from 'vue-router'
 import { useAuthSession } from '@/features/auth/authSession'
 import AppShell from '@/layout/AppShell.vue'
 
-import { blockedActionsDescription, moduleActions, pageSizeOptions, topBadges } from './fixtures'
-import { useSuplementosFixture } from './useSuplementosFixture'
+import { blockedActionsDescription, moduleActions } from './fixtures'
+import { useSuplementos } from './useSuplementos'
 
 const router = useRouter()
 const { session, userLabel, logout } = useAuthSession()
@@ -17,23 +17,40 @@ const {
   changePageSize,
   clearFilters,
   draftFilters,
+  error,
   firstVisible,
   formatDate,
+  isBackendMode,
   lastVisible,
+  loading,
+  pageSizeOptions,
   pagedItems,
   pagination,
   resultLabel,
   searchSuplementos,
+  situacionOptions,
   tableCaption,
+  tipoOptions,
   total,
   totalPages,
-} = useSuplementosFixture()
+} = useSuplementos()
 
 const sessionLabel = computed(() => {
-  return session.value?.currentBrokerId ? `Broker ${session.value.currentBrokerId}` : 'Modo fixture'
+  if (session.value?.currentBrokerId) {
+    return `Broker ${session.value.currentBrokerId}`
+  }
+
+  return isBackendMode ? 'Broker pendiente' : 'Modo fixture'
 })
 
-const sessionNeedsAttention = computed(() => false)
+const sessionNeedsAttention = computed(() => isBackendMode && !session.value?.currentBrokerId)
+const topBadges = computed(() =>
+  isBackendMode ? ['Read-only', 'BBDD local'] : ['Read-only', 'Fixture'],
+)
+
+async function changePageSizeFromEvent(event: Event) {
+  await changePageSize(Number((event.target as HTMLSelectElement).value))
+}
 
 async function signOut() {
   await logout()
@@ -80,7 +97,10 @@ async function signOut() {
 
     <section class="runtime-strip" aria-label="Contexto de suplementos">
       <span><i class="pi pi-lock" aria-hidden="true"></i> Solo lectura</span>
-      <span><i class="pi pi-database" aria-hidden="true"></i> Fixture local sin API</span>
+      <span>
+        <i class="pi pi-database" aria-hidden="true"></i>
+        {{ isBackendMode ? 'BBDD local/API' : 'Fixture local sin API' }}
+      </span>
       <span><i class="pi pi-shield" aria-hidden="true"></i> Datos sanitizados</span>
       <span><i class="pi pi-ban" aria-hidden="true"></i> Sin workflows ni escrituras</span>
     </section>
@@ -98,7 +118,12 @@ async function signOut() {
     <section class="search-panel" aria-label="Filtros locales de suplementos">
       <header class="search-actions">
         <div class="search-action-buttons">
-          <button type="button" class="primary-action" @click="searchSuplementos">
+          <button
+            type="button"
+            class="primary-action"
+            :disabled="loading"
+            @click="searchSuplementos"
+          >
             <i class="pi pi-search" aria-hidden="true"></i>
             Buscar
           </button>
@@ -127,13 +152,13 @@ async function signOut() {
 
           <div class="filter-row">
             <label class="filter-field" for="suplementos-filter-texto" style="grid-column: span 3">
-              <span>Referencia o concepto</span>
+              <span>Referencia</span>
               <span class="field-control">
                 <input
                   id="suplementos-filter-texto"
                   v-model="draftFilters.texto"
                   type="search"
-                  aria-label="Referencia o concepto"
+                  aria-label="Referencia"
                 />
                 <button
                   type="button"
@@ -171,10 +196,9 @@ async function signOut() {
               <span class="field-control">
                 <select id="suplementos-filter-tipo" v-model="draftFilters.tipo" aria-label="Tipo">
                   <option value=""></option>
-                  <option>Alta de riesgo</option>
-                  <option>Regularizacion</option>
-                  <option>Domiciliacion</option>
-                  <option>Renovacion</option>
+                  <option v-for="option in tipoOptions" :key="option" :value="option">
+                    {{ option }}
+                  </option>
                 </select>
                 <button
                   type="button"
@@ -202,10 +226,9 @@ async function signOut() {
                   aria-label="Situacion"
                 >
                   <option value=""></option>
-                  <option>Pendiente</option>
-                  <option>En revision</option>
-                  <option>Validado</option>
-                  <option>Bloqueado</option>
+                  <option v-for="option in situacionOptions" :key="option" :value="option">
+                    {{ option }}
+                  </option>
                 </select>
                 <button
                   type="button"
@@ -276,11 +299,33 @@ async function signOut() {
         <span>{{ firstVisible }}-{{ lastVisible }} visibles</span>
       </div>
 
-      <div v-if="pagedItems.length === 0" class="state state-box empty" role="status">
+      <div v-if="error" class="state state-box error" role="alert">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        <div>
+          <strong>Error de carga</strong>
+          <p>{{ error }}</p>
+        </div>
+      </div>
+
+      <div v-else-if="loading" class="state state-box" role="status">
+        <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+        <div>
+          <strong>Cargando</strong>
+          <p>Consultando suplementos.</p>
+        </div>
+      </div>
+
+      <div v-else-if="pagedItems.length === 0" class="state state-box empty" role="status">
         <i class="pi pi-inbox" aria-hidden="true"></i>
         <div>
           <strong>Sin resultados</strong>
-          <p>No hay suplementos fixture para los filtros actuales.</p>
+          <p>
+            {{
+              isBackendMode
+                ? 'No hay suplementos en la BBDD local para los filtros actuales.'
+                : 'No hay suplementos fixture para los filtros actuales.'
+            }}
+          </p>
         </div>
       </div>
 
@@ -297,7 +342,6 @@ async function signOut() {
               <th scope="col">Fecha efecto</th>
               <th scope="col">Concepto</th>
               <th scope="col">Resumen</th>
-              <th scope="col">Origen</th>
             </tr>
           </thead>
           <tbody>
@@ -323,7 +367,6 @@ async function signOut() {
               <td>{{ formatDate(item.fechaEfecto) }}</td>
               <td>{{ item.concepto }}</td>
               <td>{{ item.resumen }}</td>
-              <td>{{ item.origen }}</td>
             </tr>
           </tbody>
         </table>
@@ -332,7 +375,11 @@ async function signOut() {
       <footer class="pagination-bar" aria-label="Paginacion de suplementos">
         <div class="page-size-control">
           <label for="suplementos-page-size">Filas</label>
-          <select id="suplementos-page-size" :value="pagination.pageSize" @change="changePageSize">
+          <select
+            id="suplementos-page-size"
+            :value="pagination.pageSize"
+            @change="changePageSizeFromEvent"
+          >
             <option v-for="option in pageSizeOptions" :key="option" :value="option">
               {{ option }}
             </option>

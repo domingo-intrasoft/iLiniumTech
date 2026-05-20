@@ -32,7 +32,9 @@ Preparar el primer incremento funcional de `Suplementos` como listado read-only 
 - Permisos iniciales `suplementos.catalogs` y `suplementos.read`.
 - Mantener detalle, alta, edicion, anulacion, importacion, exportacion, actualizacion masiva, workflows, documentos, recibos/declaraciones relacionados, comunicaciones y escrituras fuera del primer corte.
 
-Esta SDD no autoriza aun implementacion con datos reales. Antes de programar API real deben resolverse UAT, DBA, permisos, origen de lectura, vistas/tablas autorizadas, minimizacion de PII/importes/banco/documentos y revision de seguridad.
+Actualizacion 2026-05-20: por decision humana posterior, el MVP debe avanzar con datos reales en BBDD local. Se implementa lectura SQL local real minimizada para `Suplementos`, activable con `Suplementos:Repository=Sql`, usando SQL parametrizado, whitelist de ordenacion, filtro `BrokerIntegracionId` y contrato sin PII, importes, banco, documentos, workflows ni textos libres reales. El smoke SQL real queda `SKIPPED_ENV_MISSING` hasta que exista configuracion local fuera de Git.
+
+Esta SDD autoriza solo lectura real minimizada local para el MVP. No autoriza escrituras, detalle, tabs por tipo, workflows, adjuntos, recibos/declaraciones, exportacion, importes reales, datos bancarios ni PII. Antes de ampliar el contrato deben resolverse UAT, DBA, permisos, origen de lectura, vistas/tablas autorizadas, minimizacion de PII/importes/banco/documentos y revision de seguridad.
 
 ## Fuera de alcance
 
@@ -115,14 +117,15 @@ Regla explicita: `suplementos.read` no concede detalle, PII, importes, banco, do
 - [ ] Antes de implementar API real, producto confirma columnas, filtros y si `Suplementos` es pantalla independiente o subflujo de `Polizas`.
 - [ ] Antes de implementar API real, DBA confirma origen de lectura autorizado y regla por broker.
 - [ ] Seguridad confirma que el primer corte no devuelve PII, importes, banco, documentos, riesgo ni textos libres.
-- [ ] `GET /api/suplementos/catalogs` exige `suplementos.catalogs`.
-- [ ] `GET /api/suplementos` exige `suplementos.read`.
-- [ ] `suplementos.read` no devuelve detalle, PII, importes, banco, documentos ni acciones de escritura.
+- [x] `GET /api/suplementos/catalogs` exige `suplementos.catalogs`.
+- [x] `GET /api/suplementos` exige `suplementos.read`.
+- [x] Lectura SQL local real minimizada implementada como opt-in `Suplementos:Repository=Sql`.
+- [x] `suplementos.read` no devuelve detalle, PII, importes, banco, documentos ni acciones de escritura.
+- [x] Filtros y sort fuera de whitelist devuelven error sanitizado.
+- [x] El frontend mantiene detalle, exportacion, workflows y adjuntos bloqueados en el primer corte.
+- [x] No se guardan secretos ni datos sensibles en Git.
+- [x] No se introduce runtime AppBuilder.
 - [ ] El backend no consulta datos si falta broker o el broker no esta permitido.
-- [ ] Filtros y sort fuera de whitelist devuelven error sanitizado.
-- [ ] El frontend mantiene detalle, exportacion, workflows y adjuntos bloqueados en el primer corte.
-- [ ] No se guardan secretos ni datos sensibles en Git.
-- [ ] No se introduce runtime AppBuilder.
 
 ## Impacto tecnico
 

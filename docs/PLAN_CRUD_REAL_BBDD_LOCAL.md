@@ -31,31 +31,31 @@ Cada pagina se convierte en vertical propia:
 
 ## Siguiente tarea activa
 
-ID: `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL`
+ID: `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL`
 
 Estado: `READY_GUARDED`
 
-Objetivo: implementar lectura SQL local real minimizada para Suplementos, sin escrituras, sin workflows/adjuntos/importes reales/banco/datos sensibles y con filtro broker/tenant.
+Objetivo: confirmar origen SQL local real de Propuestas sin asumir `Solicitudes` por inferencia y, solo si hay evidencia suficiente, implementar lectura SQL local real minimizada, sin escrituras, conversion, emision, tarificacion, documentos, importes reales/banco/datos sensibles y con filtro broker/tenant.
 
 Archivos permitidos:
 
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/sdd/specs/iLiniumTech/*suplementos*`
+- `docs/sdd/specs/iLiniumTech/*propuestas*`
 - `docs/qa/*`
-- `iLiniumTech.Backend/src/**/Suplementos/**`
+- `iLiniumTech.Backend/src/**/Propuestas/**`
 - `iLiniumTech.Backend/src/**/Program.cs`
 - `iLiniumTech.Backend/src/**/DependencyInjection*.cs`
-- `iLiniumTech.Backend/tests/**/Suplementos*`
-- `iLiniumTech.Frontend/src/features/suplementos/**`
+- `iLiniumTech.Backend/tests/**/Propuestas*`
+- `iLiniumTech.Frontend/src/features/propuestas/**`
 - `iLiniumTech.Frontend/src/services/**`
 
 Archivos prohibidos:
 
 - `.env*`, dumps, connection strings o capturas con datos reales;
 - pantallas no relacionadas;
-- escrituras reales de Suplementos;
-- triggers/workflows heredados, cambios de poliza, adjuntos, liquidaciones, remesas, cobros, EIAC o banco;
+- escrituras reales de Propuestas;
+- conversion a poliza, emision, tarificacion, workflows, documentos, integraciones externas, llamadas de compania o banco;
 - importes reales, documentos, contacto, direccion, banco, observaciones libres o datos sensibles en contrato publico;
 - datos personales reales en evidencias.
 
@@ -63,19 +63,20 @@ Pasos:
 
 1. Revisar `git status --short --branch`.
 2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`.
-3. Leer `docs/sdd/specs/iLiniumTech/SDD-2026-013-suplementos-read-only.md`.
-4. Confirmar origen SQL minimizado desde documentacion AppBuilder ya existente.
-5. Implementar repositorio SQL read-only activable con `Suplementos:Repository=Sql`.
-6. Aplicar broker/tenant, parametros y whitelists; sin escrituras, workflows, adjuntos, importes reales, banco ni datos sensibles.
-7. Conectar frontend a API si todavia usa fixture en modo backend.
-8. Ejecutar tests dirigidos y smoke SQL local si hay configuracion; si falta, documentar `SKIPPED_ENV_MISSING`.
+3. Leer `docs/sdd/specs/iLiniumTech/SDD-2026-012-propuestas-read-only.md`.
+4. Confirmar origen SQL minimizado desde documentacion AppBuilder ya existente sin asumir `Solicitudes`.
+5. Si hay origen confirmado, implementar repositorio SQL read-only activable con `Propuestas:Repository=Sql`.
+6. Aplicar broker/tenant, parametros y whitelists; sin escrituras, conversion, emision, tarificacion, documentos, importes reales, banco ni datos sensibles.
+7. Si no hay origen confirmado, documentar `BLOCKED_ORIGIN_UNCONFIRMED` y no tocar runtime.
+8. Conectar frontend a API si todavia usa fixture en modo backend y hay API SQL segura.
+9. Ejecutar tests dirigidos y smoke SQL local si hay configuracion; si falta, documentar `SKIPPED_ENV_MISSING`.
 
 Validacion minima:
 
 ```powershell
-dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Suplementos
+dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Propuestas
 cd .\iLiniumTech.Frontend
-npm run test:unit -- Suplementos
+npm run test:unit -- Propuestas
 cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
@@ -94,8 +95,8 @@ git diff --check
 | `T-303-CLIENTES-CRUD-BBDD-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Clientes | API/frontend CRUD segun SDD-2026-016; update/delete solo MVP-owned | alto |
 | `T-304-SINIESTROS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Siniestros | SQL local real minimizado; escritura bloqueada por triggers/intervinientes | alto |
 | `T-305-RECIBOS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Recibos | SQL local real minimizado; sin banco y sin importes reales en primer corte | alto |
-| `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `READY_GUARDED` | Suplementos | SQL local real minimizado; escritura bloqueada por workflows/banco/PII | alto |
-| `T-206-PROPUESTAS-DISCOVERY` | `TODO` | Propuestas | Confirmar origen real; no usar `Solicitudes` sin UAT/DBA | alto |
+| `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Suplementos | SQL local real minimizado; escritura bloqueada por workflows/banco/PII | alto |
+| `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` | `READY_GUARDED` | Propuestas | Confirmar origen real; no usar `Solicitudes` sin UAT/DBA | alto |
 | `T-207-LIQUIDACIONES-SDD` | `TODO` | Liq.Cia/Liq.Col | SDD financiera antes de API real | critico |
 
 ## Notas de arquitectura detectadas

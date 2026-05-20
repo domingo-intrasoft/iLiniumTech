@@ -28,8 +28,23 @@ public static class DependencyInjection
         services.AddScoped<IAgendaWriteRepository>(provider => provider.GetRequiredService<InMemoryAgendaRepository>());
         services.AddSingleton<InMemoryPropuestasRepository>();
         services.AddScoped<IPropuestasRepository>(provider => provider.GetRequiredService<InMemoryPropuestasRepository>());
-        services.AddSingleton<InMemorySuplementosRepository>();
-        services.AddScoped<ISuplementosRepository>(provider => provider.GetRequiredService<InMemorySuplementosRepository>());
+
+        var suplementosRepositoryMode = configuration["Suplementos:Repository"];
+        if (string.Equals(suplementosRepositoryMode, "Sql", StringComparison.OrdinalIgnoreCase))
+        {
+            services.TryAddScoped<IPolizasExecutionContextAccessor>(_ => new ConfiguredPolizasExecutionContextAccessor(configuration));
+            services.AddScoped<ISuplementosRepository>(provider => new SqlSuplementosRepository(
+                CreateConnectionStringProvider(
+                    configuration,
+                    provider.GetRequiredService<IPolizasExecutionContextAccessor>(),
+                    "Suplementos"),
+                provider.GetRequiredService<IPolizasExecutionContextAccessor>()));
+        }
+        else
+        {
+            services.AddSingleton<InMemorySuplementosRepository>();
+            services.AddScoped<ISuplementosRepository>(provider => provider.GetRequiredService<InMemorySuplementosRepository>());
+        }
 
         var recibosRepositoryMode = configuration["Recibos:Repository"];
         if (string.Equals(recibosRepositoryMode, "Sql", StringComparison.OrdinalIgnoreCase))

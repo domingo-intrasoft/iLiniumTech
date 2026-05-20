@@ -45,6 +45,16 @@ Fecha: 2026-05-18
 - No hay SQL real, detalle, exportacion ni acciones operativas.
 - Prueba dirigida ejecutada: `dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "Suplementos"` OK, 5 tests.
 
+## Actualizacion T-306-SUPLEMENTOS-SQL-READONLY-LOCAL - 2026-05-20
+
+- Se anade lectura SQL local real minimizada para `Suplementos`, activable con `Suplementos:Repository=Sql`.
+- La consulta usa `dbo.Suplemento` con join minimizado a `dbo.Poliza` y `dbo.Catalogo`, filtro por `BrokerIntegracionId`, parametros y whitelist de ordenacion.
+- El contrato no proyecta `Concepto` real, `Valor`, `ValorAnterior`, `EmailComunicacion`, tomador, beneficiario, documentos, contacto, direccion, banco, importes, recibos/declaraciones, adjuntos ni workflows.
+- El frontend `/suplementos` consume API en `VITE_USE_BACKEND=true` y conserva fixture solo para tests/offline.
+- La columna `Origen` se elimina del listado visible porque no pertenece al contrato real.
+- Smoke SQL local: `SKIPPED_ENV_MISSING` por ausencia de configuracion local visible sin secretos.
+- Evidencia detallada: `docs/qa/suplementos-sql-readonly-local-evidence.md`.
+
 ## Pruebas de esta ronda
 
 Ronda documental. Se ejecuto validacion documental ligera desde raiz:

@@ -10,7 +10,6 @@ export const suplementosFixture: readonly SuplementoListItem[] = [
     fechaEfecto: '2026-02-01',
     concepto: 'Incorporacion de cobertura',
     resumen: 'Cambio operativo pendiente de contrato API',
-    origen: 'Fixture sanitizado A',
   },
   {
     id: 'SUP-MVP-1002',
@@ -21,7 +20,6 @@ export const suplementosFixture: readonly SuplementoListItem[] = [
     fechaEfecto: '2026-03-15',
     concepto: 'Revision de condiciones',
     resumen: 'Movimiento read-only sin importes ni adjuntos',
-    origen: 'Fixture sanitizado B',
   },
   {
     id: 'SUP-MVP-1003',
@@ -32,7 +30,6 @@ export const suplementosFixture: readonly SuplementoListItem[] = [
     fechaEfecto: '2026-01-20',
     concepto: 'Cambio administrativo',
     resumen: 'Datos restringidos ocultos hasta SDD',
-    origen: 'Fixture sanitizado C',
   },
   {
     id: 'SUP-MVP-1004',
@@ -43,12 +40,12 @@ export const suplementosFixture: readonly SuplementoListItem[] = [
     fechaEfecto: '2026-04-05',
     concepto: 'Actualizacion de vigencia',
     resumen: 'Lectura de muestra sin workflows',
-    origen: 'Fixture sanitizado D',
   },
 ]
 
+export const suplementoTipos = ['Alta de riesgo', 'Regularizacion', 'Domiciliacion', 'Renovacion']
+export const suplementoSituaciones = ['Pendiente', 'En revision', 'Validado', 'Bloqueado']
 export const pageSizeOptions = [2, 10, 25]
-export const topBadges = ['Read-only', 'Fixture']
 export const moduleActions = [
   { label: 'Buscar suplementos', icon: 'pi pi-search', active: true },
   { label: 'Detalle pendiente', icon: 'pi pi-eye' },

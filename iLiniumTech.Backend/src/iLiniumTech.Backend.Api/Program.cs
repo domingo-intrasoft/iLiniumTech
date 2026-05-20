@@ -1079,7 +1079,8 @@ suplementos.MapGet("/catalogs", async (
     CancellationToken cancellationToken) =>
         Results.Ok(await service.GetCatalogsAsync(cancellationToken)))
     .WithName("GetSuplementosCatalogs")
-    .RequireAuthorization(SuplementosAuthorizationPolicies.Catalogs);
+    .RequireAuthorization(SuplementosAuthorizationPolicies.Catalogs)
+    .AddEndpointFilter(RequireSuplementosExecutionContextAsync);
 
 suplementos.MapGet("/", async (
     HttpContext httpContext,
@@ -1119,7 +1120,8 @@ suplementos.MapGet("/", async (
     }
 })
 .WithName("SearchSuplementos")
-.RequireAuthorization(SuplementosAuthorizationPolicies.Read);
+.RequireAuthorization(SuplementosAuthorizationPolicies.Read)
+.AddEndpointFilter(RequireSuplementosExecutionContextAsync);
 
 app.Run();
 
@@ -1386,6 +1388,49 @@ static async ValueTask<object?> RequireRecibosExecutionContextAsync(
     return await next(context);
 }
 
+static async ValueTask<object?> RequireSuplementosExecutionContextAsync(
+    EndpointFilterInvocationContext context,
+    EndpointFilterDelegate next)
+{
+    var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+    var requiresExecutionContext = RequiresSuplementosExecutionContext(configuration);
+    var executionContextAccessor = context.HttpContext.RequestServices
+        .GetRequiredService<IPolizasExecutionContextAccessor>();
+    PolizasExecutionContext? executionContext;
+    try
+    {
+        executionContext = executionContextAccessor.Current;
+    }
+    catch (PolizasExecutionContextException exception)
+    {
+        return Results.BadRequest(new ErrorResponse(new ErrorBody(
+            Code: "SUPLEMENTOS_CONTEXT_INVALID",
+            Message: exception.Message,
+            CorrelationId: EnsureCorrelationId(context.HttpContext))));
+    }
+
+    if (executionContext is null)
+    {
+        return requiresExecutionContext
+            ? Results.BadRequest(new ErrorResponse(new ErrorBody(
+                Code: "SUPLEMENTOS_CONTEXT_REQUIRED",
+                Message: "Broker context is required for SQL suplementos requests.",
+                CorrelationId: EnsureCorrelationId(context.HttpContext))))
+            : await next(context);
+    }
+
+    if (!IsBrokerAllowedForAuthenticatedContext(context.HttpContext.User, executionContext.BrokerId))
+    {
+        return ErrorResult(
+            context.HttpContext,
+            StatusCodes.Status403Forbidden,
+            "SUPLEMENTOS_BROKER_FORBIDDEN",
+            "The active broker is not available for this session.");
+    }
+
+    return await next(context);
+}
+
 static bool IsBrokerAllowedForAuthenticatedContext(ClaimsPrincipal user, int brokerId)
 {
     if (string.Equals(
@@ -1429,6 +1474,7 @@ static bool IsKnownConfigurationException(InvalidOperationException exception) =
     exception.Message.Contains("Clientes SQL repository", StringComparison.OrdinalIgnoreCase) ||
     exception.Message.Contains("Recibos SQL repository", StringComparison.OrdinalIgnoreCase) ||
     exception.Message.Contains("Siniestros SQL repository", StringComparison.OrdinalIgnoreCase) ||
+    exception.Message.Contains("Suplementos SQL repository", StringComparison.OrdinalIgnoreCase) ||
     exception.Message.Contains("Agenda SQL repository", StringComparison.OrdinalIgnoreCase);
 
 static PolizaDetail SanitizeAutosParticularesDetail(PolizaDetail detail) =>
@@ -1597,6 +1643,26 @@ static bool RequiresRecibosExecutionContext(IConfiguration configuration)
     return bool.TryParse(
             configuration["Recibos:RequireExecutionContext"]
             ?? configuration["ILINIUMTECH:REQUIRE_RECIBOS_EXECUTION_CONTEXT"],
+            out var requireExecutionContext)
+        && requireExecutionContext;
+}
+
+static bool RequiresSuplementosExecutionContext(IConfiguration configuration)
+{
+    if (!string.Equals(configuration["Suplementos:Repository"], "Sql", StringComparison.OrdinalIgnoreCase))
+    {
+        return false;
+    }
+
+    if (string.Equals(configuration["Suplementos:ConnectionResolver"], "AppBuilderMaster", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(configuration["Polizas:ConnectionResolver"], "AppBuilderMaster", StringComparison.OrdinalIgnoreCase))
+    {
+        return true;
+    }
+
+    return bool.TryParse(
+            configuration["Suplementos:RequireExecutionContext"]
+            ?? configuration["ILINIUMTECH:REQUIRE_SUPLEMENTOS_EXECUTION_CONTEXT"],
             out var requireExecutionContext)
         && requireExecutionContext;
 }
