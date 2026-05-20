@@ -172,3 +172,31 @@ Smoke SQL local:
 Evidencia detallada:
 
 - `docs/qa/siniestros-sql-readonly-local-evidence.md`.
+
+## Actualizacion T-011-SIN-FE-API-ADAPTER-BLOCKED - 2026-05-20
+
+Alcance de esta actualizacion:
+
+- Se revisa el frontend de `Siniestros` tras `T-304`.
+- `siniestrosApi.ts` ya consumia `/api/siniestros/catalogs` y `/api/siniestros` cuando `VITE_USE_BACKEND=true`.
+- El fixture queda limitado a `VITE_USE_BACKEND=false`, tests/offline o backend desactivado explicitamente.
+- Se anade `siniestrosApi.test.ts` para cubrir catalogs/search en modo backend y fallback fixture sin llamadas API.
+- No se toca backend, SQL, detalle, exportacion, escrituras, intervinientes, documentos, textos libres ni PII real.
+
+Evidencia de validacion:
+
+| Comando | Resultado |
+| --- | --- |
+| `npm run test:unit -- Siniestros` | OK |
+| `npm run format` | OK |
+| `npm run lint` | OK |
+| `npm run build` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1` | OK |
+| `git diff --check` | OK |
+
+Riesgos residuales:
+
+- Sigue pendiente smoke SQL real local por falta de configuracion visible sin secretos.
+- Detalle, exportacion y escrituras siguen bloqueados hasta SDD/UAT/DBA especificos.
+- La siguiente verificacion equivalente pasa a `Recibos`.

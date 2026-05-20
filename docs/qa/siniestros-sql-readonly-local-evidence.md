@@ -77,3 +77,30 @@ No se ejecutaron consultas reales ni se imprimieron connection strings.
 ## Siguiente paso
 
 El cursor operativo pasa a `T-305-RECIBOS-SQL-READONLY-LOCAL`.
+
+## Actualizacion frontend adapter - 2026-05-20
+
+Tarea: `T-011-SIN-FE-API-ADAPTER-BLOCKED`
+
+Estado: `DONE`
+
+Resultado:
+
+- Se confirma que el frontend de `Siniestros` consume API cuando `VITE_USE_BACKEND=true`.
+- Se confirma que el fixture queda solo para `VITE_USE_BACKEND=false`, tests/offline o backend desactivado explicitamente.
+- Se anade prueba unitaria del adaptador para endpoint de catalogos, endpoint de busqueda y fallback fixture.
+- No se tocan backend, SQL, repositorios, permisos, detalle, exportacion, escrituras ni datos sensibles.
+
+Validacion:
+
+| Comando | Resultado |
+| --- | --- |
+| `npm run test:unit -- Siniestros` | OK |
+| `npm run format` | OK |
+| `npm run lint` | OK |
+| `npm run build` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1` | OK |
+| `git diff --check` | OK |
+
+Siguiente paso operativo: `T-308-RECIBOS-FE-API-ADAPTER-VERIFY`.

@@ -38,18 +38,18 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-011-SIN-FE-API-ADAPTER-BLOCKED`
+ID: `T-308-RECIBOS-FE-API-ADAPTER-VERIFY`
 
 Estado: `READY`
 
-Nombre: Verificar/adaptar frontend Siniestros a API con fallback fixture.
+Nombre: Verificar/adaptar frontend Recibos a API con fallback fixture.
 
 Objetivo:
 
-- Confirmar que `/siniestros` consume API cuando `VITE_USE_BACKEND=true`.
+- Confirmar que `/recibos` consume API cuando `VITE_USE_BACKEND=true`.
 - Mantener fixture solo cuando `VITE_USE_BACKEND=false`, tests/offline o backend no configurado explicitamente.
 - No tocar backend, SQL, permisos, menu, layout ni otras pantallas.
-- Mantener detalle, exportacion, escritura, intervinientes, documentos, descripciones libres y datos sensibles bloqueados.
+- Mantener detalle, exportacion, escritura, banco, importes no aprobados, liquidaciones y datos sensibles bloqueados.
 - Si ya esta implementado, documentar la evidencia y cerrar la tarea sin cambios runtime.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
@@ -58,17 +58,17 @@ Fuentes a leer, sin buscar mas salvo bloqueo real:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/DECISION_DATOS_REALES_LOCALES.md`
-- `docs/sdd/specs/iLiniumTech/*siniestros*`
-- `docs/qa/siniestros-mvp-evidence.md`
-- `docs/qa/siniestros-sql-readonly-local-evidence.md`
-- `iLiniumTech.Frontend/src/features/siniestros/**`
+- `docs/sdd/specs/iLiniumTech/*recibos*`
+- `docs/qa/recibos-mvp-evidence.md`
+- `docs/qa/recibos-sql-readonly-local-evidence.md`
+- `iLiniumTech.Frontend/src/features/recibos/**`
 
 Archivos que puede tocar:
 
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
-- `docs/qa/*siniestros*`
-- `iLiniumTech.Frontend/src/features/siniestros/**`
+- `docs/qa/*recibos*`
+- `iLiniumTech.Frontend/src/features/recibos/**`
 - `iLiniumTech.Frontend/src/services/**`
 
 Archivos que NO debe tocar:
@@ -76,14 +76,14 @@ Archivos que NO debe tocar:
 - cualquier `.env*`, config con secretos, dumps o capturas sensibles;
 - backend, SQL real, repositorios, migraciones, extractores o scripts de BBDD;
 - router, layout, menu, auth o pantallas no relacionadas;
-- detalle, exportacion, escrituras, workflow, documentos, intervinientes, textos libres o PII real;
+- detalle, exportacion, escrituras, banco, importes no aprobados, liquidaciones, workflow, documentos, textos libres o PII real;
 - cambios de contrato backend sin SDD.
 
 Pasos de implementacion:
 
 1. Revisar `git status --short --branch`.
 2. Leer solo las fuentes indicadas.
-3. Revisar si el composable/servicio de `Siniestros` usa API con `VITE_USE_BACKEND=true`.
+3. Revisar si el composable/servicio de `Recibos` usa API con `VITE_USE_BACKEND=true`.
 4. Si falta, implementar adaptador frontend explicito con fallback fixture solo cuando `VITE_USE_BACKEND=false`.
 5. Actualizar tests y evidencia QA.
 6. Actualizar planes y mover cursor si queda cerrado.
@@ -92,7 +92,7 @@ Pruebas obligatorias:
 
 ```powershell
 cd .\iLiniumTech.Frontend
-npm run test:unit -- Siniestros
+npm run test:unit -- Recibos
 npm run lint
 npm run build
 cd ..
@@ -103,12 +103,12 @@ git diff --check
 
 Criterios de aceptacion:
 
-- `/siniestros` usa API en modo backend y fixture solo en modo offline/test explicito.
-- No se introducen datos sensibles, detalle/exportacion/escrituras ni SQL.
+- `/recibos` usa API en modo backend y fixture solo en modo offline/test explicito.
+- No se introducen datos sensibles, detalle/exportacion/escrituras, banco, importes no aprobados ni SQL.
 - Tests frontend dirigidos y build quedan OK.
 - Evidencia QA explica modo API/fallback y riesgos residuales.
 
-Riesgo de conflicto: medio; tocar solo `Siniestros` frontend y servicios necesarios.
+Riesgo de conflicto: medio; tocar solo `Recibos` frontend y servicios necesarios.
 
 ## Cola de tareas pequenas
 
@@ -139,7 +139,8 @@ Objetivo: disenar contratos y pruebas de dominio antes de SQL real. No conectar 
 | ID | Estado | Tarea | Archivos permitidos | Bloqueo |
 | --- | --- | --- | --- | --- |
 | `T-010-SIN-BE-CONTRACT-DESIGN` | `SUPERSEDED` | Sustituida por `T-110-SINIESTROS-BE-READONLY-CONTRACT`. | backend Siniestros nuevo, tests backend, docs QA | no SQL real |
-| `T-011-SIN-FE-API-ADAPTER-BLOCKED` | `READY_ACTIVE` | Preparar adaptador frontend Siniestros con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/siniestros/**` | `T-110`/`T-304` cerradas |
+| `T-011-SIN-FE-API-ADAPTER-BLOCKED` | `DONE` | Preparar adaptador frontend Siniestros con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/siniestros/**` | `T-110`/`T-304` cerradas |
+| `T-308-RECIBOS-FE-API-ADAPTER-VERIFY` | `READY_ACTIVE` | Verificar/adaptar frontend Recibos con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/recibos/**` | `T-120`/`T-305` cerradas |
 | `T-012-REC-BE-CONTRACT-DESIGN` | `SUPERSEDED` | Sustituida por `T-120-RECIBOS-BE-READONLY-CONTRACT`. | backend Recibos nuevo, tests backend | no SQL real |
 | `T-013-CLI-BE-CONTRACT-DESIGN` | `SUPERSEDED` | Sustituida por `T-121-CLIENTES-BE-READONLY-CONTRACT`. | backend Clientes nuevo, tests backend | no SQL real |
 
@@ -290,3 +291,4 @@ Gate completo:
 - 2026-05-20: `T-051-LIQCOL-SDD-READONLY` cerrada. Se crea `docs/sdd/specs/iLiniumTech/SDD-2026-018-liq-col-read-only.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; comisiones reales, liquidos, retenciones, banco, exportacion, detalle financiero y escrituras siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-052-LOGS-THREAT-MODEL`.
 - 2026-05-20: `T-052-LOGS-THREAT-MODEL` cerrada. Se crea `docs/engineering/logs-threat-model.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; logs reales, payloads, secretos, tokens, headers, cookies, stack traces sensibles, URLs internas, PII, detalle y exportacion siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-053-CONNECTIVITY-THREAT-MODEL`.
 - 2026-05-20: `T-053-CONNECTIVITY-THREAT-MODEL` cerrada. Se crea `docs/engineering/conectividad-threat-model.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; conectores reales, llamadas externas, URL libre, payloads, secretos, tokens, headers, cookies, responses, URLs internas, PII, detalle y exportacion siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-011-SIN-FE-API-ADAPTER-BLOCKED`.
+- 2026-05-20: `T-011-SIN-FE-API-ADAPTER-BLOCKED` cerrada. Se confirma que `Siniestros` usa API con `VITE_USE_BACKEND=true` y fixture solo con backend desactivado; se anade prueba unitaria del adaptador para catalogs/search backend y fallback fixture, sin tocar backend, SQL, detalle, exportacion ni escrituras. Validacion OK: `npm run test:unit -- Siniestros`, `npm run format`, `npm run lint`, `npm run build`, baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-308-RECIBOS-FE-API-ADAPTER-VERIFY`.
