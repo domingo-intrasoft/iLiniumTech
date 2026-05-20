@@ -31,18 +31,18 @@ Cada pagina se convierte en vertical propia:
 
 ## Siguiente tarea activa
 
-ID: `T-308-RECIBOS-FE-API-ADAPTER-VERIFY`
+ID: `T-309-SUPLEMENTOS-FE-API-ADAPTER-VERIFY`
 
 Estado: `READY`
 
-Objetivo: verificar/adaptar el frontend de `Recibos` para consumir API cuando `VITE_USE_BACKEND=true` y usar fixture solo con `VITE_USE_BACKEND=false`, tests/offline o fallback explicito, sin tocar backend, SQL, detalle, exportacion, escrituras, banco ni importes no aprobados.
+Objetivo: verificar/adaptar el frontend de `Suplementos` para consumir API cuando `VITE_USE_BACKEND=true` y usar fixture solo con `VITE_USE_BACKEND=false`, tests/offline o fallback explicito, sin tocar backend, SQL, detalle, exportacion, escrituras, workflows, adjuntos, banco ni importes.
 
 Archivos permitidos:
 
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/qa/*recibos*`
-- `iLiniumTech.Frontend/src/features/recibos/**`
+- `docs/qa/*suplementos*`
+- `iLiniumTech.Frontend/src/features/suplementos/**`
 - `iLiniumTech.Frontend/src/services/**`
 
 Archivos prohibidos:
@@ -50,14 +50,14 @@ Archivos prohibidos:
 - `.env*`, dumps, connection strings o capturas con datos reales;
 - backend, SQL real, repositorios, migraciones, extractores o scripts de BBDD;
 - router, layout, menu, auth o pantallas no relacionadas;
-- detalle, exportacion, escrituras, banco, importes no aprobados, liquidaciones, workflow, documentos, textos libres o PII real;
+- detalle, exportacion, escrituras, workflows, adjuntos, documentos, banco, importes, textos libres o PII real;
 - cambios de contrato backend sin SDD.
 
 Pasos:
 
 1. Revisar `git status --short --branch`.
-2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`, SDD/evidencias de `Recibos` y feature frontend actual.
-3. Confirmar si el composable/servicio de `Recibos` ya usa API con `VITE_USE_BACKEND=true`.
+2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`, SDD/evidencias de `Suplementos` y feature frontend actual.
+3. Confirmar si el composable/servicio de `Suplementos` ya usa API con `VITE_USE_BACKEND=true`.
 4. Si falta, implementar adaptador frontend explicito con fallback fixture solo cuando `VITE_USE_BACKEND=false`.
 5. Actualizar tests y evidencia QA.
 6. No tocar backend ni BBDD.
@@ -66,7 +66,7 @@ Validacion minima:
 
 ```powershell
 cd .\iLiniumTech.Frontend
-npm run test:unit -- Recibos
+npm run test:unit -- Suplementos
 npm run lint
 npm run build
 cd ..
@@ -95,7 +95,8 @@ git diff --check
 | `T-052-LOGS-THREAT-MODEL` | `DONE` | Logs | Threat model antes de API real o lectura de logs | critico |
 | `T-053-CONNECTIVITY-THREAT-MODEL` | `DONE` | Conectividad | Threat model antes de conectores reales, APIs o llamadas externas | critico |
 | `T-011-SIN-FE-API-ADAPTER-BLOCKED` | `DONE` | Siniestros | Frontend API con fallback fixture explicito | medio |
-| `T-308-RECIBOS-FE-API-ADAPTER-VERIFY` | `READY_ACTIVE` | Recibos | Frontend API con fallback fixture explicito | alto |
+| `T-308-RECIBOS-FE-API-ADAPTER-VERIFY` | `DONE` | Recibos | Frontend API con fallback fixture explicito | alto |
+| `T-309-SUPLEMENTOS-FE-API-ADAPTER-VERIFY` | `READY_ACTIVE` | Suplementos | Frontend API con fallback fixture explicito | alto |
 
 ## Notas de arquitectura detectadas
 

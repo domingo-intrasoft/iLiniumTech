@@ -90,3 +90,30 @@ Resultados:
 - Smoke real pendiente hasta que exista configuracion local fuera de Git.
 - Los catalogos SQL de Recibos se mantienen conservadores (`No informado`) hasta confirmar taxonomia real por UAT/DBA.
 - El detalle, cobro, remesas, exportacion e importes requieren SDD posterior y permisos separados.
+
+## Actualizacion frontend adapter - 2026-05-20
+
+Tarea: `T-308-RECIBOS-FE-API-ADAPTER-VERIFY`
+
+Estado: `DONE`
+
+Resultado:
+
+- Se confirma que el frontend de `Recibos` consume API cuando `VITE_USE_BACKEND=true`.
+- Se confirma que el fixture queda solo para `VITE_USE_BACKEND=false`, tests/offline o backend desactivado explicitamente.
+- Se anade prueba unitaria del adaptador para endpoint de catalogos, endpoint de busqueda y fallback fixture.
+- No se tocan backend, SQL, repositorios, permisos, detalle, exportacion, cobro, banco, importes reales, liquidaciones ni escrituras.
+
+Validacion:
+
+| Comando | Resultado |
+| --- | --- |
+| `npm run test:unit -- Recibos` | OK |
+| `npm run format` | OK |
+| `npm run lint` | OK |
+| `npm run build` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1` | OK |
+| `git diff --check` | OK |
+
+Siguiente paso operativo: `T-309-SUPLEMENTOS-FE-API-ADAPTER-VERIFY`.
