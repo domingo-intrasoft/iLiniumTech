@@ -38,18 +38,18 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-052-LOGS-THREAT-MODEL`
+ID: `T-053-CONNECTIVITY-THREAT-MODEL`
 
 Estado: `READY`
 
-Nombre: Crear threat model para Logs antes de cualquier API.
+Nombre: Crear threat model para Conectividad/secretos/SSRF.
 
 Objetivo:
 
-- Crear threat model documental de `Logs` antes de cualquier API, SQL, lectura real, busqueda, detalle o exportacion.
-- Delimitar datos prohibidos: secretos, tokens, connection strings, payloads, stack traces sensibles, PII, documentos, headers, cookies, URLs internas y resultados reales.
+- Crear threat model documental de `Conectividad` antes de cualquier API, llamada externa, prueba REST/SOAP, SQL, lectura real o ejecucion de conectores.
+- Delimitar datos prohibidos: secretos, tokens, connection strings, payloads, headers, cookies, URLs internas, respuestas reales y PII.
 - Reutilizar la evidencia documental existente de AppBuilder y QA sin reanalizar todo el repositorio.
-- Dejar controles de seguridad, permisos, retencion, redaccion, auditoria y preguntas UAT/seguridad concretas.
+- Dejar controles de seguridad, allowlists, egress, permisos, redaccion, auditoria y preguntas UAT/seguridad concretas.
 - No modificar runtime backend/frontend.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
@@ -58,34 +58,34 @@ Fuentes a leer, sin buscar mas salvo bloqueo real:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/DECISION_DATOS_REALES_LOCALES.md`
-- `docs/appbuilder/pages/logs/README.md`
-- `docs/qa/logs-mvp-evidence.md`
+- `docs/appbuilder/pages/conectividad/README.md`
+- `docs/qa/conectividad-mvp-evidence.md`
 - `docs/qa/conectividad-logs-byaunna-mvp-evidence.md`
 
 Archivos que puede tocar:
 
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
-- `docs/engineering/*logs*`
-- `docs/sdd/specs/iLiniumTech/*logs*`
-- `docs/qa/*logs*`
-- `docs/appbuilder/pages/logs/**`
+- `docs/engineering/*conectividad*`
+- `docs/sdd/specs/iLiniumTech/*conectividad*`
+- `docs/qa/*conectividad*`
+- `docs/appbuilder/pages/conectividad/**`
 
 Archivos que NO debe tocar:
 
 - cualquier `.env*`, config con secretos, dumps o capturas sensibles;
 - backend, frontend, servicios API, router, layout o codigo de aplicacion;
-- SQL real, repositorios, migraciones, extractores o scripts de BBDD;
-- logs reales, payloads reales, tokens, headers, cookies, stack traces sensibles, connection strings, URLs internas, documentos o datos personales reales;
-- `Conectividad`, `By Aunna`, `Administracion`, `Configuracion` u otras pantallas salvo enlaces documentales estrictamente necesarios.
+- conectores reales, llamadas externas, SQL real, repositorios, migraciones, extractores o scripts de BBDD;
+- payloads reales, tokens, headers, cookies, responses, connection strings, URLs internas, documentos o datos personales reales;
+- `Logs`, `By Aunna`, `Administracion`, `Configuracion` u otras pantallas salvo enlaces documentales estrictamente necesarios.
 
 Pasos de implementacion:
 
 1. Revisar `git status --short --branch`.
 2. Leer solo las fuentes indicadas.
-3. Crear `docs/engineering/logs-threat-model.md` o SDD equivalente si no existe.
-4. Definir activos, actores, amenazas, datos prohibidos, controles, permisos, retencion, redaccion, validacion y bloqueos.
-5. Actualizar evidencia QA de `Logs` enlazando el threat model.
+3. Crear `docs/engineering/conectividad-threat-model.md` o SDD equivalente si no existe.
+4. Definir activos, actores, amenazas SSRF/exfiltracion, datos prohibidos, controles, permisos, allowlists, redaccion, validacion y bloqueos.
+5. Actualizar evidencia QA de `Conectividad` enlazando el threat model.
 6. Actualizar planes y mover cursor si queda cerrado.
 
 Pruebas obligatorias:
@@ -98,13 +98,13 @@ git diff --check
 
 Criterios de aceptacion:
 
-- Threat model de `Logs` queda creado o actualizado.
+- Threat model de `Conectividad` queda creado o actualizado.
 - No se toca runtime backend/frontend.
-- Quedan prohibidos logs reales, payloads, secretos, tokens, headers, cookies, stack traces sensibles, URLs internas, documentos y PII.
+- Quedan prohibidas llamadas externas, payloads reales, secretos, tokens, headers, cookies, responses, URLs internas, documentos y PII.
 - Quedan preguntas seguridad/UAT/operacion accionables para futuro API real.
 - La evidencia QA enlaza el threat model y explica que sigue sin datos/API reales.
 
-Riesgo de conflicto: bajo si se limita a documentacion `Logs`.
+Riesgo de conflicto: bajo si se limita a documentacion `Conectividad`.
 
 ## Cola de tareas pequenas
 
@@ -206,8 +206,8 @@ Objetivo: no abrir superficies de alto riesgo sin threat model.
 | --- | --- | --- |
 | `T-050-LIQCIA-SDD-READONLY` | `SUPERSEDED_BY_T-130` | Preparar SDD Liq.Cia read-only financiera sin importes reales. | readiness ya existe |
 | `T-051-LIQCOL-SDD-READONLY` | `DONE` | Preparar SDD Liq.Col read-only financiera sin comisiones reales. | readiness ya existe |
-| `T-052-LOGS-THREAT-MODEL` | `READY_ACTIVE` | Crear threat model para Logs antes de cualquier API. | readiness ya existe |
-| `T-053-CONNECTIVITY-THREAT-MODEL` | `TODO` | Crear threat model para Conectividad/secretos/SSRF. | readiness ya existe |
+| `T-052-LOGS-THREAT-MODEL` | `DONE` | Crear threat model para Logs antes de cualquier API. | readiness ya existe |
+| `T-053-CONNECTIVITY-THREAT-MODEL` | `READY_ACTIVE` | Crear threat model para Conectividad/secretos/SSRF. | readiness ya existe |
 
 ## Regla para mover la siguiente tarea
 
@@ -284,3 +284,4 @@ Gate completo:
 - 2026-05-20: `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` cerrada como `BLOCKED_ORIGIN_UNCONFIRMED`. Se revisan `SDD-2026-012` y `docs/appbuilder/pages/propuestas/README.md`; no hay `componentId`, datasource, tabla/vista origen, regla broker/tenant ni equivalencia `Solicitudes` confirmada. No se toca runtime ni se crea SQL especulativo. Validacion OK: backend `Propuestas` 5 tests, frontend `Propuestas` 4 tests, baseline documental, secret scan y `git diff --check`. Evidencia en `docs/qa/propuestas-sql-discovery-local-evidence.md`. Cursor pasa a `T-130-LIQCIA-SDD-READONLY`.
 - 2026-05-20: `T-130-LIQCIA-SDD-READONLY` cerrada. Se crea `docs/sdd/specs/iLiniumTech/SDD-2026-017-liq-cia-read-only.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; importes, banco, facturas, exportacion, detalle financiero y escrituras siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-051-LIQCOL-SDD-READONLY`.
 - 2026-05-20: `T-051-LIQCOL-SDD-READONLY` cerrada. Se crea `docs/sdd/specs/iLiniumTech/SDD-2026-018-liq-col-read-only.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; comisiones reales, liquidos, retenciones, banco, exportacion, detalle financiero y escrituras siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-052-LOGS-THREAT-MODEL`.
+- 2026-05-20: `T-052-LOGS-THREAT-MODEL` cerrada. Se crea `docs/engineering/logs-threat-model.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; logs reales, payloads, secretos, tokens, headers, cookies, stack traces sensibles, URLs internas, PII, detalle y exportacion siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-053-CONNECTIVITY-THREAT-MODEL`.

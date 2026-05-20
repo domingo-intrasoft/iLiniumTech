@@ -62,3 +62,9 @@ Validado en navegador embebido contra `http://127.0.0.1:5174` con login demo:
 - Las pantallas siguen siendo MVP estaticas: no validan permisos reales ni datos de backend.
 - La activacion funcional futura requiere SDD, contrato API explicito, owner de UAT y revision de seguridad.
 - Cualquier detalle, descarga, publicacion, prueba remota o enlace externo debe seguir bloqueado hasta nueva decision.
+
+## Actualizacion Logs 2026-05-20
+
+- `Logs` cuenta con threat model documental en `docs/engineering/logs-threat-model.md`.
+- La pantalla `/logs` sigue bloqueada para API real, SQL, logs reales, payloads, secretos, tokens, headers, cookies, stack traces sensibles, URLs internas, PII, detalle y exportacion.
+- No se modifica runtime backend/frontend ni se usan datos reales.

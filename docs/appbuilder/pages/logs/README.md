@@ -22,6 +22,8 @@ Si hay evidencias tecnicas de infraestructura de logs:
 
 Esa evidencia prueba que AppBuilder registra logs, pero no prueba que exista una pantalla de menu `Logs` migrable tal cual. Por tanto, no se han creado documentos de componentes internos ni subagentes de pestanas/submenus.
 
+Actualizacion 2026-05-20: se crea [`docs/engineering/logs-threat-model.md`](../../../engineering/logs-threat-model.md). El threat model es requisito previo para cualquier API, SQL, lectura real, busqueda, detalle o exportacion de `Logs`; no autoriza todavia datos reales ni payloads.
+
 ## Regla base aplicada
 
 iLiniumTech no debe reconstruir AppBuilder como runtime dinamico.
@@ -481,9 +483,9 @@ Permisos candidatos no aprobados:
 - `logs.export`;
 - `logs.payload.read`.
 
-Threat model requerido antes de cualquier dato/API:
+Threat model creado como requisito antes de cualquier dato/API:
 
-- clasificacion de PII, secretos, headers, tokens, payloads y trazas;
+- [`docs/engineering/logs-threat-model.md`](../../../engineering/logs-threat-model.md) define clasificacion de PII, secretos, headers, tokens, payloads y trazas;
 - politica de retencion y rango maximo de consulta;
 - redaccion por permiso y por tipo de log;
 - auditoria de lecturas, detalle y exportacion;
@@ -495,7 +497,7 @@ Threat model requerido antes de cualquier dato/API:
 Tareas futuras pequenas recomendadas:
 
 1. Confirmar si `Logs` sera soporte, auditoria, seguridad u observabilidad.
-2. Crear SDD de listado read-only minimizado si producto lo aprueba.
+2. Crear SDD de listado read-only minimizado si producto lo aprueba y seguridad revisa el threat model.
 3. Definir matriz de redaccion por tipo de log.
 4. Definir permisos candidatos y limites de consulta.
 5. Mantener fixture redactado y tests de no secretos/no payloads.

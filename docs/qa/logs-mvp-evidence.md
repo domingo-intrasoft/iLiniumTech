@@ -23,6 +23,7 @@ Fecha: 2026-05-18
 ## Riesgos residuales
 
 - Riesgo critico de PII, secretos, tokens, stack traces, URLs internas y payloads en logs reales.
+- Threat model creado: `docs/engineering/logs-threat-model.md`.
 - Requiere SDD, privacy/security review, politica de retencion, redaccion por permiso y auditoria antes de cualquier API.
 
 ## Pruebas esperadas si cambia UI
@@ -37,3 +38,11 @@ Fecha: 2026-05-18
 
 - Revision documental y de frontend en solo lectura.
 - Validacion documental ligera ejecutada al cierre de la ronda.
+
+## Actualizacion threat model 2026-05-20
+
+- `T-052-LOGS-THREAT-MODEL` crea `docs/engineering/logs-threat-model.md`.
+- El threat model deja bloqueados API real, SQL, logs reales, payloads, secretos, tokens, headers, cookies, stack traces sensibles, URLs internas, documentos, PII, detalle y exportacion.
+- `/logs` sigue como fixture local read-only redactado.
+- No se modifica runtime backend/frontend ni se usan datos reales.
+- Validacion ejecutada: baseline documental OK, secret scan OK y `git diff --check` OK.
