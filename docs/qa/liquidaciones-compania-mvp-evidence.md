@@ -89,8 +89,14 @@ Smoke visual en navegador:
 
 ## Riesgos residuales
 
-- Falta SDD/UAT funcional para confirmar columnas, estados y permisos reales.
+- Existe SDD draft `docs/sdd/specs/iLiniumTech/SDD-2026-017-liq-cia-read-only.md`; falta aprobacion UAT/DBA/seguridad para confirmar columnas, estados, permisos reales y origen SQL.
 - No existe contrato API de liquidaciones de compania; cualquier conexion futura debe definirse en backend explicito.
 - Detalle, desglose, exportacion, banco, facturas, importes reales y operaciones financieras siguen bloqueados.
 - La comparativa con AppBuilder queda pendiente de metadata sanitizada o validacion autorizada.
 - Los fallos intermedios observados durante el trabajo paralelo quedaron resueltos en la integracion final.
+
+## Actualizacion SDD 2026-05-20
+
+- `T-130-LIQCIA-SDD-READONLY` formaliza la SDD draft `SDD-2026-017 Liq.Cia read-only financiero minimizado`.
+- La pantalla `/liq-cia` sigue siendo MVP estatico fixture/read-only.
+- La SDD no autoriza todavia API, SQL real, importes, banco, facturas, exportacion, detalle financiero ni escrituras.

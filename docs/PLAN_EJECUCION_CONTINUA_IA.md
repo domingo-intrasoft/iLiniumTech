@@ -38,16 +38,16 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-130-LIQCIA-SDD-READONLY`
+ID: `T-051-LIQCOL-SDD-READONLY`
 
 Estado: `READY`
 
-Nombre: Preparar SDD/readiness de Liq.Cia antes de API por riesgo financiero.
+Nombre: Preparar SDD Liq.Col read-only financiera sin comisiones reales.
 
 Objetivo:
 
-- Crear o actualizar una SDD read-only de `Liq.Cia` antes de cualquier API, SQL o dato real.
-- Delimitar el primer corte como listado financiero minimizado, sin importes reales, banco, facturas, cierres, conciliacion, importacion, exportacion ni escrituras.
+- Crear o actualizar una SDD read-only de `Liq.Col` antes de cualquier API, SQL o dato real.
+- Delimitar el primer corte como listado financiero minimizado, sin comisiones reales, liquidos, retenciones, banco, cierres, exportacion ni escrituras.
 - Reutilizar la evidencia documental existente de AppBuilder y QA sin reanalizar todo el repositorio.
 - Dejar preguntas DBA/UAT/seguridad concretas para desbloquear una futura vertical SQL local real.
 - No modificar runtime backend/frontend.
@@ -58,9 +58,9 @@ Fuentes a leer, sin buscar mas salvo bloqueo real:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/DECISION_DATOS_REALES_LOCALES.md`
-- `docs/appbuilder/pages/liq-cia/README.md`
-- `docs/qa/liq-cia-mvp-evidence.md`
-- `docs/qa/liquidaciones-compania-mvp-evidence.md`
+- `docs/appbuilder/pages/liq-col/README.md`
+- `docs/qa/liq-col-mvp-evidence.md`
+- `docs/qa/liquidaciones-colaborador-mvp-evidence.md`
 
 Archivos que puede tocar:
 
@@ -68,23 +68,23 @@ Archivos que puede tocar:
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/sdd/specs/iLiniumTech/*liq*`
 - `docs/qa/*liq*`
-- `docs/appbuilder/pages/liq-cia/**`
+- `docs/appbuilder/pages/liq-col/**`
 
 Archivos que NO debe tocar:
 
 - cualquier `.env*`, config con secretos, dumps o capturas sensibles;
 - backend, frontend, servicios API, router, layout o codigo de aplicacion;
 - SQL real, repositorios, migraciones, extractores o scripts de BBDD;
-- importes reales, banco, facturas, cierres, conciliacion, exportacion, documentos o datos personales reales;
-- `Liq.Col`, `Recibos`, `Polizas`, `Clientes` u otras pantallas salvo enlaces documentales estrictamente necesarios.
+- comisiones reales, liquidos, retenciones, banco, cierres, exportacion, documentos o datos personales reales;
+- `Liq.Cia`, `Recibos`, `Polizas`, `Clientes` u otras pantallas salvo enlaces documentales estrictamente necesarios.
 
 Pasos de implementacion:
 
 1. Revisar `git status --short --branch`.
 2. Leer solo las fuentes indicadas.
-3. Crear `docs/sdd/specs/iLiniumTech/SDD-2026-017-liq-cia-read-only.md` si no existe SDD equivalente.
+3. Crear `docs/sdd/specs/iLiniumTech/SDD-2026-018-liq-col-read-only.md` si no existe SDD equivalente.
 4. Definir objetivo read-only, fuera de alcance, contrato candidato minimizado, permisos, seguridad, plan de pruebas y bloqueos UAT/DBA.
-5. Actualizar evidencia QA de `Liq.Cia` enlazando la SDD.
+5. Actualizar evidencia QA de `Liq.Col` enlazando la SDD.
 6. Actualizar planes y mover cursor si queda cerrado.
 
 Pruebas obligatorias:
@@ -97,13 +97,13 @@ git diff --check
 
 Criterios de aceptacion:
 
-- SDD/readiness de `Liq.Cia` queda creada o actualizada.
+- SDD/readiness de `Liq.Col` queda creada o actualizada.
 - No se toca runtime backend/frontend.
-- La SDD deja prohibidos importes reales, banco, facturas, cierres, conciliacion, importacion, exportacion y escrituras.
+- La SDD deja prohibidos comisiones reales, liquidos, retenciones, banco, cierres, exportacion y escrituras.
 - Quedan preguntas DBA/UAT/seguridad accionables para futuro SQL real local.
 - La evidencia QA enlaza la SDD y explica que sigue sin datos/API reales.
 
-Riesgo de conflicto: bajo si se limita a documentacion `Liq.Cia`.
+Riesgo de conflicto: bajo si se limita a documentacion `Liq.Col`.
 
 ## Cola de tareas pequenas
 
@@ -155,7 +155,7 @@ Objetivo: convertir la peticion de CRUD al resto de paginas en verticales explic
 | `T-122-AGENDA-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Agenda sin calendario mutante ni PII. | backend Agenda, API, tests, docs QA | SQL real, frontend services | backend dirigido |
 | `T-123-PROPUESTAS-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Propuestas sin solicitante real, importes, documentos ni conversion. | backend Propuestas, API, tests, docs QA | SQL real, frontend services | backend dirigido |
 | `T-124-SUPLEMENTOS-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Suplementos sin workflows, banco, adjuntos, importes ni escrituras. | backend Suplementos, API, tests, docs QA | SQL real, frontend services | backend dirigido |
-| `T-130-LIQCIA-SDD-READONLY` | `READY_ACTIVE` | Preparar SDD/readiness de Liq.Cia antes de API por riesgo financiero. | docs SDD, appbuilder pages, QA, planes | backend, frontend, SQL real | docs |
+| `T-130-LIQCIA-SDD-READONLY` | `DONE` | Preparar SDD/readiness de Liq.Cia antes de API por riesgo financiero. | docs SDD, appbuilder pages, QA, planes | backend, frontend, SQL real | docs |
 
 ### Fase 3 - Datos reales read-only por pagina
 
@@ -203,8 +203,8 @@ Objetivo: no abrir superficies de alto riesgo sin threat model.
 
 | ID | Estado | Tarea | Precondicion |
 | --- | --- | --- |
-| `T-050-LIQCIA-SDD-READONLY` | `TODO` | Preparar SDD Liq.Cia read-only financiera sin importes reales. | readiness ya existe |
-| `T-051-LIQCOL-SDD-READONLY` | `TODO` | Preparar SDD Liq.Col read-only financiera sin comisiones reales. | readiness ya existe |
+| `T-050-LIQCIA-SDD-READONLY` | `SUPERSEDED_BY_T-130` | Preparar SDD Liq.Cia read-only financiera sin importes reales. | readiness ya existe |
+| `T-051-LIQCOL-SDD-READONLY` | `READY_ACTIVE` | Preparar SDD Liq.Col read-only financiera sin comisiones reales. | readiness ya existe |
 | `T-052-LOGS-THREAT-MODEL` | `TODO` | Crear threat model para Logs antes de cualquier API. | readiness ya existe |
 | `T-053-CONNECTIVITY-THREAT-MODEL` | `TODO` | Crear threat model para Conectividad/secretos/SSRF. | readiness ya existe |
 
@@ -281,3 +281,4 @@ Gate completo:
 - 2026-05-20: `T-305-RECIBOS-SQL-READONLY-LOCAL` cerrada como `DONE_WITH_SKIPPED_SQL_SMOKE`. Se implemento repositorio SQL read-only de Recibos sobre `dbo.Recibo`, join minimizado a `Poliza`/`Catalogo`, filtro `BrokerIntegracionId`, frontend API en `VITE_USE_BACKEND=true` y columna de importes eliminada. Smoke SQL real local queda `SKIPPED_ENV_MISSING` por ausencia de configuracion `Recibos__*`, `ConnectionStrings__Recibos*` o `ConnectionStrings__AppBuilderMaster` visible sin secretos. Evidencia en `docs/qa/recibos-sql-readonly-local-evidence.md`. Cursor pasa a `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL`.
 - 2026-05-20: `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` cerrada como `DONE_WITH_SKIPPED_SQL_SMOKE`. Se implemento repositorio SQL read-only de Suplementos sobre `dbo.Suplemento`, join minimizado a `Poliza`/`Catalogo`, filtro `BrokerIntegracionId`, frontend API en `VITE_USE_BACKEND=true` y columna `Origen` eliminada. No se proyectan `Concepto` real, `Valor`, `ValorAnterior`, `EmailComunicacion`, tomador, beneficiario, documentos, banco, importes, recibos/declaraciones, adjuntos ni workflows. Smoke SQL real local queda `SKIPPED_ENV_MISSING` por ausencia de configuracion `Suplementos__*`, `ConnectionStrings__Suplementos*` o `ConnectionStrings__AppBuilderMaster` visible sin secretos. Evidencia en `docs/qa/suplementos-sql-readonly-local-evidence.md`. Cursor pasa a `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL`.
 - 2026-05-20: `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` cerrada como `BLOCKED_ORIGIN_UNCONFIRMED`. Se revisan `SDD-2026-012` y `docs/appbuilder/pages/propuestas/README.md`; no hay `componentId`, datasource, tabla/vista origen, regla broker/tenant ni equivalencia `Solicitudes` confirmada. No se toca runtime ni se crea SQL especulativo. Validacion OK: backend `Propuestas` 5 tests, frontend `Propuestas` 4 tests, baseline documental, secret scan y `git diff --check`. Evidencia en `docs/qa/propuestas-sql-discovery-local-evidence.md`. Cursor pasa a `T-130-LIQCIA-SDD-READONLY`.
+- 2026-05-20: `T-130-LIQCIA-SDD-READONLY` cerrada. Se crea `docs/sdd/specs/iLiniumTech/SDD-2026-017-liq-cia-read-only.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; importes, banco, facturas, exportacion, detalle financiero y escrituras siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-051-LIQCOL-SDD-READONLY`.

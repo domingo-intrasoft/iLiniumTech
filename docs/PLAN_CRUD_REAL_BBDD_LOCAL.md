@@ -31,11 +31,11 @@ Cada pagina se convierte en vertical propia:
 
 ## Siguiente tarea activa
 
-ID: `T-130-LIQCIA-SDD-READONLY`
+ID: `T-051-LIQCOL-SDD-READONLY`
 
 Estado: `READY`
 
-Objetivo: preparar SDD/readiness de `Liq.Cia` antes de API por riesgo financiero, sin activar SQL, API, importes reales, banco, facturas, cierres, conciliacion, importacion, exportacion ni escrituras.
+Objetivo: preparar SDD/readiness de `Liq.Col` antes de API por riesgo financiero, sin activar SQL, API, comisiones reales, liquidos, retenciones, banco, cierres, exportacion ni escrituras.
 
 Archivos permitidos:
 
@@ -43,23 +43,23 @@ Archivos permitidos:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/sdd/specs/iLiniumTech/*liq*`
 - `docs/qa/*liq*`
-- `docs/appbuilder/pages/liq-cia/**`
+- `docs/appbuilder/pages/liq-col/**`
 
 Archivos prohibidos:
 
 - `.env*`, dumps, connection strings o capturas con datos reales;
 - backend, frontend, servicios API, router, layout o codigo de aplicacion;
 - SQL real, repositorios, migraciones, extractores o scripts de BBDD;
-- importes reales, banco, facturas, cierres, conciliacion, importacion, exportacion, documentos o datos personales reales;
-- `Liq.Col`, `Recibos`, `Polizas`, `Clientes` u otras pantallas salvo enlaces documentales estrictamente necesarios.
+- comisiones reales, liquidos, retenciones, banco, cierres, exportacion, documentos o datos personales reales;
+- `Liq.Cia`, `Recibos`, `Polizas`, `Clientes` u otras pantallas salvo enlaces documentales estrictamente necesarios.
 
 Pasos:
 
 1. Revisar `git status --short --branch`.
-2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`, `docs/appbuilder/pages/liq-cia/README.md` y evidencias QA existentes.
-3. Crear `docs/sdd/specs/iLiniumTech/SDD-2026-017-liq-cia-read-only.md` si no existe SDD equivalente.
+2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`, `docs/appbuilder/pages/liq-col/README.md` y evidencias QA existentes.
+3. Crear `docs/sdd/specs/iLiniumTech/SDD-2026-018-liq-col-read-only.md` si no existe SDD equivalente.
 4. Definir primer corte read-only minimizado, permisos, campos candidatos/prohibidos, seguridad, pruebas y bloqueos DBA/UAT.
-5. Actualizar evidencia QA de `Liq.Cia` enlazando la SDD.
+5. Actualizar evidencia QA de `Liq.Col` enlazando la SDD.
 6. No tocar runtime ni BBDD.
 
 Validacion minima:
@@ -84,7 +84,8 @@ git diff --check
 | `T-305-RECIBOS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Recibos | SQL local real minimizado; sin banco y sin importes reales en primer corte | alto |
 | `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Suplementos | SQL local real minimizado; escritura bloqueada por workflows/banco/PII | alto |
 | `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` | `BLOCKED_ORIGIN_UNCONFIRMED` | Propuestas | Origen real no confirmado; no usar `Solicitudes` sin UAT/DBA | alto |
-| `T-130-LIQCIA-SDD-READONLY` | `READY_ACTIVE` | Liq.Cia | SDD/readiness financiera read-only antes de API real | critico |
+| `T-130-LIQCIA-SDD-READONLY` | `DONE` | Liq.Cia | SDD/readiness financiera read-only antes de API real | critico |
+| `T-051-LIQCOL-SDD-READONLY` | `READY_ACTIVE` | Liq.Col | SDD/readiness financiera read-only antes de API real | critico |
 | `T-207-LIQUIDACIONES-SDD` | `TODO` | Liq.Cia/Liq.Col | SDD financiera antes de API real | critico |
 
 ## Notas de arquitectura detectadas

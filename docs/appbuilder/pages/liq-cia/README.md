@@ -20,6 +20,8 @@ Por tanto, el desarrollo de una pagina iLiniumTech de `Liq.Cia` debe quedar bloq
 - validacion DBA de tablas/vistas, broker, permisos, `SESSION_CONTEXT` y campos sensibles;
 - decision de si `Liq.Cia` sera read-only, gestion operativa o flujo de conciliacion/liquidacion.
 
+Actualizacion 2026-05-20: se crea la SDD draft [`SDD-2026-017 Liq.Cia read-only financiero minimizado`](../../../sdd/specs/iLiniumTech/SDD-2026-017-liq-cia-read-only.md). La SDD prepara un primer corte futuro de listado read-only minimizado, pero no autoriza todavia API, SQL real, importes, banco, facturas, exportacion, detalle financiero ni escrituras.
+
 ## Fuentes revisadas
 
 Repositorio iLiniumTech:
@@ -609,7 +611,7 @@ Actualizacion documental sin cambios de aplicacion. Esta seccion contrasta la ev
 
 ### Tareas futuras pequenas
 
-- Redactar SDD read-only de `Liq.Cia` con listado minimizado y exportacion fuera de alcance.
+- Revisar y aprobar `SDD-2026-017 Liq.Cia read-only financiero minimizado` con producto, DBA y seguridad.
 - Definir DTO de listado sin importes reales salvo permiso financiero explicito.
 - Inventariar filtros candidatos y descartes con UAT.
 - Proponer pruebas 401/403/tenant para `catalogs`, listado y detalle futuro.
