@@ -86,3 +86,11 @@ Fecha: 2026-05-16.
 - Contrato recortado a referencia, estado, ramo, fecha alta y canal; no publica solicitante, vigencia, resultado, importes, documentos, tarificacion ni conversion.
 - No hay SQL real, detalle, exportacion, documentos ni escrituras.
 - Prueba dirigida ejecutada: `dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "Propuestas"` OK, 5 tests.
+
+## Actualizacion SQL discovery local 2026-05-20
+
+- `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` queda cerrada como `BLOCKED_ORIGIN_UNCONFIRMED`.
+- Se revisan la SDD `SDD-2026-012` y `docs/appbuilder/pages/propuestas/README.md`.
+- No existe evidencia suficiente de `componentId`, datasource, tabla/vista origen, regla broker/tenant ni equivalencia funcional con `Solicitudes`.
+- No se implementa SQL real ni se toca runtime backend/frontend.
+- Evidencia especifica: `docs/qa/propuestas-sql-discovery-local-evidence.md`.

@@ -38,20 +38,19 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL`
+ID: `T-130-LIQCIA-SDD-READONLY`
 
-Estado: `READY_GUARDED`
+Estado: `READY`
 
-Nombre: Propuestas discovery SQL local y read-only minimizado.
+Nombre: Preparar SDD/readiness de Liq.Cia antes de API por riesgo financiero.
 
 Objetivo:
 
-- Confirmar origen SQL local real de Propuestas sin asumir que `Solicitudes` equivale a Propuestas.
-- Implementar lectura SQL read-only minimizada solo si hay evidencia suficiente de origen seguro.
-- Mantener escrituras totalmente bloqueadas.
-- No exponer PII, importes reales, documentos, riesgo, observaciones libres, workflows, tarificacion, emision ni conversion en evidencia.
-- Si falta configuracion local, dejar `SKIPPED_ENV_MISSING` sin pedir ni imprimir secretos.
-- Si el origen funcional no queda suficientemente confirmado, documentar `BLOCKED_ORIGIN_UNCONFIRMED` y no crear SQL especulativo.
+- Crear o actualizar una SDD read-only de `Liq.Cia` antes de cualquier API, SQL o dato real.
+- Delimitar el primer corte como listado financiero minimizado, sin importes reales, banco, facturas, cierres, conciliacion, importacion, exportacion ni escrituras.
+- Reutilizar la evidencia documental existente de AppBuilder y QA sin reanalizar todo el repositorio.
+- Dejar preguntas DBA/UAT/seguridad concretas para desbloquear una futura vertical SQL local real.
+- No modificar runtime backend/frontend.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
 
@@ -59,50 +58,38 @@ Fuentes a leer, sin buscar mas salvo bloqueo real:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/DECISION_DATOS_REALES_LOCALES.md`
-- `docs/sdd/specs/iLiniumTech/SDD-2026-012-propuestas-read-only.md`
-- `docs/appbuilder/pages/propuestas/README.md`
-- `docs/qa/propuestas-mvp-evidence.md`
+- `docs/appbuilder/pages/liq-cia/README.md`
+- `docs/qa/liq-cia-mvp-evidence.md`
+- `docs/qa/liquidaciones-compania-mvp-evidence.md`
 
 Archivos que puede tocar:
 
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
-- `docs/sdd/specs/iLiniumTech/*propuestas*`
-- `docs/qa/*`
-- `iLiniumTech.Backend/src/**/Propuestas/**`
-- `iLiniumTech.Backend/src/**/Program.cs`
-- `iLiniumTech.Backend/src/**/DependencyInjection*.cs`
-- `iLiniumTech.Backend/tests/**/Propuestas*`
-- `iLiniumTech.Frontend/src/features/propuestas/**`
-- `iLiniumTech.Frontend/src/services/**`
+- `docs/sdd/specs/iLiniumTech/*liq*`
+- `docs/qa/*liq*`
+- `docs/appbuilder/pages/liq-cia/**`
 
 Archivos que NO debe tocar:
 
-- cualquier `.env*`, config con secretos, dumps o capturas sensibles.
-- codigo de aplicacion fuera de Propuestas y servicios compartidos necesarios;
-- escrituras reales de Propuestas.
-- conversion a poliza, emision, tarificacion, workflows, documentos, integraciones externas, llamadas de compania o banco.
-- importes reales, documentos, contacto, direccion, banco, observaciones libres o datos sensibles en contrato publico.
-- pantallas no relacionadas.
+- cualquier `.env*`, config con secretos, dumps o capturas sensibles;
+- backend, frontend, servicios API, router, layout o codigo de aplicacion;
+- SQL real, repositorios, migraciones, extractores o scripts de BBDD;
+- importes reales, banco, facturas, cierres, conciliacion, exportacion, documentos o datos personales reales;
+- `Liq.Col`, `Recibos`, `Polizas`, `Clientes` u otras pantallas salvo enlaces documentales estrictamente necesarios.
 
 Pasos de implementacion:
 
 1. Revisar `git status --short --branch`.
-2. Leer SDD y documentacion AppBuilder de Propuestas ya generada.
-3. Revisar solo evidencia local permitida para confirmar tabla/vista origen; no usar `Solicitudes` por inferencia.
-4. Si hay origen confirmado, implementar repositorio SQL read-only activable con `Propuestas:Repository=Sql`, broker/tenant, parametros y whitelists.
-5. Si no hay origen confirmado, documentar bloqueo `BLOCKED_ORIGIN_UNCONFIRMED` y no tocar runtime.
-6. Conectar frontend a API cuando `VITE_USE_BACKEND=true` si falta y hay API SQL segura.
-7. Ejecutar smoke local si existe configuracion fuera de Git; si falta, documentar `SKIPPED_ENV_MISSING`.
-8. Actualizar evidencias/planes y mover cursor si queda cerrado.
+2. Leer solo las fuentes indicadas.
+3. Crear `docs/sdd/specs/iLiniumTech/SDD-2026-017-liq-cia-read-only.md` si no existe SDD equivalente.
+4. Definir objetivo read-only, fuera de alcance, contrato candidato minimizado, permisos, seguridad, plan de pruebas y bloqueos UAT/DBA.
+5. Actualizar evidencia QA de `Liq.Cia` enlazando la SDD.
+6. Actualizar planes y mover cursor si queda cerrado.
 
 Pruebas obligatorias:
 
 ```powershell
-dotnet test .\iLiniumTech.Backend\iLiniumTech.Backend.slnx --configuration Release --filter Propuestas
-cd .\iLiniumTech.Frontend
-npm run test:unit -- Propuestas
-cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
@@ -110,13 +97,13 @@ git diff --check
 
 Criterios de aceptacion:
 
-- Origen de Propuestas queda confirmado con evidencia o se documenta bloqueo honesto.
-- Si se implementa SQL, backend Propuestas puede leer desde SQL local real cuando se configure.
-- El contrato sigue minimizado y sin datos sensibles.
-- No hay escrituras, conversion, emision, tarificacion, workflows, documentos, importes ni banco.
-- Smoke SQL local queda OK o `SKIPPED_ENV_MISSING`.
+- SDD/readiness de `Liq.Cia` queda creada o actualizada.
+- No se toca runtime backend/frontend.
+- La SDD deja prohibidos importes reales, banco, facturas, cierres, conciliacion, importacion, exportacion y escrituras.
+- Quedan preguntas DBA/UAT/seguridad accionables para futuro SQL real local.
+- La evidencia QA enlaza la SDD y explica que sigue sin datos/API reales.
 
-Riesgo de conflicto: alto; tocar solo vertical Propuestas.
+Riesgo de conflicto: bajo si se limita a documentacion `Liq.Cia`.
 
 ## Cola de tareas pequenas
 
@@ -168,7 +155,7 @@ Objetivo: convertir la peticion de CRUD al resto de paginas en verticales explic
 | `T-122-AGENDA-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Agenda sin calendario mutante ni PII. | backend Agenda, API, tests, docs QA | SQL real, frontend services | backend dirigido |
 | `T-123-PROPUESTAS-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Propuestas sin solicitante real, importes, documentos ni conversion. | backend Propuestas, API, tests, docs QA | SQL real, frontend services | backend dirigido |
 | `T-124-SUPLEMENTOS-BE-READONLY-CONTRACT` | `DONE` | Crear backend read-only in-memory para Suplementos sin workflows, banco, adjuntos, importes ni escrituras. | backend Suplementos, API, tests, docs QA | SQL real, frontend services | backend dirigido |
-| `T-130-LIQCIA-SDD-READONLY` | `READY` | Preparar SDD/readiness de Liq.Cia antes de API por riesgo financiero. | docs SDD, appbuilder pages, QA, planes | backend, frontend, SQL real | docs |
+| `T-130-LIQCIA-SDD-READONLY` | `READY_ACTIVE` | Preparar SDD/readiness de Liq.Cia antes de API por riesgo financiero. | docs SDD, appbuilder pages, QA, planes | backend, frontend, SQL real | docs |
 
 ### Fase 3 - Datos reales read-only por pagina
 
@@ -183,7 +170,7 @@ Objetivo: activar lectura SQL minimizada solo cuando haya SDD, UAT/DBA, permisos
 | `T-304-SINIESTROS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Implementar SQL local real minimizado para Siniestros. | BBDD local disponible, minimizacion |
 | `T-305-RECIBOS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Implementar SQL local real minimizado para Recibos. | BBDD local disponible, cuidado financiero |
 | `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Implementar SQL local real minimizado para Suplementos. | BBDD local disponible, workflows bloqueados |
-| `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` | `READY_GUARDED` | Confirmar origen real local de Propuestas y crear SQL read-only. | no asumir `Solicitudes` sin evidencia |
+| `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` | `BLOCKED_ORIGIN_UNCONFIRMED` | Confirmar origen real local de Propuestas y crear SQL read-only. | no asumir `Solicitudes` sin evidencia |
 
 ### Fase 4 - Auth, permisos y multi-tenant productivo
 
@@ -293,3 +280,4 @@ Gate completo:
 - 2026-05-19: `T-304-SINIESTROS-SQL-READONLY-LOCAL` cerrada como `DONE_WITH_SKIPPED_SQL_SMOKE`. Se implemento repositorio SQL read-only de Siniestros sobre `dbo.Siniestro` con filtro `BrokerIntegracionId`, joins minimizados a `RiesgoPoliza`/`Poliza`/`Catalogo`, frontend API en `VITE_USE_BACKEND=true` y acciones de detalle/exportacion bloqueadas. Smoke SQL real local queda `SKIPPED_ENV_MISSING` por ausencia de configuracion `Siniestros__*`, `ConnectionStrings__Siniestros*` o `ConnectionStrings__AppBuilderMaster` visible sin secretos. Evidencia en `docs/qa/siniestros-sql-readonly-local-evidence.md`. Cursor pasa a `T-305-RECIBOS-SQL-READONLY-LOCAL`.
 - 2026-05-20: `T-305-RECIBOS-SQL-READONLY-LOCAL` cerrada como `DONE_WITH_SKIPPED_SQL_SMOKE`. Se implemento repositorio SQL read-only de Recibos sobre `dbo.Recibo`, join minimizado a `Poliza`/`Catalogo`, filtro `BrokerIntegracionId`, frontend API en `VITE_USE_BACKEND=true` y columna de importes eliminada. Smoke SQL real local queda `SKIPPED_ENV_MISSING` por ausencia de configuracion `Recibos__*`, `ConnectionStrings__Recibos*` o `ConnectionStrings__AppBuilderMaster` visible sin secretos. Evidencia en `docs/qa/recibos-sql-readonly-local-evidence.md`. Cursor pasa a `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL`.
 - 2026-05-20: `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` cerrada como `DONE_WITH_SKIPPED_SQL_SMOKE`. Se implemento repositorio SQL read-only de Suplementos sobre `dbo.Suplemento`, join minimizado a `Poliza`/`Catalogo`, filtro `BrokerIntegracionId`, frontend API en `VITE_USE_BACKEND=true` y columna `Origen` eliminada. No se proyectan `Concepto` real, `Valor`, `ValorAnterior`, `EmailComunicacion`, tomador, beneficiario, documentos, banco, importes, recibos/declaraciones, adjuntos ni workflows. Smoke SQL real local queda `SKIPPED_ENV_MISSING` por ausencia de configuracion `Suplementos__*`, `ConnectionStrings__Suplementos*` o `ConnectionStrings__AppBuilderMaster` visible sin secretos. Evidencia en `docs/qa/suplementos-sql-readonly-local-evidence.md`. Cursor pasa a `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL`.
+- 2026-05-20: `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` cerrada como `BLOCKED_ORIGIN_UNCONFIRMED`. Se revisan `SDD-2026-012` y `docs/appbuilder/pages/propuestas/README.md`; no hay `componentId`, datasource, tabla/vista origen, regla broker/tenant ni equivalencia `Solicitudes` confirmada. No se toca runtime ni se crea SQL especulativo. Validacion OK: backend `Propuestas` 5 tests, frontend `Propuestas` 4 tests, baseline documental, secret scan y `git diff --check`. Evidencia en `docs/qa/propuestas-sql-discovery-local-evidence.md`. Cursor pasa a `T-130-LIQCIA-SDD-READONLY`.

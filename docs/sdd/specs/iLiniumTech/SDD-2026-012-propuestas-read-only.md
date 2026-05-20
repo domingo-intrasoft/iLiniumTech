@@ -225,6 +225,15 @@ Manual/UAT:
 - Este corte no desbloquea datos reales; SQL y CRUD siguen bloqueados hasta UAT/DBA/security review y SDD de escritura si aplica.
 - Tests dirigidos `PropuestasApiTests`: OK.
 
+## Actualizacion discovery SQL local 2026-05-20
+
+- Se revisa la decision vigente de trabajar con datos reales locales para todas las pantallas funcionales.
+- Resultado de `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL`: `BLOCKED_ORIGIN_UNCONFIRMED`.
+- No se implementa `Propuestas:Repository=Sql` porque no hay evidencia suficiente de origen funcional/SQL seguro.
+- No se asume que `Propuestas` equivalga a `Solicitudes`; esa relacion requiere confirmacion producto/DBA/UAT.
+- No se toca runtime backend/frontend en esta actualizacion.
+- La evidencia queda en `docs/qa/propuestas-sql-discovery-local-evidence.md`.
+
 ## Definicion de hecho
 
 - [ ] SDD revisada por producto, backend/datos, frontend y seguridad.
