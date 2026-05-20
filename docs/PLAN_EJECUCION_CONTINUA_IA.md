@@ -38,19 +38,19 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-310-AGENDA-FE-CRUD-API-ADAPTER-VERIFY`
+ID: `T-311-CLIENTES-FE-CRUD-API-ADAPTER-VERIFY`
 
 Estado: `READY`
 
-Nombre: Verificar/adaptar frontend Agenda CRUD a API con fallback controlado.
+Nombre: Verificar/adaptar frontend Clientes CRUD a API con fallback controlado.
 
 Objetivo:
 
-- Confirmar que `/agenda` consume API CRUD cuando `VITE_USE_BACKEND=true`.
+- Confirmar que `/clientes` consume API CRUD cuando `VITE_USE_BACKEND=true`.
 - Mantener fixture solo cuando `VITE_USE_BACKEND=false`, tests/offline o backend no configurado explicitamente.
 - No tocar backend, SQL, permisos, menu, layout ni otras pantallas.
-- No activar escrituras reales nuevas: respetar `Agenda:WritesEnabled`, permisos y SDD-2026-015.
-- Mantener PII minimizada y evitar asunto/descripcion sensible en evidencias.
+- No activar escrituras reales nuevas: respetar `Clientes:WritesEnabled`, permisos, regla MVP-owned y SDD-2026-016.
+- Mantener PII minimizada y evitar documento/contacto/direccion sensible en evidencias.
 - Si ya esta implementado, documentar la evidencia y cerrar la tarea sin cambios runtime.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
@@ -59,17 +59,17 @@ Fuentes a leer, sin buscar mas salvo bloqueo real:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/DECISION_DATOS_REALES_LOCALES.md`
-- `docs/sdd/specs/iLiniumTech/*agenda*`
-- `docs/qa/agenda-mvp-evidence.md`
-- `docs/qa/agenda-crud-bbdd-evidence.md`
-- `iLiniumTech.Frontend/src/features/agenda/**`
+- `docs/sdd/specs/iLiniumTech/*clientes*`
+- `docs/qa/clientes-mvp-evidence.md`
+- `docs/qa/clientes-crud-bbdd-local-evidence.md`
+- `iLiniumTech.Frontend/src/features/clientes/**`
 
 Archivos que puede tocar:
 
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
-- `docs/qa/*agenda*`
-- `iLiniumTech.Frontend/src/features/agenda/**`
+- `docs/qa/*clientes*`
+- `iLiniumTech.Frontend/src/features/clientes/**`
 - `iLiniumTech.Frontend/src/services/**`
 
 Archivos que NO debe tocar:
@@ -77,14 +77,14 @@ Archivos que NO debe tocar:
 - cualquier `.env*`, config con secretos, dumps o capturas sensibles;
 - backend, SQL real, repositorios, migraciones, extractores o scripts de BBDD;
 - router, layout, menu, auth o pantallas no relacionadas;
-- escrituras reales nuevas, cambios de permisos, cambios de flags, SQL, migraciones, asunto/descripcion sensible, textos libres o PII real;
+- escrituras reales nuevas, cambios de permisos, cambios de flags, SQL, migraciones, documento/contacto/direccion sensible, textos libres o PII real;
 - cambios de contrato backend sin SDD.
 
 Pasos de implementacion:
 
 1. Revisar `git status --short --branch`.
 2. Leer solo las fuentes indicadas.
-3. Revisar si el composable/servicio de `Agenda` usa API CRUD con `VITE_USE_BACKEND=true`.
+3. Revisar si el composable/servicio de `Clientes` usa API CRUD con `VITE_USE_BACKEND=true`.
 4. Si falta, implementar adaptador frontend explicito con fallback fixture solo cuando `VITE_USE_BACKEND=false`.
 5. Actualizar tests y evidencia QA.
 6. Actualizar planes y mover cursor si queda cerrado.
@@ -93,7 +93,7 @@ Pruebas obligatorias:
 
 ```powershell
 cd .\iLiniumTech.Frontend
-npm run test:unit -- Agenda
+npm run test:unit -- Clientes
 npm run lint
 npm run build
 cd ..
@@ -104,12 +104,12 @@ git diff --check
 
 Criterios de aceptacion:
 
-- `/agenda` usa API en modo backend y fixture solo en modo offline/test explicito.
+- `/clientes` usa API en modo backend y fixture solo en modo offline/test explicito.
 - No se introducen datos sensibles, escrituras reales nuevas, cambios de permisos/flags ni SQL.
 - Tests frontend dirigidos y build quedan OK.
 - Evidencia QA explica modo API/fallback y riesgos residuales.
 
-Riesgo de conflicto: medio; tocar solo `Agenda` frontend y servicios necesarios.
+Riesgo de conflicto: medio; tocar solo `Clientes` frontend y servicios necesarios.
 
 ## Cola de tareas pequenas
 
@@ -143,7 +143,8 @@ Objetivo: disenar contratos y pruebas de dominio antes de SQL real. No conectar 
 | `T-011-SIN-FE-API-ADAPTER-BLOCKED` | `DONE` | Preparar adaptador frontend Siniestros con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/siniestros/**` | `T-110`/`T-304` cerradas |
 | `T-308-RECIBOS-FE-API-ADAPTER-VERIFY` | `DONE` | Verificar/adaptar frontend Recibos con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/recibos/**` | `T-120`/`T-305` cerradas |
 | `T-309-SUPLEMENTOS-FE-API-ADAPTER-VERIFY` | `DONE` | Verificar/adaptar frontend Suplementos con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/suplementos/**` | `T-124`/`T-306` cerradas |
-| `T-310-AGENDA-FE-CRUD-API-ADAPTER-VERIFY` | `READY_ACTIVE` | Verificar/adaptar frontend Agenda CRUD con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/agenda/**` | `T-200`/`T-200B` cerradas |
+| `T-310-AGENDA-FE-CRUD-API-ADAPTER-VERIFY` | `DONE` | Verificar/adaptar frontend Agenda CRUD con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/agenda/**` | `T-200`/`T-200B` cerradas |
+| `T-311-CLIENTES-FE-CRUD-API-ADAPTER-VERIFY` | `READY_ACTIVE` | Verificar/adaptar frontend Clientes CRUD con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/clientes/**` | `T-303` cerrada |
 | `T-012-REC-BE-CONTRACT-DESIGN` | `SUPERSEDED` | Sustituida por `T-120-RECIBOS-BE-READONLY-CONTRACT`. | backend Recibos nuevo, tests backend | no SQL real |
 | `T-013-CLI-BE-CONTRACT-DESIGN` | `SUPERSEDED` | Sustituida por `T-121-CLIENTES-BE-READONLY-CONTRACT`. | backend Clientes nuevo, tests backend | no SQL real |
 
@@ -297,3 +298,4 @@ Gate completo:
 - 2026-05-20: `T-011-SIN-FE-API-ADAPTER-BLOCKED` cerrada. Se confirma que `Siniestros` usa API con `VITE_USE_BACKEND=true` y fixture solo con backend desactivado; se anade prueba unitaria del adaptador para catalogs/search backend y fallback fixture, sin tocar backend, SQL, detalle, exportacion ni escrituras. Validacion OK: `npm run test:unit -- Siniestros`, `npm run format`, `npm run lint`, `npm run build`, baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-308-RECIBOS-FE-API-ADAPTER-VERIFY`.
 - 2026-05-20: `T-308-RECIBOS-FE-API-ADAPTER-VERIFY` cerrada. Se confirma que `Recibos` usa API con `VITE_USE_BACKEND=true` y fixture solo con backend desactivado; se anade prueba unitaria del adaptador para catalogs/search backend y fallback fixture, sin tocar backend, SQL, detalle, exportacion, cobro, banco, importes ni escrituras. Validacion OK: `npm run test:unit -- Recibos`, `npm run format`, `npm run lint`, `npm run build`, baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-309-SUPLEMENTOS-FE-API-ADAPTER-VERIFY`.
 - 2026-05-20: `T-309-SUPLEMENTOS-FE-API-ADAPTER-VERIFY` cerrada. Se confirma que `Suplementos` usa API con `VITE_USE_BACKEND=true` y fixture solo con backend desactivado; se anade prueba unitaria del adaptador para catalogs/search backend y fallback fixture, sin tocar backend, SQL, detalle, exportacion, workflows, adjuntos, banco, importes ni escrituras. Validacion OK: `npm run test:unit -- Suplementos`, `npm run format`, `npm run lint`, `npm run build`, baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-310-AGENDA-FE-CRUD-API-ADAPTER-VERIFY`.
+- 2026-05-20: `T-310-AGENDA-FE-CRUD-API-ADAPTER-VERIFY` cerrada. Se confirma que `Agenda` usa API CRUD con `VITE_USE_BACKEND=true` y fixture solo con backend desactivado; se anade prueba unitaria del adaptador para search backend, mapeo minimizado, bloqueo de escrituras sin backend y llamadas CRUD explicitas, sin tocar backend, SQL, permisos ni flags. Validacion OK: `npm run test:unit -- Agenda`, `npm run format`, `npm run lint`, `npm run build`, baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-311-CLIENTES-FE-CRUD-API-ADAPTER-VERIFY`.

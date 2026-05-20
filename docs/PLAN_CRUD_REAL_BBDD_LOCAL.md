@@ -31,18 +31,18 @@ Cada pagina se convierte en vertical propia:
 
 ## Siguiente tarea activa
 
-ID: `T-310-AGENDA-FE-CRUD-API-ADAPTER-VERIFY`
+ID: `T-311-CLIENTES-FE-CRUD-API-ADAPTER-VERIFY`
 
 Estado: `READY`
 
-Objetivo: verificar/adaptar el frontend de `Agenda` para consumir API CRUD cuando `VITE_USE_BACKEND=true` y usar fixture solo con `VITE_USE_BACKEND=false`, tests/offline o fallback explicito, sin tocar backend, SQL, permisos, flags ni activar escrituras reales nuevas.
+Objetivo: verificar/adaptar el frontend de `Clientes` para consumir API CRUD cuando `VITE_USE_BACKEND=true` y usar fixture solo con `VITE_USE_BACKEND=false`, tests/offline o fallback explicito, sin tocar backend, SQL, permisos, flags ni activar escrituras reales nuevas.
 
 Archivos permitidos:
 
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/qa/*agenda*`
-- `iLiniumTech.Frontend/src/features/agenda/**`
+- `docs/qa/*clientes*`
+- `iLiniumTech.Frontend/src/features/clientes/**`
 - `iLiniumTech.Frontend/src/services/**`
 
 Archivos prohibidos:
@@ -50,14 +50,14 @@ Archivos prohibidos:
 - `.env*`, dumps, connection strings o capturas con datos reales;
 - backend, SQL real, repositorios, migraciones, extractores o scripts de BBDD;
 - router, layout, menu, auth o pantallas no relacionadas;
-- escrituras reales nuevas, cambios de permisos, cambios de flags, SQL, migraciones, asunto/descripcion sensible, textos libres o PII real;
+- escrituras reales nuevas, cambios de permisos, cambios de flags, SQL, migraciones, documento/contacto/direccion sensible, textos libres o PII real;
 - cambios de contrato backend sin SDD.
 
 Pasos:
 
 1. Revisar `git status --short --branch`.
-2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`, SDD/evidencias de `Agenda` y feature frontend actual.
-3. Confirmar si el composable/servicio de `Agenda` ya usa API CRUD con `VITE_USE_BACKEND=true`.
+2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`, SDD/evidencias de `Clientes` y feature frontend actual.
+3. Confirmar si el composable/servicio de `Clientes` ya usa API CRUD con `VITE_USE_BACKEND=true`.
 4. Si falta, implementar adaptador frontend explicito con fallback fixture solo cuando `VITE_USE_BACKEND=false`.
 5. Actualizar tests y evidencia QA.
 6. No tocar backend ni BBDD.
@@ -66,7 +66,7 @@ Validacion minima:
 
 ```powershell
 cd .\iLiniumTech.Frontend
-npm run test:unit -- Agenda
+npm run test:unit -- Clientes
 npm run lint
 npm run build
 cd ..
@@ -97,7 +97,8 @@ git diff --check
 | `T-011-SIN-FE-API-ADAPTER-BLOCKED` | `DONE` | Siniestros | Frontend API con fallback fixture explicito | medio |
 | `T-308-RECIBOS-FE-API-ADAPTER-VERIFY` | `DONE` | Recibos | Frontend API con fallback fixture explicito | alto |
 | `T-309-SUPLEMENTOS-FE-API-ADAPTER-VERIFY` | `DONE` | Suplementos | Frontend API con fallback fixture explicito | alto |
-| `T-310-AGENDA-FE-CRUD-API-ADAPTER-VERIFY` | `READY_ACTIVE` | Agenda | Frontend API CRUD con fallback fixture explicito | medio |
+| `T-310-AGENDA-FE-CRUD-API-ADAPTER-VERIFY` | `DONE` | Agenda | Frontend API CRUD con fallback fixture explicito | medio |
+| `T-311-CLIENTES-FE-CRUD-API-ADAPTER-VERIFY` | `READY_ACTIVE` | Clientes | Frontend API CRUD con fallback fixture explicito | alto |
 
 ## Notas de arquitectura detectadas
 

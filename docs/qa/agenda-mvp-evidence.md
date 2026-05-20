@@ -76,3 +76,32 @@ Fecha: 2026-05-16
 - Contrato minimizado sin descripcion larga, participantes, `IdentidadId`, calendario mutante, drag/drop ni escrituras.
 - Se valida rango maximo defensivo de fechas y sort por whitelist.
 - Prueba dirigida ejecutada: `dotnet test .\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\iLiniumTech.Backend.Tests.csproj --configuration Release --filter "Agenda"` OK, 6 tests.
+
+## Actualizacion T-310-AGENDA-FE-CRUD-API-ADAPTER-VERIFY - 2026-05-20
+
+Alcance de esta actualizacion:
+
+- Se revisa el frontend de `Agenda` tras `SDD-2026-015`.
+- `agendaApi.ts` ya consumia `/api/agenda` cuando `VITE_USE_BACKEND=true`.
+- El fixture queda limitado a `VITE_USE_BACKEND=false`, tests/offline o backend desactivado explicitamente.
+- Las funciones de escritura (`createAgendaEvent`, `updateAgendaEvent`, `deleteAgendaEvent`) fallan antes de llamar a API si el backend no esta activo.
+- Se anade `agendaApi.test.ts` para cubrir busqueda backend, mapeo minimizado, fallback fixture, bloqueo de escrituras sin backend y llamadas CRUD explicitas en modo backend.
+- No se toca backend, SQL, permisos, flags, menu, layout ni se activan escrituras reales nuevas.
+
+Evidencia de validacion:
+
+| Comando | Resultado |
+| --- | --- |
+| `npm run test:unit -- Agenda` | OK |
+| `npm run format` | OK |
+| `npm run lint` | OK |
+| `npm run build` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1` | OK |
+| `git diff --check` | OK |
+
+Riesgos residuales:
+
+- Sigue pendiente smoke SQL real local por falta de configuracion visible sin secretos.
+- Escrituras reales dependen de `Agenda:WritesEnabled`, permisos backend y SDD-2026-015; esta tarea no cambia esa configuracion.
+- La siguiente verificacion equivalente pasa a `Clientes`.

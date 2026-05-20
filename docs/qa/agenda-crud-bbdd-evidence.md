@@ -73,3 +73,31 @@ Por tanto no se ejecuta smoke real para evitar pedir, imprimir o versionar secre
 - Agenda permite delete logico solo para filas `ILMVP-AGE-*`; no hay borrado funcional historico.
 - UAT/DBA deben confirmar si `IdPrioridad` debe usar catalogos reales.
 - El smoke SQL real sigue pendiente hasta configurar secretos locales.
+
+## Actualizacion frontend adapter - 2026-05-20
+
+Tarea: `T-310-AGENDA-FE-CRUD-API-ADAPTER-VERIFY`
+
+Estado: `DONE`
+
+Resultado:
+
+- Se confirma que el frontend de `Agenda` consume API cuando `VITE_USE_BACKEND=true`.
+- Se confirma que el fixture queda solo para `VITE_USE_BACKEND=false`, tests/offline o backend desactivado explicitamente.
+- Se confirma que las escrituras del adaptador no llaman API si el backend no esta activo.
+- Se anade prueba unitaria del adaptador para busqueda backend, mapeo minimizado, fallback fixture y llamadas CRUD explicitas.
+- No se tocan backend, SQL, repositorios, permisos, flags ni se activan escrituras reales nuevas.
+
+Validacion:
+
+| Comando | Resultado |
+| --- | --- |
+| `npm run test:unit -- Agenda` | OK |
+| `npm run format` | OK |
+| `npm run lint` | OK |
+| `npm run build` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1` | OK |
+| `git diff --check` | OK |
+
+Siguiente paso operativo: `T-311-CLIENTES-FE-CRUD-API-ADAPTER-VERIFY`.
