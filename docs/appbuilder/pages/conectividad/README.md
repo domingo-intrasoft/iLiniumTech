@@ -21,6 +21,8 @@ Si en el futuro se quiere desarrollar esta pagina, debe abrirse SDD propia y con
 
 Hasta entonces, no debe implementarse nada funcional bajo `Conectividad`.
 
+Actualizacion 2026-05-20: se crea [`docs/engineering/conectividad-threat-model.md`](../../../engineering/conectividad-threat-model.md). El threat model es requisito previo para cualquier API, llamada externa, prueba REST/SOAP, SQL, lectura real, ejecucion de conectores o gestion de secretos; no autoriza todavia datos reales ni payloads.
+
 ## Fuentes revisadas
 
 Repositorio iLiniumTech:
@@ -469,9 +471,9 @@ Permisos candidatos no aprobados:
 - `conectividad.secrets.manage`;
 - `conectividad.audit.read`.
 
-Threat model requerido antes de cualquier dato/API:
+Threat model creado como requisito antes de cualquier dato/API:
 
-- SSRF y allowlist de destinos;
+- [`docs/engineering/conectividad-threat-model.md`](../../../engineering/conectividad-threat-model.md) define SSRF y allowlist de destinos;
 - gestion de secretos fuera del frontend y fuera de Git;
 - timeouts, cancelacion, rate limit y no retry peligroso;
 - auditoria de pruebas;
@@ -483,7 +485,7 @@ Threat model requerido antes de cualquier dato/API:
 Tareas futuras pequenas recomendadas:
 
 1. Confirmar si `Conectividad` es salud de integraciones, administracion tecnica o modulo nuevo.
-2. Preparar threat model de conectividad antes de cualquier API.
+2. Revisar y aprobar el threat model de conectividad antes de cualquier API.
 3. Definir modelo allowlist y secret store.
 4. Crear SDD read-only de inventario sanitizado si producto lo aprueba.
 5. Mantener pruebas que garantizan acciones deshabilitadas y ausencia de secretos.

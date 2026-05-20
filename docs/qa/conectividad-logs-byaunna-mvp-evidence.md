@@ -68,3 +68,9 @@ Validado en navegador embebido contra `http://127.0.0.1:5174` con login demo:
 - `Logs` cuenta con threat model documental en `docs/engineering/logs-threat-model.md`.
 - La pantalla `/logs` sigue bloqueada para API real, SQL, logs reales, payloads, secretos, tokens, headers, cookies, stack traces sensibles, URLs internas, PII, detalle y exportacion.
 - No se modifica runtime backend/frontend ni se usan datos reales.
+
+## Actualizacion Conectividad 2026-05-20
+
+- `Conectividad` cuenta con threat model documental en `docs/engineering/conectividad-threat-model.md`.
+- La pantalla `/conectividad` sigue bloqueada para API real, SQL, conectores reales, llamadas externas, pruebas REST/SOAP, URL libre, payloads reales, secretos, tokens, headers, cookies, responses, URLs internas, PII, detalle y exportacion.
+- No se modifica runtime backend/frontend ni se ejecutan llamadas reales.

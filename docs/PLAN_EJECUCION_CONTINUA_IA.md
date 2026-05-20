@@ -38,19 +38,19 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-053-CONNECTIVITY-THREAT-MODEL`
+ID: `T-011-SIN-FE-API-ADAPTER-BLOCKED`
 
 Estado: `READY`
 
-Nombre: Crear threat model para Conectividad/secretos/SSRF.
+Nombre: Verificar/adaptar frontend Siniestros a API con fallback fixture.
 
 Objetivo:
 
-- Crear threat model documental de `Conectividad` antes de cualquier API, llamada externa, prueba REST/SOAP, SQL, lectura real o ejecucion de conectores.
-- Delimitar datos prohibidos: secretos, tokens, connection strings, payloads, headers, cookies, URLs internas, respuestas reales y PII.
-- Reutilizar la evidencia documental existente de AppBuilder y QA sin reanalizar todo el repositorio.
-- Dejar controles de seguridad, allowlists, egress, permisos, redaccion, auditoria y preguntas UAT/seguridad concretas.
-- No modificar runtime backend/frontend.
+- Confirmar que `/siniestros` consume API cuando `VITE_USE_BACKEND=true`.
+- Mantener fixture solo cuando `VITE_USE_BACKEND=false`, tests/offline o backend no configurado explicitamente.
+- No tocar backend, SQL, permisos, menu, layout ni otras pantallas.
+- Mantener detalle, exportacion, escritura, intervinientes, documentos, descripciones libres y datos sensibles bloqueados.
+- Si ya esta implementado, documentar la evidencia y cerrar la tarea sin cambios runtime.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
 
@@ -58,39 +58,44 @@ Fuentes a leer, sin buscar mas salvo bloqueo real:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/DECISION_DATOS_REALES_LOCALES.md`
-- `docs/appbuilder/pages/conectividad/README.md`
-- `docs/qa/conectividad-mvp-evidence.md`
-- `docs/qa/conectividad-logs-byaunna-mvp-evidence.md`
+- `docs/sdd/specs/iLiniumTech/*siniestros*`
+- `docs/qa/siniestros-mvp-evidence.md`
+- `docs/qa/siniestros-sql-readonly-local-evidence.md`
+- `iLiniumTech.Frontend/src/features/siniestros/**`
 
 Archivos que puede tocar:
 
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
-- `docs/engineering/*conectividad*`
-- `docs/sdd/specs/iLiniumTech/*conectividad*`
-- `docs/qa/*conectividad*`
-- `docs/appbuilder/pages/conectividad/**`
+- `docs/qa/*siniestros*`
+- `iLiniumTech.Frontend/src/features/siniestros/**`
+- `iLiniumTech.Frontend/src/services/**`
 
 Archivos que NO debe tocar:
 
 - cualquier `.env*`, config con secretos, dumps o capturas sensibles;
-- backend, frontend, servicios API, router, layout o codigo de aplicacion;
-- conectores reales, llamadas externas, SQL real, repositorios, migraciones, extractores o scripts de BBDD;
-- payloads reales, tokens, headers, cookies, responses, connection strings, URLs internas, documentos o datos personales reales;
-- `Logs`, `By Aunna`, `Administracion`, `Configuracion` u otras pantallas salvo enlaces documentales estrictamente necesarios.
+- backend, SQL real, repositorios, migraciones, extractores o scripts de BBDD;
+- router, layout, menu, auth o pantallas no relacionadas;
+- detalle, exportacion, escrituras, workflow, documentos, intervinientes, textos libres o PII real;
+- cambios de contrato backend sin SDD.
 
 Pasos de implementacion:
 
 1. Revisar `git status --short --branch`.
 2. Leer solo las fuentes indicadas.
-3. Crear `docs/engineering/conectividad-threat-model.md` o SDD equivalente si no existe.
-4. Definir activos, actores, amenazas SSRF/exfiltracion, datos prohibidos, controles, permisos, allowlists, redaccion, validacion y bloqueos.
-5. Actualizar evidencia QA de `Conectividad` enlazando el threat model.
+3. Revisar si el composable/servicio de `Siniestros` usa API con `VITE_USE_BACKEND=true`.
+4. Si falta, implementar adaptador frontend explicito con fallback fixture solo cuando `VITE_USE_BACKEND=false`.
+5. Actualizar tests y evidencia QA.
 6. Actualizar planes y mover cursor si queda cerrado.
 
 Pruebas obligatorias:
 
 ```powershell
+cd .\iLiniumTech.Frontend
+npm run test:unit -- Siniestros
+npm run lint
+npm run build
+cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
@@ -98,13 +103,12 @@ git diff --check
 
 Criterios de aceptacion:
 
-- Threat model de `Conectividad` queda creado o actualizado.
-- No se toca runtime backend/frontend.
-- Quedan prohibidas llamadas externas, payloads reales, secretos, tokens, headers, cookies, responses, URLs internas, documentos y PII.
-- Quedan preguntas seguridad/UAT/operacion accionables para futuro API real.
-- La evidencia QA enlaza el threat model y explica que sigue sin datos/API reales.
+- `/siniestros` usa API en modo backend y fixture solo en modo offline/test explicito.
+- No se introducen datos sensibles, detalle/exportacion/escrituras ni SQL.
+- Tests frontend dirigidos y build quedan OK.
+- Evidencia QA explica modo API/fallback y riesgos residuales.
 
-Riesgo de conflicto: bajo si se limita a documentacion `Conectividad`.
+Riesgo de conflicto: medio; tocar solo `Siniestros` frontend y servicios necesarios.
 
 ## Cola de tareas pequenas
 
@@ -135,7 +139,7 @@ Objetivo: disenar contratos y pruebas de dominio antes de SQL real. No conectar 
 | ID | Estado | Tarea | Archivos permitidos | Bloqueo |
 | --- | --- | --- | --- | --- |
 | `T-010-SIN-BE-CONTRACT-DESIGN` | `SUPERSEDED` | Sustituida por `T-110-SINIESTROS-BE-READONLY-CONTRACT`. | backend Siniestros nuevo, tests backend, docs QA | no SQL real |
-| `T-011-SIN-FE-API-ADAPTER-BLOCKED` | `TODO` | Preparar adaptador frontend Siniestros con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/siniestros/**` | requiere `T-010` |
+| `T-011-SIN-FE-API-ADAPTER-BLOCKED` | `READY_ACTIVE` | Preparar adaptador frontend Siniestros con fallback fixture solo cuando `VITE_USE_BACKEND=false`. | `src/features/siniestros/**` | `T-110`/`T-304` cerradas |
 | `T-012-REC-BE-CONTRACT-DESIGN` | `SUPERSEDED` | Sustituida por `T-120-RECIBOS-BE-READONLY-CONTRACT`. | backend Recibos nuevo, tests backend | no SQL real |
 | `T-013-CLI-BE-CONTRACT-DESIGN` | `SUPERSEDED` | Sustituida por `T-121-CLIENTES-BE-READONLY-CONTRACT`. | backend Clientes nuevo, tests backend | no SQL real |
 
@@ -207,7 +211,7 @@ Objetivo: no abrir superficies de alto riesgo sin threat model.
 | `T-050-LIQCIA-SDD-READONLY` | `SUPERSEDED_BY_T-130` | Preparar SDD Liq.Cia read-only financiera sin importes reales. | readiness ya existe |
 | `T-051-LIQCOL-SDD-READONLY` | `DONE` | Preparar SDD Liq.Col read-only financiera sin comisiones reales. | readiness ya existe |
 | `T-052-LOGS-THREAT-MODEL` | `DONE` | Crear threat model para Logs antes de cualquier API. | readiness ya existe |
-| `T-053-CONNECTIVITY-THREAT-MODEL` | `READY_ACTIVE` | Crear threat model para Conectividad/secretos/SSRF. | readiness ya existe |
+| `T-053-CONNECTIVITY-THREAT-MODEL` | `DONE` | Crear threat model para Conectividad/secretos/SSRF. | readiness ya existe |
 
 ## Regla para mover la siguiente tarea
 
@@ -285,3 +289,4 @@ Gate completo:
 - 2026-05-20: `T-130-LIQCIA-SDD-READONLY` cerrada. Se crea `docs/sdd/specs/iLiniumTech/SDD-2026-017-liq-cia-read-only.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; importes, banco, facturas, exportacion, detalle financiero y escrituras siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-051-LIQCOL-SDD-READONLY`.
 - 2026-05-20: `T-051-LIQCOL-SDD-READONLY` cerrada. Se crea `docs/sdd/specs/iLiniumTech/SDD-2026-018-liq-col-read-only.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; comisiones reales, liquidos, retenciones, banco, exportacion, detalle financiero y escrituras siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-052-LOGS-THREAT-MODEL`.
 - 2026-05-20: `T-052-LOGS-THREAT-MODEL` cerrada. Se crea `docs/engineering/logs-threat-model.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; logs reales, payloads, secretos, tokens, headers, cookies, stack traces sensibles, URLs internas, PII, detalle y exportacion siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-053-CONNECTIVITY-THREAT-MODEL`.
+- 2026-05-20: `T-053-CONNECTIVITY-THREAT-MODEL` cerrada. Se crea `docs/engineering/conectividad-threat-model.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; conectores reales, llamadas externas, URL libre, payloads, secretos, tokens, headers, cookies, responses, URLs internas, PII, detalle y exportacion siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-011-SIN-FE-API-ADAPTER-BLOCKED`.

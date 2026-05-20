@@ -31,41 +31,45 @@ Cada pagina se convierte en vertical propia:
 
 ## Siguiente tarea activa
 
-ID: `T-053-CONNECTIVITY-THREAT-MODEL`
+ID: `T-011-SIN-FE-API-ADAPTER-BLOCKED`
 
 Estado: `READY`
 
-Objetivo: preparar threat model de `Conectividad` antes de cualquier API, llamada externa, prueba REST/SOAP, SQL, lectura real o ejecucion de conectores, sin activar payloads reales, secretos, tokens, headers, cookies, responses, URLs internas ni PII.
+Objetivo: verificar/adaptar el frontend de `Siniestros` para consumir API cuando `VITE_USE_BACKEND=true` y usar fixture solo con `VITE_USE_BACKEND=false`, tests/offline o fallback explicito, sin tocar backend, SQL, detalle, exportacion ni escrituras.
 
 Archivos permitidos:
 
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/engineering/*conectividad*`
-- `docs/sdd/specs/iLiniumTech/*conectividad*`
-- `docs/qa/*conectividad*`
-- `docs/appbuilder/pages/conectividad/**`
+- `docs/qa/*siniestros*`
+- `iLiniumTech.Frontend/src/features/siniestros/**`
+- `iLiniumTech.Frontend/src/services/**`
 
 Archivos prohibidos:
 
 - `.env*`, dumps, connection strings o capturas con datos reales;
-- backend, frontend, servicios API, router, layout o codigo de aplicacion;
-- conectores reales, llamadas externas, SQL real, repositorios, migraciones, extractores o scripts de BBDD;
-- payloads reales, tokens, headers, cookies, responses, connection strings, URLs internas, documentos o datos personales reales;
-- `Logs`, `By Aunna`, `Administracion`, `Configuracion` u otras pantallas salvo enlaces documentales estrictamente necesarios.
+- backend, SQL real, repositorios, migraciones, extractores o scripts de BBDD;
+- router, layout, menu, auth o pantallas no relacionadas;
+- detalle, exportacion, escrituras, workflow, documentos, intervinientes, textos libres o PII real;
+- cambios de contrato backend sin SDD.
 
 Pasos:
 
 1. Revisar `git status --short --branch`.
-2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`, `docs/appbuilder/pages/conectividad/README.md` y evidencias QA existentes.
-3. Crear `docs/engineering/conectividad-threat-model.md` o SDD equivalente si no existe.
-4. Definir activos, actores, amenazas SSRF/exfiltracion, datos prohibidos, controles, permisos, allowlists, redaccion, validacion y bloqueos.
-5. Actualizar evidencia QA de `Conectividad` enlazando el threat model.
-6. No tocar runtime ni BBDD.
+2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`, SDD/evidencias de `Siniestros` y feature frontend actual.
+3. Confirmar si el composable/servicio de `Siniestros` ya usa API con `VITE_USE_BACKEND=true`.
+4. Si falta, implementar adaptador frontend explicito con fallback fixture solo cuando `VITE_USE_BACKEND=false`.
+5. Actualizar tests y evidencia QA.
+6. No tocar backend ni BBDD.
 
 Validacion minima:
 
 ```powershell
+cd .\iLiniumTech.Frontend
+npm run test:unit -- Siniestros
+npm run lint
+npm run build
+cd ..
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1
 git diff --check
@@ -89,7 +93,8 @@ git diff --check
 | `T-051-LIQCOL-SDD-READONLY` | `DONE` | Liq.Col | SDD/readiness financiera read-only antes de API real | critico |
 | `T-207-LIQUIDACIONES-SDD` | `SUPERSEDED_BY_T-130_T-051` | Liq.Cia/Liq.Col | SDD financiera antes de API real | critico |
 | `T-052-LOGS-THREAT-MODEL` | `DONE` | Logs | Threat model antes de API real o lectura de logs | critico |
-| `T-053-CONNECTIVITY-THREAT-MODEL` | `READY_ACTIVE` | Conectividad | Threat model antes de conectores reales, APIs o llamadas externas | critico |
+| `T-053-CONNECTIVITY-THREAT-MODEL` | `DONE` | Conectividad | Threat model antes de conectores reales, APIs o llamadas externas | critico |
+| `T-011-SIN-FE-API-ADAPTER-BLOCKED` | `READY_ACTIVE` | Siniestros | Frontend API con fallback fixture explicito | medio |
 
 ## Notas de arquitectura detectadas
 
