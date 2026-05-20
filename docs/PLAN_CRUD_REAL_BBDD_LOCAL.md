@@ -31,35 +31,36 @@ Cada pagina se convierte en vertical propia:
 
 ## Siguiente tarea activa
 
-ID: `T-051-LIQCOL-SDD-READONLY`
+ID: `T-052-LOGS-THREAT-MODEL`
 
 Estado: `READY`
 
-Objetivo: preparar SDD/readiness de `Liq.Col` antes de API por riesgo financiero, sin activar SQL, API, comisiones reales, liquidos, retenciones, banco, cierres, exportacion ni escrituras.
+Objetivo: preparar threat model de `Logs` antes de cualquier API, SQL, lectura real, busqueda, detalle o exportacion, sin activar logs reales, payloads, secretos, tokens, headers, cookies, stack traces sensibles, URLs internas ni PII.
 
 Archivos permitidos:
 
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
-- `docs/sdd/specs/iLiniumTech/*liq*`
-- `docs/qa/*liq*`
-- `docs/appbuilder/pages/liq-col/**`
+- `docs/engineering/*logs*`
+- `docs/sdd/specs/iLiniumTech/*logs*`
+- `docs/qa/*logs*`
+- `docs/appbuilder/pages/logs/**`
 
 Archivos prohibidos:
 
 - `.env*`, dumps, connection strings o capturas con datos reales;
 - backend, frontend, servicios API, router, layout o codigo de aplicacion;
 - SQL real, repositorios, migraciones, extractores o scripts de BBDD;
-- comisiones reales, liquidos, retenciones, banco, cierres, exportacion, documentos o datos personales reales;
-- `Liq.Cia`, `Recibos`, `Polizas`, `Clientes` u otras pantallas salvo enlaces documentales estrictamente necesarios.
+- logs reales, payloads reales, tokens, headers, cookies, stack traces sensibles, connection strings, URLs internas, documentos o datos personales reales;
+- `Conectividad`, `By Aunna`, `Administracion`, `Configuracion` u otras pantallas salvo enlaces documentales estrictamente necesarios.
 
 Pasos:
 
 1. Revisar `git status --short --branch`.
-2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`, `docs/appbuilder/pages/liq-col/README.md` y evidencias QA existentes.
-3. Crear `docs/sdd/specs/iLiniumTech/SDD-2026-018-liq-col-read-only.md` si no existe SDD equivalente.
-4. Definir primer corte read-only minimizado, permisos, campos candidatos/prohibidos, seguridad, pruebas y bloqueos DBA/UAT.
-5. Actualizar evidencia QA de `Liq.Col` enlazando la SDD.
+2. Leer `docs/DECISION_DATOS_REALES_LOCALES.md`, `docs/appbuilder/pages/logs/README.md` y evidencias QA existentes.
+3. Crear `docs/engineering/logs-threat-model.md` o SDD equivalente si no existe.
+4. Definir activos, actores, amenazas, datos prohibidos, controles, permisos, retencion, redaccion, validacion y bloqueos.
+5. Actualizar evidencia QA de `Logs` enlazando el threat model.
 6. No tocar runtime ni BBDD.
 
 Validacion minima:
@@ -85,8 +86,9 @@ git diff --check
 | `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` | `DONE_WITH_SKIPPED_SQL_SMOKE` | Suplementos | SQL local real minimizado; escritura bloqueada por workflows/banco/PII | alto |
 | `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` | `BLOCKED_ORIGIN_UNCONFIRMED` | Propuestas | Origen real no confirmado; no usar `Solicitudes` sin UAT/DBA | alto |
 | `T-130-LIQCIA-SDD-READONLY` | `DONE` | Liq.Cia | SDD/readiness financiera read-only antes de API real | critico |
-| `T-051-LIQCOL-SDD-READONLY` | `READY_ACTIVE` | Liq.Col | SDD/readiness financiera read-only antes de API real | critico |
-| `T-207-LIQUIDACIONES-SDD` | `TODO` | Liq.Cia/Liq.Col | SDD financiera antes de API real | critico |
+| `T-051-LIQCOL-SDD-READONLY` | `DONE` | Liq.Col | SDD/readiness financiera read-only antes de API real | critico |
+| `T-207-LIQUIDACIONES-SDD` | `SUPERSEDED_BY_T-130_T-051` | Liq.Cia/Liq.Col | SDD financiera antes de API real | critico |
+| `T-052-LOGS-THREAT-MODEL` | `READY_ACTIVE` | Logs | Threat model antes de API real o lectura de logs | critico |
 
 ## Notas de arquitectura detectadas
 

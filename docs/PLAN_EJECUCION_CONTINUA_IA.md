@@ -38,18 +38,18 @@ Estado: plan operativo canonico para automatizaciones y agentes que continen el 
 
 ## Siguiente tarea activa
 
-ID: `T-051-LIQCOL-SDD-READONLY`
+ID: `T-052-LOGS-THREAT-MODEL`
 
 Estado: `READY`
 
-Nombre: Preparar SDD Liq.Col read-only financiera sin comisiones reales.
+Nombre: Crear threat model para Logs antes de cualquier API.
 
 Objetivo:
 
-- Crear o actualizar una SDD read-only de `Liq.Col` antes de cualquier API, SQL o dato real.
-- Delimitar el primer corte como listado financiero minimizado, sin comisiones reales, liquidos, retenciones, banco, cierres, exportacion ni escrituras.
+- Crear threat model documental de `Logs` antes de cualquier API, SQL, lectura real, busqueda, detalle o exportacion.
+- Delimitar datos prohibidos: secretos, tokens, connection strings, payloads, stack traces sensibles, PII, documentos, headers, cookies, URLs internas y resultados reales.
 - Reutilizar la evidencia documental existente de AppBuilder y QA sin reanalizar todo el repositorio.
-- Dejar preguntas DBA/UAT/seguridad concretas para desbloquear una futura vertical SQL local real.
+- Dejar controles de seguridad, permisos, retencion, redaccion, auditoria y preguntas UAT/seguridad concretas.
 - No modificar runtime backend/frontend.
 
 Fuentes a leer, sin buscar mas salvo bloqueo real:
@@ -58,33 +58,34 @@ Fuentes a leer, sin buscar mas salvo bloqueo real:
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
 - `docs/DECISION_DATOS_REALES_LOCALES.md`
-- `docs/appbuilder/pages/liq-col/README.md`
-- `docs/qa/liq-col-mvp-evidence.md`
-- `docs/qa/liquidaciones-colaborador-mvp-evidence.md`
+- `docs/appbuilder/pages/logs/README.md`
+- `docs/qa/logs-mvp-evidence.md`
+- `docs/qa/conectividad-logs-byaunna-mvp-evidence.md`
 
 Archivos que puede tocar:
 
 - `docs/PLAN_EJECUCION_CONTINUA_IA.md`
 - `docs/PLAN_CRUD_REAL_BBDD_LOCAL.md`
-- `docs/sdd/specs/iLiniumTech/*liq*`
-- `docs/qa/*liq*`
-- `docs/appbuilder/pages/liq-col/**`
+- `docs/engineering/*logs*`
+- `docs/sdd/specs/iLiniumTech/*logs*`
+- `docs/qa/*logs*`
+- `docs/appbuilder/pages/logs/**`
 
 Archivos que NO debe tocar:
 
 - cualquier `.env*`, config con secretos, dumps o capturas sensibles;
 - backend, frontend, servicios API, router, layout o codigo de aplicacion;
 - SQL real, repositorios, migraciones, extractores o scripts de BBDD;
-- comisiones reales, liquidos, retenciones, banco, cierres, exportacion, documentos o datos personales reales;
-- `Liq.Cia`, `Recibos`, `Polizas`, `Clientes` u otras pantallas salvo enlaces documentales estrictamente necesarios.
+- logs reales, payloads reales, tokens, headers, cookies, stack traces sensibles, connection strings, URLs internas, documentos o datos personales reales;
+- `Conectividad`, `By Aunna`, `Administracion`, `Configuracion` u otras pantallas salvo enlaces documentales estrictamente necesarios.
 
 Pasos de implementacion:
 
 1. Revisar `git status --short --branch`.
 2. Leer solo las fuentes indicadas.
-3. Crear `docs/sdd/specs/iLiniumTech/SDD-2026-018-liq-col-read-only.md` si no existe SDD equivalente.
-4. Definir objetivo read-only, fuera de alcance, contrato candidato minimizado, permisos, seguridad, plan de pruebas y bloqueos UAT/DBA.
-5. Actualizar evidencia QA de `Liq.Col` enlazando la SDD.
+3. Crear `docs/engineering/logs-threat-model.md` o SDD equivalente si no existe.
+4. Definir activos, actores, amenazas, datos prohibidos, controles, permisos, retencion, redaccion, validacion y bloqueos.
+5. Actualizar evidencia QA de `Logs` enlazando el threat model.
 6. Actualizar planes y mover cursor si queda cerrado.
 
 Pruebas obligatorias:
@@ -97,13 +98,13 @@ git diff --check
 
 Criterios de aceptacion:
 
-- SDD/readiness de `Liq.Col` queda creada o actualizada.
+- Threat model de `Logs` queda creado o actualizado.
 - No se toca runtime backend/frontend.
-- La SDD deja prohibidos comisiones reales, liquidos, retenciones, banco, cierres, exportacion y escrituras.
-- Quedan preguntas DBA/UAT/seguridad accionables para futuro SQL real local.
-- La evidencia QA enlaza la SDD y explica que sigue sin datos/API reales.
+- Quedan prohibidos logs reales, payloads, secretos, tokens, headers, cookies, stack traces sensibles, URLs internas, documentos y PII.
+- Quedan preguntas seguridad/UAT/operacion accionables para futuro API real.
+- La evidencia QA enlaza el threat model y explica que sigue sin datos/API reales.
 
-Riesgo de conflicto: bajo si se limita a documentacion `Liq.Col`.
+Riesgo de conflicto: bajo si se limita a documentacion `Logs`.
 
 ## Cola de tareas pequenas
 
@@ -204,8 +205,8 @@ Objetivo: no abrir superficies de alto riesgo sin threat model.
 | ID | Estado | Tarea | Precondicion |
 | --- | --- | --- |
 | `T-050-LIQCIA-SDD-READONLY` | `SUPERSEDED_BY_T-130` | Preparar SDD Liq.Cia read-only financiera sin importes reales. | readiness ya existe |
-| `T-051-LIQCOL-SDD-READONLY` | `READY_ACTIVE` | Preparar SDD Liq.Col read-only financiera sin comisiones reales. | readiness ya existe |
-| `T-052-LOGS-THREAT-MODEL` | `TODO` | Crear threat model para Logs antes de cualquier API. | readiness ya existe |
+| `T-051-LIQCOL-SDD-READONLY` | `DONE` | Preparar SDD Liq.Col read-only financiera sin comisiones reales. | readiness ya existe |
+| `T-052-LOGS-THREAT-MODEL` | `READY_ACTIVE` | Crear threat model para Logs antes de cualquier API. | readiness ya existe |
 | `T-053-CONNECTIVITY-THREAT-MODEL` | `TODO` | Crear threat model para Conectividad/secretos/SSRF. | readiness ya existe |
 
 ## Regla para mover la siguiente tarea
@@ -282,3 +283,4 @@ Gate completo:
 - 2026-05-20: `T-306-SUPLEMENTOS-SQL-READONLY-LOCAL` cerrada como `DONE_WITH_SKIPPED_SQL_SMOKE`. Se implemento repositorio SQL read-only de Suplementos sobre `dbo.Suplemento`, join minimizado a `Poliza`/`Catalogo`, filtro `BrokerIntegracionId`, frontend API en `VITE_USE_BACKEND=true` y columna `Origen` eliminada. No se proyectan `Concepto` real, `Valor`, `ValorAnterior`, `EmailComunicacion`, tomador, beneficiario, documentos, banco, importes, recibos/declaraciones, adjuntos ni workflows. Smoke SQL real local queda `SKIPPED_ENV_MISSING` por ausencia de configuracion `Suplementos__*`, `ConnectionStrings__Suplementos*` o `ConnectionStrings__AppBuilderMaster` visible sin secretos. Evidencia en `docs/qa/suplementos-sql-readonly-local-evidence.md`. Cursor pasa a `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL`.
 - 2026-05-20: `T-307-PROPUESTAS-SQL-DISCOVERY-LOCAL` cerrada como `BLOCKED_ORIGIN_UNCONFIRMED`. Se revisan `SDD-2026-012` y `docs/appbuilder/pages/propuestas/README.md`; no hay `componentId`, datasource, tabla/vista origen, regla broker/tenant ni equivalencia `Solicitudes` confirmada. No se toca runtime ni se crea SQL especulativo. Validacion OK: backend `Propuestas` 5 tests, frontend `Propuestas` 4 tests, baseline documental, secret scan y `git diff --check`. Evidencia en `docs/qa/propuestas-sql-discovery-local-evidence.md`. Cursor pasa a `T-130-LIQCIA-SDD-READONLY`.
 - 2026-05-20: `T-130-LIQCIA-SDD-READONLY` cerrada. Se crea `docs/sdd/specs/iLiniumTech/SDD-2026-017-liq-cia-read-only.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; importes, banco, facturas, exportacion, detalle financiero y escrituras siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-051-LIQCOL-SDD-READONLY`.
+- 2026-05-20: `T-051-LIQCOL-SDD-READONLY` cerrada. Se crea `docs/sdd/specs/iLiniumTech/SDD-2026-018-liq-col-read-only.md` y se enlaza desde evidencia AppBuilder/QA. No se toca runtime, API, SQL ni BBDD; comisiones reales, liquidos, retenciones, banco, exportacion, detalle financiero y escrituras siguen bloqueados. Validacion OK: baseline documental, secret scan y `git diff --check`. Cursor pasa a `T-052-LOGS-THREAT-MODEL`.

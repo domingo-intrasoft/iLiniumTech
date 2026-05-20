@@ -43,7 +43,8 @@ Fuentes revisadas:
 
 ## Dependencias para avanzar
 
-- SDD read-only aprobada.
+- SDD draft creada: `docs/sdd/specs/iLiniumTech/SDD-2026-018-liq-col-read-only.md`.
+- SDD read-only pendiente de aprobacion por producto, DBA y seguridad.
 - UAT owner para identidad funcional, columnas, filtros, estados y reglas de comision.
 - DBA owner para fuente read-only, claves estables, relacion con `Liq.Cia`, `SESSION_CONTEXT`, whitelists e indices.
 - Seguridad para minimizacion de documentos, motivos libres, importes, logging y exportaciones.
@@ -54,3 +55,11 @@ Fuentes revisadas:
 - No se ejecutaron tests frontend/backend porque no hubo cambio runtime.
 - Validacion documental ligera ejecutada: `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1` OK.
 - `git diff --check` ejecutado sin errores bloqueantes; solo avisos LF/CRLF de normalizacion.
+
+## Actualizacion SDD 2026-05-20
+
+- `T-051-LIQCOL-SDD-READONLY` crea la SDD draft `SDD-2026-018`.
+- La SDD delimita un primer corte futuro de listado read-only minimizado.
+- Siguen bloqueados API real, SQL, comisiones reales, liquidos, retenciones, banco, exportacion, detalle financiero, conceptos, exclusiones, cierre, validacion, recalculo y escrituras.
+- No se modifica runtime backend/frontend ni se usan datos reales.
+- Validacion ejecutada: baseline documental OK, secret scan OK y `git diff --check` OK.

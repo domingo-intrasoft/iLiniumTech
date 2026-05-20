@@ -93,6 +93,12 @@ Smoke visual en navegador:
 ## Riesgos residuales
 
 - La pantalla usa fixture local y no valida contratos reales de API.
-- El significado funcional de estados, cierres, conceptos y liquidacion de colaborador sigue pendiente de SDD/UAT.
+- Existe SDD draft `docs/sdd/specs/iLiniumTech/SDD-2026-018-liq-col-read-only.md`; falta aprobacion UAT/DBA/seguridad para confirmar identidad funcional, columnas, estados, permisos reales y origen SQL.
 - Comisiones, retenciones, liquidos, documentos y datos bancarios permanecen bloqueados hasta permisos y minimizacion backend.
 - No se habilitan escrituras, cierres, recalculos, validaciones ni exportaciones.
+
+## Actualizacion SDD 2026-05-20
+
+- `T-051-LIQCOL-SDD-READONLY` formaliza la SDD draft `SDD-2026-018 Liq.Col read-only financiero minimizado`.
+- La pantalla `/liq-col` sigue siendo MVP estatico fixture/read-only.
+- La SDD no autoriza todavia API, SQL real, comisiones reales, liquidos, retenciones, banco, exportacion, detalle financiero ni escrituras.

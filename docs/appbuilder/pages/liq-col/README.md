@@ -21,6 +21,8 @@ Hay evidencia local suficiente para afirmar que existe un dominio de datos de li
 
 Por tanto, `Liq.Col` no debe desarrollarse todavia como pagina iLiniumTech salvo que producto aporte una SDD y UAT, o que se extraiga metadata sanitizada suficiente de AppBuilder. Las entidades y vistas encontradas sirven como evidencia de dominio, no como contrato de UI/API.
 
+Actualizacion 2026-05-20: se crea la SDD draft [`SDD-2026-018 Liq.Col read-only financiero minimizado`](../../../sdd/specs/iLiniumTech/SDD-2026-018-liq-col-read-only.md). La SDD prepara un primer corte futuro de listado read-only minimizado, pero no autoriza todavia API, SQL real, comisiones reales, liquidos, retenciones, banco, exportacion, detalle financiero ni escrituras.
+
 ## Fuentes revisadas
 
 Repositorio iLiniumTech:
@@ -740,7 +742,7 @@ Actualizacion documental sin cambios de aplicacion. Esta seccion contrasta la ev
 
 ### Tareas futuras pequenas
 
-- Redactar SDD read-only de `Liq.Col` con listado minimizado y sin comisiones/liquidos por defecto.
+- Revisar y aprobar `SDD-2026-018 Liq.Col read-only financiero minimizado` con producto, DBA y seguridad.
 - Separar permisos de lectura general y lectura de comisiones.
 - Inventariar filtros candidatos y descartes con UAT.
 - Proponer pruebas 401/403/tenant para `catalogs`, listado y detalle futuro.
