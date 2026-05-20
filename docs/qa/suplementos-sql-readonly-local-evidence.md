@@ -91,3 +91,30 @@ Resultados:
 - Smoke real pendiente hasta que exista configuracion local fuera de Git.
 - Los catalogos SQL de Suplementos se mantienen conservadores (`No informado`) hasta confirmar taxonomia real por UAT/DBA.
 - Detalle, tabs por tipo, workflows, adjuntos, recibos/declaraciones, exportacion y escrituras requieren SDD posterior.
+
+## Actualizacion frontend adapter - 2026-05-20
+
+Tarea: `T-309-SUPLEMENTOS-FE-API-ADAPTER-VERIFY`
+
+Estado: `DONE`
+
+Resultado:
+
+- Se confirma que el frontend de `Suplementos` consume API cuando `VITE_USE_BACKEND=true`.
+- Se confirma que el fixture queda solo para `VITE_USE_BACKEND=false`, tests/offline o backend desactivado explicitamente.
+- Se anade prueba unitaria del adaptador para endpoint de catalogos, endpoint de busqueda y fallback fixture.
+- No se tocan backend, SQL, repositorios, permisos, detalle, exportacion, workflows, adjuntos, documentos, banco, importes reales ni escrituras.
+
+Validacion:
+
+| Comando | Resultado |
+| --- | --- |
+| `npm run test:unit -- Suplementos` | OK |
+| `npm run format` | OK |
+| `npm run lint` | OK |
+| `npm run build` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1` | OK |
+| `git diff --check` | OK |
+
+Siguiente paso operativo: `T-310-AGENDA-FE-CRUD-API-ADAPTER-VERIFY`.

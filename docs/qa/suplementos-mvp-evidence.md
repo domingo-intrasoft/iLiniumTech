@@ -64,3 +64,31 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-Documenta
 ```
 
 Resultado: ver cierre de la tarea integradora de Operativa seguros.
+
+## Actualizacion T-309-SUPLEMENTOS-FE-API-ADAPTER-VERIFY - 2026-05-20
+
+Alcance de esta actualizacion:
+
+- Se revisa el frontend de `Suplementos` tras `T-306`.
+- `suplementosApi.ts` ya consumia `/api/suplementos/catalogs` y `/api/suplementos` cuando `VITE_USE_BACKEND=true`.
+- El fixture queda limitado a `VITE_USE_BACKEND=false`, tests/offline o backend desactivado explicitamente.
+- Se anade `suplementosApi.test.ts` para cubrir catalogs/search en modo backend y fallback fixture sin llamadas API.
+- No se toca backend, SQL, detalle, exportacion, workflows, adjuntos, banco, importes, documentos ni escrituras.
+
+Evidencia de validacion:
+
+| Comando | Resultado |
+| --- | --- |
+| `npm run test:unit -- Suplementos` | OK |
+| `npm run format` | OK |
+| `npm run lint` | OK |
+| `npm run build` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\quality\Test-DocumentationBaseline.ps1` | OK |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File tools\security\Invoke-SecretScan.ps1` | OK |
+| `git diff --check` | OK |
+
+Riesgos residuales:
+
+- Sigue pendiente smoke SQL real local por falta de configuracion visible sin secretos.
+- Detalle, tabs por tipo, workflows, adjuntos, recibos/declaraciones, exportacion, importes, banco y escrituras siguen bloqueados hasta SDD/UAT/DBA especificos.
+- La siguiente verificacion equivalente pasa a `Agenda`.
