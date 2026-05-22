@@ -13,6 +13,11 @@ export function usePolizas() {
     numero: '',
     cliente: '',
     estado: '',
+    compania: '',
+    ramo: '',
+    documento: '',
+    fechaEfectoDesde: '',
+    fechaEfectoHasta: '',
   })
 
   const visibleFields = computed(() =>
@@ -31,6 +36,11 @@ export function usePolizas() {
         numero: filters.numero || undefined,
         cliente: filters.cliente || undefined,
         estado: filters.estado || undefined,
+        compania: filters.compania || undefined,
+        ramo: filters.ramo || undefined,
+        documento: filters.documento || undefined,
+        fechaEfectoDesde: filters.fechaEfectoDesde || undefined,
+        fechaEfectoHasta: filters.fechaEfectoHasta || undefined,
         page: 1,
         pageSize: 25,
         sort: 'fechaEfecto:desc',

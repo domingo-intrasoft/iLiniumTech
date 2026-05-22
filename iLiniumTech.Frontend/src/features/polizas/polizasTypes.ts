@@ -41,6 +41,64 @@ export interface PolizaListItem {
   moneda: string
 }
 
+export interface PolizaCliente {
+  id: string
+  nombre: string
+  documento: string
+}
+
+export interface PolizaProducto {
+  nombre: string
+  modalidad: string
+}
+
+export interface PolizaVigencia {
+  fechaInicio: string
+  fechaVencimiento: string
+  renovacion: string
+}
+
+export interface PolizaFinanciero {
+  primaAnual: number
+  moneda: string
+}
+
+export interface PolizaRiesgo {
+  id: string
+  descripcion: string
+  tipoRiesgo?: string
+  fechaAlta?: string
+  fechaBaja?: string
+}
+
+export interface PolizaRecibo {
+  id: string
+  numero: string
+  estado: string
+  estadoCia: string
+  estadoColab: string
+  tipo: string
+  gestor: string
+  primaTotal: number
+  fechaEfecto: string
+  fechaVencimiento: string
+}
+
+export interface PolizaDetail {
+  id: string
+  numero: string
+  aplicacion: string
+  estado: string
+  ramo: string
+  compania: string
+  cliente: PolizaCliente
+  producto: PolizaProducto
+  vigencia: PolizaVigencia
+  financiero: PolizaFinanciero
+  riesgos: PolizaRiesgo[]
+  recibos: PolizaRecibo[]
+}
+
 export interface PagedResult<T> {
   items: T[]
   page: number

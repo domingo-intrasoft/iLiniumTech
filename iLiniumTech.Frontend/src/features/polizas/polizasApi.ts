@@ -1,12 +1,17 @@
 import { apiClient } from '@/services/apiClient'
 
 import { polizasFixture, polizasMetadata } from './polizasFixture'
-import type { PagedResult, PolizaListItem, PolizasComponentMetadata } from './polizasTypes'
+import type { PagedResult, PolizaListItem, PolizasComponentMetadata, PolizaDetail } from './polizasTypes'
 
 export interface PolizasSearchParams {
   numero?: string
   cliente?: string
   estado?: string
+  compania?: string
+  ramo?: string
+  documento?: string
+  fechaEfectoDesde?: string
+  fechaEfectoHasta?: string
   page?: number
   pageSize?: number
   sort?: string
@@ -43,5 +48,57 @@ export async function searchPolizas(
     ...polizasFixture,
     total: items.length,
     items,
+  }
+}
+
+export async function getPolizaById(id: string): Promise<PolizaDetail> {
+  if (import.meta.env.VITE_USE_BACKEND === 'true') {
+    const response = await apiClient.get<PolizaDetail>(`/api/polizas/${id}`)
+    return response.data
+  }
+
+  // Fallback to mock detailed item
+  return {
+    id: id,
+    numero: '4105925343142',
+    aplicacion: 'Autos',
+    estado: 'Vigor',
+    ramo: 'Autos',
+    compania: 'Reale Vida',
+    cliente: {
+      id: 'CLI-588788',
+      nombre: 'Hernandez Gila, Lara',
+      documento: '52017408X',
+    },
+    producto: {
+      nombre: 'Reale Seguros Generales, S.A. - Vida Tem',
+      modalidad: 'Individual',
+    },
+    vigencia: {
+      fechaInicio: '2026-01-01',
+      fechaVencimiento: '2027-01-01',
+      renovacion: 'Anual',
+    },
+    financiero: {
+      primaAnual: 609.61,
+      moneda: 'EUR',
+    },
+    riesgos: [
+      { id: 'R-001', descripcion: 'Vehiculo Automovil ', tipoRiesgo: 'Autos Cat.1', fechaAlta: '2026-01-01', fechaBaja: undefined }
+    ],
+    recibos: [
+      {
+        id: 'REC-251436851',
+        numero: '251436851',
+        estado: 'Cobrado',
+        estadoCia: 'Liquidado',
+        estadoColab: 'Liquidado',
+        tipo: 'Producción',
+        gestor: 'Compañía',
+        primaTotal: 609.61,
+        fechaEfecto: '2026-01-01',
+        fechaVencimiento: '2027-01-01'
+      }
+    ]
   }
 }

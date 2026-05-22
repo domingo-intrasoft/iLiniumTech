@@ -8,7 +8,10 @@ public sealed record PolizasSearchRequest(
     string? Cliente = null,
     string? Estado = null,
     DateOnly? FechaEfectoDesde = null,
-    DateOnly? FechaEfectoHasta = null);
+    DateOnly? FechaEfectoHasta = null,
+    string? Compania = null,
+    string? Ramo = null,
+    string? Documento = null);
 
 public sealed record PolizasSort(
     string Field,

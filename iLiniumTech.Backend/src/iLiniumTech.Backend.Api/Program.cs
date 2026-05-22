@@ -23,7 +23,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddSingleton<IPolizasService, PolizasService>();
+builder.Services.AddScoped<IPolizasService, PolizasService>();
 builder.Services.AddInfrastructure();
 
 var app = builder.Build();
@@ -59,6 +59,9 @@ polizas.MapGet("/", async (
     [FromQuery] string? estado,
     [FromQuery] DateOnly? fechaEfectoDesde,
     [FromQuery] DateOnly? fechaEfectoHasta,
+    [FromQuery] string? compania,
+    [FromQuery] string? ramo,
+    [FromQuery] string? documento,
     CancellationToken cancellationToken) =>
 {
     var request = new PolizasSearchRequest(
@@ -69,7 +72,10 @@ polizas.MapGet("/", async (
         Cliente: cliente,
         Estado: estado,
         FechaEfectoDesde: fechaEfectoDesde,
-        FechaEfectoHasta: fechaEfectoHasta);
+        FechaEfectoHasta: fechaEfectoHasta,
+        Compania: compania,
+        Ramo: ramo,
+        Documento: documento);
 
     try
     {

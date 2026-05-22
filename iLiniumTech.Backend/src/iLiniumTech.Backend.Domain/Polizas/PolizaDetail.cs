@@ -11,7 +11,8 @@ public sealed record PolizaDetail(
     PolizaProducto Producto,
     PolizaVigencia Vigencia,
     PolizaFinanciero Financiero,
-    IReadOnlyList<PolizaRiesgo> Riesgos);
+    IReadOnlyList<PolizaRiesgo> Riesgos,
+    IReadOnlyList<PolizaRecibo> Recibos);
 
 public sealed record PolizaCliente(
     string Id,
@@ -33,4 +34,19 @@ public sealed record PolizaFinanciero(
 
 public sealed record PolizaRiesgo(
     string Id,
-    string Descripcion);
+    string Descripcion,
+    string? TipoRiesgo = null,
+    DateOnly? FechaAlta = null,
+    DateOnly? FechaBaja = null);
+
+public sealed record PolizaRecibo(
+    string Id,
+    string Numero,
+    string Estado,
+    string EstadoCia,
+    string EstadoColab,
+    string Tipo,
+    string Gestor,
+    decimal PrimaTotal,
+    DateOnly FechaEfecto,
+    DateOnly FechaVencimiento);

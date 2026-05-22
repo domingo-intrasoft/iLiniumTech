@@ -94,7 +94,19 @@ public sealed class InMemoryPolizasRepository : IPolizasRepository
             Producto: new PolizaProducto(item.Aplicacion, "Modalidad demo"),
             Vigencia: new PolizaVigencia(item.FechaEfecto, item.FechaVencimiento, "Anual"),
             Financiero: new PolizaFinanciero(item.PrimaAnual, item.Moneda),
-            Riesgos: [new PolizaRiesgo("R-001", "Riesgo anonimizado")]);
+            Riesgos: [new PolizaRiesgo("R-001", "Riesgo anonimizado")],
+            Recibos: [new PolizaRecibo(
+                "REC-001",
+                "REC-NUM-001",
+                "Cobrado",
+                "Liquidado",
+                "Liquidado",
+                "Cartera",
+                "Compañía",
+                item.PrimaAnual,
+                item.FechaEfecto,
+                item.FechaVencimiento
+            )]);
 
         return Task.FromResult<PolizaDetail?>(detail);
     }

@@ -1,0 +1,1231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="7b6f1916-5c0c-44a0-a8b6-cff3848f16c7" name="DomingoCabezaGuerra@DESKTOP-1REV7PD 2026-05-17 13:42:49" runUser="AzureAD\DomingoCabezaGuerra" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-05-17T13:42:49.7739451+01:00" queuing="2026-05-17T13:42:49.7739453+01:00" start="2026-05-17T13:42:49.0991353+01:00" finish="2026-05-17T13:42:52.9682614+01:00" />
+  <TestSettings name="default" id="15a4da6a-5fd9-47aa-bb64-980f2d6b0fd0">
+    <Deployment runDeploymentRoot="DomingoCabezaGuerra_DESKTOP-1REV7PD_2026-05-17_13_42_49" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="45c330b0-c8c9-4775-8494-c83d85e61d60" testId="72d75e13-c5a1-3289-4c64-509c039ba79b" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Responses_include_baseline_security_headers" computerName="DESKTOP-1REV7PD" duration="00:00:00.0407713" startTime="2026-05-17T13:42:51.5467776+01:00" endTime="2026-05-17T13:42:51.5877660+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="45c330b0-c8c9-4775-8494-c83d85e61d60" />
+    <UnitTestResult executionId="2c630811-6ecb-4ac8-ae91-ba07d80d1828" testId="d9534c04-79fe-db51-4fe8-51cbf87c510e" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_rejects_demo_session_when_current_broker_is_not_allowed" computerName="DESKTOP-1REV7PD" duration="00:00:00.0426717" startTime="2026-05-17T13:42:51.8969092+01:00" endTime="2026-05-17T13:42:51.9397634+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2c630811-6ecb-4ac8-ae91-ba07d80d1828" />
+    <UnitTestResult executionId="871c2986-d54b-41fd-b969-af64cabe1b9e" testId="a562eb8a-6eeb-e3af-d348-30e472b6acac" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_parameterizes_filter_values" computerName="DESKTOP-1REV7PD" duration="00:00:00.0022328" startTime="2026-05-17T13:42:49.7532082+01:00" endTime="2026-05-17T13:42:49.7535820+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="871c2986-d54b-41fd-b969-af64cabe1b9e" />
+    <UnitTestResult executionId="6a80ce61-bb67-47d7-b743-c841390ed966" testId="497644ba-2607-81d1-e72b-6ad818de0e4d" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_rejects_broker_switch_when_allowed_brokers_are_missing" computerName="DESKTOP-1REV7PD" duration="00:00:00.0497314" startTime="2026-05-17T13:42:51.0122527+01:00" endTime="2026-05-17T13:42:51.0621129+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6a80ce61-bb67-47d7-b743-c841390ed966" />
+    <UnitTestResult executionId="9ec87282-b93f-41d2-89f8-a28358d8329a" testId="ce6994e0-0692-7186-0558-e37e999b10eb" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_applies_offset_fetch_pagination(page: 2, pageSize: 25, expectedOffset: 25)" computerName="DESKTOP-1REV7PD" duration="00:00:00.0005555" startTime="2026-05-17T13:42:49.7503950+01:00" endTime="2026-05-17T13:42:49.7504309+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9ec87282-b93f-41d2-89f8-a28358d8329a" />
+    <UnitTestResult executionId="7e6ca67e-1b68-41eb-8a92-6a51253c2250" testId="4fbe285e-7105-35d8-3de4-07fcb5f28270" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_can_use_header_context_outside_development_with_explicit_demo_opt_in" computerName="DESKTOP-1REV7PD" duration="00:00:00.0510262" startTime="2026-05-17T13:42:50.4945882+01:00" endTime="2026-05-17T13:42:50.5458029+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7e6ca67e-1b68-41eb-8a92-6a51253c2250" />
+    <UnitTestResult executionId="be575690-58c0-4a79-baf8-1360eba9a525" testId="3c8129ef-d341-c87b-0668-bfdce0f32649" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Sql_repository_configuration_errors_are_sanitized" computerName="DESKTOP-1REV7PD" duration="00:00:00.0422221" startTime="2026-05-17T13:42:51.1052913+01:00" endTime="2026-05-17T13:42:51.1477352+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="be575690-58c0-4a79-baf8-1360eba9a525" />
+    <UnitTestResult executionId="b638cf9e-9000-4351-a106-2a21972e3a20" testId="bec11589-aa7f-ffbe-0e53-0562aa828811" testName="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_registers_appbuilder_master_connection_provider" computerName="DESKTOP-1REV7PD" duration="00:00:00.0001758" startTime="2026-05-17T13:42:49.7542455+01:00" endTime="2026-05-17T13:42:49.7542702+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b638cf9e-9000-4351-a106-2a21972e3a20" />
+    <UnitTestResult executionId="35cf7ee6-4b2f-4ff1-bf57-5f088ba7e296" testId="8037b4cf-7882-04bd-936e-095271a84313" testName="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.Protector_returns_plain_values_when_key_is_not_configured" computerName="DESKTOP-1REV7PD" duration="00:00:00.0000758" startTime="2026-05-17T13:42:49.7961713+01:00" endTime="2026-05-17T13:42:49.7962168+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="35cf7ee6-4b2f-4ff1-bf57-5f088ba7e296" />
+    <UnitTestResult executionId="a2819f6a-c770-4eb9-95af-1793229afee5" testId="36294e64-44d6-a9cf-e827-3879dbb4f088" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Sql_appbuilder_mode_requires_broker_context" computerName="DESKTOP-1REV7PD" duration="00:00:00.0473736" startTime="2026-05-17T13:42:50.0875569+01:00" endTime="2026-05-17T13:42:50.1350770+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a2819f6a-c770-4eb9-95af-1793229afee5" />
+    <UnitTestResult executionId="c7ca636e-2c09-484d-8aa4-5ee46a36ba44" testId="6b050e37-645f-928b-ac25-457bf27815e1" testName="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_ignores_header_context_outside_development_without_demo_opt_in_even_with_override" computerName="DESKTOP-1REV7PD" duration="00:00:00.0016423" startTime="2026-05-17T13:42:49.7543804+01:00" endTime="2026-05-17T13:42:49.7544281+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c7ca636e-2c09-484d-8aa4-5ee46a36ba44" />
+    <UnitTestResult executionId="577d5321-5c6b-4eab-8876-017e65383974" testId="8a44db3f-c29b-66ca-e9c6-6813c922ed1e" testName="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_can_enable_header_context_outside_development_with_explicit_demo_opt_in" computerName="DESKTOP-1REV7PD" duration="00:00:00.0007393" startTime="2026-05-17T13:42:49.7547039+01:00" endTime="2026-05-17T13:42:49.7547278+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="577d5321-5c6b-4eab-8876-017e65383974" />
+    <UnitTestResult executionId="fd904d24-93c5-4f55-b668-4643a600902c" testId="5100adc6-9ba0-3cce-0394-d084bfdc4117" testName="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_ignores_headers_unless_header_context_is_enabled" computerName="DESKTOP-1REV7PD" duration="00:00:00.0001722" startTime="2026-05-17T13:42:49.7552712+01:00" endTime="2026-05-17T13:42:49.7552973+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fd904d24-93c5-4f55-b668-4643a600902c" />
+    <UnitTestResult executionId="270f37ee-b23f-4c1f-a5e4-961d99fa8329" testId="1d976dce-29b4-d866-a28f-8f93e445c68c" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_allows_explicit_non_default_password_outside_development_with_opt_in" computerName="DESKTOP-1REV7PD" duration="00:00:00.0446145" startTime="2026-05-17T13:42:52.5658138+01:00" endTime="2026-05-17T13:42:52.6108127+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="270f37ee-b23f-4c1f-a5e4-961d99fa8329" />
+    <UnitTestResult executionId="ca34866a-8965-427b-b7f3-1a4bf51e5ad8" testId="1bc1047c-901a-6aa8-01a0-0c74e3987a56" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Api_key_mvp_does_not_grant_polizas_permissions_outside_development" computerName="DESKTOP-1REV7PD" duration="00:00:00.0576543" startTime="2026-05-17T13:42:50.6417370+01:00" endTime="2026-05-17T13:42:50.6995471+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ca34866a-8965-427b-b7f3-1a4bf51e5ad8" />
+    <UnitTestResult executionId="86a48a62-d0be-490a-8713-1622e301c6bb" testId="21247a78-8a85-d769-fef8-c9b2f8270c4f" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_applies_offset_fetch_pagination(page: 5, pageSize: 10, expectedOffset: 40)" computerName="DESKTOP-1REV7PD" duration="00:00:00.0024391" startTime="2026-05-17T13:42:49.7277957+01:00" endTime="2026-05-17T13:42:49.7500201+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="86a48a62-d0be-490a-8713-1622e301c6bb" />
+    <UnitTestResult executionId="c1deec79-8e1d-4576-b902-38fa25fb4107" testId="6c6a9e0c-d504-8146-7d35-8cd094b7ed4b" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_read_permission_does_not_allow_detail" computerName="DESKTOP-1REV7PD" duration="00:00:00.0803847" startTime="2026-05-17T13:42:50.2345335+01:00" endTime="2026-05-17T13:42:50.3151015+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c1deec79-8e1d-4576-b902-38fa25fb4107" />
+    <UnitTestResult executionId="c311141d-5661-4a4f-92f8-670b0a27a9ca" testId="9031b07e-0a1e-ed69-3228-7773655e7245" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_validation_errors_are_sanitized" computerName="DESKTOP-1REV7PD" duration="00:00:00.0482150" startTime="2026-05-17T13:42:52.6113908+01:00" endTime="2026-05-17T13:42:52.6593115+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c311141d-5661-4a4f-92f8-670b0a27a9ca" />
+    <UnitTestResult executionId="35114994-e124-478e-9576-25045a4cf874" testId="ffa06ba7-bf2a-3051-3a22-27a07cd887c4" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_is_anonymous_and_reports_configured_backend" computerName="DESKTOP-1REV7PD" duration="00:00:00.0495110" startTime="2026-05-17T13:42:50.5464353+01:00" endTime="2026-05-17T13:42:50.5956149+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="35114994-e124-478e-9576-25045a4cf874" />
+    <UnitTestResult executionId="ccb9b56b-9683-48db-88f9-3a0a06da4a32" testId="b8b7379c-554d-fcfa-555f-ec67f2884629" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_with_catalogs_permission_can_read_catalogs" computerName="DESKTOP-1REV7PD" duration="00:00:00.0440822" startTime="2026-05-17T13:42:52.1201797+01:00" endTime="2026-05-17T13:42:52.1644344+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ccb9b56b-9683-48db-88f9-3a0a06da4a32" />
+    <UnitTestResult executionId="bc8be6ab-4fb4-44d4-b7cb-7bcbb94dc95d" testId="40551f50-f54a-6b61-8602-e19271ce42d4" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_rejects_broker_switch_outside_allowed_brokers_without_exposing_ids" computerName="DESKTOP-1REV7PD" duration="00:00:00.0448963" startTime="2026-05-17T13:42:50.9243785+01:00" endTime="2026-05-17T13:42:50.9696027+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bc8be6ab-4fb4-44d4-b7cb-7bcbb94dc95d" />
+    <UnitTestResult executionId="699bfa1c-43bc-4604-bd0a-315cf7eae09e" testId="7238cd6c-35e1-3c85-40f6-a353b45a6015" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_search_returns_only_autos_fixture_data" computerName="DESKTOP-1REV7PD" duration="00:00:00.0472709" startTime="2026-05-17T13:42:51.5878730+01:00" endTime="2026-05-17T13:42:51.6355657+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="699bfa1c-43bc-4604-bd0a-315cf7eae09e" />
+    <UnitTestResult executionId="dc747093-47f9-4ed8-b1b1-5e93b0130e8a" testId="e950b4f9-85f2-6898-9579-7377ed67ea47" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_catalogs_are_minimized_and_scoped" computerName="DESKTOP-1REV7PD" duration="00:00:00.0521756" startTime="2026-05-17T13:42:52.4272802+01:00" endTime="2026-05-17T13:42:52.4796671+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dc747093-47f9-4ed8-b1b1-5e93b0130e8a" />
+    <UnitTestResult executionId="16c22f34-872a-4105-8154-6ef1f8bfc7e5" testId="ffe0d561-8f90-c6a5-9e51-01f8dc9b15fd" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_returns_effective_polizas_context_from_configuration" computerName="DESKTOP-1REV7PD" duration="00:00:00.0422176" startTime="2026-05-17T13:42:50.9702359+01:00" endTime="2026-05-17T13:42:51.0120872+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="16c22f34-872a-4105-8154-6ef1f8bfc7e5" />
+    <UnitTestResult executionId="f1037c34-63f8-4dcf-a19a-714252a6542b" testId="c7d7c313-cb84-b828-dfd5-7bf4e571137b" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildDetailQuery_minimizes_legal_document_in_detail_projection" computerName="DESKTOP-1REV7PD" duration="00:00:00.0002280" startTime="2026-05-17T13:42:49.7531062+01:00" endTime="2026-05-17T13:42:49.7531377+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f1037c34-63f8-4dcf-a19a-714252a6542b" />
+    <UnitTestResult executionId="e6cbad12-fcc9-4b2a-8082-4241719c303c" testId="13a4262a-b40a-25ce-5d32-c4671428fa98" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_logout_clears_cookie_session" computerName="DESKTOP-1REV7PD" duration="00:00:00.0455974" startTime="2026-05-17T13:42:52.6594289+01:00" endTime="2026-05-17T13:42:52.7051678+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e6cbad12-fcc9-4b2a-8082-4241719c303c" />
+    <UnitTestResult executionId="df2b94cb-026d-40e6-a8ec-dbcad9311b31" testId="ea448b05-e2a1-04b5-d894-a20394e21b38" testName="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_registers_sql_repository_with_static_connection_provider" computerName="DESKTOP-1REV7PD" duration="00:00:00.0004418" startTime="2026-05-17T13:42:49.7534780+01:00" endTime="2026-05-17T13:42:49.7536547+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="df2b94cb-026d-40e6-a8ec-dbcad9311b31" />
+    <UnitTestResult executionId="a5c15e87-370d-4937-aee2-c83f754b4b2a" testId="dd91d435-a1f3-a2bf-f2f3-9a0d84d9b377" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_allows_demo_auth_outside_development_with_explicit_non_default_password" computerName="DESKTOP-1REV7PD" duration="00:00:00.0426131" startTime="2026-05-17T13:42:52.1645351+01:00" endTime="2026-05-17T13:42:52.2073868+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a5c15e87-370d-4937-aee2-c83f754b4b2a" />
+    <UnitTestResult executionId="a4432cf5-8d4c-443d-9373-08c67fbf8518" testId="916afb57-64f0-00db-d016-d43a4b8db6d0" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_does_not_expose_runtime_metadata_route" computerName="DESKTOP-1REV7PD" duration="00:00:00.0472997" startTime="2026-05-17T13:42:51.6785731+01:00" endTime="2026-05-17T13:42:51.7260810+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a4432cf5-8d4c-443d-9373-08c67fbf8518" />
+    <UnitTestResult executionId="873097b6-f034-43cd-9d27-ebfa975e115b" testId="c3172922-45b6-abb5-0ad3-51bee6bef64a" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_applies_offset_fetch_pagination(page: 1, pageSize: 25, expectedOffset: 0)" computerName="DESKTOP-1REV7PD" duration="00:00:00.0008193" startTime="2026-05-17T13:42:49.7502814+01:00" endTime="2026-05-17T13:42:49.7503137+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="873097b6-f034-43cd-9d27-ebfa975e115b" />
+    <UnitTestResult executionId="c259d7fe-50cf-4ebe-b163-c200c22a1f71" testId="c1a18653-16e1-7a06-4c5b-613aa6a9ce4d" testName="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_registers_appbuilder_master_connection_provider_without_startup_broker" computerName="DESKTOP-1REV7PD" duration="00:00:00.0261312" startTime="2026-05-17T13:42:49.6943005+01:00" endTime="2026-05-17T13:42:49.7505736+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c259d7fe-50cf-4ebe-b163-c200c22a1f71" />
+    <UnitTestResult executionId="cce4fb16-0d52-40a8-b1ba-c3eb8f1906d7" testId="32b17a7e-0299-0dc3-49f4-23fcea2dac9b" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_rejects_demo_auth_outside_development_without_explicit_password" computerName="DESKTOP-1REV7PD" duration="00:00:00.0499412" startTime="2026-05-17T13:42:52.2079361+01:00" endTime="2026-05-17T13:42:52.2576886+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cce4fb16-0d52-40a8-b1ba-c3eb8f1906d7" />
+    <UnitTestResult executionId="b09d8a1a-6cee-427a-a83f-52b1b9beae97" testId="1e80bf46-03fd-8e03-5f2e-7d56e5323c35" testName="iLiniumTech.Backend.Tests.Polizas.SqlServerSessionContextTests.BuildApplyQuery_parameterizes_session_context_keys_and_values" computerName="DESKTOP-1REV7PD" duration="00:00:00.0224544" startTime="2026-05-17T13:42:49.6932002+01:00" endTime="2026-05-17T13:42:49.7285206+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b09d8a1a-6cee-427a-a83f-52b1b9beae97" />
+    <UnitTestResult executionId="7a437dea-f9f4-4caf-9793-dce1e3a7f9a4" testId="357f47bd-657e-3eb8-fa52-c263150b464a" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_search_supports_pagination_and_basic_filters" computerName="DESKTOP-1REV7PD" duration="00:00:00.0457318" startTime="2026-05-17T13:42:50.5957648+01:00" endTime="2026-05-17T13:42:50.6416030+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7a437dea-f9f4-4caf-9793-dce1e3a7f9a4" />
+    <UnitTestResult executionId="2595baa1-2007-47c0-b7e1-94536285dcae" testId="01a59b78-9d7a-4c1b-5e3f-2d92e327aa12" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_permissions_take_precedence_over_api_key_when_both_are_present" computerName="DESKTOP-1REV7PD" duration="00:00:00.0437821" startTime="2026-05-17T13:42:51.1894916+01:00" endTime="2026-05-17T13:42:51.2333955+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2595baa1-2007-47c0-b7e1-94536285dcae" />
+    <UnitTestResult executionId="526bd6a3-7ef1-4c31-bec7-f567d05e79c8" testId="de46218a-7577-3293-9843-31109cc6459c" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildDetailQuery_can_scope_detail_by_ramo" computerName="DESKTOP-1REV7PD" duration="00:00:00.0007708" startTime="2026-05-17T13:42:49.7529691+01:00" endTime="2026-05-17T13:42:49.7530147+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="526bd6a3-7ef1-4c31-bec7-f567d05e79c8" />
+    <UnitTestResult executionId="6bff30bd-49a2-49b2-b5d1-e1b74be93e45" testId="02d6b15a-57ce-7e6e-240f-4c8e2336d512" testName="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_defaults_to_in_memory_repository" computerName="DESKTOP-1REV7PD" duration="00:00:00.0011148" startTime="2026-05-17T13:42:49.7540942+01:00" endTime="2026-05-17T13:42:49.7541817+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6bff30bd-49a2-49b2-b5d1-e1b74be93e45" />
+    <UnitTestResult executionId="af076702-6888-4f14-ac6b-de659c8b9232" testId="a7737e1d-feab-9f3e-59e0-93060bbf2970" testName="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_rejects_invalid_broker_header_when_header_context_is_enabled" computerName="DESKTOP-1REV7PD" duration="00:00:00.0005911" startTime="2026-05-17T13:42:49.7551629+01:00" endTime="2026-05-17T13:42:49.7551937+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="af076702-6888-4f14-ac6b-de659c8b9232" />
+    <UnitTestResult executionId="312e2998-1289-43fe-8013-67a433970715" testId="f3952790-4209-55a7-4140-ea95f87b288a" testName="iLiniumTech.Backend.Tests.Polizas.SqlServerSessionContextTests.BuildApplyQuery_clears_known_session_context_values_without_request_context" computerName="DESKTOP-1REV7PD" duration="00:00:00.0045608" startTime="2026-05-17T13:42:49.7499714+01:00" endTime="2026-05-17T13:42:49.7507661+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="312e2998-1289-43fe-8013-67a433970715" />
+    <UnitTestResult executionId="0ba705fe-f155-49da-92e7-48de441fec47" testId="26258c4d-c07e-7a10-915b-92f76d281c32" testName="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_requires_connection_string_for_sql_repository" computerName="DESKTOP-1REV7PD" duration="00:00:00.0080057" startTime="2026-05-17T13:42:49.7507077+01:00" endTime="2026-05-17T13:42:49.7532710+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0ba705fe-f155-49da-92e7-48de441fec47" />
+    <UnitTestResult executionId="7f8fba85-d5e7-415f-91e4-d0d920da1bee" testId="5cba42fb-ee83-2e2a-e42d-1270d689b8c7" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_rejects_non_positive_broker_switch_with_sanitized_error" computerName="DESKTOP-1REV7PD" duration="00:00:00.0468613" startTime="2026-05-17T13:42:50.7443405+01:00" endTime="2026-05-17T13:42:50.7913768+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7f8fba85-d5e7-415f-91e4-d0d920da1bee" />
+    <UnitTestResult executionId="8d5dbc93-80a1-4323-b56f-f655a41c0c57" testId="c35f4f7c-ba8d-70a4-37b6-eadcce497ba1" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_minimizes_legal_document_in_list_projection" computerName="DESKTOP-1REV7PD" duration="00:00:00.0032600" startTime="2026-05-17T13:42:49.7507198+01:00" endTime="2026-05-17T13:42:49.7516879+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8d5dbc93-80a1-4323-b56f-f655a41c0c57" />
+    <UnitTestResult executionId="a7818184-9722-4e10-bad1-dde4c23d813e" testId="dad42aa1-7d8a-6afe-0926-89e4c280ecd5" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSearchValidatorTests.Validate_rejects_page_size_over_limit" computerName="DESKTOP-1REV7PD" duration="00:00:00.0341714" startTime="2026-05-17T13:42:49.6943247+01:00" endTime="2026-05-17T13:42:49.7532354+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a7818184-9722-4e10-bad1-dde4c23d813e" />
+    <UnitTestResult executionId="08798a85-8a3e-434c-8550-81cc7c886e98" testId="a399885d-6a3c-e8d8-8d5e-4e1bb648a673" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_ignores_header_context_outside_development_without_demo_opt_in_even_with_override" computerName="DESKTOP-1REV7PD" duration="00:00:00.0448044" startTime="2026-05-17T13:42:52.7052726+01:00" endTime="2026-05-17T13:42:52.7502643+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="08798a85-8a3e-434c-8550-81cc7c886e98" />
+    <UnitTestResult executionId="e5bdcfcb-d85d-4045-b595-9d80ba346ea6" testId="bc44d2e7-c3ce-ecc9-3706-f95a73330746" testName="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_ignores_header_context_outside_development_without_override" computerName="DESKTOP-1REV7PD" duration="00:00:00.0002308" startTime="2026-05-17T13:42:49.7544907+01:00" endTime="2026-05-17T13:42:49.7546351+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e5bdcfcb-d85d-4045-b595-9d80ba346ea6" />
+    <UnitTestResult executionId="3a22fa28-de99-47c5-8045-c8299af32984" testId="7b948a6a-4fae-b2ff-f76a-e5e203c1e6b3" testName="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.BuildModelConnectionString_allows_trusting_server_certificate_by_explicit_configuration" computerName="DESKTOP-1REV7PD" duration="00:00:00.0001382" startTime="2026-05-17T13:42:49.7960027+01:00" endTime="2026-05-17T13:42:49.7961109+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3a22fa28-de99-47c5-8045-c8299af32984" />
+    <UnitTestResult executionId="e2ebebae-00af-449e-9ac1-3392e8def63e" testId="b8522c6d-5e43-2cd7-9c43-5b95eff3b79b" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.GetById_returns_sanitized_not_found_error_with_correlation_id" computerName="DESKTOP-1REV7PD" duration="00:00:00.0406834" startTime="2026-05-17T13:42:52.2986248+01:00" endTime="2026-05-17T13:42:52.3394371+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e2ebebae-00af-449e-9ac1-3392e8def63e" />
+    <UnitTestResult executionId="72cd6dc7-af90-41aa-a6fb-bcec34ed9deb" testId="11d54464-51d3-3af7-6842-06a53fb05481" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_reports_sql_configuration_gap_without_secret_values" computerName="DESKTOP-1REV7PD" duration="00:00:00.0407263" startTime="2026-05-17T13:42:52.0792163+01:00" endTime="2026-05-17T13:42:52.1200686+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="72cd6dc7-af90-41aa-a6fb-bcec34ed9deb" />
+    <UnitTestResult executionId="028934fd-1e21-40ef-b230-3f9819305aa4" testId="1ba1ca7a-5c25-dfa8-25a2-bed04f1285d3" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSearchValidatorTests.ValidateAndParseSort_rejects_unknown_sort_fields" computerName="DESKTOP-1REV7PD" duration="00:00:00.0007803" startTime="2026-05-17T13:42:49.7533594+01:00" endTime="2026-05-17T13:42:49.7535020+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="028934fd-1e21-40ef-b230-3f9819305aa4" />
+    <UnitTestResult executionId="0f07da02-d50e-43b5-9923-724c3671fcd2" testId="3aa6f34e-0fb4-033a-e5b0-a1eecff18663" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_requires_api_key" computerName="DESKTOP-1REV7PD" duration="00:00:00.0640911" startTime="2026-05-17T13:42:50.0230683+01:00" endTime="2026-05-17T13:42:50.0874257+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0f07da02-d50e-43b5-9923-724c3671fcd2" />
+    <UnitTestResult executionId="e9ca62c0-7fee-4b65-82b4-be2e72caeb9d" testId="03eda6d2-a446-9073-b900-be535a313314" testName="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.BuildModelConnectionString_rejects_incomplete_records" computerName="DESKTOP-1REV7PD" duration="00:00:00.0004305" startTime="2026-05-17T13:42:49.7956033+01:00" endTime="2026-05-17T13:42:49.7959355+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e9ca62c0-7fee-4b65-82b4-be2e72caeb9d" />
+    <UnitTestResult executionId="4ade3d14-0de5-4022-8487-0bd2802c5c6a" testId="034478e5-be95-fb78-281a-9a12103bd489" testName="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_uses_configuration_as_fallback" computerName="DESKTOP-1REV7PD" duration="00:00:00.0400794" startTime="2026-05-17T13:42:49.6942737+01:00" endTime="2026-05-17T13:42:49.7543205+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4ade3d14-0de5-4022-8487-0bd2802c5c6a" />
+    <UnitTestResult executionId="54e58b5e-3009-4eef-ad96-770697bc7d96" testId="9ecceaba-29a0-36c0-e30b-c6b5c4a60fc0" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Cors_wildcard_origins_are_rejected_at_startup" computerName="DESKTOP-1REV7PD" duration="00:00:00.0277795" startTime="2026-05-17T13:42:52.7503746+01:00" endTime="2026-05-17T13:42:52.7781142+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="54e58b5e-3009-4eef-ad96-770697bc7d96" />
+    <UnitTestResult executionId="d27ea59d-b315-482b-bfd8-3aa553934b96" testId="04ad555a-8fc6-b286-603e-ba97850b9f9b" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_rejects_requested_broker_outside_allowed_brokers" computerName="DESKTOP-1REV7PD" duration="00:00:00.0487990" startTime="2026-05-17T13:42:50.8321054+01:00" endTime="2026-05-17T13:42:50.8810652+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d27ea59d-b315-482b-bfd8-3aa553934b96" />
+    <UnitTestResult executionId="50b1c6b7-8f18-4a10-a258-05be6a9e01fb" testId="6fa9fc3a-2812-1154-ba43-c745bfff8ba5" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Health_is_anonymous" computerName="DESKTOP-1REV7PD" duration="00:00:00.0425853" startTime="2026-05-17T13:42:51.6356793+01:00" endTime="2026-05-17T13:42:51.6784460+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="50b1c6b7-8f18-4a10-a258-05be6a9e01fb" />
+    <UnitTestResult executionId="1a13eacb-c1cc-4a07-91ae-7779b37a6d4e" testId="4f73ed9e-d292-9736-b93e-6c9ac669d198" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_can_switch_to_allowed_broker_and_me_reflects_it" computerName="DESKTOP-1REV7PD" duration="00:00:00.0452822" startTime="2026-05-17T13:42:52.5202942+01:00" endTime="2026-05-17T13:42:52.5657124+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1a13eacb-c1cc-4a07-91ae-7779b37a6d4e" />
+    <UnitTestResult executionId="6307c8ec-0446-4279-833f-a98456533d5d" testId="716056ba-ccd6-be73-a3c4-a4efdbae5a2a" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_rejects_outside_development_header_override_without_demo_opt_in" computerName="DESKTOP-1REV7PD" duration="00:00:00.0434221" startTime="2026-05-17T13:42:52.8765923+01:00" endTime="2026-05-17T13:42:52.9201348+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6307c8ec-0446-4279-833f-a98456533d5d" />
+    <UnitTestResult executionId="a16c861a-504f-4ba3-be95-edea9ddeb30c" testId="1f374145-d435-fcee-0b81-9cde698d50da" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildDetailQuery_parameterizes_id" computerName="DESKTOP-1REV7PD" duration="00:00:00.0014702" startTime="2026-05-17T13:42:49.7505339+01:00" endTime="2026-05-17T13:42:49.7505884+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a16c861a-504f-4ba3-be95-edea9ddeb30c" />
+    <UnitTestResult executionId="bce0203e-7636-497b-93b2-4772b7480cea" testId="2942ae01-41ba-c82e-a60a-5f6c9c777821" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_broker_validation_takes_precedence_over_api_key_when_both_are_present" computerName="DESKTOP-1REV7PD" duration="00:00:00.0412874" startTime="2026-05-17T13:42:51.1478442+01:00" endTime="2026-05-17T13:42:51.1893626+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bce0203e-7636-497b-93b2-4772b7480cea" />
+    <UnitTestResult executionId="9833d38b-d2ed-43c0-a464-376112bb6620" testId="e1c874e0-28a5-c095-990d-90acfcb75557" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_polizas_requires_api_key" computerName="DESKTOP-1REV7PD" duration="00:00:00.0403247" startTime="2026-05-17T13:42:50.7914920+01:00" endTime="2026-05-17T13:42:50.8319906+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9833d38b-d2ed-43c0-a464-376112bb6620" />
+    <UnitTestResult executionId="08b5654f-3544-4ca1-bd8b-2fa2a19a964c" testId="f9e63693-7459-0cb8-17f0-a5c1cb9cda9c" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_rejected_broker_switch_keeps_effective_session_context" computerName="DESKTOP-1REV7PD" duration="00:00:00.0514918" startTime="2026-05-17T13:42:51.7262156+01:00" endTime="2026-05-17T13:42:51.7778901+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="08b5654f-3544-4ca1-bd8b-2fa2a19a964c" />
+    <UnitTestResult executionId="d123337e-a7e1-4fd5-8429-05cfc3158628" testId="cd42075a-bfc2-bc35-5f4c-15a38ac903a6" testName="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_requires_master_connection_for_appbuilder_master_resolver" computerName="DESKTOP-1REV7PD" duration="00:00:00.0006353" startTime="2026-05-17T13:42:49.7533924+01:00" endTime="2026-05-17T13:42:49.7534173+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d123337e-a7e1-4fd5-8429-05cfc3158628" />
+    <UnitTestResult executionId="0dc163e8-2abd-411d-9035-1eeb85d49edf" testId="0a8a3811-3df7-f47d-69ac-7df9b84e2f7d" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_search_keeps_autos_filter_even_when_query_asks_for_other_ramo" computerName="DESKTOP-1REV7PD" duration="00:00:00.0513361" startTime="2026-05-17T13:42:50.4429661+01:00" endTime="2026-05-17T13:42:50.4944412+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0dc163e8-2abd-411d-9035-1eeb85d49edf" />
+    <UnitTestResult executionId="3073281d-236e-4567-b9ab-00faf6c21bbe" testId="6aa184c8-fb50-0da2-0cd2-16b21494e887" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_ignores_header_context_outside_development_without_explicit_override" computerName="DESKTOP-1REV7PD" duration="00:00:00.0428116" startTime="2026-05-17T13:42:52.3841594+01:00" endTime="2026-05-17T13:42:52.4271547+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3073281d-236e-4567-b9ab-00faf6c21bbe" />
+    <UnitTestResult executionId="04b42c98-22d3-4392-81d6-bb46bca02c39" testId="9637a674-368a-b26c-c610-0c25cefb9cb6" testName="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_reads_broker_context_from_headers" computerName="DESKTOP-1REV7PD" duration="00:00:00.0006803" startTime="2026-05-17T13:42:49.7553612+01:00" endTime="2026-05-17T13:42:49.7553865+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="04b42c98-22d3-4392-81d6-bb46bca02c39" />
+    <UnitTestResult executionId="e20a031b-0a4f-48a7-9b16-f51b3c5a2c97" testId="ed40c782-fc5e-5c1b-ae50-748ce60ad560" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_allows_header_context_outside_development_with_explicit_demo_opt_in" computerName="DESKTOP-1REV7PD" duration="00:00:00.0718516" startTime="2026-05-17T13:42:51.7784901+01:00" endTime="2026-05-17T13:42:51.8500593+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e20a031b-0a4f-48a7-9b16-f51b3c5a2c97" />
+    <UnitTestResult executionId="4d2ec912-b847-42aa-9643-af9b5275e4b2" testId="a4b47287-8475-f9f5-eb50-3397f4d9946b" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Search_rejects_sort_fields_outside_whitelist" computerName="DESKTOP-1REV7PD" duration="00:00:00.0510788" startTime="2026-05-17T13:42:52.0278128+01:00" endTime="2026-05-17T13:42:52.0790976+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4d2ec912-b847-42aa-9643-af9b5275e4b2" />
+    <UnitTestResult executionId="5d240610-da16-4171-80fd-01c82475ca54" testId="bc2f0552-ca02-c0cd-d046-080e88fb03ec" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSearchValidatorTests.ValidateAndParseSort_accepts_whitelisted_field" computerName="DESKTOP-1REV7PD" duration="00:00:00.0010594" startTime="2026-05-17T13:42:49.7535559+01:00" endTime="2026-05-17T13:42:49.7541264+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5d240610-da16-4171-80fd-01c82475ca54" />
+    <UnitTestResult executionId="1dd7d339-c3a9-46d3-82f5-574854542559" testId="91135454-165e-2590-1f63-f2242458d396" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_without_catalogs_permission_cannot_read_catalogs" computerName="DESKTOP-1REV7PD" duration="00:00:00.0444685" startTime="2026-05-17T13:42:50.6996720+01:00" endTime="2026-05-17T13:42:50.7442403+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1dd7d339-c3a9-46d3-82f5-574854542559" />
+    <UnitTestResult executionId="587ca025-0424-4990-872b-abf15da7e85f" testId="93dc2e0a-1ad3-1096-bc8a-996b05754d3d" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_configuration_errors_are_sanitized" computerName="DESKTOP-1REV7PD" duration="00:00:00.0470750" startTime="2026-05-17T13:42:50.1871083+01:00" endTime="2026-05-17T13:42:50.2343960+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="587ca025-0424-4990-872b-abf15da7e85f" />
+    <UnitTestResult executionId="ae464664-a739-453d-a7ac-5a6d9d9c9856" testId="d7e0ea0b-3fec-127c-2af4-12711d2ae6a4" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Polizas_requires_api_key" computerName="DESKTOP-1REV7PD" duration="00:00:00.0423417" startTime="2026-05-17T13:42:51.9398703+01:00" endTime="2026-05-17T13:42:51.9824519+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ae464664-a739-453d-a7ac-5a6d9d9c9856" />
+    <UnitTestResult executionId="f340c105-bf57-4ae0-a3a5-70e1bd9ccd57" testId="417993d9-4add-11b6-a71c-e0e98e51b014" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_rejects_invalid_header_context" computerName="DESKTOP-1REV7PD" duration="00:00:00.0404921" startTime="2026-05-17T13:42:52.2577941+01:00" endTime="2026-05-17T13:42:52.2985048+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f340c105-bf57-4ae0-a3a5-70e1bd9ccd57" />
+    <UnitTestResult executionId="070866aa-f143-48f9-b52b-c6539cabd156" testId="b6c4b426-29a7-0cba-a8d2-884b3815629a" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_returns_effective_polizas_context_from_headers_when_enabled" computerName="DESKTOP-1REV7PD" duration="00:00:00.0464031" startTime="2026-05-17T13:42:51.8501971+01:00" endTime="2026-05-17T13:42:51.8967682+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="070866aa-f143-48f9-b52b-c6539cabd156" />
+    <UnitTestResult executionId="2e8bfcec-1de1-474b-b6c0-c8b025cb4e20" testId="f7bbf3ab-c4cd-8fa6-dab7-aef5b53c1e86" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_reports_unavailable_when_api_key_is_not_configured" computerName="DESKTOP-1REV7PD" duration="00:00:00.0424208" startTime="2026-05-17T13:42:51.5041029+01:00" endTime="2026-05-17T13:42:51.5466669+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2e8bfcec-1de1-474b-b6c0-c8b025cb4e20" />
+    <UnitTestResult executionId="f9e97bcd-a670-4868-b21a-957c404c2d87" testId="b2707268-7ec1-6116-7641-f240ac7e9522" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_requires_explicit_non_default_password_outside_development" computerName="DESKTOP-1REV7PD" duration="00:00:00.0423107" startTime="2026-05-17T13:42:51.4612770+01:00" endTime="2026-05-17T13:42:51.5039804+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f9e97bcd-a670-4868-b21a-957c404c2d87" />
+    <UnitTestResult executionId="30f74a62-0b08-4111-bf4a-83e435b6e824" testId="cf7c2238-05b7-ba19-cfa4-e2259b004074" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_uses_whitelisted_sort_column" computerName="DESKTOP-1REV7PD" duration="00:00:00.0001316" startTime="2026-05-17T13:42:49.7271623+01:00" endTime="2026-05-17T13:42:49.7272083+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="30f74a62-0b08-4111-bf4a-83e435b6e824" />
+    <UnitTestResult executionId="27190016-8b6d-46dc-be61-0429341a9332" testId="4d385bbc-f59c-f092-f2b8-ea2fcbbfeed1" testName="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.Protector_decrypts_appbuilder_aes_values" computerName="DESKTOP-1REV7PD" duration="00:00:00.0012478" startTime="2026-05-17T13:42:49.7962820+01:00" endTime="2026-05-17T13:42:49.7975144+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="27190016-8b6d-46dc-be61-0429341a9332" />
+    <UnitTestResult executionId="994e774b-2bf2-4ea8-8052-15f3f33b2ff2" testId="1096871d-fea4-a77c-b888-ba8790eb2365" testName="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.BuildModelConnectionString_decrypts_fields_and_sets_secure_sql_options_by_default" computerName="DESKTOP-1REV7PD" duration="00:00:00.0557029" startTime="2026-05-17T13:42:49.7546061+01:00" endTime="2026-05-17T13:42:49.7954909+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="994e774b-2bf2-4ea8-8052-15f3f33b2ff2" />
+    <UnitTestResult executionId="1fcf5967-5818-4e2b-aac7-38bcf694ab6e" testId="aa6c48d8-abd9-ab0f-3ce1-aa320dde46a5" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_rejects_non_positive_requested_broker_without_configuration_fallback" computerName="DESKTOP-1REV7PD" duration="00:00:00.0402142" startTime="2026-05-17T13:42:52.4797904+01:00" endTime="2026-05-17T13:42:52.5201816+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1fcf5967-5818-4e2b-aac7-38bcf694ab6e" />
+    <UnitTestResult executionId="7e82c4fc-adf1-4f07-85be-442dacdbed38" testId="b1b8aab2-dac0-cfa8-f3df-169b997de28a" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_without_required_permission_returns_forbidden" computerName="DESKTOP-1REV7PD" duration="00:00:00.0547004" startTime="2026-05-17T13:42:51.2335274+01:00" endTime="2026-05-17T13:42:51.2884996+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7e82c4fc-adf1-4f07-85be-442dacdbed38" />
+    <UnitTestResult executionId="9add1e55-1552-4ed8-afd7-4e2979aa9808" testId="922452fd-3fab-d7e4-07fe-29739bab1d3d" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Api_key_mvp_remains_development_compatibility_for_policy_protected_polizas" computerName="DESKTOP-1REV7PD" duration="00:00:00.0601907" startTime="2026-05-17T13:42:50.3824267+01:00" endTime="2026-05-17T13:42:50.4428106+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9add1e55-1552-4ed8-afd7-4e2979aa9808" />
+    <UnitTestResult executionId="84ce4f58-f193-47b9-b9f6-3de7e6460cdc" testId="21eae7dd-1020-32f1-77d0-9cc1ce14a731" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Sql_appbuilder_mode_rejects_invalid_header_broker_context" computerName="DESKTOP-1REV7PD" duration="00:00:00.0515868" startTime="2026-05-17T13:42:50.1351932+01:00" endTime="2026-05-17T13:42:50.1869795+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="84ce4f58-f193-47b9-b9f6-3de7e6460cdc" />
+    <UnitTestResult executionId="86f13c80-007b-4b07-a1fc-51d7477b9f62" testId="044a5920-3199-14a8-10a6-4d09c30c1c17" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Api_key_alone_cannot_switch_demo_session_broker" computerName="DESKTOP-1REV7PD" duration="00:00:00.0417051" startTime="2026-05-17T13:42:51.3305621+01:00" endTime="2026-05-17T13:42:51.3724274+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="86f13c80-007b-4b07-a1fc-51d7477b9f62" />
+    <UnitTestResult executionId="fed03c90-64f3-40d4-a4ca-b64194cee43e" testId="bd309a85-329a-3659-82f7-a328120500d4" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Search_returns_polizas_data" computerName="DESKTOP-1REV7PD" duration="00:00:00.0416065" startTime="2026-05-17T13:42:51.2886078+01:00" endTime="2026-05-17T13:42:51.3304486+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fed03c90-64f3-40d4-a4ca-b64194cee43e" />
+    <UnitTestResult executionId="58b91fe6-7720-4bd8-a622-32ca3178a2cb" testId="2c0ae443-c224-9623-8dc6-9e363c9abd4c" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_creates_cookie_session_and_me_context_without_api_key" computerName="DESKTOP-1REV7PD" duration="00:00:00.0668444" startTime="2026-05-17T13:42:50.3152514+01:00" endTime="2026-05-17T13:42:50.3822647+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="58b91fe6-7720-4bd8-a622-32ca3178a2cb" />
+    <UnitTestResult executionId="e5dd403c-4e26-4474-9a81-fa9b3a6f9c47" testId="180b78b6-f678-55c3-f1a0-eee1e2511abb" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Metadata_is_deprecated_without_appbuilder_reference" computerName="DESKTOP-1REV7PD" duration="00:00:00.0400753" startTime="2026-05-17T13:42:51.3729833+01:00" endTime="2026-05-17T13:42:51.4128118+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e5dd403c-4e26-4474-9a81-fa9b3a6f9c47" />
+    <UnitTestResult executionId="5bf486d9-0564-4472-87ae-40de272f2963" testId="7bae5ff7-80d6-49b5-e743-7c94dbc28257" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_does_not_duplicate_numero_tie_breaker" computerName="DESKTOP-1REV7PD" duration="00:00:00.0184437" startTime="2026-05-17T13:42:49.6942346+01:00" endTime="2026-05-17T13:42:49.7181863+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5bf486d9-0564-4472-87ae-40de272f2963" />
+    <UnitTestResult executionId="51e731b1-0a52-49c3-916b-2206ae92f3eb" testId="08eb79ef-f395-2dc2-86aa-d9512d68040f" testName="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.AppBuilderMaster_resolver_requires_runtime_broker_context" computerName="DESKTOP-1REV7PD" duration="00:00:00.0418039" startTime="2026-05-17T13:42:49.6943117+01:00" endTime="2026-05-17T13:42:49.7545248+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="51e731b1-0a52-49c3-916b-2206ae92f3eb" />
+    <UnitTestResult executionId="823de6a0-7790-4fdc-8855-4db781be974d" testId="7097b4f5-0329-805e-7d2b-c9e08227fde7" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_detail_returns_autos_and_hides_other_ramos" computerName="DESKTOP-1REV7PD" duration="00:00:00.0443101" startTime="2026-05-17T13:42:52.3395529+01:00" endTime="2026-05-17T13:42:52.3840529+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="823de6a0-7790-4fdc-8855-4db781be974d" />
+    <UnitTestResult executionId="6d2d6b49-a673-4c48-b1b3-0b801b5361c7" testId="b54060f3-8ea2-e3c2-1573-c35d70c44b5f" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Api_key_production_denial_short_circuits_before_polizas_service" computerName="DESKTOP-1REV7PD" duration="00:00:00.0514589" startTime="2026-05-17T13:42:52.7782247+01:00" endTime="2026-05-17T13:42:52.8299838+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d2d6b49-a673-4c48-b1b3-0b801b5361c7" />
+    <UnitTestResult executionId="122851f1-8067-4e3f-a029-2479e9376158" testId="665eb1d5-3ff5-03e1-6bfb-99a080b631a8" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.GetById_returns_poliza_detail" computerName="DESKTOP-1REV7PD" duration="00:00:00.0479818" startTime="2026-05-17T13:42:51.4129148+01:00" endTime="2026-05-17T13:42:51.4611649+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="122851f1-8067-4e3f-a029-2479e9376158" />
+    <UnitTestResult executionId="990fa999-f3e9-4477-930b-1a5a0672b0d5" testId="f7b47e4e-4039-dcef-e363-3385b140b0aa" testName="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildCountQuery_applies_same_date_effect_filters_without_pagination" computerName="DESKTOP-1REV7PD" duration="00:00:00.0024219" startTime="2026-05-17T13:42:49.7517909+01:00" endTime="2026-05-17T13:42:49.7518238+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="990fa999-f3e9-4477-930b-1a5a0672b0d5" />
+    <UnitTestResult executionId="a7e30cc0-bf4a-4b79-90ac-c9b41116e50c" testId="cd8e48c0-6432-dc77-9c51-402cbdf6d677" testName="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_is_null_without_header_or_fallback" computerName="DESKTOP-1REV7PD" duration="00:00:00.0002060" startTime="2026-05-17T13:42:49.7554416+01:00" endTime="2026-05-17T13:42:49.7554643+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a7e30cc0-bf4a-4b79-90ac-c9b41116e50c" />
+    <UnitTestResult executionId="843847ad-c6bf-469b-81cc-fed79dabe3ae" testId="684d0fc9-d86e-48b6-126e-c83107a33e5d" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Catalogs_exposes_policy_select_data" computerName="DESKTOP-1REV7PD" duration="00:00:00.0429276" startTime="2026-05-17T13:42:50.8811819+01:00" endTime="2026-05-17T13:42:50.9242655+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="843847ad-c6bf-469b-81cc-fed79dabe3ae" />
+    <UnitTestResult executionId="e6167543-34f4-44be-b12b-42125c357485" testId="50f62751-042b-8617-6f19-a677d8de52c2" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_rejects_invalid_credentials_without_setting_session_cookie" computerName="DESKTOP-1REV7PD" duration="00:00:00.3226773" startTime="2026-05-17T13:42:49.6942889+01:00" endTime="2026-05-17T13:42:50.0222920+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e6167543-34f4-44be-b12b-42125c357485" />
+    <UnitTestResult executionId="11d90230-e3cd-4726-a886-21042996831a" testId="a7ce0896-6463-75b0-d8fa-779aad43fdb8" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_rejects_header_context_outside_development_without_demo_opt_in" computerName="DESKTOP-1REV7PD" duration="00:00:00.0449832" startTime="2026-05-17T13:42:51.9825644+01:00" endTime="2026-05-17T13:42:52.0276938+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="11d90230-e3cd-4726-a886-21042996831a" />
+    <UnitTestResult executionId="e0b8e421-8a5d-41fd-a7a3-5169eb1189e1" testId="6ade87f2-9f01-5b4e-4b93-12a2186b6fac" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_permission_denial_short_circuits_before_polizas_service" computerName="DESKTOP-1REV7PD" duration="00:00:00.0446943" startTime="2026-05-17T13:42:52.8317349+01:00" endTime="2026-05-17T13:42:52.8764742+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0b8e421-8a5d-41fd-a7a3-5169eb1189e1" />
+    <UnitTestResult executionId="6f6db2ed-e331-45fb-b15f-82e4dd81c629" testId="919fcf9b-a4af-d492-7f45-1d1aab120095" testName="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_is_disabled_outside_development_without_explicit_opt_in" computerName="DESKTOP-1REV7PD" duration="00:00:00.0428265" startTime="2026-05-17T13:42:51.0622344+01:00" endTime="2026-05-17T13:42:51.1051807+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6f6db2ed-e331-45fb-b15f-82e4dd81c629" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_logout_clears_cookie_session" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="13a4262a-b40a-25ce-5d32-c4671428fa98">
+      <Execution id="e6cbad12-fcc9-4b2a-8082-4241719c303c" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_logout_clears_cookie_session" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Api_key_alone_cannot_switch_demo_session_broker" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="044a5920-3199-14a8-10a6-4d09c30c1c17">
+      <Execution id="86f13c80-007b-4b07-a1fc-51d7477b9f62" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Api_key_alone_cannot_switch_demo_session_broker" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_rejects_invalid_header_context" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="417993d9-4add-11b6-a71c-e0e98e51b014">
+      <Execution id="f340c105-bf57-4ae0-a3a5-70e1bd9ccd57" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Me_rejects_invalid_header_context" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_rejects_non_positive_requested_broker_without_configuration_fallback" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="aa6c48d8-abd9-ab0f-3ce1-aa320dde46a5">
+      <Execution id="1fcf5967-5818-4e2b-aac7-38bcf694ab6e" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_login_rejects_non_positive_requested_broker_without_configuration_fallback" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSearchValidatorTests.ValidateAndParseSort_accepts_whitelisted_field" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="bc2f0552-ca02-c0cd-d046-080e88fb03ec">
+      <Execution id="5d240610-da16-4171-80fd-01c82475ca54" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSearchValidatorTests" name="ValidateAndParseSort_accepts_whitelisted_field" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.BuildModelConnectionString_allows_trusting_server_certificate_by_explicit_configuration" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="7b948a6a-4fae-b2ff-f76a-e5e203c1e6b3">
+      <Execution id="3a22fa28-de99-47c5-8045-c8299af32984" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests" name="BuildModelConnectionString_allows_trusting_server_certificate_by_explicit_configuration" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildDetailQuery_parameterizes_id" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="1f374145-d435-fcee-0b81-9cde698d50da">
+      <Execution id="a16c861a-504f-4ba3-be95-edea9ddeb30c" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests" name="BuildDetailQuery_parameterizes_id" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_returns_effective_polizas_context_from_headers_when_enabled" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="b6c4b426-29a7-0cba-a8d2-884b3815629a">
+      <Execution id="070866aa-f143-48f9-b52b-c6539cabd156" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Me_returns_effective_polizas_context_from_headers_when_enabled" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Sql_repository_configuration_errors_are_sanitized" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="3c8129ef-d341-c87b-0668-bfdce0f32649">
+      <Execution id="be575690-58c0-4a79-baf8-1360eba9a525" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Sql_repository_configuration_errors_are_sanitized" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Health_is_anonymous" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="6fa9fc3a-2812-1154-ba43-c745bfff8ba5">
+      <Execution id="50b1c6b7-8f18-4a10-a258-05be6a9e01fb" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Health_is_anonymous" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_rejected_broker_switch_keeps_effective_session_context" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="f9e63693-7459-0cb8-17f0-a5c1cb9cda9c">
+      <Execution id="08b5654f-3544-4ca1-bd8b-2fa2a19a964c" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_rejected_broker_switch_keeps_effective_session_context" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_broker_validation_takes_precedence_over_api_key_when_both_are_present" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="2942ae01-41ba-c82e-a60a-5f6c9c777821">
+      <Execution id="bce0203e-7636-497b-93b2-4772b7480cea" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_broker_validation_takes_precedence_over_api_key_when_both_are_present" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_requires_api_key" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="3aa6f34e-0fb4-033a-e5b0-a1eecff18663">
+      <Execution id="0f07da02-d50e-43b5-9923-724c3671fcd2" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Me_requires_api_key" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_is_null_without_header_or_fallback" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="cd8e48c0-6432-dc77-9c51-402cbdf6d677">
+      <Execution id="a7e30cc0-bf4a-4b79-90ac-c9b41116e50c" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests" name="Current_is_null_without_header_or_fallback" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Api_key_mvp_remains_development_compatibility_for_policy_protected_polizas" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="922452fd-3fab-d7e4-07fe-29739bab1d3d">
+      <Execution id="9add1e55-1552-4ed8-afd7-4e2979aa9808" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Api_key_mvp_remains_development_compatibility_for_policy_protected_polizas" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_reports_unavailable_when_api_key_is_not_configured" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="f7bbf3ab-c4cd-8fa6-dab7-aef5b53c1e86">
+      <Execution id="2e8bfcec-1de1-474b-b6c0-c8b025cb4e20" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Ready_reports_unavailable_when_api_key_is_not_configured" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Metadata_is_deprecated_without_appbuilder_reference" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="180b78b6-f678-55c3-f1a0-eee1e2511abb">
+      <Execution id="e5dd403c-4e26-4474-9a81-fa9b3a6f9c47" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Metadata_is_deprecated_without_appbuilder_reference" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_does_not_duplicate_numero_tie_breaker" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="7bae5ff7-80d6-49b5-e743-7c94dbc28257">
+      <Execution id="5bf486d9-0564-4472-87ae-40de272f2963" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests" name="BuildSearchQuery_does_not_duplicate_numero_tie_breaker" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Sql_appbuilder_mode_rejects_invalid_header_broker_context" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="21eae7dd-1020-32f1-77d0-9cc1ce14a731">
+      <Execution id="84ce4f58-f193-47b9-b9f6-3de7e6460cdc" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Sql_appbuilder_mode_rejects_invalid_header_broker_context" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_ignores_header_context_outside_development_without_explicit_override" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="6aa184c8-fb50-0da2-0cd2-16b21494e887">
+      <Execution id="3073281d-236e-4567-b9ab-00faf6c21bbe" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Me_ignores_header_context_outside_development_without_explicit_override" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildDetailQuery_can_scope_detail_by_ramo" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="de46218a-7577-3293-9843-31109cc6459c">
+      <Execution id="526bd6a3-7ef1-4c31-bec7-f567d05e79c8" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests" name="BuildDetailQuery_can_scope_detail_by_ramo" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_with_catalogs_permission_can_read_catalogs" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="b8b7379c-554d-fcfa-555f-ec67f2884629">
+      <Execution id="ccb9b56b-9683-48db-88f9-3a0a06da4a32" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_with_catalogs_permission_can_read_catalogs" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildDetailQuery_minimizes_legal_document_in_detail_projection" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="c7d7c313-cb84-b828-dfd5-7bf4e571137b">
+      <Execution id="f1037c34-63f8-4dcf-a19a-714252a6542b" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests" name="BuildDetailQuery_minimizes_legal_document_in_detail_projection" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.Protector_decrypts_appbuilder_aes_values" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="4d385bbc-f59c-f092-f2b8-ea2fcbbfeed1">
+      <Execution id="27190016-8b6d-46dc-be61-0429341a9332" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests" name="Protector_decrypts_appbuilder_aes_values" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.AppBuilderMaster_resolver_requires_runtime_broker_context" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="08eb79ef-f395-2dc2-86aa-d9512d68040f">
+      <Execution id="51e731b1-0a52-49c3-916b-2206ae92f3eb" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests" name="AppBuilderMaster_resolver_requires_runtime_broker_context" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_search_returns_only_autos_fixture_data" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="7238cd6c-35e1-3c85-40f6-a353b45a6015">
+      <Execution id="699bfa1c-43bc-4604-bd0a-315cf7eae09e" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Autos_particulares_search_returns_only_autos_fixture_data" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSearchValidatorTests.ValidateAndParseSort_rejects_unknown_sort_fields" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="1ba1ca7a-5c25-dfa8-25a2-bed04f1285d3">
+      <Execution id="028934fd-1e21-40ef-b230-3f9819305aa4" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSearchValidatorTests" name="ValidateAndParseSort_rejects_unknown_sort_fields" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_detail_returns_autos_and_hides_other_ramos" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="7097b4f5-0329-805e-7d2b-c9e08227fde7">
+      <Execution id="823de6a0-7790-4fdc-8855-4db781be974d" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Autos_particulares_detail_returns_autos_and_hides_other_ramos" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_read_permission_does_not_allow_detail" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="6c6a9e0c-d504-8146-7d35-8cd094b7ed4b">
+      <Execution id="c1deec79-8e1d-4576-b902-38fa25fb4107" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_read_permission_does_not_allow_detail" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.Protector_returns_plain_values_when_key_is_not_configured" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="8037b4cf-7882-04bd-936e-095271a84313">
+      <Execution id="35cf7ee6-4b2f-4ff1-bf57-5f088ba7e296" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests" name="Protector_returns_plain_values_when_key_is_not_configured" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_registers_sql_repository_with_static_connection_provider" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="ea448b05-e2a1-04b5-d894-a20394e21b38">
+      <Execution id="df2b94cb-026d-40e6-a8ec-dbcad9311b31" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests" name="AddInfrastructure_registers_sql_repository_with_static_connection_provider" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_rejects_demo_auth_outside_development_without_explicit_password" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="32b17a7e-0299-0dc3-49f4-23fcea2dac9b">
+      <Execution id="cce4fb16-0d52-40a8-b1ba-c3eb8f1906d7" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Ready_rejects_demo_auth_outside_development_without_explicit_password" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_rejects_invalid_credentials_without_setting_session_cookie" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="50f62751-042b-8617-6f19-a677d8de52c2">
+      <Execution id="e6167543-34f4-44be-b12b-42125c357485" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_login_rejects_invalid_credentials_without_setting_session_cookie" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_rejects_outside_development_header_override_without_demo_opt_in" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="716056ba-ccd6-be73-a3c4-a4efdbae5a2a">
+      <Execution id="6307c8ec-0446-4279-833f-a98456533d5d" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Ready_rejects_outside_development_header_override_without_demo_opt_in" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_rejects_broker_switch_outside_allowed_brokers_without_exposing_ids" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="40551f50-f54a-6b61-8602-e19271ce42d4">
+      <Execution id="bc8be6ab-4fb4-44d4-b7cb-7bcbb94dc95d" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_rejects_broker_switch_outside_allowed_brokers_without_exposing_ids" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildCountQuery_applies_same_date_effect_filters_without_pagination" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="f7b47e4e-4039-dcef-e363-3385b140b0aa">
+      <Execution id="990fa999-f3e9-4477-930b-1a5a0672b0d5" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests" name="BuildCountQuery_applies_same_date_effect_filters_without_pagination" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_requires_connection_string_for_sql_repository" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="26258c4d-c07e-7a10-915b-92f76d281c32">
+      <Execution id="0ba705fe-f155-49da-92e7-48de441fec47" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests" name="AddInfrastructure_requires_connection_string_for_sql_repository" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_allows_explicit_non_default_password_outside_development_with_opt_in" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="1d976dce-29b4-d866-a28f-8f93e445c68c">
+      <Execution id="270f37ee-b23f-4c1f-a5e4-961d99fa8329" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_login_allows_explicit_non_default_password_outside_development_with_opt_in" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Api_key_mvp_does_not_grant_polizas_permissions_outside_development" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="1bc1047c-901a-6aa8-01a0-0c74e3987a56">
+      <Execution id="ca34866a-8965-427b-b7f3-1a4bf51e5ad8" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Api_key_mvp_does_not_grant_polizas_permissions_outside_development" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.GetById_returns_poliza_detail" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="665eb1d5-3ff5-03e1-6bfb-99a080b631a8">
+      <Execution id="122851f1-8067-4e3f-a029-2479e9376158" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="GetById_returns_poliza_detail" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Search_returns_polizas_data" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="bd309a85-329a-3659-82f7-a328120500d4">
+      <Execution id="fed03c90-64f3-40d4-a4ca-b64194cee43e" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Search_returns_polizas_data" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_requires_master_connection_for_appbuilder_master_resolver" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="cd42075a-bfc2-bc35-5f4c-15a38ac903a6">
+      <Execution id="d123337e-a7e1-4fd5-8429-05cfc3158628" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests" name="AddInfrastructure_requires_master_connection_for_appbuilder_master_resolver" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_ignores_header_context_outside_development_without_demo_opt_in_even_with_override" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="6b050e37-645f-928b-ac25-457bf27815e1">
+      <Execution id="c7ca636e-2c09-484d-8aa4-5ee46a36ba44" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests" name="Current_ignores_header_context_outside_development_without_demo_opt_in_even_with_override" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_rejects_non_positive_broker_switch_with_sanitized_error" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="5cba42fb-ee83-2e2a-e42d-1270d689b8c7">
+      <Execution id="7f8fba85-d5e7-415f-91e4-d0d920da1bee" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_rejects_non_positive_broker_switch_with_sanitized_error" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_ignores_header_context_outside_development_without_override" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="bc44d2e7-c3ce-ecc9-3706-f95a73330746">
+      <Execution id="e5bdcfcb-d85d-4045-b595-9d80ba346ea6" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests" name="Current_ignores_header_context_outside_development_without_override" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_minimizes_legal_document_in_list_projection" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="c35f4f7c-ba8d-70a4-37b6-eadcce497ba1">
+      <Execution id="8d5dbc93-80a1-4323-b56f-f655a41c0c57" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests" name="BuildSearchQuery_minimizes_legal_document_in_list_projection" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_rejects_broker_switch_when_allowed_brokers_are_missing" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="497644ba-2607-81d1-e72b-6ad818de0e4d">
+      <Execution id="6a80ce61-bb67-47d7-b743-c841390ed966" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_rejects_broker_switch_when_allowed_brokers_are_missing" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_ignores_headers_unless_header_context_is_enabled" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="5100adc6-9ba0-3cce-0394-d084bfdc4117">
+      <Execution id="fd904d24-93c5-4f55-b668-4643a600902c" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests" name="Current_ignores_headers_unless_header_context_is_enabled" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_ignores_header_context_outside_development_without_demo_opt_in_even_with_override" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="a399885d-6a3c-e8d8-8d5e-4e1bb648a673">
+      <Execution id="08798a85-8a3e-434c-8550-81cc7c886e98" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Me_ignores_header_context_outside_development_without_demo_opt_in_even_with_override" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_can_switch_to_allowed_broker_and_me_reflects_it" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="4f73ed9e-d292-9736-b93e-6c9ac669d198">
+      <Execution id="1a13eacb-c1cc-4a07-91ae-7779b37a6d4e" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_can_switch_to_allowed_broker_and_me_reflects_it" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.SqlServerSessionContextTests.BuildApplyQuery_clears_known_session_context_values_without_request_context" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="f3952790-4209-55a7-4140-ea95f87b288a">
+      <Execution id="312e2998-1289-43fe-8013-67a433970715" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.SqlServerSessionContextTests" name="BuildApplyQuery_clears_known_session_context_values_without_request_context" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_rejects_requested_broker_outside_allowed_brokers" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="04ad555a-8fc6-b286-603e-ba97850b9f9b">
+      <Execution id="d27ea59d-b315-482b-bfd8-3aa553934b96" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_login_rejects_requested_broker_outside_allowed_brokers" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_allows_demo_auth_outside_development_with_explicit_non_default_password" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="dd91d435-a1f3-a2bf-f2f3-9a0d84d9b377">
+      <Execution id="a5c15e87-370d-4937-aee2-c83f754b4b2a" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Ready_allows_demo_auth_outside_development_with_explicit_non_default_password" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Responses_include_baseline_security_headers" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="72d75e13-c5a1-3289-4c64-509c039ba79b">
+      <Execution id="45c330b0-c8c9-4775-8494-c83d85e61d60" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Responses_include_baseline_security_headers" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_creates_cookie_session_and_me_context_without_api_key" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="2c0ae443-c224-9623-8dc6-9e363c9abd4c">
+      <Execution id="58b91fe6-7720-4bd8-a622-32ca3178a2cb" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_login_creates_cookie_session_and_me_context_without_api_key" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_without_catalogs_permission_cannot_read_catalogs" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="91135454-165e-2590-1f63-f2242458d396">
+      <Execution id="1dd7d339-c3a9-46d3-82f5-574854542559" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_without_catalogs_permission_cannot_read_catalogs" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_search_supports_pagination_and_basic_filters" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="357f47bd-657e-3eb8-fa52-c263150b464a">
+      <Execution id="7a437dea-f9f4-4caf-9793-dce1e3a7f9a4" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Autos_particulares_search_supports_pagination_and_basic_filters" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_uses_whitelisted_sort_column" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="cf7c2238-05b7-ba19-cfa4-e2259b004074">
+      <Execution id="30f74a62-0b08-4111-bf4a-83e435b6e824" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests" name="BuildSearchQuery_uses_whitelisted_sort_column" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_parameterizes_filter_values" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="a562eb8a-6eeb-e3af-d348-30e472b6acac">
+      <Execution id="871c2986-d54b-41fd-b969-af64cabe1b9e" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests" name="BuildSearchQuery_parameterizes_filter_values" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.GetById_returns_sanitized_not_found_error_with_correlation_id" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="b8522c6d-5e43-2cd7-9c43-5b95eff3b79b">
+      <Execution id="e2ebebae-00af-449e-9ac1-3392e8def63e" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="GetById_returns_sanitized_not_found_error_with_correlation_id" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_is_disabled_outside_development_without_explicit_opt_in" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="919fcf9b-a4af-d492-7f45-1d1aab120095">
+      <Execution id="6f6db2ed-e331-45fb-b15f-82e4dd81c629" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_login_is_disabled_outside_development_without_explicit_opt_in" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_allows_header_context_outside_development_with_explicit_demo_opt_in" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="ed40c782-fc5e-5c1b-ae50-748ce60ad560">
+      <Execution id="e20a031b-0a4f-48a7-9b16-f51b3c5a2c97" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Ready_allows_header_context_outside_development_with_explicit_demo_opt_in" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_validation_errors_are_sanitized" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="9031b07e-0a1e-ed69-3228-7773655e7245">
+      <Execution id="c311141d-5661-4a4f-92f8-670b0a27a9ca" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Autos_particulares_validation_errors_are_sanitized" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_can_enable_header_context_outside_development_with_explicit_demo_opt_in" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="8a44db3f-c29b-66ca-e9c6-6813c922ed1e">
+      <Execution id="577d5321-5c6b-4eab-8876-017e65383974" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests" name="Current_can_enable_header_context_outside_development_with_explicit_demo_opt_in" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_reads_broker_context_from_headers" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="9637a674-368a-b26c-c610-0c25cefb9cb6">
+      <Execution id="04b42c98-22d3-4392-81d6-bb46bca02c39" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests" name="Current_reads_broker_context_from_headers" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_rejects_invalid_broker_header_when_header_context_is_enabled" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="a7737e1d-feab-9f3e-59e0-93060bbf2970">
+      <Execution id="af076702-6888-4f14-ac6b-de659c8b9232" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests" name="Current_rejects_invalid_broker_header_when_header_context_is_enabled" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_rejects_header_context_outside_development_without_demo_opt_in" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="a7ce0896-6463-75b0-d8fa-779aad43fdb8">
+      <Execution id="11d90230-e3cd-4726-a886-21042996831a" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Ready_rejects_header_context_outside_development_without_demo_opt_in" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_does_not_expose_runtime_metadata_route" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="916afb57-64f0-00db-d016-d43a4b8db6d0">
+      <Execution id="a4432cf5-8d4c-443d-9373-08c67fbf8518" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Autos_particulares_does_not_expose_runtime_metadata_route" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_search_keeps_autos_filter_even_when_query_asks_for_other_ramo" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="0a8a3811-3df7-f47d-69ac-7df9b84e2f7d">
+      <Execution id="0dc163e8-2abd-411d-9035-1eeb85d49edf" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Autos_particulares_search_keeps_autos_filter_even_when_query_asks_for_other_ramo" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_permission_denial_short_circuits_before_polizas_service" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="6ade87f2-9f01-5b4e-4b93-12a2186b6fac">
+      <Execution id="e0b8e421-8a5d-41fd-a7a3-5169eb1189e1" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_permission_denial_short_circuits_before_polizas_service" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_rejects_demo_session_when_current_broker_is_not_allowed" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="d9534c04-79fe-db51-4fe8-51cbf87c510e">
+      <Execution id="2c630811-6ecb-4ac8-ae91-ba07d80d1828" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Me_rejects_demo_session_when_current_broker_is_not_allowed" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.BuildModelConnectionString_rejects_incomplete_records" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="03eda6d2-a446-9073-b900-be535a313314">
+      <Execution id="e9ca62c0-7fee-4b65-82b4-be2e72caeb9d" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests" name="BuildModelConnectionString_rejects_incomplete_records" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_permissions_take_precedence_over_api_key_when_both_are_present" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="01a59b78-9d7a-4c1b-5e3f-2d92e327aa12">
+      <Execution id="2595baa1-2007-47c0-b7e1-94536285dcae" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_permissions_take_precedence_over_api_key_when_both_are_present" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_registers_appbuilder_master_connection_provider" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="bec11589-aa7f-ffbe-0e53-0562aa828811">
+      <Execution id="b638cf9e-9000-4351-a106-2a21972e3a20" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests" name="AddInfrastructure_registers_appbuilder_master_connection_provider" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_returns_effective_polizas_context_from_configuration" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="ffe0d561-8f90-c6a5-9e51-01f8dc9b15fd">
+      <Execution id="16c22f34-872a-4105-8154-6ef1f8bfc7e5" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Me_returns_effective_polizas_context_from_configuration" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_login_requires_explicit_non_default_password_outside_development" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="b2707268-7ec1-6116-7641-f240ac7e9522">
+      <Execution id="f9e97bcd-a670-4868-b21a-957c404c2d87" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_login_requires_explicit_non_default_password_outside_development" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_polizas_requires_api_key" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="e1c874e0-28a5-c095-990d-90acfcb75557">
+      <Execution id="9833d38b-d2ed-43c0-a464-376112bb6620" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Autos_particulares_polizas_requires_api_key" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_reports_sql_configuration_gap_without_secret_values" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="11d54464-51d3-3af7-6842-06a53fb05481">
+      <Execution id="72cd6dc7-af90-41aa-a6fb-bcec34ed9deb" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Ready_reports_sql_configuration_gap_without_secret_values" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_defaults_to_in_memory_repository" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="02d6b15a-57ce-7e6e-240f-4c8e2336d512">
+      <Execution id="6bff30bd-49a2-49b2-b5d1-e1b74be93e45" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests" name="AddInfrastructure_defaults_to_in_memory_repository" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Sql_appbuilder_mode_requires_broker_context" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="36294e64-44d6-a9cf-e827-3879dbb4f088">
+      <Execution id="a2819f6a-c770-4eb9-95af-1793229afee5" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Sql_appbuilder_mode_requires_broker_context" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Demo_session_without_required_permission_returns_forbidden" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="b1b8aab2-dac0-cfa8-f3df-169b997de28a">
+      <Execution id="7e82c4fc-adf1-4f07-85be-442dacdbed38" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Demo_session_without_required_permission_returns_forbidden" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Me_can_use_header_context_outside_development_with_explicit_demo_opt_in" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="4fbe285e-7105-35d8-3de4-07fcb5f28270">
+      <Execution id="7e6ca67e-1b68-41eb-8a92-6a51253c2250" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Me_can_use_header_context_outside_development_with_explicit_demo_opt_in" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Cors_wildcard_origins_are_rejected_at_startup" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="9ecceaba-29a0-36c0-e30b-c6b5c4a60fc0">
+      <Execution id="54e58b5e-3009-4eef-ad96-770697bc7d96" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Cors_wildcard_origins_are_rejected_at_startup" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.SqlServerSessionContextTests.BuildApplyQuery_parameterizes_session_context_keys_and_values" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="1e80bf46-03fd-8e03-5f2e-7d56e5323c35">
+      <Execution id="b09d8a1a-6cee-427a-a83f-52b1b9beae97" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.SqlServerSessionContextTests" name="BuildApplyQuery_parameterizes_session_context_keys_and_values" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_catalogs_are_minimized_and_scoped" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="e950b4f9-85f2-6898-9579-7377ed67ea47">
+      <Execution id="dc747093-47f9-4ed8-b1b1-5e93b0130e8a" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Autos_particulares_catalogs_are_minimized_and_scoped" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests.BuildModelConnectionString_decrypts_fields_and_sets_secure_sql_options_by_default" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="1096871d-fea4-a77c-b888-ba8790eb2365">
+      <Execution id="994e774b-2bf2-4ea8-8052-15f3f33b2ff2" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.AppBuilderConnectionResolverTests" name="BuildModelConnectionString_decrypts_fields_and_sets_secure_sql_options_by_default" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_applies_offset_fetch_pagination(page: 5, pageSize: 10, expectedOffset: 40)" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="21247a78-8a85-d769-fef8-c9b2f8270c4f">
+      <Execution id="86a48a62-d0be-490a-8713-1622e301c6bb" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests" name="BuildSearchQuery_applies_offset_fetch_pagination" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Search_rejects_sort_fields_outside_whitelist" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="a4b47287-8475-f9f5-eb50-3397f4d9946b">
+      <Execution id="4d2ec912-b847-42aa-9643-af9b5275e4b2" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Search_rejects_sort_fields_outside_whitelist" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Polizas_requires_api_key" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="d7e0ea0b-3fec-127c-2af4-12711d2ae6a4">
+      <Execution id="ae464664-a739-453d-a7ac-5a6d9d9c9856" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Polizas_requires_api_key" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests.AddInfrastructure_registers_appbuilder_master_connection_provider_without_startup_broker" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="c1a18653-16e1-7a06-4c5b-613aa6a9ce4d">
+      <Execution id="c259d7fe-50cf-4ebe-b163-c200c22a1f71" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasInfrastructureTests" name="AddInfrastructure_registers_appbuilder_master_connection_provider_without_startup_broker" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_applies_offset_fetch_pagination(page: 2, pageSize: 25, expectedOffset: 25)" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="ce6994e0-0692-7186-0558-e37e999b10eb">
+      <Execution id="9ec87282-b93f-41d2-89f8-a28358d8329a" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests" name="BuildSearchQuery_applies_offset_fetch_pagination" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Ready_is_anonymous_and_reports_configured_backend" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="ffa06ba7-bf2a-3051-3a22-27a07cd887c4">
+      <Execution id="35114994-e124-478e-9576-25045a4cf874" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Ready_is_anonymous_and_reports_configured_backend" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Autos_particulares_configuration_errors_are_sanitized" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="93dc2e0a-1ad3-1096-bc8a-996b05754d3d">
+      <Execution id="587ca025-0424-4990-872b-abf15da7e85f" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Autos_particulares_configuration_errors_are_sanitized" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests.BuildSearchQuery_applies_offset_fetch_pagination(page: 1, pageSize: 25, expectedOffset: 0)" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="c3172922-45b6-abb5-0ad3-51bee6bef64a">
+      <Execution id="873097b6-f034-43cd-9d27-ebfa975e115b" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSqlQueryBuilderTests" name="BuildSearchQuery_applies_offset_fetch_pagination" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Catalogs_exposes_policy_select_data" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="684d0fc9-d86e-48b6-126e-c83107a33e5d">
+      <Execution id="843847ad-c6bf-469b-81cc-fed79dabe3ae" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Catalogs_exposes_policy_select_data" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests.Api_key_production_denial_short_circuits_before_polizas_service" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="b54060f3-8ea2-e3c2-1573-c35d70c44b5f">
+      <Execution id="6d2d6b49-a673-4c48-b1b3-0b801b5361c7" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasApiTests" name="Api_key_production_denial_short_circuits_before_polizas_service" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests.Current_uses_configuration_as_fallback" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="034478e5-be95-fb78-281a-9a12103bd489">
+      <Execution id="4ade3d14-0de5-4022-8487-0bd2802c5c6a" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.HeaderPolizasExecutionContextAccessorTests" name="Current_uses_configuration_as_fallback" />
+    </UnitTest>
+    <UnitTest name="iLiniumTech.Backend.Tests.Polizas.PolizasSearchValidatorTests.Validate_rejects_page_size_over_limit" storage="c:\desarrollo\iliniumtech\iliniumtech.backend\tests\iliniumtech.backend.tests\bin\release\net10.0\iliniumtech.backend.tests.dll" id="dad42aa1-7d8a-6afe-0926-89e4c280ecd5">
+      <Execution id="a7818184-9722-4e10-bad1-dde4c23d813e" />
+      <TestMethod codeBase="C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\tests\iLiniumTech.Backend.Tests\bin\Release\net10.0\iLiniumTech.Backend.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="iLiniumTech.Backend.Tests.Polizas.PolizasSearchValidatorTests" name="Validate_rejects_page_size_over_limit" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="72d75e13-c5a1-3289-4c64-509c039ba79b" executionId="45c330b0-c8c9-4775-8494-c83d85e61d60" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d9534c04-79fe-db51-4fe8-51cbf87c510e" executionId="2c630811-6ecb-4ac8-ae91-ba07d80d1828" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a562eb8a-6eeb-e3af-d348-30e472b6acac" executionId="871c2986-d54b-41fd-b969-af64cabe1b9e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="497644ba-2607-81d1-e72b-6ad818de0e4d" executionId="6a80ce61-bb67-47d7-b743-c841390ed966" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ce6994e0-0692-7186-0558-e37e999b10eb" executionId="9ec87282-b93f-41d2-89f8-a28358d8329a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4fbe285e-7105-35d8-3de4-07fcb5f28270" executionId="7e6ca67e-1b68-41eb-8a92-6a51253c2250" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3c8129ef-d341-c87b-0668-bfdce0f32649" executionId="be575690-58c0-4a79-baf8-1360eba9a525" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bec11589-aa7f-ffbe-0e53-0562aa828811" executionId="b638cf9e-9000-4351-a106-2a21972e3a20" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8037b4cf-7882-04bd-936e-095271a84313" executionId="35cf7ee6-4b2f-4ff1-bf57-5f088ba7e296" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="36294e64-44d6-a9cf-e827-3879dbb4f088" executionId="a2819f6a-c770-4eb9-95af-1793229afee5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6b050e37-645f-928b-ac25-457bf27815e1" executionId="c7ca636e-2c09-484d-8aa4-5ee46a36ba44" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8a44db3f-c29b-66ca-e9c6-6813c922ed1e" executionId="577d5321-5c6b-4eab-8876-017e65383974" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5100adc6-9ba0-3cce-0394-d084bfdc4117" executionId="fd904d24-93c5-4f55-b668-4643a600902c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d976dce-29b4-d866-a28f-8f93e445c68c" executionId="270f37ee-b23f-4c1f-a5e4-961d99fa8329" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1bc1047c-901a-6aa8-01a0-0c74e3987a56" executionId="ca34866a-8965-427b-b7f3-1a4bf51e5ad8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="21247a78-8a85-d769-fef8-c9b2f8270c4f" executionId="86a48a62-d0be-490a-8713-1622e301c6bb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6c6a9e0c-d504-8146-7d35-8cd094b7ed4b" executionId="c1deec79-8e1d-4576-b902-38fa25fb4107" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9031b07e-0a1e-ed69-3228-7773655e7245" executionId="c311141d-5661-4a4f-92f8-670b0a27a9ca" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ffa06ba7-bf2a-3051-3a22-27a07cd887c4" executionId="35114994-e124-478e-9576-25045a4cf874" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b8b7379c-554d-fcfa-555f-ec67f2884629" executionId="ccb9b56b-9683-48db-88f9-3a0a06da4a32" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="40551f50-f54a-6b61-8602-e19271ce42d4" executionId="bc8be6ab-4fb4-44d4-b7cb-7bcbb94dc95d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7238cd6c-35e1-3c85-40f6-a353b45a6015" executionId="699bfa1c-43bc-4604-bd0a-315cf7eae09e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e950b4f9-85f2-6898-9579-7377ed67ea47" executionId="dc747093-47f9-4ed8-b1b1-5e93b0130e8a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ffe0d561-8f90-c6a5-9e51-01f8dc9b15fd" executionId="16c22f34-872a-4105-8154-6ef1f8bfc7e5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c7d7c313-cb84-b828-dfd5-7bf4e571137b" executionId="f1037c34-63f8-4dcf-a19a-714252a6542b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13a4262a-b40a-25ce-5d32-c4671428fa98" executionId="e6cbad12-fcc9-4b2a-8082-4241719c303c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ea448b05-e2a1-04b5-d894-a20394e21b38" executionId="df2b94cb-026d-40e6-a8ec-dbcad9311b31" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dd91d435-a1f3-a2bf-f2f3-9a0d84d9b377" executionId="a5c15e87-370d-4937-aee2-c83f754b4b2a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="916afb57-64f0-00db-d016-d43a4b8db6d0" executionId="a4432cf5-8d4c-443d-9373-08c67fbf8518" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c3172922-45b6-abb5-0ad3-51bee6bef64a" executionId="873097b6-f034-43cd-9d27-ebfa975e115b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c1a18653-16e1-7a06-4c5b-613aa6a9ce4d" executionId="c259d7fe-50cf-4ebe-b163-c200c22a1f71" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="32b17a7e-0299-0dc3-49f4-23fcea2dac9b" executionId="cce4fb16-0d52-40a8-b1ba-c3eb8f1906d7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e80bf46-03fd-8e03-5f2e-7d56e5323c35" executionId="b09d8a1a-6cee-427a-a83f-52b1b9beae97" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="357f47bd-657e-3eb8-fa52-c263150b464a" executionId="7a437dea-f9f4-4caf-9793-dce1e3a7f9a4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="01a59b78-9d7a-4c1b-5e3f-2d92e327aa12" executionId="2595baa1-2007-47c0-b7e1-94536285dcae" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="de46218a-7577-3293-9843-31109cc6459c" executionId="526bd6a3-7ef1-4c31-bec7-f567d05e79c8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="02d6b15a-57ce-7e6e-240f-4c8e2336d512" executionId="6bff30bd-49a2-49b2-b5d1-e1b74be93e45" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a7737e1d-feab-9f3e-59e0-93060bbf2970" executionId="af076702-6888-4f14-ac6b-de659c8b9232" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f3952790-4209-55a7-4140-ea95f87b288a" executionId="312e2998-1289-43fe-8013-67a433970715" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="26258c4d-c07e-7a10-915b-92f76d281c32" executionId="0ba705fe-f155-49da-92e7-48de441fec47" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5cba42fb-ee83-2e2a-e42d-1270d689b8c7" executionId="7f8fba85-d5e7-415f-91e4-d0d920da1bee" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c35f4f7c-ba8d-70a4-37b6-eadcce497ba1" executionId="8d5dbc93-80a1-4323-b56f-f655a41c0c57" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dad42aa1-7d8a-6afe-0926-89e4c280ecd5" executionId="a7818184-9722-4e10-bad1-dde4c23d813e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a399885d-6a3c-e8d8-8d5e-4e1bb648a673" executionId="08798a85-8a3e-434c-8550-81cc7c886e98" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bc44d2e7-c3ce-ecc9-3706-f95a73330746" executionId="e5bdcfcb-d85d-4045-b595-9d80ba346ea6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7b948a6a-4fae-b2ff-f76a-e5e203c1e6b3" executionId="3a22fa28-de99-47c5-8045-c8299af32984" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b8522c6d-5e43-2cd7-9c43-5b95eff3b79b" executionId="e2ebebae-00af-449e-9ac1-3392e8def63e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11d54464-51d3-3af7-6842-06a53fb05481" executionId="72cd6dc7-af90-41aa-a6fb-bcec34ed9deb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ba1ca7a-5c25-dfa8-25a2-bed04f1285d3" executionId="028934fd-1e21-40ef-b230-3f9819305aa4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3aa6f34e-0fb4-033a-e5b0-a1eecff18663" executionId="0f07da02-d50e-43b5-9923-724c3671fcd2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="03eda6d2-a446-9073-b900-be535a313314" executionId="e9ca62c0-7fee-4b65-82b4-be2e72caeb9d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="034478e5-be95-fb78-281a-9a12103bd489" executionId="4ade3d14-0de5-4022-8487-0bd2802c5c6a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9ecceaba-29a0-36c0-e30b-c6b5c4a60fc0" executionId="54e58b5e-3009-4eef-ad96-770697bc7d96" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="04ad555a-8fc6-b286-603e-ba97850b9f9b" executionId="d27ea59d-b315-482b-bfd8-3aa553934b96" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6fa9fc3a-2812-1154-ba43-c745bfff8ba5" executionId="50b1c6b7-8f18-4a10-a258-05be6a9e01fb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4f73ed9e-d292-9736-b93e-6c9ac669d198" executionId="1a13eacb-c1cc-4a07-91ae-7779b37a6d4e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="716056ba-ccd6-be73-a3c4-a4efdbae5a2a" executionId="6307c8ec-0446-4279-833f-a98456533d5d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f374145-d435-fcee-0b81-9cde698d50da" executionId="a16c861a-504f-4ba3-be95-edea9ddeb30c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2942ae01-41ba-c82e-a60a-5f6c9c777821" executionId="bce0203e-7636-497b-93b2-4772b7480cea" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e1c874e0-28a5-c095-990d-90acfcb75557" executionId="9833d38b-d2ed-43c0-a464-376112bb6620" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f9e63693-7459-0cb8-17f0-a5c1cb9cda9c" executionId="08b5654f-3544-4ca1-bd8b-2fa2a19a964c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cd42075a-bfc2-bc35-5f4c-15a38ac903a6" executionId="d123337e-a7e1-4fd5-8429-05cfc3158628" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0a8a3811-3df7-f47d-69ac-7df9b84e2f7d" executionId="0dc163e8-2abd-411d-9035-1eeb85d49edf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6aa184c8-fb50-0da2-0cd2-16b21494e887" executionId="3073281d-236e-4567-b9ab-00faf6c21bbe" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9637a674-368a-b26c-c610-0c25cefb9cb6" executionId="04b42c98-22d3-4392-81d6-bb46bca02c39" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ed40c782-fc5e-5c1b-ae50-748ce60ad560" executionId="e20a031b-0a4f-48a7-9b16-f51b3c5a2c97" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a4b47287-8475-f9f5-eb50-3397f4d9946b" executionId="4d2ec912-b847-42aa-9643-af9b5275e4b2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bc2f0552-ca02-c0cd-d046-080e88fb03ec" executionId="5d240610-da16-4171-80fd-01c82475ca54" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="91135454-165e-2590-1f63-f2242458d396" executionId="1dd7d339-c3a9-46d3-82f5-574854542559" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="93dc2e0a-1ad3-1096-bc8a-996b05754d3d" executionId="587ca025-0424-4990-872b-abf15da7e85f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d7e0ea0b-3fec-127c-2af4-12711d2ae6a4" executionId="ae464664-a739-453d-a7ac-5a6d9d9c9856" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="417993d9-4add-11b6-a71c-e0e98e51b014" executionId="f340c105-bf57-4ae0-a3a5-70e1bd9ccd57" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b6c4b426-29a7-0cba-a8d2-884b3815629a" executionId="070866aa-f143-48f9-b52b-c6539cabd156" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f7bbf3ab-c4cd-8fa6-dab7-aef5b53c1e86" executionId="2e8bfcec-1de1-474b-b6c0-c8b025cb4e20" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b2707268-7ec1-6116-7641-f240ac7e9522" executionId="f9e97bcd-a670-4868-b21a-957c404c2d87" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cf7c2238-05b7-ba19-cfa4-e2259b004074" executionId="30f74a62-0b08-4111-bf4a-83e435b6e824" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4d385bbc-f59c-f092-f2b8-ea2fcbbfeed1" executionId="27190016-8b6d-46dc-be61-0429341a9332" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1096871d-fea4-a77c-b888-ba8790eb2365" executionId="994e774b-2bf2-4ea8-8052-15f3f33b2ff2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="aa6c48d8-abd9-ab0f-3ce1-aa320dde46a5" executionId="1fcf5967-5818-4e2b-aac7-38bcf694ab6e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b1b8aab2-dac0-cfa8-f3df-169b997de28a" executionId="7e82c4fc-adf1-4f07-85be-442dacdbed38" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="922452fd-3fab-d7e4-07fe-29739bab1d3d" executionId="9add1e55-1552-4ed8-afd7-4e2979aa9808" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="21eae7dd-1020-32f1-77d0-9cc1ce14a731" executionId="84ce4f58-f193-47b9-b9f6-3de7e6460cdc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="044a5920-3199-14a8-10a6-4d09c30c1c17" executionId="86f13c80-007b-4b07-a1fc-51d7477b9f62" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bd309a85-329a-3659-82f7-a328120500d4" executionId="fed03c90-64f3-40d4-a4ca-b64194cee43e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2c0ae443-c224-9623-8dc6-9e363c9abd4c" executionId="58b91fe6-7720-4bd8-a622-32ca3178a2cb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="180b78b6-f678-55c3-f1a0-eee1e2511abb" executionId="e5dd403c-4e26-4474-9a81-fa9b3a6f9c47" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7bae5ff7-80d6-49b5-e743-7c94dbc28257" executionId="5bf486d9-0564-4472-87ae-40de272f2963" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="08eb79ef-f395-2dc2-86aa-d9512d68040f" executionId="51e731b1-0a52-49c3-916b-2206ae92f3eb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7097b4f5-0329-805e-7d2b-c9e08227fde7" executionId="823de6a0-7790-4fdc-8855-4db781be974d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b54060f3-8ea2-e3c2-1573-c35d70c44b5f" executionId="6d2d6b49-a673-4c48-b1b3-0b801b5361c7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="665eb1d5-3ff5-03e1-6bfb-99a080b631a8" executionId="122851f1-8067-4e3f-a029-2479e9376158" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f7b47e4e-4039-dcef-e363-3385b140b0aa" executionId="990fa999-f3e9-4477-930b-1a5a0672b0d5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cd8e48c0-6432-dc77-9c51-402cbdf6d677" executionId="a7e30cc0-bf4a-4b79-90ac-c9b41116e50c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="684d0fc9-d86e-48b6-126e-c83107a33e5d" executionId="843847ad-c6bf-469b-81cc-fed79dabe3ae" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="50f62751-042b-8617-6f19-a677d8de52c2" executionId="e6167543-34f4-44be-b12b-42125c357485" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a7ce0896-6463-75b0-d8fa-779aad43fdb8" executionId="11d90230-e3cd-4726-a886-21042996831a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6ade87f2-9f01-5b4e-4b93-12a2186b6fac" executionId="e0b8e421-8a5d-41fd-a7a3-5169eb1189e1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="919fcf9b-a4af-d492-7f45-1d1aab120095" executionId="6f6db2ed-e331-45fb-b15f-82e4dd81c629" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados sin formato de lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos los resultados cargados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="98" executed="98" passed="98" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.8)&#xD;
+[xUnit.net 00:00:00.08]   Discovering: iLiniumTech.Backend.Tests&#xD;
+[xUnit.net 00:00:00.12]   Discovered:  iLiniumTech.Backend.Tests&#xD;
+[xUnit.net 00:00:00.14]   Starting:    iLiniumTech.Backend.Tests&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+fail: iLiniumTech.Backend.Api[0]&#xD;
+      Known backend configuration error test-correlation-autos-config (InvalidOperationException)&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+fail: iLiniumTech.Backend.Api[0]&#xD;
+      Known backend configuration error test-correlation-polizas-config (InvalidOperationException)&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key is not configured.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+crit: Microsoft.AspNetCore.Hosting.Diagnostics[6]&#xD;
+      Application startup exception&#xD;
+      System.InvalidOperationException: CORS wildcard origins are not allowed. Configure explicit origins.&#xD;
+         at Program.&lt;&lt;Main&gt;$&gt;g__GetAllowedCorsOrigins|0_48(IConfiguration configuration) in C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api\Program.cs:line 888&#xD;
+         at Program.&lt;&gt;c__DisplayClass0_0.&lt;&lt;Main&gt;$&gt;b__55(CorsPolicyBuilder policy) in C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api\Program.cs:line 79&#xD;
+         at Microsoft.AspNetCore.Cors.Infrastructure.CorsOptions.AddPolicy(String name, Action`1 configurePolicy)&#xD;
+         at Program.&lt;&gt;c__DisplayClass0_0.&lt;&lt;Main&gt;$&gt;b__5(CorsOptions options) in C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api\Program.cs:line 77&#xD;
+         at Microsoft.Extensions.Options.OptionsFactory`1.Create(String name)&#xD;
+         at Microsoft.Extensions.Options.UnnamedOptionsManager`1.get_Value()&#xD;
+         at Microsoft.AspNetCore.Cors.Infrastructure.CorsService..ctor(IOptions`1 options, ILoggerFactory loggerFactory)&#xD;
+         at InvokeStub_CorsService..ctor(Object, Span`1)&#xD;
+         at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+         at System.Reflection.RuntimeConstructorInfo.Invoke(BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.VisitConstructor(ConstructorCallSite constructorCallSite, RuntimeResolverContext context)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteVisitor`2.VisitCallSite(ServiceCallSite callSite, TArgument argument)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.Resolve(ServiceCallSite callSite, ServiceProviderEngineScope scope)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceLookup.DynamicServiceProviderEngine.&lt;&gt;c__DisplayClass2_0.&lt;RealizeService&gt;b__0(ServiceProviderEngineScope scope)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceProvider.GetService(ServiceIdentifier serviceIdentifier, ServiceProviderEngineScope serviceProviderEngineScope)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceProvider.GetService(Type serviceType)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.ConstructorMatcher.CreateInstance(IServiceProvider provider)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance(IServiceProvider provider, Type instanceType, Object[] parameters)&#xD;
+         at Microsoft.AspNetCore.Builder.UseMiddlewareExtensions.ReflectionMiddlewareBinder.CreateMiddleware(RequestDelegate next)&#xD;
+         at Microsoft.AspNetCore.Builder.ApplicationBuilder.Build()&#xD;
+         at Microsoft.AspNetCore.Builder.ApplicationBuilder.Build()&#xD;
+         at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)&#xD;
+fail: Microsoft.Extensions.Hosting.Internal.Host[11]&#xD;
+      Hosting failed to start&#xD;
+      System.InvalidOperationException: CORS wildcard origins are not allowed. Configure explicit origins.&#xD;
+         at Program.&lt;&lt;Main&gt;$&gt;g__GetAllowedCorsOrigins|0_48(IConfiguration configuration) in C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api\Program.cs:line 888&#xD;
+         at Program.&lt;&gt;c__DisplayClass0_0.&lt;&lt;Main&gt;$&gt;b__55(CorsPolicyBuilder policy) in C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api\Program.cs:line 79&#xD;
+         at Microsoft.AspNetCore.Cors.Infrastructure.CorsOptions.AddPolicy(String name, Action`1 configurePolicy)&#xD;
+         at Program.&lt;&gt;c__DisplayClass0_0.&lt;&lt;Main&gt;$&gt;b__5(CorsOptions options) in C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api\Program.cs:line 77&#xD;
+         at Microsoft.Extensions.Options.OptionsFactory`1.Create(String name)&#xD;
+         at Microsoft.Extensions.Options.UnnamedOptionsManager`1.get_Value()&#xD;
+         at Microsoft.AspNetCore.Cors.Infrastructure.CorsService..ctor(IOptions`1 options, ILoggerFactory loggerFactory)&#xD;
+         at InvokeStub_CorsService..ctor(Object, Span`1)&#xD;
+         at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+         at System.Reflection.RuntimeConstructorInfo.Invoke(BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.VisitConstructor(ConstructorCallSite constructorCallSite, RuntimeResolverContext context)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteVisitor`2.VisitCallSite(ServiceCallSite callSite, TArgument argument)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.Resolve(ServiceCallSite callSite, ServiceProviderEngineScope scope)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceLookup.DynamicServiceProviderEngine.&lt;&gt;c__DisplayClass2_0.&lt;RealizeService&gt;b__0(ServiceProviderEngineScope scope)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceProvider.GetService(ServiceIdentifier serviceIdentifier, ServiceProviderEngineScope serviceProviderEngineScope)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ServiceProvider.GetService(Type serviceType)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.ConstructorMatcher.CreateInstance(IServiceProvider provider)&#xD;
+         at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance(IServiceProvider provider, Type instanceType, Object[] parameters)&#xD;
+         at Microsoft.AspNetCore.Builder.UseMiddlewareExtensions.ReflectionMiddlewareBinder.CreateMiddleware(RequestDelegate next)&#xD;
+         at Microsoft.AspNetCore.Builder.ApplicationBuilder.Build()&#xD;
+         at Microsoft.AspNetCore.Builder.ApplicationBuilder.Build()&#xD;
+         at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)&#xD;
+         at Microsoft.Extensions.Hosting.Internal.Host.&lt;StartAsync&gt;b__14_1(IHostedService service, CancellationToken token)&#xD;
+         at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Development&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application started. Press Ctrl+C to shut down.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Hosting environment: Production&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Content root path: C:\Desarrollo\iLiniumTech\iLiniumTech.Backend\src\iLiniumTech.Backend.Api&#xD;
+info: iLiniumTech.Backend.Api.Security.ApiKeyAuthenticationHandler[7]&#xD;
+      ApiKey was not authenticated. Failure message: API key header is missing.&#xD;
+info: Microsoft.Hosting.Lifetime[0]&#xD;
+      Application is shutting down...&#xD;
+[xUnit.net 00:00:03.39]   Finished:    iLiniumTech.Backend.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

@@ -8,7 +8,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        services.AddSingleton<IPolizasRepository, InMemoryPolizasRepository>();
+        services.AddScoped<IPolizasRepository, SqlPolizasRepository>();
         return services;
     }
 }
